@@ -15,6 +15,7 @@ import Sedes from "./pages/configuracion/maestros/Sedes";
 import Bodegas from "./pages/configuracion/maestros/Bodegas";
 import Marcas from "./pages/configuracion/maestros/Marcas";
 import Perifericos from "./pages/configuracion/maestros/Perifericos";
+import Dashboard from "./pages/dashboard/Index";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -36,6 +37,7 @@ const App = () => {
             <div className={`flex-1 overflow-auto transition-all duration-300 ${isCollapsed ? "ml-16" : "ml-64"}`}>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/productos/ingreso" element={<IngresoProducto />} />
                 <Route path="/productos/lista" element={<ListaInventario />} />
                 <Route path="/productos/salidas/prestamos" element={<Salidas />} />
