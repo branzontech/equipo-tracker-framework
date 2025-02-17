@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import IngresoProducto from "./pages/productos/Ingreso";
 import ListaInventario from "./pages/productos/Lista";
+import Salidas from "./pages/productos/Salidas";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -31,6 +32,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/productos/ingreso" element={<IngresoProducto />} />
                 <Route path="/productos/lista" element={<ListaInventario />} />
+                <Route path="/productos/salidas" element={<Salidas />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
