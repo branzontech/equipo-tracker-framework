@@ -77,11 +77,17 @@ const menuItems = [
     icon: Settings,
     path: "/configuracion",
     submenu: [
-      { title: "Maestros", icon: FileCog, path: "/configuracion/maestros" },
-      { title: "Sedes", icon: Building2, path: "/configuracion/sedes" },
-      { title: "Bodegas", icon: Box, path: "/configuracion/bodegas" },
-      { title: "Marcas", icon: Tag, path: "/configuracion/marcas" },
-      { title: "Periféricos", icon: Cable, path: "/configuracion/perifericos" },
+      { 
+        title: "Maestros", 
+        icon: FileCog, 
+        path: "/configuracion/maestros",
+        submenu: [
+          { title: "Sedes", icon: Building2, path: "/configuracion/maestros/sedes" },
+          { title: "Bodegas", icon: Box, path: "/configuracion/maestros/bodegas" },
+          { title: "Marcas", icon: Tag, path: "/configuracion/maestros/marcas" },
+          { title: "Periféricos", icon: Cable, path: "/configuracion/maestros/perifericos" },
+        ]
+      },
       { title: "Accesorios", icon: Laptop2, path: "/configuracion/accesorios" },
       {
         title: "Categorias",
