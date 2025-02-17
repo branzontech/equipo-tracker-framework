@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -154,9 +153,13 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
   );
 };
 
-export const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
+export const Sidebar = ({ 
+  isCollapsed, 
+  onToggle 
+}: { 
+  isCollapsed: boolean; 
+  onToggle: (isCollapsed: boolean) => void;
+}) => {
   return (
     <div
       className={`h-screen bg-[#040d50] border-r border-[#0a1668] transition-all duration-300 ${
@@ -168,7 +171,7 @@ export const Sidebar = () => {
           <span className="text-xl font-semibold text-[#F49F1C]">Smart TI</span>
         )}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={() => onToggle(!isCollapsed)}
           className="p-1.5 rounded-lg hover:bg-[#0a1668] transition-colors"
         >
           {isCollapsed ? (
