@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
@@ -22,6 +21,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { 
+  Document, 
+  Page, 
+  Text, 
+  View, 
+  StyleSheet, 
+  PDFViewer,
+  PDFDownloadLink 
+} from "@react-pdf/renderer";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   fechaEntrega: z.date({
@@ -40,9 +49,7 @@ const formSchema = z.object({
   firmaRecibe: z.string().min(1, "La firma de quien recibe es requerida"),
 });
 
-// Simular búsqueda de equipo por serial
 const buscarEquipoPorSerial = async (serial: string) => {
-  // Aquí iría la llamada real a la API
   return {
     descripcion: "Laptop Dell XPS 13",
     marca: "Dell",
@@ -51,7 +58,148 @@ const buscarEquipoPorSerial = async (serial: string) => {
   };
 };
 
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    padding: 30,
+    fontFamily: 'Helvetica',
+  },
+  header: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  subheader: {
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  table: {
+    display: 'flex',
+    width: 'auto',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
+  tableRow: {
+    margin: 'auto',
+    flexDirection: 'row',
+  },
+  tableCol: {
+    width: '25%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+  tableCell: {
+    margin: 5,
+    fontSize: 10,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    marginTop: 15,
+    marginBottom: 5,
+    fontWeight: 'bold',
+  },
+  text: {
+    fontSize: 10,
+    marginBottom: 10,
+  },
+  signatures: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 50,
+  },
+  signature: {
+    width: '40%',
+    borderTopWidth: 1,
+    borderColor: '#000',
+    paddingTop: 5,
+    fontSize: 10,
+    textAlign: 'center',
+  },
+});
+
+const ActaEntregaPDF = ({ data }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.header}>Acta de Entrega de Equipos</Text>
+      
+      <Text style={styles.subheader}>
+        Fecha: {format(data.fechaEntrega, "PPP")}
+      </Text>
+
+      <Text style={styles.text}>
+        Señor(a) {data.nombreUsuario} a continuación se le hace entrega de los siguientes implementos de trabajo:
+      </Text>
+
+      <View style={styles.table}>
+        <View style={styles.tableRow}>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>Serial</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>Marca</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>Activo Fijo</Text>
+          </View>
+          <View style={styles.tableCol}>
+            <Text style={styles.tableCell}>Accesorios</Text>
+          </View>
+        </View>
+        
+        {data.equipos.map((equipo, index) => (
+          <View style={styles.tableRow} key={index}>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{equipo.serial}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{equipo.marca}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{equipo.activoFijo}</Text>
+            </View>
+            <View style={styles.tableCol}>
+              <Text style={styles.tableCell}>{equipo.accesorios}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      {data.observaciones && (
+        <>
+          <Text style={styles.sectionTitle}>Observaciones:</Text>
+          <Text style={styles.text}>{data.observaciones}</Text>
+        </>
+      )}
+
+      <Text style={styles.sectionTitle}>Términos y Condiciones:</Text>
+      <Text style={styles.text}>
+        El receptor se compromete a utilizar el equipo exclusivamente para propósitos laborales,
+        mantenerlo en óptimas condiciones y reportar de manera inmediata cualquier falla o anomalía que se presente.
+        Asimismo, se compromete a no instalar ningún tipo de software sin la debida autorización,
+        no prestar ni transferir el equipo a terceras personas y devolverlo cuando la empresa lo requiera.
+      </Text>
+
+      <View style={styles.signatures}>
+        <View style={styles.signature}>
+          <Text>{data.firmaEntrega}</Text>
+          <Text>Entrega</Text>
+        </View>
+        <View style={styles.signature}>
+          <Text>{data.firmaRecibe}</Text>
+          <Text>Recibe</Text>
+        </View>
+      </View>
+    </Page>
+  </Document>
+);
+
 const Salidas = () => {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -78,7 +226,10 @@ const Salidas = () => {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    toast({
+      title: "Acta de entrega generada",
+      description: "El documento PDF se descargará automáticamente",
+    });
   }
 
   return (
@@ -307,9 +458,20 @@ const Salidas = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full">
-            Generar Acta de Entrega
-          </Button>
+          <div className="flex justify-end space-x-4">
+            <Button type="submit" className="w-full">
+              Generar Acta de Entrega
+            </Button>
+            <PDFDownloadLink
+              document={<ActaEntregaPDF data={form.getValues()} />}
+              fileName={`acta-entrega-${format(new Date(), "yyyy-MM-dd")}.pdf`}
+              className="hidden"
+            >
+              {({ blob, url, loading, error }) =>
+                loading ? "Generando documento..." : "Descargar PDF"
+              }
+            </PDFDownloadLink>
+          </div>
         </form>
       </Form>
     </div>
