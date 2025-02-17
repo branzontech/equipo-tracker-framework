@@ -69,8 +69,8 @@ const ExistenciaToners = () => {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedColor, setSelectedColor] = useState<string>("");
-  const [selectedSede, setSelectedSede] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("todos");
+  const [selectedSede, setSelectedSede] = useState<string>("todas");
   const itemsPerPage = 5;
 
   // Filtrar por búsqueda y filtros
@@ -80,8 +80,8 @@ const ExistenciaToners = () => {
         value &&
         value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const matchesColor = selectedColor ? item.color.toLowerCase() === selectedColor.toLowerCase() : true;
-    const matchesSede = selectedSede ? item.sede.toLowerCase() === selectedSede.toLowerCase() : true;
+    const matchesColor = selectedColor === "todos" ? true : item.color.toLowerCase() === selectedColor.toLowerCase();
+    const matchesSede = selectedSede === "todas" ? true : item.sede.toLowerCase() === selectedSede.toLowerCase();
     return matchesSearch && matchesColor && matchesSede;
   });
 
@@ -110,8 +110,8 @@ const ExistenciaToners = () => {
 
   const resetFilters = () => {
     setSearchTerm("");
-    setSelectedColor("");
-    setSelectedSede("");
+    setSelectedColor("todos");
+    setSelectedSede("todas");
     setCurrentPage(1);
   };
 
@@ -135,7 +135,7 @@ const ExistenciaToners = () => {
             <SelectValue placeholder="Filtrar por color" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos los colores</SelectItem>
+            <SelectItem value="todos">Todos los colores</SelectItem>
             <SelectItem value="negro">Negro</SelectItem>
             <SelectItem value="cyan">Cyan</SelectItem>
             <SelectItem value="magenta">Magenta</SelectItem>
@@ -147,7 +147,7 @@ const ExistenciaToners = () => {
             <SelectValue placeholder="Filtrar por sede" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas las sedes</SelectItem>
+            <SelectItem value="todas">Todas las sedes</SelectItem>
             <SelectItem value="sede norte">Sede Norte</SelectItem>
             <SelectItem value="sede sur">Sede Sur</SelectItem>
             <SelectItem value="sede centro">Sede Centro</SelectItem>
