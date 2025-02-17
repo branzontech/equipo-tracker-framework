@@ -87,16 +87,17 @@ const menuItems = [
           { title: "Marcas", icon: Tag, path: "/configuracion/maestros/marcas" },
           { title: "Periféricos", icon: Cable, path: "/configuracion/maestros/perifericos" },
           { title: "Accesorios", icon: Laptop2, path: "/configuracion/maestros/accesorios" },
-          { 
-            title: "Categorias", 
-            icon: Tag, 
-            path: "/configuracion/maestros/categorias",
-            submenu: [
-              { title: "Usuarios", icon: Users, path: "/configuracion/maestros/categorias/usuarios" },
-              { title: "Agentes", icon: UserCog, path: "/configuracion/maestros/categorias/agentes" },
-            ],
-          },
+          { title: "Categorias", icon: Tag, path: "/configuracion/maestros/categorias" },
         ]
+      },
+      {
+        title: "Usuarios",
+        icon: Users,
+        path: "/configuracion/usuarios",
+        submenu: [
+          { title: "Agentes", icon: UserCog, path: "/configuracion/usuarios/agentes" },
+          { title: "Responsables", icon: UserCog, path: "/configuracion/usuarios/responsables" },
+        ],
       },
     ],
   },
