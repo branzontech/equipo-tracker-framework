@@ -32,12 +32,12 @@ const menuItems = [
     icon: LayoutDashboard,
     path: "/dashboard",
     submenu: [
-      { title: "Total de equipos", path: "/dashboard/total-equipos" },
-      { title: "Mantenimientos vencidos", path: "/dashboard/mant-vencidos" },
-      { title: "Mantenimientos ejecutados", path: "/dashboard/mant-ejecutados" },
-      { title: "Sedes", path: "/dashboard/sedes" },
-      { title: "Bodegas", path: "/dashboard/bodegas" },
-      { title: "Marcas", path: "/dashboard/marcas" },
+      { title: "Total de equipos", icon: Package, path: "/dashboard/total-equipos" },
+      { title: "Mantenimientos vencidos", icon: Wrench, path: "/dashboard/mant-vencidos" },
+      { title: "Mantenimientos ejecutados", icon: FileText, path: "/dashboard/mant-ejecutados" },
+      { title: "Sedes", icon: Building2, path: "/dashboard/sedes" },
+      { title: "Bodegas", icon: Box, path: "/dashboard/bodegas" },
+      { title: "Marcas", icon: Tag, path: "/dashboard/marcas" },
     ],
   },
   {
@@ -123,6 +123,8 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
   const [isOpen, setIsOpen] = useState(false);
   const hasSubmenu = item.submenu && item.submenu.length > 0;
 
+  const Icon = item.icon;
+
   return (
     <div className="mb-1">
       <div
@@ -136,7 +138,7 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
           className="flex items-center flex-1"
           onClick={(e) => hasSubmenu && e.preventDefault()}
         >
-          <item.icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#E6E8E6]`} />
+          {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#E6E8E6]`} />}
           {!isCollapsed && (
             <span className="flex-1 whitespace-nowrap">{item.title}</span>
           )}
