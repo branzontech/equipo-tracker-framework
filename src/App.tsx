@@ -19,6 +19,7 @@ import Dashboard from "./pages/dashboard/Index";
 import IngresoToner from "./pages/toners/Ingreso";
 import ExistenciaToners from "./pages/toners/Existencia";
 import SalidaToners from "./pages/toners/Salida";
+import BajaEquipos from "./pages/productos/BajaEquipos";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -46,6 +47,7 @@ const App = () => {
                 <Route path="/productos/salidas/prestamos" element={<Salidas />} />
                 <Route path="/productos/salidas/traslados" element={<Traslados />} />
                 <Route path="/productos/actas" element={<Actas />} />
+                <Route path="/baja-equipos" element={<BajaEquipos />} />
                 <Route path="/configuracion/maestros/sedes" element={<Sedes />} />
                 <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                 <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
