@@ -11,6 +11,8 @@ import ListaInventario from "./pages/productos/Lista";
 import Salidas from "./pages/productos/Salidas";
 import Traslados from "./pages/productos/salidas/Traslados";
 import Actas from "./pages/productos/Actas";
+import Sedes from "./pages/configuracion/maestros/Sedes";
+import Bodegas from "./pages/configuracion/maestros/Bodegas";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -37,6 +39,8 @@ const App = () => {
                 <Route path="/productos/salidas/prestamos" element={<Salidas />} />
                 <Route path="/productos/salidas/traslados" element={<Traslados />} />
                 <Route path="/productos/actas" element={<Actas />} />
+                <Route path="/configuracion/maestros/sedes" element={<Sedes />} />
+                <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
