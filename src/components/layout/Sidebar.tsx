@@ -51,18 +51,16 @@ const menuItems = [
     path: "/productos",
     submenu: [
       { title: "Ingreso", icon: ArrowDownToLine, path: "/productos/ingreso" },
-      { title: "Salidas", icon: ArrowUpFromLine, path: "/productos/salidas" },
+      { 
+        title: "Salidas", 
+        icon: ArrowUpFromLine, 
+        path: "/productos/salidas",
+        submenu: [
+          { title: "Préstamos", icon: Share2, path: "/productos/salidas/prestamos" },
+          { title: "Traslados", icon: Share2, path: "/productos/salidas/traslados" },
+        ]
+      },
     ],
-  },
-  {
-    title: "Prestamos",
-    icon: Share2,
-    path: "/prestamos",
-  },
-  {
-    title: "Traslados",
-    icon: Share2,
-    path: "/traslados",
   },
   {
     title: "Baja de Equipos",
