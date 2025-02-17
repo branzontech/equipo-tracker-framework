@@ -120,8 +120,8 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
   return (
     <div className="mb-1">
       <div
-        className={`flex items-center px-3 py-2 text-gray-100 hover:bg-[#1a1f2c] rounded-lg transition-all duration-200 cursor-pointer ${
-          isOpen ? "bg-[#1a1f2c]" : ""
+        className={`flex items-center px-3 py-2 text-gray-100 hover:bg-[#0a1668] rounded-lg transition-all duration-200 cursor-pointer ${
+          isOpen ? "bg-[#0a1668]" : ""
         }`}
         onClick={() => hasSubmenu && setIsOpen(!isOpen)}
       >
@@ -159,17 +159,17 @@ export const Sidebar = () => {
 
   return (
     <div
-      className={`min-h-screen bg-[#221F26] border-r border-gray-700 transition-all duration-300 flex flex-col ${
+      className={`min-h-screen bg-[#040d50] border-r border-[#0a1668] transition-all duration-300 flex flex-col ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-[#0a1668]">
         {!isCollapsed && (
           <span className="text-xl font-semibold text-[#F49F1C]">Smart TI</span>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-[#1a1f2c] transition-colors"
+          className="p-1.5 rounded-lg hover:bg-[#0a1668] transition-colors"
         >
           {isCollapsed ? (
             <ChevronRight className="w-5 h-5 text-[#F49F1C]" />
@@ -183,8 +183,8 @@ export const Sidebar = () => {
           <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
         ))}
       </nav>
-      <div className="p-2 border-t border-gray-700">
-        <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#1a1f2c] rounded-lg transition-all duration-200">
+      <div className="p-2 border-t border-[#0a1668]">
+        <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#0a1668] rounded-lg transition-all duration-200">
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F49F1C]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
