@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,6 +24,7 @@ import {
   Cable,
   UserCog,
   LogOut,
+  Printer,
 } from "lucide-react";
 
 const menuItems = [
@@ -91,6 +93,15 @@ const menuItems = [
           { title: "Responsables", icon: UserCog, path: "/configuracion/usuarios/responsables" },
         ],
       },
+    ],
+  },
+  {
+    title: "Toners",
+    icon: Printer,
+    path: "/toners",
+    submenu: [
+      { title: "Ingreso", icon: ArrowDownToLine, path: "/toners/ingreso" },
+      { title: "Salida", icon: ArrowUpFromLine, path: "/toners/salida" },
     ],
   },
   {
