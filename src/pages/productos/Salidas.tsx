@@ -128,11 +128,11 @@ const ActaEntregaPDF = ({ data }) => (
       <Text style={styles.header}>Acta de Entrega de Equipos</Text>
       
       <Text style={styles.subheader}>
-        Fecha: {format(data.fechaEntrega, "PPP")}
+        Fecha: {data.fechaEntrega ? format(data.fechaEntrega, "PPP") : ''}
       </Text>
 
       <Text style={styles.text}>
-        Señor(a) {data.nombreUsuario} a continuación se le hace entrega de los siguientes implementos de trabajo:
+        Señor(a) {data.nombreUsuario || ''} a continuación se le hace entrega de los siguientes implementos de trabajo:
       </Text>
 
       <View style={styles.table}>
@@ -151,19 +151,19 @@ const ActaEntregaPDF = ({ data }) => (
           </View>
         </View>
         
-        {data.equipos.map((equipo, index) => (
+        {data.equipos && data.equipos.map((equipo, index) => (
           <View style={styles.tableRow} key={index}>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.serial}</Text>
+              <Text style={styles.tableCell}>{equipo.serial || ''}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.marca}</Text>
+              <Text style={styles.tableCell}>{equipo.marca || ''}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.activoFijo}</Text>
+              <Text style={styles.tableCell}>{equipo.activoFijo || ''}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.accesorios}</Text>
+              <Text style={styles.tableCell}>{equipo.accesorios || ''}</Text>
             </View>
           </View>
         ))}
@@ -186,11 +186,11 @@ const ActaEntregaPDF = ({ data }) => (
 
       <View style={styles.signatures}>
         <View style={styles.signature}>
-          <Text>{data.firmaEntrega}</Text>
+          <Text>{data.firmaEntrega || ''}</Text>
           <Text>Entrega</Text>
         </View>
         <View style={styles.signature}>
-          <Text>{data.firmaRecibe}</Text>
+          <Text>{data.firmaRecibe || ''}</Text>
           <Text>Recibe</Text>
         </View>
       </View>
@@ -462,15 +462,17 @@ const Salidas = () => {
             <Button type="submit" className="w-full">
               Generar Acta de Entrega
             </Button>
-            <PDFDownloadLink
-              document={<ActaEntregaPDF data={form.getValues()} />}
-              fileName={`acta-entrega-${format(new Date(), "yyyy-MM-dd")}.pdf`}
-              className="hidden"
-            >
-              {({ blob, url, loading, error }) =>
-                loading ? "Generando documento..." : "Descargar PDF"
-              }
-            </PDFDownloadLink>
+            {form.getValues("fechaEntrega") && (
+              <PDFDownloadLink
+                document={<ActaEntregaPDF data={form.getValues()} />}
+                fileName={`acta-entrega-${format(new Date(), "yyyy-MM-dd")}.pdf`}
+                className="hidden"
+              >
+                {({ blob, url, loading, error }) =>
+                  loading ? "Generando documento..." : "Descargar PDF"
+                }
+              </PDFDownloadLink>
+            )}
           </div>
         </form>
       </Form>
