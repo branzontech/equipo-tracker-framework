@@ -13,6 +13,7 @@ import Traslados from "./pages/productos/salidas/Traslados";
 import Actas from "./pages/productos/Actas";
 import Sedes from "./pages/configuracion/maestros/Sedes";
 import Bodegas from "./pages/configuracion/maestros/Bodegas";
+import Marcas from "./pages/configuracion/maestros/Marcas";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -41,6 +42,7 @@ const App = () => {
                 <Route path="/productos/actas" element={<Actas />} />
                 <Route path="/configuracion/maestros/sedes" element={<Sedes />} />
                 <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
+                <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
