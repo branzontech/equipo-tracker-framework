@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -60,6 +59,7 @@ const menuItems = [
           { title: "Traslados", icon: Share2, path: "/productos/salidas/traslados" },
         ]
       },
+      { title: "Actas Generadas", icon: FileText, path: "/productos/actas" },
     ],
   },
   {
