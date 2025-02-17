@@ -22,6 +22,8 @@ interface Sede {
   estado: "Activo" | "Inactivo";
 }
 
+type EstadoType = "Activo" | "Inactivo";
+
 const Sedes = () => {
   const [sedes, setSedes] = useState<Sede[]>([
     {
@@ -32,10 +34,14 @@ const Sedes = () => {
     },
   ]);
 
-  const [newSede, setNewSede] = useState({
+  const [newSede, setNewSede] = useState<{
+    descripcion: string;
+    responsables: string;
+    estado: EstadoType;
+  }>({
     descripcion: "",
     responsables: "",
-    estado: "Activo" as const,
+    estado: "Activo",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -90,8 +96,8 @@ const Sedes = () => {
               <Label htmlFor="estado">Estado</Label>
               <Select
                 value={newSede.estado}
-                onValueChange={(value) =>
-                  setNewSede({ ...newSede, estado: value as "Activo" | "Inactivo" })
+                onValueChange={(value: EstadoType) =>
+                  setNewSede({ ...newSede, estado: value })
                 }
               >
                 <SelectTrigger>

@@ -22,6 +22,8 @@ interface Bodega {
   estado: "Activo" | "Inactivo";
 }
 
+type EstadoType = "Activo" | "Inactivo";
+
 const Bodegas = () => {
   const [bodegas, setBodegas] = useState<Bodega[]>([
     {
@@ -32,10 +34,14 @@ const Bodegas = () => {
     },
   ]);
 
-  const [newBodega, setNewBodega] = useState({
+  const [newBodega, setNewBodega] = useState<{
+    descripcion: string;
+    responsables: string;
+    estado: EstadoType;
+  }>({
     descripcion: "",
     responsables: "",
-    estado: "Activo" as const,
+    estado: "Activo",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -90,8 +96,8 @@ const Bodegas = () => {
               <Label htmlFor="estado">Estado</Label>
               <Select
                 value={newBodega.estado}
-                onValueChange={(value) =>
-                  setNewBodega({ ...newBodega, estado: value as "Activo" | "Inactivo" })
+                onValueChange={(value: EstadoType) =>
+                  setNewBodega({ ...newBodega, estado: value })
                 }
               >
                 <SelectTrigger>
