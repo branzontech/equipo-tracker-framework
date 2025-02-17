@@ -136,14 +136,14 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
           className="flex items-center flex-1"
           onClick={(e) => hasSubmenu && e.preventDefault()}
         >
-          <item.icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F49F1C]`} />
+          <item.icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#e25025]`} />
           {!isCollapsed && (
             <span className="flex-1 whitespace-nowrap">{item.title}</span>
           )}
         </Link>
         {!isCollapsed && hasSubmenu && (
           <ChevronRight
-            className={`w-4 h-4 transition-transform duration-200 text-[#F49F1C] ${
+            className={`w-4 h-4 transition-transform duration-200 text-[#e25025] ${
               isOpen ? "rotate-90" : ""
             }`}
           />
@@ -175,16 +175,16 @@ export const Sidebar = ({
     >
       <div className="flex items-center justify-between p-4 border-b border-[#3d2a40]">
         {!isCollapsed && (
-          <span className="text-xl font-semibold text-[#F49F1C]">Smart TI</span>
+          <span className="text-xl font-semibold text-[#e25025]">Smart TI</span>
         )}
         <button
           onClick={() => onToggle(!isCollapsed)}
           className="p-1.5 rounded-lg hover:bg-[#3d2a40] transition-colors"
         >
           {isCollapsed ? (
-            <ChevronRight className="w-5 h-5 text-[#F49F1C]" />
+            <ChevronRight className="w-5 h-5 text-[#e25025]" />
           ) : (
-            <ChevronLeft className="w-5 h-5 text-[#F49F1C]" />
+            <ChevronLeft className="w-5 h-5 text-[#e25025]" />
           )}
         </button>
       </div>
@@ -195,7 +195,7 @@ export const Sidebar = ({
       </nav>
       <div className="p-2 border-t border-[#3d2a40]">
         <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200">
-          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F49F1C]`} />
+          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#e25025]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
       </div>
