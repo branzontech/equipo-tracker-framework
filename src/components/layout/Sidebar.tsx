@@ -142,20 +142,20 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
   return (
     <div className="mb-1">
       <div
-        className={`flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200 cursor-pointer ${
-          isOpen ? "bg-[#3d2a40]" : ""
+        className={`flex items-center px-3 py-2 text-white hover:bg-lightship-3/20 rounded-lg transition-all duration-200 cursor-pointer ${
+          isOpen ? "bg-lightship-3/20" : ""
         }`}
         onClick={handleClick}
       >
         <div className="flex items-center flex-1">
-          {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#E6E8E6]`} />}
+          {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-white`} />}
           {!isCollapsed && (
             <span className="flex-1 whitespace-nowrap">{item.title}</span>
           )}
         </div>
         {!isCollapsed && hasSubmenu && (
           <ChevronRight
-            className={`w-4 h-4 transition-transform duration-200 text-[#E6E8E6] ${
+            className={`w-4 h-4 transition-transform duration-200 text-white ${
               isOpen ? "rotate-90" : ""
             }`}
           />
@@ -181,33 +181,33 @@ export const Sidebar = ({
 }) => {
   return (
     <div
-      className={`h-screen bg-[#2d1e2f] border-r border-[#3d2a40] transition-all duration-300 flex flex-col ${
+      className={`h-screen bg-lightship-2 border-r border-lightship-3/20 transition-all duration-300 flex flex-col ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-[#3d2a40] flex-shrink-0">
+      <div className="flex items-center justify-between p-4 border-b border-lightship-3/20 flex-shrink-0">
         {!isCollapsed && (
-          <span className="text-xl font-semibold text-[#E6E8E6]">Smart TI</span>
+          <span className="text-xl font-semibold text-white">Smart TI</span>
         )}
         <button
           onClick={() => onToggle(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-[#3d2a40] transition-colors"
+          className="p-1.5 rounded-lg hover:bg-lightship-3/20 transition-colors"
         >
           {isCollapsed ? (
-            <ChevronRight className="w-5 h-5 text-[#E6E8E6]" />
+            <ChevronRight className="w-5 h-5 text-white" />
           ) : (
-            <ChevronLeft className="w-5 h-5 text-[#E6E8E6]" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           )}
         </button>
       </div>
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#3d2a40] scrollbar-track-transparent hover:scrollbar-thumb-[#4d3a50]">
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-lightship-3/20 scrollbar-track-transparent hover:scrollbar-thumb-lightship-3/30">
         {menuItems.map((item) => (
           <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
         ))}
       </nav>
-      <div className="p-2 border-t border-[#3d2a40] flex-shrink-0">
-        <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200">
-          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#E6E8E6]`} />
+      <div className="p-2 border-t border-lightship-3/20 flex-shrink-0">
+        <button className="w-full flex items-center px-3 py-2 text-white hover:bg-lightship-3/20 rounded-lg transition-all duration-200">
+          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-white`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
       </div>
