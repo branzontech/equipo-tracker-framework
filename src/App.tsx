@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import IngresoProducto from "./pages/productos/Ingreso";
+import ListaInventario from "./pages/productos/Lista";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -29,6 +30,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/productos/ingreso" element={<IngresoProducto />} />
+                <Route path="/productos/lista" element={<ListaInventario />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
