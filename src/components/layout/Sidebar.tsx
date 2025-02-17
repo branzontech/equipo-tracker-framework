@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -42,7 +43,7 @@ const menuItems = [
   {
     title: "Lista de Inventario",
     icon: ClipboardList,
-    path: "/inventario",
+    path: "/productos/lista",
   },
   {
     title: "Productos",
