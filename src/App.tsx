@@ -18,6 +18,7 @@ import Perifericos from "./pages/configuracion/maestros/Perifericos";
 import Dashboard from "./pages/dashboard/Index";
 import IngresoToner from "./pages/toners/Ingreso";
 import ExistenciaToners from "./pages/toners/Existencia";
+import SalidaToners from "./pages/toners/Salida";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -51,6 +52,7 @@ const App = () => {
                 <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
                 <Route path="/toners/ingreso" element={<IngresoToner />} />
                 <Route path="/toners/existencia" element={<ExistenciaToners />} />
+                <Route path="/toners/salida" element={<SalidaToners />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
