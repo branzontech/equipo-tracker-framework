@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -23,11 +24,11 @@ export default {
       },
       colors: {
         'lightship': {
-          1: '#D9414E', // Primary/accent color
-          2: '#191726', // Dark background
-          3: '#4F698C', // Secondary interactive elements
-          4: '#7C8EA6', // Text and foreground
-          5: '#400101', // Destructive actions
+          1: '#D9414E',
+          2: '#191726',
+          3: '#4F698C',
+          4: '#7C8EA6',
+          5: '#400101',
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -61,6 +62,16 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          'primary-foreground': "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          'accent-foreground': "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
         },
       },
       borderRadius: {
