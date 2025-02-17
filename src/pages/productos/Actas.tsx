@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { FileText, Grid, LayoutGrid } from "lucide-react";
 import { format } from "date-fns";
+import { VerActaDialog } from "./components/VerActaDialog";
 
 // Tipo de acta para TypeScript
 type Acta = {
@@ -62,6 +63,13 @@ const Actas = () => {
   const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [tipoFiltro, setTipoFiltro] = useState<string>("todos");
   const [busqueda, setBusqueda] = useState("");
+  const [selectedActa, setSelectedActa] = useState<Acta | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleVerActa = (acta: Acta) => {
+    setSelectedActa(acta);
+    setDialogOpen(true);
+  };
 
   const filtrarActas = () => {
     return actasEjemplo.filter((acta) => {
@@ -108,7 +116,11 @@ const Actas = () => {
                 </span>
               </div>
               <p className="text-sm text-gray-600">{acta.descripcion}</p>
-              <Button variant="outline" className="w-full mt-4">
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={() => handleVerActa(acta)}
+              >
                 Ver Acta
               </Button>
             </div>
@@ -148,7 +160,11 @@ const Actas = () => {
               </TableCell>
               <TableCell className="max-w-xs truncate">{acta.descripcion}</TableCell>
               <TableCell className="text-right">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleVerActa(acta)}
+                >
                   Ver Acta
                 </Button>
               </TableCell>
@@ -202,6 +218,12 @@ const Actas = () => {
       </div>
 
       {viewMode === "grid" ? <GridView /> : <TableView />}
+
+      <VerActaDialog 
+        acta={selectedActa} 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };
