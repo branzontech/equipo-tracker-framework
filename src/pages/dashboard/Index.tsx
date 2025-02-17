@@ -1,8 +1,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Package, Wrench, Building2, Box, Tag, Printer } from "lucide-react";
 
-const data = [
+const equiposData = [
   { name: 'Laptops', cantidad: 120 },
   { name: 'Desktops', cantidad: 80 },
   { name: 'Monitores', cantidad: 150 },
@@ -10,10 +11,15 @@ const data = [
   { name: 'Servidores', cantidad: 20 },
 ];
 
-const estadoMantenimiento = [
+const mantenimientosData = [
   { name: 'Al día', value: 75, color: '#4ade80' },
   { name: 'Próximos', value: 15, color: '#fbbf24' },
   { name: 'Vencidos', value: 10, color: '#f87171' },
+];
+
+const tonerData = [
+  { name: 'Disponibles', value: 85, color: '#4ade80' },
+  { name: 'Alerta', value: 15, color: '#f87171' },
 ];
 
 const COLORS = ['#4ade80', '#fbbf24', '#f87171'];
@@ -26,7 +32,12 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Equipos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Total Equipos
+              </div>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">415</div>
@@ -38,31 +49,12 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mantenimientos Pendientes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">25</div>
-            <p className="text-xs text-muted-foreground">
-              Para los próximos 30 días
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sedes Activas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              Con equipos asignados
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mantenimientos Vencidos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Wrench className="h-4 w-4" />
+                Mantenimientos Vencidos
+              </div>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-500">12</div>
@@ -71,17 +63,51 @@ export default function Dashboard() {
             </p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Printer className="h-4 w-4" />
+                Tóner Disponible
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">85%</div>
+            <p className="text-xs text-muted-foreground">
+              Stock saludable
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Sedes Activas
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-muted-foreground">
+              Con equipos asignados
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Distribución de Equipos</CardTitle>
+            <CardTitle>Distribución de Equipos por Tipo</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
+                <BarChart data={equiposData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -103,7 +129,7 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={estadoMantenimiento}
+                    data={mantenimientosData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -112,13 +138,68 @@ export default function Dashboard() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {estadoMantenimiento.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {mantenimientosData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip />
                   <Legend />
                 </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Estado de Tóner</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={tonerData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {tonerData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Equipos por Sede</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { name: 'Sede A', cantidad: 150 },
+                  { name: 'Sede B', cantidad: 120 },
+                  { name: 'Sede C', cantidad: 80 },
+                  { name: 'Sede D', cantidad: 65 },
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="cantidad" fill="#8b5cf6" />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>

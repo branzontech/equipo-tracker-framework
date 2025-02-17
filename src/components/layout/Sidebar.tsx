@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -31,14 +30,6 @@ const menuItems = [
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/dashboard",
-    submenu: [
-      { title: "Total de equipos", icon: Package, path: "/dashboard/total-equipos" },
-      { title: "Mantenimientos vencidos", icon: Wrench, path: "/dashboard/mant-vencidos" },
-      { title: "Mantenimientos ejecutados", icon: FileText, path: "/dashboard/mant-ejecutados" },
-      { title: "Sedes", icon: Building2, path: "/dashboard/sedes" },
-      { title: "Bodegas", icon: Box, path: "/dashboard/bodegas" },
-      { title: "Marcas", icon: Tag, path: "/dashboard/marcas" },
-    ],
   },
   {
     title: "Lista de Inventario",
