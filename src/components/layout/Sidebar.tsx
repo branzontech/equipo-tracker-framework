@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -122,8 +122,18 @@ const menuItems = [
 const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
   const hasSubmenu = item.submenu && item.submenu.length > 0;
+  const navigate = useNavigate();
 
   const Icon = item.icon;
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasSubmenu) {
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    } else {
+      navigate(item.path);
+    }
+  };
 
   return (
     <div className="mb-1">
@@ -131,18 +141,14 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
         className={`flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200 cursor-pointer ${
           isOpen ? "bg-[#3d2a40]" : ""
         }`}
-        onClick={() => hasSubmenu && setIsOpen(!isOpen)}
+        onClick={handleClick}
       >
-        <Link
-          to={item.path}
-          className="flex items-center flex-1"
-          onClick={(e) => hasSubmenu && e.preventDefault()}
-        >
+        <div className="flex items-center flex-1">
           {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#E6E8E6]`} />}
           {!isCollapsed && (
             <span className="flex-1 whitespace-nowrap">{item.title}</span>
           )}
-        </Link>
+        </div>
         {!isCollapsed && hasSubmenu && (
           <ChevronRight
             className={`w-4 h-4 transition-transform duration-200 text-[#E6E8E6] ${
