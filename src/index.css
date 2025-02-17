@@ -11,10 +11,10 @@
     --foreground: 0 0% 100%;
 
     --card: 247 24% 12%;
-    --card-foreground: 0 0% 100%;
+    --card-foreground: 213 28% 42%;
 
     --popover: 247 24% 12%;
-    --popover-foreground: 0 0% 100%;
+    --popover-foreground: 213 28% 42%;
 
     --primary: 354 66% 55%;
     --primary-foreground: 0 0% 100%;
@@ -23,22 +23,22 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 213 18% 56%;
-    --muted-foreground: 0 0% 85%;
+    --muted-foreground: 213 18% 56%;
 
-    --accent: 213 28% 42%;
+    --accent: 354 66% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 96% 12%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 354 66% 55%;
 
-    --border: 213 18% 56%;
-    --input: 213 18% 56%;
+    --border: 213 28% 42%;
+    --input: 213 28% 42%;
     --ring: 354 66% 55%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 247 24% 12%;
-    --sidebar-foreground: 0 0% 100%;
+    --sidebar-foreground: 213 28% 42%;
     --sidebar-primary: 354 66% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 213 28% 42%;
@@ -52,10 +52,10 @@
     --foreground: 0 0% 100%;
 
     --card: 247 24% 12%;
-    --card-foreground: 0 0% 100%;
+    --card-foreground: 213 28% 42%;
 
     --popover: 247 24% 12%;
-    --popover-foreground: 0 0% 100%;
+    --popover-foreground: 213 28% 42%;
 
     --primary: 354 66% 55%;
     --primary-foreground: 0 0% 100%;
@@ -64,20 +64,20 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 213 18% 56%;
-    --muted-foreground: 0 0% 85%;
+    --muted-foreground: 213 18% 56%;
 
-    --accent: 213 28% 42%;
+    --accent: 354 66% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 96% 12%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 354 66% 55%;
 
-    --border: 213 18% 56%;
-    --input: 213 18% 56%;
+    --border: 213 28% 42%;
+    --input: 213 28% 42%;
     --ring: 354 66% 55%;
 
     --sidebar-background: 247 24% 12%;
-    --sidebar-foreground: 0 0% 100%;
+    --sidebar-foreground: 213 28% 42%;
     --sidebar-primary: 354 66% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 213 28% 42%;
@@ -93,6 +93,14 @@
   }
 
   body {
-    @apply bg-background text-foreground font-montserrat;
+    @apply bg-lightship-2 text-lightship-4;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-lightship-4;
+  }
+
+  button {
+    @apply hover:bg-lightship-3/20 text-lightship-4;
   }
 }

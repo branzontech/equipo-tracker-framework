@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -116,12 +115,12 @@ const IngresoProducto = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Ingreso de Producto</h1>
+      <h1 className="text-2xl font-bold text-lightship-4 mb-6">Ingreso de Producto</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* Información Básica */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">Información Básica</h2>
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">Información Básica</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -250,8 +249,8 @@ const IngresoProducto = () => {
           </div>
 
           {/* Especificaciones Técnicas */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">
               Especificaciones Técnicas
             </h2>
             <div className="grid grid-cols-1 gap-6">
@@ -276,8 +275,8 @@ const IngresoProducto = () => {
           </div>
 
           {/* Información de Adquisición */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">
               Información de Adquisición
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -462,8 +461,8 @@ const IngresoProducto = () => {
           </div>
 
           {/* Estado y Ubicación */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">
               Estado y Ubicación
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -583,8 +582,8 @@ const IngresoProducto = () => {
           </div>
 
           {/* Mantenimiento */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">
               Mantenimiento
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -671,8 +670,8 @@ const IngresoProducto = () => {
           </div>
 
           {/* Documentación Relacionada */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">
               Documentación Relacionada
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -735,8 +734,8 @@ const IngresoProducto = () => {
           </div>
 
           {/* Campos Personalizables */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+          <div className="bg-lightship-2 p-6 rounded-lg shadow-md border border-lightship-3/20">
+            <h2 className="text-xl font-semibold text-lightship-4 mb-4">
               Campos Personalizables
             </h2>
             <div className="grid grid-cols-1 gap-6">
@@ -782,10 +781,17 @@ const IngresoProducto = () => {
 
           {/* Botones de acción */}
           <div className="flex justify-end space-x-4">
-            <Button variant="outline" type="button">
+            <Button 
+              variant="outline" 
+              type="button"
+              className="bg-transparent border-lightship-3 text-lightship-4 hover:bg-lightship-3/20"
+            >
               Cancelar
             </Button>
-            <Button type="submit" className="bg-[#040d50] hover:bg-[#0a1668]">
+            <Button 
+              type="submit" 
+              className="bg-lightship-1 hover:bg-lightship-1/90 text-white"
+            >
               Guardar
             </Button>
           </div>
