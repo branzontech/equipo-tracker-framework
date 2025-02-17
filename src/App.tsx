@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import IngresoProducto from "./pages/productos/Ingreso";
+import { Sidebar } from "./components/layout/Sidebar";
 
 const queryClient = new QueryClient();
 
@@ -16,11 +17,16 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/productos/ingreso" element={<IngresoProducto />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="flex min-h-screen w-full">
+          <Sidebar />
+          <div className="flex-1">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/productos/ingreso" element={<IngresoProducto />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

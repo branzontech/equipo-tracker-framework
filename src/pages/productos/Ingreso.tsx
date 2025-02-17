@@ -114,7 +114,7 @@ const IngresoProducto = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="p-8">
       <h1 className="text-2xl font-bold text-[#040d50] mb-6">Ingreso de Producto</h1>
       
       <Form {...form}>
