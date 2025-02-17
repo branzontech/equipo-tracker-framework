@@ -181,11 +181,11 @@ export const Sidebar = ({
 }) => {
   return (
     <div
-      className={`h-screen bg-[#2d1e2f] border-r border-[#3d2a40] transition-all duration-300 ${
+      className={`h-screen bg-[#2d1e2f] border-r border-[#3d2a40] transition-all duration-300 flex flex-col ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-[#3d2a40]">
+      <div className="flex items-center justify-between p-4 border-b border-[#3d2a40] flex-shrink-0">
         {!isCollapsed && (
           <span className="text-xl font-semibold text-[#E6E8E6]">Smart TI</span>
         )}
@@ -200,12 +200,12 @@ export const Sidebar = ({
           )}
         </button>
       </div>
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#3d2a40] scrollbar-track-transparent hover:scrollbar-thumb-[#4d3a50]">
         {menuItems.map((item) => (
           <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
         ))}
       </nav>
-      <div className="p-2 border-t border-[#3d2a40]">
+      <div className="p-2 border-t border-[#3d2a40] flex-shrink-0">
         <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200">
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#E6E8E6]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
