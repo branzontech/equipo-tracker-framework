@@ -323,6 +323,447 @@ const IngresoProducto = () => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="numeroFactura"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Factura</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Número de factura" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="costoAdquisicion"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Costo de Adquisición</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Costo" type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="garantiaInicio"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Inicio de Garantía</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "P")
+                            ) : (
+                              <span>Fecha inicio</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < new Date("1900-01-01")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="garantiaFin"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Fin de Garantía</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "P")
+                            ) : (
+                              <span>Fecha fin</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < new Date("1900-01-01")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ordenCompra"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Orden de Compra</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Número de orden de compra" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Estado y Ubicación */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+              Estado y Ubicación
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="estado"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estado Actual</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar estado" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="activo">Activo</SelectItem>
+                        <SelectItem value="mantenimiento">En Mantenimiento</SelectItem>
+                        <SelectItem value="reparacion">En Reparación</SelectItem>
+                        <SelectItem value="baja">Fuera de Servicio</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ubicacionFisica"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ubicación Física</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ubicación" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="departamento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Departamento</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Departamento asignado" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="responsable"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Responsable</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre del responsable" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="disponibilidad"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Disponibilidad</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar disponibilidad" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="disponible">Disponible</SelectItem>
+                        <SelectItem value="asignado">Asignado</SelectItem>
+                        <SelectItem value="reservado">Reservado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="condicionFisica"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Condición Física</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar condición" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="nuevo">Nuevo</SelectItem>
+                        <SelectItem value="bueno">Bueno</SelectItem>
+                        <SelectItem value="regular">Regular</SelectItem>
+                        <SelectItem value="malo">Malo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Mantenimiento */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+              Mantenimiento
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="frecuenciaMantenimiento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Frecuencia de Mantenimiento</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar frecuencia" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="mensual">Mensual</SelectItem>
+                        <SelectItem value="trimestral">Trimestral</SelectItem>
+                        <SelectItem value="semestral">Semestral</SelectItem>
+                        <SelectItem value="anual">Anual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ultimaFechaMantenimiento"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Última Fecha de Mantenimiento</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "P")
+                            ) : (
+                              <span>Seleccionar fecha</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="proveedorServicio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Proveedor de Servicio</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre del proveedor de servicio" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Documentación Relacionada */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+              Documentación Relacionada
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="manualUsuario"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Manual de Usuario</FormLabel>
+                    <FormControl>
+                      <Input type="file" {...field} value={field.value?.filename} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="manualServicio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Manual de Servicio</FormLabel>
+                    <FormControl>
+                      <Input type="file" {...field} value={field.value?.filename} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="certificados"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Certificados</FormLabel>
+                    <FormControl>
+                      <Input type="file" {...field} value={field.value?.filename} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="polizasSeguro"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pólizas de Seguro</FormLabel>
+                    <FormControl>
+                      <Input type="file" {...field} value={field.value?.filename} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Campos Personalizables */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+              Campos Personalizables
+            </h2>
+            <div className="grid grid-cols-1 gap-6">
+              <FormField
+                control={form.control}
+                name="observaciones"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Observaciones</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Observaciones adicionales"
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Etiquetas/Tags</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Etiquetas separadas por comas"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Ingrese las etiquetas separadas por comas (ej: impresora, red, oficina)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
 
