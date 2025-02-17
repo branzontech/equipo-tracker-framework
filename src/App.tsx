@@ -18,8 +18,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <div className="flex min-h-screen w-full">
-          <Sidebar />
-          <div className="flex-1">
+          <div className="fixed left-0 top-0 h-screen">
+            <Sidebar />
+          </div>
+          <div className="flex-1 overflow-auto ml-16">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/productos/ingreso" element={<IngresoProducto />} />

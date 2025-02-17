@@ -155,11 +155,11 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
 };
 
 export const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true); // Set to true for default collapsed state
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div
-      className={`min-h-screen bg-[#040d50] border-r border-[#0a1668] transition-all duration-300 flex flex-col ${
+      className={`h-screen bg-[#040d50] border-r border-[#0a1668] transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
