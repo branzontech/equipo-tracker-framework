@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -146,6 +145,20 @@ const IngresoProducto = () => {
                     <FormLabel>Número de Serie</FormLabel>
                     <FormControl>
                       <Input placeholder="Número de serie" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="numeroActivoFijo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Activo Fijo</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Número de activo fijo" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
