@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -125,8 +126,8 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
   return (
     <div className="mb-1">
       <div
-        className={`flex items-center px-3 py-2 text-gray-100 hover:bg-[#0a1668] rounded-lg transition-all duration-200 cursor-pointer ${
-          isOpen ? "bg-[#0a1668]" : ""
+        className={`flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200 cursor-pointer ${
+          isOpen ? "bg-[#3d2a40]" : ""
         }`}
         onClick={() => hasSubmenu && setIsOpen(!isOpen)}
       >
@@ -168,17 +169,17 @@ export const Sidebar = ({
 }) => {
   return (
     <div
-      className={`h-screen bg-[#040d50] border-r border-[#0a1668] transition-all duration-300 ${
+      className={`h-screen bg-[#2d1e2f] border-r border-[#3d2a40] transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-[#0a1668]">
+      <div className="flex items-center justify-between p-4 border-b border-[#3d2a40]">
         {!isCollapsed && (
           <span className="text-xl font-semibold text-[#F49F1C]">Smart TI</span>
         )}
         <button
           onClick={() => onToggle(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-[#0a1668] transition-colors"
+          className="p-1.5 rounded-lg hover:bg-[#3d2a40] transition-colors"
         >
           {isCollapsed ? (
             <ChevronRight className="w-5 h-5 text-[#F49F1C]" />
@@ -192,8 +193,8 @@ export const Sidebar = ({
           <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
         ))}
       </nav>
-      <div className="p-2 border-t border-[#0a1668]">
-        <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#0a1668] rounded-lg transition-all duration-200">
+      <div className="p-2 border-t border-[#3d2a40]">
+        <button className="w-full flex items-center px-3 py-2 text-gray-100 hover:bg-[#3d2a40] rounded-lg transition-all duration-200">
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F49F1C]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
