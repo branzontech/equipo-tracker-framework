@@ -14,6 +14,7 @@ import Actas from "./pages/productos/Actas";
 import Sedes from "./pages/configuracion/maestros/Sedes";
 import Bodegas from "./pages/configuracion/maestros/Bodegas";
 import Marcas from "./pages/configuracion/maestros/Marcas";
+import Perifericos from "./pages/configuracion/maestros/Perifericos";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -43,6 +44,7 @@ const App = () => {
                 <Route path="/configuracion/maestros/sedes" element={<Sedes />} />
                 <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                 <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
+                <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>

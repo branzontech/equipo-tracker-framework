@@ -112,13 +112,15 @@ const Perifericos = () => {
               {perifericos.map((periferico) => (
                 <TableRow key={periferico.id}>
                   <TableCell>{periferico.descripcion}</TableCell>
-                  <TableCell className="flex items-center">
-                    {periferico.estado === "Activo" ? (
-                      <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                    )}
-                    {periferico.estado}
+                  <TableCell>
+                    <span className="flex items-center">
+                      {periferico.estado === "Activo" ? (
+                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                      ) : (
+                        <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                      )}
+                      {periferico.estado}
+                    </span>
                   </TableCell>
                 </TableRow>
               ))}
