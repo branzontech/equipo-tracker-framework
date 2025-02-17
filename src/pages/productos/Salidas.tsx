@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
 const ActaEntregaPDF = ({ data }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.header}>Acta de Entrega de Equipos</Text>
+      <Text style={styles.header}>Acta de Salida de Equipos en Condición de Préstamo</Text>
       
       <Text style={styles.subheader}>
         Fecha: {data.fechaEntrega ? format(data.fechaEntrega, "PPP") : ''}
@@ -234,7 +234,7 @@ const Salidas = () => {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Salida de Equipos</h1>
+      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Salida de Equipos en Condición de Préstamo</h1>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
