@@ -25,6 +25,7 @@ import {
   UserCog,
   LogOut,
   Printer,
+  Database,
 } from "lucide-react";
 
 const menuItems = [
@@ -102,6 +103,7 @@ const menuItems = [
     submenu: [
       { title: "Ingreso", icon: ArrowDownToLine, path: "/toners/ingreso" },
       { title: "Salida", icon: ArrowUpFromLine, path: "/toners/salida" },
+      { title: "Existencia", icon: Database, path: "/toners/existencia" },
     ],
   },
   {
