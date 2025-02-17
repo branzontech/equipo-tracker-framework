@@ -22,7 +22,7 @@ import SalidaToners from "./pages/toners/Salida";
 import BajaEquipos from "./pages/productos/BajaEquipos";
 import Login from "./pages/auth/Login";
 import { Sidebar } from "./components/layout/Sidebar";
-import { Header } from "./components/layout/Header";
+import Header from "./components/layout/Header";
 import { useState } from "react";
 
 const queryClient = new QueryClient();
