@@ -11,25 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Globe, Phone, CheckCircle, XCircle } from "lucide-react";
-
-interface Periferico {
-  id: number;
-  descripcion: string;
-  estado: "Activo" | "Inactivo";
-}
+import { PlusCircle, Globe, Phone } from "lucide-react";
 
 interface Marca {
   id: number;
   descripcion: string;
   telefono: string;
   sitioWeb: string;
-  perifericos: Periferico[];
 }
-
-type EstadoType = "Activo" | "Inactivo";
 
 const Marcas = () => {
   const [marcas, setMarcas] = useState<Marca[]>([
@@ -38,66 +28,28 @@ const Marcas = () => {
       descripcion: "HP",
       telefono: "123-456-7890",
       sitioWeb: "https://www.hp.com",
-      perifericos: [
-        { id: 1, descripcion: "Teclado Mecánico", estado: "Activo" },
-        { id: 2, descripcion: "Mouse Inalámbrico", estado: "Activo" },
-      ],
     },
   ]);
 
-  const [newMarca, setNewMarca] = useState<Omit<Marca, "id" | "perifericos">>({
+  const [newMarca, setNewMarca] = useState<Omit<Marca, "id">>({
     descripcion: "",
     telefono: "",
     sitioWeb: "",
   });
 
-  const [newPeriferico, setNewPeriferico] = useState<Omit<Periferico, "id">>({
-    descripcion: "",
-    estado: "Activo",
-  });
-
-  const [selectedMarcaId, setSelectedMarcaId] = useState<number | null>(null);
-
-  const handleSubmitMarca = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setMarcas([
       ...marcas,
       {
         id: marcas.length + 1,
         ...newMarca,
-        perifericos: [],
       },
     ]);
     setNewMarca({
       descripcion: "",
       telefono: "",
       sitioWeb: "",
-    });
-  };
-
-  const handleSubmitPeriferico = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedMarcaId) return;
-
-    setMarcas(marcas.map(marca => {
-      if (marca.id === selectedMarcaId) {
-        return {
-          ...marca,
-          perifericos: [
-            ...marca.perifericos,
-            {
-              id: marca.perifericos.length + 1,
-              ...newPeriferico,
-            },
-          ],
-        };
-      }
-      return marca;
-    }));
-
-    setNewPeriferico({
-      descripcion: "",
-      estado: "Activo",
     });
   };
 
@@ -108,7 +60,7 @@ const Marcas = () => {
           <CardTitle className="text-2xl font-bold">Registro de Marcas</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmitMarca} className="grid gap-4 md:grid-cols-4">
+          <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <Label htmlFor="descripcion">Descripción</Label>
               <Input
@@ -163,93 +115,46 @@ const Marcas = () => {
         </CardContent>
       </Card>
 
-      {marcas.map((marca) => (
-        <Card key={marca.id} className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-xl">
-              {marca.descripcion}
-              <div className="flex gap-4 mt-2 text-sm font-normal text-muted-foreground">
-                <span className="flex items-center">
-                  <Phone className="mr-2 h-4 w-4" /> {marca.telefono}
-                </span>
-                <span className="flex items-center">
-                  <Globe className="mr-2 h-4 w-4" />
-                  <a href={marca.sitioWeb} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                    {marca.sitioWeb}
-                  </a>
-                </span>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <form onSubmit={handleSubmitPeriferico} className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <Label htmlFor={`periferico-${marca.id}`}>Periférico</Label>
-                  <Input
-                    id={`periferico-${marca.id}`}
-                    value={newPeriferico.descripcion}
-                    onChange={(e) =>
-                      setNewPeriferico({ ...newPeriferico, descripcion: e.target.value })
-                    }
-                    placeholder="Descripción del periférico"
-                    onClick={() => setSelectedMarcaId(marca.id)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`estado-${marca.id}`}>Estado</Label>
-                  <Select
-                    value={newPeriferico.estado}
-                    onValueChange={(value: EstadoType) => {
-                      setNewPeriferico({ ...newPeriferico, estado: value });
-                      setSelectedMarcaId(marca.id);
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione el estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Activo">Activo</SelectItem>
-                      <SelectItem value="Inactivo">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end">
-                  <Button type="submit" className="w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Agregar Periférico
-                  </Button>
-                </div>
-              </form>
-            </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Descripción</TableHead>
-                  <TableHead>Estado</TableHead>
+      <Card>
+        <CardHeader>
+          <CardTitle>Lista de Marcas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Teléfono</TableHead>
+                <TableHead>Sitio Web</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {marcas.map((marca) => (
+                <TableRow key={marca.id}>
+                  <TableCell>{marca.descripcion}</TableCell>
+                  <TableCell>
+                    <span className="flex items-center">
+                      <Phone className="mr-2 h-4 w-4" />
+                      {marca.telefono}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <a 
+                      href={marca.sitioWeb} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center hover:underline"
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      {marca.sitioWeb}
+                    </a>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {marca.perifericos.map((periferico) => (
-                  <TableRow key={periferico.id}>
-                    <TableCell>{periferico.descripcion}</TableCell>
-                    <TableCell className="flex items-center">
-                      {periferico.estado === "Activo" ? (
-                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                      ) : (
-                        <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                      )}
-                      {periferico.estado}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      ))}
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
