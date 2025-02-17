@@ -134,7 +134,7 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
         onClick={() => hasSubmenu && setIsOpen(!isOpen)}
       >
         <Link
-          to={!hasSubmenu ? item.path : "#"}
+          to={item.path}
           className="flex items-center flex-1"
           onClick={(e) => hasSubmenu && e.preventDefault()}
         >
