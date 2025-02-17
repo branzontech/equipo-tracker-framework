@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import IngresoProducto from "./pages/productos/Ingreso";
 import ListaInventario from "./pages/productos/Lista";
 import Salidas from "./pages/productos/Salidas";
+import Traslados from "./pages/productos/salidas/Traslados";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -33,6 +34,7 @@ const App = () => {
                 <Route path="/productos/ingreso" element={<IngresoProducto />} />
                 <Route path="/productos/lista" element={<ListaInventario />} />
                 <Route path="/productos/salidas/prestamos" element={<Salidas />} />
+                <Route path="/productos/salidas/traslados" element={<Traslados />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
