@@ -16,6 +16,7 @@ import Bodegas from "./pages/configuracion/maestros/Bodegas";
 import Marcas from "./pages/configuracion/maestros/Marcas";
 import Perifericos from "./pages/configuracion/maestros/Perifericos";
 import Dashboard from "./pages/dashboard/Index";
+import IngresoToner from "./pages/toners/Ingreso";
 import { Sidebar } from "./components/layout/Sidebar";
 import { useState } from "react";
 
@@ -47,6 +48,7 @@ const App = () => {
                 <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                 <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
                 <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
+                <Route path="/toners/ingreso" element={<IngresoToner />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
