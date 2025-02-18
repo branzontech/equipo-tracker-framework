@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,6 +28,7 @@ import {
   Database,
   Cpu,
   Shield,
+  RotateCcw,
 } from "lucide-react";
 
 const menuItems = [
@@ -54,6 +56,11 @@ const menuItems = [
           { title: "Préstamos", icon: Share2, path: "/productos/salidas/prestamos" },
           { title: "Traslados", icon: Share2, path: "/productos/salidas/traslados" },
         ]
+      },
+      { 
+        title: "Devoluciones", 
+        icon: RotateCcw, 
+        path: "/productos/devoluciones" 
       },
       { title: "Actas Generadas", icon: FileText, path: "/productos/actas" },
     ],
