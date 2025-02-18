@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Package, Wrench, Building2, Box, Tag, Printer, GripVertical } from "lucide-react";
+import { Package, Wrench, Building2, Printer, GripVertical } from "lucide-react";
 
 const equiposData = [
   { name: 'Laptops', cantidad: 120 },
@@ -23,12 +22,21 @@ const tonerData = [
   { name: 'Alerta', value: 15, color: '#f87171' },
 ];
 
+const sedesData = [
+  { name: 'Sede A', cantidad: 150 },
+  { name: 'Sede B', cantidad: 120 },
+  { name: 'Sede C', cantidad: 80 },
+  { name: 'Sede D', cantidad: 65 },
+];
+
 type DashboardItem = {
   id: string;
   order: number;
   title: string;
   component: JSX.Element;
   size: 'small' | 'large';
+  chartType?: 'bar' | 'pie';
+  data?: any[];
 };
 
 export default function Dashboard() {
@@ -103,106 +111,33 @@ export default function Dashboard() {
       order: 4,
       title: 'Distribución de Equipos por Tipo',
       size: 'large',
-      component: (
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={equiposData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="cantidad" fill="#3b82f6" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )
+      chartType: 'bar',
+      data: equiposData
     },
     {
       id: 'estado-mantenimientos',
       order: 5,
       title: 'Estado de Mantenimientos',
       size: 'large',
-      component: (
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={mantenimientosData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {mantenimientosData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      )
+      chartType: 'pie',
+      data: mantenimientosData
     },
     {
       id: 'estado-toner',
       order: 6,
       title: 'Estado de Tóner',
       size: 'large',
-      component: (
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={tonerData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {tonerData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      )
+      chartType: 'pie',
+      data: tonerData
     },
     {
       id: 'equipos-sede',
       order: 7,
       title: 'Equipos por Sede',
       size: 'large',
-      component: (
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={[
-              { name: 'Sede A', cantidad: 150 },
-              { name: 'Sede B', cantidad: 120 },
-              { name: 'Sede C', cantidad: 80 },
-              { name: 'Sede D', cantidad: 65 },
-            ]}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="cantidad" fill="#8b5cf6" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )
-    },
+      chartType: 'bar',
+      data: sedesData
+    }
   ]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
@@ -257,6 +192,54 @@ export default function Dashboard() {
   const smallItems = sortedItems.filter(item => item.size === 'small');
   const largeItems = sortedItems.filter(item => item.size === 'large');
 
+  const renderChart = (item: DashboardItem) => {
+    if (item.chartType === 'bar') {
+      return (
+        <BarChart data={item.data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis 
+            dataKey="name" 
+            tick={{ fontSize: 12 }}
+            interval={0}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+          <YAxis tick={{ fontSize: 12 }} />
+          <Tooltip />
+          <Legend wrapperStyle={{ fontSize: '12px' }} />
+          <Bar dataKey="cantidad" fill="#3b82f6" />
+        </BarChart>
+      );
+    } else if (item.chartType === 'pie') {
+      return (
+        <PieChart>
+          <Pie
+            data={item.data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            outerRadius={window.innerWidth < 640 ? 80 : 100}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {item.data?.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend 
+            wrapperStyle={{ fontSize: '12px' }}
+            verticalAlign="bottom"
+            height={36}
+          />
+        </PieChart>
+      );
+    }
+    return item.component;
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard</h1>
@@ -306,46 +289,7 @@ export default function Dashboard() {
             <CardContent className="p-4 sm:p-6 pt-0">
               <div className="h-[250px] sm:h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  {item.component.type === Bar ? (
-                    <BarChart data={item.component.props.data}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="name" 
-                        tick={{ fontSize: 12 }}
-                        interval={0}
-                        angle={-45}
-                        textAnchor="end"
-                        height={60}
-                      />
-                      <YAxis tick={{ fontSize: 12 }} />
-                      <Tooltip />
-                      <Legend wrapperStyle={{ fontSize: '12px' }} />
-                      <Bar dataKey="cantidad" fill="#3b82f6" />
-                    </BarChart>
-                  ) : (
-                    <PieChart>
-                      <Pie
-                        data={item.component.props.data}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={window.innerWidth < 640 ? 80 : 100}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {item.component.props.data.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend 
-                        wrapperStyle={{ fontSize: '12px' }}
-                        verticalAlign="bottom"
-                        height={36}
-                      />
-                    </PieChart>
-                  )}
+                  {renderChart(item)}
                 </ResponsiveContainer>
               </div>
             </CardContent>
