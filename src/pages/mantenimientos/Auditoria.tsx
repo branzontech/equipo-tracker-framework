@@ -1,18 +1,12 @@
 
 import { useState } from "react";
-import { ChevronLeft, Search, Filter, Download } from "lucide-react";
+import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Calendar } from "@/components/ui/calendar";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -20,11 +14,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { es } from "date-fns/locale";
+
+const estados = [
+  { value: "ejecutado", label: "Ejecutado", icon: Check, color: "bg-green-500" },
+  { value: "pendiente", label: "Pendiente", icon: Pause, color: "bg-yellow-500" },
+  { value: "programado", label: "Programado", icon: Clock, color: "bg-blue-500" },
+  { value: "atrasado", label: "Atrasado", icon: AlertCircle, color: "bg-red-500" },
+];
 
 const AuditoriaMantenimiento = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterPeriod, setFilterPeriod] = useState("todo");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedEstados, setSelectedEstados] = useState<string[]>([]);
+
+  const toggleEstado = (estado: string) => {
+    setSelectedEstados(prev =>
+      prev.includes(estado)
+        ? prev.filter(e => e !== estado)
+        : [...prev, estado]
+    );
+  };
 
   return (
     <div className="p-8">
@@ -35,51 +46,111 @@ const AuditoriaMantenimiento = () => {
         <h1 className="text-2xl font-bold text-[#040d50]">Auditoría de Mantenimientos</h1>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-[#040d50]" />
-          <Input
-            placeholder="Buscar registros..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <Select value={filterPeriod} onValueChange={setFilterPeriod}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Período" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todo">Todo</SelectItem>
-            <SelectItem value="hoy">Hoy</SelectItem>
-            <SelectItem value="semana">Última semana</SelectItem>
-            <SelectItem value="mes">Último mes</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Exportar
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Panel de Calendario */}
+        <Card className="md:col-span-2">
+          <CardContent className="p-6">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              locale={es}
+              className="w-full"
+              styles={{
+                head_cell: "w-12",
+                cell: "w-12 h-12",
+                button: "w-12 h-12",
+                nav_button: "h-8 w-8",
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Panel de Filtros */}
+        <Card>
+          <CardContent className="p-6 space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Filtros</h3>
+              <div className="relative mb-4">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar mantenimientos..."
+                  className="pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium mb-2">Estado</h4>
+                <div className="space-y-2">
+                  {estados.map((estado) => {
+                    const Icon = estado.icon;
+                    const isSelected = selectedEstados.includes(estado.value);
+                    return (
+                      <button
+                        key={estado.value}
+                        className={`w-full flex items-center gap-2 p-2 rounded-md transition-colors ${
+                          isSelected ? estado.color + " text-white" : "hover:bg-accent"
+                        }`}
+                        onClick={() => toggleEstado(estado.value)}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{estado.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Estadísticas */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Estadísticas</h3>
+              <div className="space-y-2">
+                {estados.map((estado) => (
+                  <div key={estado.value} className="flex justify-between items-center">
+                    <span className="text-sm">{estado.label}</span>
+                    <Badge variant="outline" className={estado.color + " text-white"}>
+                      0
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button className="w-full" variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Exportar Reporte
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-[#040d50]">Fecha</TableHead>
-                <TableHead className="text-[#040d50]">Equipo</TableHead>
-                <TableHead className="text-[#040d50]">Tipo</TableHead>
-                <TableHead className="text-[#040d50]">Responsable</TableHead>
-                <TableHead className="text-[#040d50]">Estado</TableHead>
-                <TableHead className="text-[#040d50]">Cumplimiento</TableHead>
-                <TableHead className="text-[#040d50]">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Aquí irían los registros de auditoría */}
-            </TableBody>
-          </Table>
+      {/* Lista de Mantenimientos del Día Seleccionado */}
+      <Card className="mt-6">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold mb-4">
+            Mantenimientos para el día {selectedDate?.toLocaleDateString()}
+          </h3>
+          <div className="space-y-4">
+            {/* Ejemplo de mantenimiento */}
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="bg-blue-500 text-white">
+                  Programado
+                </Badge>
+                <div>
+                  <h4 className="font-medium">Mantenimiento Preventivo</h4>
+                  <p className="text-sm text-muted-foreground">Equipo XYZ - Sede Principal</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">09:00 AM</p>
+                <p className="text-sm text-muted-foreground">Juan Pérez</p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
