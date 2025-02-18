@@ -47,13 +47,13 @@ const App = () => {
             <Route
               path="*"
               element={
-                <div className="flex min-h-screen w-full">
-                  <div className="fixed left-0 top-0 h-screen z-50">
+                <div className="h-screen flex">
+                  <div className="fixed left-0 top-0 h-screen">
                     <Sidebar isCollapsed={isCollapsed} onToggle={setIsCollapsed} />
                   </div>
-                  <div className={`flex-1 flex flex-col overflow-auto transition-all duration-300 ${isCollapsed ? "ml-16" : "ml-64"}`}>
-                    <Header />
-                    <main className="flex-1 p-6">
+                  <div className={`flex-1 flex flex-col ${isCollapsed ? "ml-16" : "ml-64"}`}>
+                    <Header className="sticky top-0 z-10" />
+                    <main className="flex-1 p-6 overflow-auto">
                       <Routes>
                         <Route path="/" element={<Index />} />
                         <Route path="/dashboard" element={<Dashboard />} />
