@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -65,7 +64,7 @@ const menuItems = [
   {
     title: "Actas",
     icon: FileText,
-    path: "/actas",
+    path: "/productos/actas",
   },
   {
     title: "Configuración",
