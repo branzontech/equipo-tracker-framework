@@ -26,6 +26,7 @@ import {
   Printer,
   Database,
   Cpu,
+  Shield,
 } from "lucide-react";
 
 const menuItems = [
@@ -93,6 +94,11 @@ const menuItems = [
           { title: "Agentes", icon: UserCog, path: "/configuracion/usuarios/agentes" },
           { title: "Responsables", icon: UserCog, path: "/configuracion/usuarios/responsables" },
         ],
+      },
+      {
+        title: "Nivel de Acceso",
+        icon: Shield,
+        path: "/configuracion/nivel-acceso",
       },
     ],
   },

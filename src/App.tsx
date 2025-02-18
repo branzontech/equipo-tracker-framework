@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -72,7 +71,7 @@ const App = () => {
                         <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
                         <Route path="/configuracion/usuarios/agentes" element={<Agentes />} />
                         <Route path="/configuracion/usuarios/responsables" element={<Responsables />} />
-                        <Route path="/configuracion/usuarios/permisos" element={<Permisos />} />
+                        <Route path="/configuracion/nivel-acceso" element={<Permisos />} />
                         <Route path="/toners/ingreso" element={<IngresoToner />} />
                         <Route path="/toners/existencia" element={<ExistenciaToners />} />
                         <Route path="/toners/salida" element={<SalidaToners />} />
