@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Card,
@@ -36,9 +35,20 @@ type Acta = {
   usuario: string;
   estado: "vigente" | "finalizada";
   descripcion: string;
+  equipos?: {
+    serial: string;
+    marca: string;
+    activoFijo: string;
+    accesorios: string;
+  }[];
+  firmaEntrega?: string;
+  firmaRecibe?: string;
+  regionalDestino?: string;
+  bodegaDestino?: string;
+  motivoTraslado?: string;
 };
 
-// Datos de ejemplo
+// Datos de ejemplo más completos
 const actasEjemplo: Acta[] = [
   {
     id: "ACT001",
@@ -46,7 +56,23 @@ const actasEjemplo: Acta[] = [
     fecha: new Date(),
     usuario: "Juan Pérez",
     estado: "vigente",
-    descripcion: "Préstamo de laptop Dell XPS",
+    descripcion: "Préstamo de equipos para proyecto de desarrollo",
+    equipos: [
+      {
+        serial: "LP2023001",
+        marca: "Dell",
+        activoFijo: "AF001",
+        accesorios: "Cargador, Mouse, Maletín",
+      },
+      {
+        serial: "LP2023002",
+        marca: "HP",
+        activoFijo: "AF002",
+        accesorios: "Cargador, Teclado externo",
+      }
+    ],
+    firmaEntrega: "Carlos Rodriguez",
+    firmaRecibe: "",
   },
   {
     id: "ACT002",
@@ -54,9 +80,45 @@ const actasEjemplo: Acta[] = [
     fecha: new Date(),
     usuario: "María González",
     estado: "finalizada",
-    descripcion: "Traslado de equipos a sede Medellín",
+    descripcion: "Traslado de equipos por apertura de nueva sede",
+    equipos: [
+      {
+        serial: "PC2023001",
+        marca: "Lenovo",
+        activoFijo: "AF003",
+        accesorios: "Monitor, Teclado, Mouse",
+      },
+      {
+        serial: "PC2023002",
+        marca: "HP",
+        activoFijo: "AF004",
+        accesorios: "Monitor Doble, Dock Station",
+      }
+    ],
+    regionalDestino: "Medellín",
+    bodegaDestino: "Sede Principal",
+    motivoTraslado: "Apertura nueva sede regional",
+    firmaEntrega: "Ana Martínez",
+    firmaRecibe: "Pedro Gómez",
   },
-  // Más actas de ejemplo...
+  {
+    id: "ACT003",
+    tipo: "prestamo",
+    fecha: new Date(),
+    usuario: "Luis Torres",
+    estado: "vigente",
+    descripcion: "Préstamo temporal para trabajo remoto",
+    equipos: [
+      {
+        serial: "LP2023003",
+        marca: "MacBook",
+        activoFijo: "AF005",
+        accesorios: "Cargador, Adaptador HDMI, Mouse Magic",
+      }
+    ],
+    firmaEntrega: "Diana Castro",
+    firmaRecibe: "Luis Torres",
+  }
 ];
 
 const Actas = () => {
