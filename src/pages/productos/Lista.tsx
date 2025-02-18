@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Eye, Pencil, Search, ArrowUp, ArrowDown } from "lucide-react";
+import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,8 +18,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// Datos de muestra
 const sampleData = [
   {
     id: 1,
@@ -121,7 +127,15 @@ const ListaInventario = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Filtrar por búsqueda
+  const [visibleColumns, setVisibleColumns] = useState({
+    numeroSerie: true,
+    descripcion: true,
+    marca: true,
+    estado: true,
+    ubicacion: true,
+    responsable: true,
+  });
+
   const filteredData = sampleData.filter((item) =>
     Object.values(item).some(
       (value) =>
@@ -130,7 +144,6 @@ const ListaInventario = () => {
     )
   );
 
-  // Ordenar datos
   const sortedData = [...filteredData].sort((a: any, b: any) => {
     if (!sortField) return 0;
     if (sortDirection === "asc") {
@@ -139,7 +152,6 @@ const ListaInventario = () => {
     return a[sortField] < b[sortField] ? 1 : -1;
   });
 
-  // Paginación
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
@@ -153,12 +165,28 @@ const ListaInventario = () => {
     }
   };
 
+  const handleDownload = () => {
+    const csvContent = [
+      Object.keys(sampleData[0]).join(","),
+      ...filteredData.map(item => Object.values(item).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'inventario.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-[#040d50] mb-6">Lista de Inventario</h1>
       
-      {/* Barra de búsqueda */}
-      <div className="flex mb-6">
+      <div className="flex justify-between mb-6">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -168,61 +196,137 @@ const ListaInventario = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <SlidersHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Columnas visibles</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={visibleColumns.numeroSerie}
+                onCheckedChange={(checked) => 
+                  setVisibleColumns(prev => ({ ...prev, numeroSerie: checked }))
+                }
+              >
+                N° Serie
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={visibleColumns.descripcion}
+                onCheckedChange={(checked) =>
+                  setVisibleColumns(prev => ({ ...prev, descripcion: checked }))
+                }
+              >
+                Descripción
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={visibleColumns.marca}
+                onCheckedChange={(checked) =>
+                  setVisibleColumns(prev => ({ ...prev, marca: checked }))
+                }
+              >
+                Marca
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={visibleColumns.estado}
+                onCheckedChange={(checked) =>
+                  setVisibleColumns(prev => ({ ...prev, estado: checked }))
+                }
+              >
+                Estado
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={visibleColumns.ubicacion}
+                onCheckedChange={(checked) =>
+                  setVisibleColumns(prev => ({ ...prev, ubicacion: checked }))
+                }
+              >
+                Ubicación
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={visibleColumns.responsable}
+                onCheckedChange={(checked) =>
+                  setVisibleColumns(prev => ({ ...prev, responsable: checked }))
+                }
+              >
+                Responsable
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" onClick={handleDownload}>
+            <Download className="h-4 w-4 mr-2" />
+            Descargar CSV
+          </Button>
+        </div>
       </div>
 
-      {/* Tabla */}
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead onClick={() => handleSort("numeroSerie")} className="cursor-pointer">
-                N° Serie
-                {sortField === "numeroSerie" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("descripcion")} className="cursor-pointer">
-                Descripción
-                {sortField === "descripcion" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("marca")} className="cursor-pointer">
-                Marca
-                {sortField === "marca" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("estado")} className="cursor-pointer">
-                Estado
-                {sortField === "estado" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("ubicacion")} className="cursor-pointer">
-                Ubicación
-                {sortField === "ubicacion" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("responsable")} className="cursor-pointer">
-                Responsable
-                {sortField === "responsable" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
+              {visibleColumns.numeroSerie && (
+                <TableHead onClick={() => handleSort("numeroSerie")} className="cursor-pointer">
+                  N° Serie
+                  {sortField === "numeroSerie" && (
+                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
+                  )}
+                </TableHead>
+              )}
+              {visibleColumns.descripcion && (
+                <TableHead onClick={() => handleSort("descripcion")} className="cursor-pointer">
+                  Descripción
+                  {sortField === "descripcion" && (
+                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
+                  )}
+                </TableHead>
+              )}
+              {visibleColumns.marca && (
+                <TableHead onClick={() => handleSort("marca")} className="cursor-pointer">
+                  Marca
+                  {sortField === "marca" && (
+                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
+                  )}
+                </TableHead>
+              )}
+              {visibleColumns.estado && (
+                <TableHead onClick={() => handleSort("estado")} className="cursor-pointer">
+                  Estado
+                  {sortField === "estado" && (
+                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
+                  )}
+                </TableHead>
+              )}
+              {visibleColumns.ubicacion && (
+                <TableHead onClick={() => handleSort("ubicacion")} className="cursor-pointer">
+                  Ubicación
+                  {sortField === "ubicacion" && (
+                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
+                  )}
+                </TableHead>
+              )}
+              {visibleColumns.responsable && (
+                <TableHead onClick={() => handleSort("responsable")} className="cursor-pointer">
+                  Responsable
+                  {sortField === "responsable" && (
+                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
+                  )}
+                </TableHead>
+              )}
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.numeroSerie}</TableCell>
-                <TableCell>{item.descripcion}</TableCell>
-                <TableCell>{item.marca}</TableCell>
-                <TableCell>{item.estado}</TableCell>
-                <TableCell>{item.ubicacion}</TableCell>
-                <TableCell>{item.responsable}</TableCell>
+                {visibleColumns.numeroSerie && <TableCell>{item.numeroSerie}</TableCell>}
+                {visibleColumns.descripcion && <TableCell>{item.descripcion}</TableCell>}
+                {visibleColumns.marca && <TableCell>{item.marca}</TableCell>}
+                {visibleColumns.estado && <TableCell>{item.estado}</TableCell>}
+                {visibleColumns.ubicacion && <TableCell>{item.ubicacion}</TableCell>}
+                {visibleColumns.responsable && <TableCell>{item.responsable}</TableCell>}
                 <TableCell>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon">
@@ -239,7 +343,6 @@ const ListaInventario = () => {
         </Table>
       </div>
 
-      {/* Paginación */}
       <div className="mt-4">
         <Pagination>
           <PaginationContent>

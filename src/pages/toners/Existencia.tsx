@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Eye, Search, ArrowUp, ArrowDown, AlertTriangle } from "lucide-react";
+import { Eye, Search, ArrowUp, ArrowDown, AlertTriangle, Download, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +25,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// Datos de muestra
 const sampleData = [
   {
     id: 1,
@@ -73,7 +79,17 @@ const ExistenciaToners = () => {
   const [selectedSede, setSelectedSede] = useState<string>("todas");
   const itemsPerPage = 5;
 
-  // Filtrar por búsqueda y filtros
+  const [visibleColumns, setVisibleColumns] = useState({
+    referencia: true,
+    modeloImpresora: true,
+    color: true,
+    stockDisponible: true,
+    alertaStockMinimo: true,
+    areas: true,
+    sede: true,
+    cantidad: true,
+  });
+
   const filteredData = sampleData.filter((item) => {
     const matchesSearch = Object.values(item).some(
       (value) =>
@@ -85,7 +101,6 @@ const ExistenciaToners = () => {
     return matchesSearch && matchesColor && matchesSede;
   });
 
-  // Ordenar datos
   const sortedData = [...filteredData].sort((a: any, b: any) => {
     if (!sortField) return 0;
     if (sortDirection === "asc") {
@@ -94,7 +109,6 @@ const ExistenciaToners = () => {
     return a[sortField] < b[sortField] ? 1 : -1;
   });
 
-  // Paginación
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
@@ -108,6 +122,23 @@ const ExistenciaToners = () => {
     }
   };
 
+  const handleDownload = () => {
+    const csvContent = [
+      Object.keys(sampleData[0]).join(","),
+      ...filteredData.map(item => Object.values(item).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'toners.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedColor("todos");
@@ -119,7 +150,6 @@ const ExistenciaToners = () => {
     <div className="p-8">
       <h1 className="text-2xl font-bold text-[#040d50] mb-6">Existencia de Toners</h1>
       
-      {/* Filtros y búsqueda */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -153,83 +183,81 @@ const ExistenciaToners = () => {
             <SelectItem value="sede centro">Sede Centro</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" onClick={resetFilters}>
-          Limpiar filtros
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <SlidersHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Columnas visibles</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {Object.entries(visibleColumns).map(([key, value]) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={value}
+                  onCheckedChange={(checked) =>
+                    setVisibleColumns(prev => ({ ...prev, [key]: checked }))
+                  }
+                >
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" onClick={handleDownload}>
+            <Download className="h-4 w-4 mr-2" />
+            Descargar CSV
+          </Button>
+          <Button variant="outline" onClick={resetFilters}>
+            Limpiar filtros
+          </Button>
+        </div>
       </div>
 
-      {/* Tabla */}
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead onClick={() => handleSort("referencia")} className="cursor-pointer">
-                Referencia
-                {sortField === "referencia" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("modeloImpresora")} className="cursor-pointer">
-                Modelo de Impresora
-                {sortField === "modeloImpresora" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("color")} className="cursor-pointer">
-                Color
-                {sortField === "color" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("stockDisponible")} className="cursor-pointer">
-                Stock
-                {sortField === "stockDisponible" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("alertaStockMinimo")} className="cursor-pointer">
-                Stock Mínimo
-                {sortField === "alertaStockMinimo" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("areas")} className="cursor-pointer">
-                Áreas
-                {sortField === "areas" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("sede")} className="cursor-pointer">
-                Sede
-                {sortField === "sede" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
-              <TableHead onClick={() => handleSort("cantidad")} className="cursor-pointer">
-                Cantidad
-                {sortField === "cantidad" && (
-                  sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                )}
-              </TableHead>
+              {Object.entries(visibleColumns).map(([key, visible]) => 
+                visible && (
+                  <TableHead
+                    key={key}
+                    onClick={() => handleSort(key)}
+                    className="cursor-pointer"
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                    {sortField === key && (
+                      sortDirection === "asc" ? 
+                        <ArrowUp className="inline ml-1 h-4 w-4" /> : 
+                        <ArrowDown className="inline ml-1 h-4 w-4" />
+                    )}
+                  </TableHead>
+                )
+              )}
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.referencia}</TableCell>
-                <TableCell>{item.modeloImpresora}</TableCell>
-                <TableCell>{item.color}</TableCell>
-                <TableCell className="flex items-center gap-2">
-                  {item.stockDisponible}
-                  {item.stockDisponible <= item.alertaStockMinimo && (
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  )}
-                </TableCell>
-                <TableCell>{item.alertaStockMinimo}</TableCell>
-                <TableCell>{item.areas}</TableCell>
-                <TableCell>{item.sede}</TableCell>
-                <TableCell>{item.cantidad}</TableCell>
+                {Object.entries(visibleColumns).map(([key, visible]) => 
+                  visible && (
+                    <TableCell key={key}>
+                      {key === 'stockDisponible' ? (
+                        <div className="flex items-center gap-2">
+                          {item[key]}
+                          {item.stockDisponible <= item.alertaStockMinimo && (
+                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                          )}
+                        </div>
+                      ) : (
+                        item[key]
+                      )}
+                    </TableCell>
+                  )
+                )}
                 <TableCell>
                   <Button variant="ghost" size="icon">
                     <Eye className="h-4 w-4" />
@@ -241,7 +269,6 @@ const ExistenciaToners = () => {
         </Table>
       </div>
 
-      {/* Paginación */}
       <div className="mt-4">
         <Pagination>
           <PaginationContent>
