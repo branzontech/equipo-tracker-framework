@@ -6,7 +6,7 @@ import { es } from "date-fns/locale";
 import {
   Activity,
   ChevronLeft,
-  Tool,
+  Wrench,
   Truck,
   User,
   Calendar,
@@ -148,7 +148,7 @@ const HojaDeVida = () => {
       case "ingreso":
         return <Clipboard className="h-6 w-6 text-green-500" />;
       case "mantenimiento_preventivo":
-        return <Tool className="h-6 w-6 text-blue-500" />;
+        return <Wrench className="h-6 w-6 text-blue-500" />;
       case "mantenimiento_correctivo":
         return <AlertCircle className="h-6 w-6 text-red-500" />;
       case "traslado":
