@@ -24,9 +24,9 @@ import {
 const EjecucionMantenimiento = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSede, setSelectedSede] = useState<string>("");
-  const [selectedArea, setSelectedArea] = useState<string>("");
-  const [selectedBodega, setSelectedBodega] = useState<string>("");
+  const [selectedSede, setSelectedSede] = useState<string>("all");
+  const [selectedArea, setSelectedArea] = useState<string>("all");
+  const [selectedBodega, setSelectedBodega] = useState<string>("all");
 
   const sedes = [
     { id: "1", nombre: "Sede Principal" },
@@ -151,9 +151,9 @@ const EjecucionMantenimiento = () => {
       mantenimiento.tecnico.toLowerCase().includes(searchTerm.toLowerCase()) ||
       mantenimiento.tipo.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesSede = selectedSede ? mantenimiento.sede === sedes.find(s => s.id === selectedSede)?.nombre : true;
-    const matchesArea = selectedArea ? mantenimiento.area === areas.find(a => a.id === selectedArea)?.nombre : true;
-    const matchesBodega = selectedBodega ? mantenimiento.bodega === bodegas.find(b => b.id === selectedBodega)?.nombre : true;
+    const matchesSede = selectedSede === "all" ? true : mantenimiento.sede === sedes.find(s => s.id === selectedSede)?.nombre;
+    const matchesArea = selectedArea === "all" ? true : mantenimiento.area === areas.find(a => a.id === selectedArea)?.nombre;
+    const matchesBodega = selectedBodega === "all" ? true : mantenimiento.bodega === bodegas.find(b => b.id === selectedBodega)?.nombre;
 
     return matchesSearch && matchesSede && matchesArea && matchesBodega;
   });
@@ -185,7 +185,7 @@ const EjecucionMantenimiento = () => {
                 <SelectValue placeholder="Filtrar por Sede" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas las Sedes</SelectItem>
+                <SelectItem value="all">Todas las Sedes</SelectItem>
                 {sedes.map((sede) => (
                   <SelectItem key={sede.id} value={sede.id}>
                     {sede.nombre}
@@ -199,7 +199,7 @@ const EjecucionMantenimiento = () => {
                 <SelectValue placeholder="Filtrar por Área" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas las Áreas</SelectItem>
+                <SelectItem value="all">Todas las Áreas</SelectItem>
                 {areas.map((area) => (
                   <SelectItem key={area.id} value={area.id}>
                     {area.nombre}
@@ -213,7 +213,7 @@ const EjecucionMantenimiento = () => {
                 <SelectValue placeholder="Filtrar por Bodega" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas las Bodegas</SelectItem>
+                <SelectItem value="all">Todas las Bodegas</SelectItem>
                 {bodegas.map((bodega) => (
                   <SelectItem key={bodega.id} value={bodega.id}>
                     {bodega.nombre}
