@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import Sedes from "./pages/configuracion/maestros/Sedes";
 import Bodegas from "./pages/configuracion/maestros/Bodegas";
 import Marcas from "./pages/configuracion/maestros/Marcas";
 import Perifericos from "./pages/configuracion/maestros/Perifericos";
+import PerfilesAcceso from "./pages/configuracion/maestros/PerfilesAcceso";
 import Dashboard from "./pages/dashboard/Index";
 import IngresoToner from "./pages/toners/Ingreso";
 import ExistenciaToners from "./pages/toners/Existencia";
@@ -69,6 +71,7 @@ const App = () => {
                         <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                         <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
                         <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
+                        <Route path="/configuracion/maestros/perfiles-acceso" element={<PerfilesAcceso />} />
                         <Route path="/configuracion/usuarios/agentes" element={<Agentes />} />
                         <Route path="/configuracion/usuarios/responsables" element={<Responsables />} />
                         <Route path="/configuracion/nivel-acceso" element={<Permisos />} />
