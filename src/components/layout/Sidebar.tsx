@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -190,7 +189,7 @@ export const Sidebar = ({
 
   return (
     <div
-      className={`h-screen bg-[#0B2559] border-r border-white/10 transition-all duration-300 flex flex-col ${
+      className={`h-screen bg-[#0B2559] border-r border-white/10 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
       onMouseEnter={() => setHovering(true)}
@@ -201,16 +200,14 @@ export const Sidebar = ({
         }
       }}
     >
-      <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
-        {!isCollapsed && (
-          <div className="flex items-center gap-2">
-            <Cpu className="w-6 h-6 text-[#F2E205]" />
-            <span className="text-xl font-semibold text-white tracking-wider">SMART TI</span>
-          </div>
-        )}
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className={`flex items-center gap-2 transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
+          <Cpu className="w-6 h-6 text-[#F2E205] flex-shrink-0" />
+          <span className="text-xl font-semibold text-white tracking-wider whitespace-nowrap overflow-hidden">SMART TI</span>
+        </div>
         <button
           onClick={() => onToggle(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+          className={`p-1.5 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0 ${isCollapsed ? 'ml-auto' : ''}`}
         >
           {isCollapsed ? (
             <ChevronRight className="w-5 h-5 text-[#F2E205]" />
@@ -224,7 +221,7 @@ export const Sidebar = ({
           <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
         ))}
       </nav>
-      <div className="p-2 border-t border-white/10 flex-shrink-0">
+      <div className="p-2 border-t border-white/10">
         <button className="w-full flex items-center px-3 py-2 text-white hover:bg-white/10 rounded-lg transition-all duration-200">
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F2E205]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
