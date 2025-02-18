@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { User, Lock } from "lucide-react";
+import ParticleEffect from "@/components/ParticleEffect";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,10 +17,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0B2559]">
+      <ParticleEffect />
+      
       {/* Blobs difuminados */}
       <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-[#F2E205]/50 blur-[100px] -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-[#F2E205]/40 blur-[100px] translate-x-1/2 translate-y-1/2" />
-      {/* Nuevo blob blanco */}
       <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] rounded-full bg-white/10 blur-[80px] -translate-y-1/2" />
       <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] rounded-full bg-[#0B2559]/50 blur-[80px] -translate-x-1/2 -translate-y-1/2" />
       
