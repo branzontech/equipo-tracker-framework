@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Eye, Search, ArrowUp, ArrowDown, AlertTriangle, Download, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -152,7 +153,7 @@ const ExistenciaToners = () => {
       
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-[#040d50]" />
           <Input
             placeholder="Buscar toners..."
             className="pl-8"
@@ -162,7 +163,7 @@ const ExistenciaToners = () => {
         </div>
         <Select value={selectedColor} onValueChange={setSelectedColor}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrar por color" />
+            <SelectValue placeholder="Filtrar por color" className="text-[#040d50]" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos los colores</SelectItem>
@@ -174,7 +175,7 @@ const ExistenciaToners = () => {
         </Select>
         <Select value={selectedSede} onValueChange={setSelectedSede}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrar por sede" />
+            <SelectValue placeholder="Filtrar por sede" className="text-[#040d50]" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todas">Todas las sedes</SelectItem>
@@ -191,7 +192,7 @@ const ExistenciaToners = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Columnas visibles</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#040d50]">Columnas visibles</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {Object.entries(visibleColumns).map(([key, value]) => (
                 <DropdownMenuCheckboxItem
@@ -225,7 +226,7 @@ const ExistenciaToners = () => {
                   <TableHead
                     key={key}
                     onClick={() => handleSort(key)}
-                    className="cursor-pointer"
+                    className="cursor-pointer text-[#040d50] hover:text-[#040d50]/80"
                   >
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                     {sortField === key && (
@@ -236,7 +237,7 @@ const ExistenciaToners = () => {
                   </TableHead>
                 )
               )}
-              <TableHead>Acciones</TableHead>
+              <TableHead className="text-[#040d50]">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
