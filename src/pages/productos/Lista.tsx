@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal } from "lucide-react";
+import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -146,17 +146,37 @@ const ListaInventario = () => {
     { id: "responsable", label: "Responsable", key: "responsable", isVisible: true, order: 5 }
   ]);
 
-  const handleDragStart = (columnId: string) => {
+  const handleDragStart = (e: React.DragEvent, columnId: string) => {
     setDraggedColumn(columnId);
+    const draggedElement = e.currentTarget as HTMLElement;
+    draggedElement.classList.add('opacity-50', 'cursor-grabbing');
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const draggedElement = e.currentTarget as HTMLElement;
+    draggedElement.classList.remove('opacity-50', 'cursor-grabbing');
+    setDraggedColumn(null);
   };
 
   const handleDragOver = (e: React.DragEvent, targetColumnId: string) => {
     e.preventDefault();
     if (!draggedColumn || draggedColumn === targetColumnId) return;
+    
+    const targetElement = e.currentTarget as HTMLElement;
+    targetElement.classList.add('bg-muted', 'transition-colors', 'duration-200');
   };
 
-  const handleDrop = (targetColumnId: string) => {
+  const handleDragLeave = (e: React.DragEvent) => {
+    const targetElement = e.currentTarget as HTMLElement;
+    targetElement.classList.remove('bg-muted', 'transition-colors', 'duration-200');
+  };
+
+  const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
     if (!draggedColumn || draggedColumn === targetColumnId) return;
+
+    const targetElement = e.currentTarget as HTMLElement;
+    targetElement.classList.remove('bg-muted', 'transition-colors', 'duration-200');
 
     setColumns(prevColumns => {
       const draggedColumnOrder = prevColumns.find(col => col.id === draggedColumn)?.order || 0;
@@ -172,8 +192,6 @@ const ListaInventario = () => {
         return column;
       });
     });
-
-    setDraggedColumn(null);
   };
 
   const toggleColumnVisibility = (columnId: string, isChecked: boolean) => {
@@ -290,20 +308,24 @@ const ListaInventario = () => {
                 column.isVisible && (
                   <TableHead
                     key={column.id}
-                    onClick={() => handleSort(column.key)}
-                    className="cursor-pointer select-none"
                     draggable
-                    onDragStart={() => handleDragStart(column.id)}
+                    onDragStart={(e) => handleDragStart(e, column.id)}
+                    onDragEnd={handleDragEnd}
                     onDragOver={(e) => handleDragOver(e, column.id)}
-                    onDrop={() => handleDrop(column.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, column.id)}
+                    className="cursor-grab transition-all duration-200 hover:bg-muted/50"
                   >
-                    <div className="flex items-center gap-2">
-                      {column.label}
-                      {sortField === column.key && (
-                        sortDirection === "asc" ? 
-                          <ArrowUp className="inline h-4 w-4" /> : 
-                          <ArrowDown className="inline h-4 w-4" />
-                      )}
+                    <div className="flex items-center gap-2 select-none">
+                      <GripVertical className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-2" onClick={() => handleSort(column.key)}>
+                        {column.label}
+                        {sortField === column.key && (
+                          sortDirection === "asc" ? 
+                            <ArrowUp className="inline h-4 w-4" /> : 
+                            <ArrowDown className="inline h-4 w-4" />
+                        )}
+                      </div>
                     </div>
                   </TableHead>
                 )
