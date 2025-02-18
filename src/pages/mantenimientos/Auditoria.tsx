@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { DateRange } from "react-day-picker";
 
 const estados = [
   { value: "ejecutado", label: "Ejecutado", icon: Check, color: "bg-green-500" },
@@ -32,12 +33,8 @@ const estados = [
 const AuditoriaMantenimiento = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedEstados, setSelectedEstados] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(),
     to: undefined,
   });
@@ -88,11 +85,11 @@ const AuditoriaMantenimiento = () => {
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        className={`w-full justify-start text-left font-normal ${!dateRange.from && "text-muted-foreground"}`}
+                        className={`w-full justify-start text-left font-normal ${!dateRange?.from && "text-muted-foreground"}`}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange.from ? (
-                          dateRange.to ? (
+                        {dateRange?.from ? (
+                          dateRange?.to ? (
                             <>
                               {format(dateRange.from, "P", { locale: es })} -{" "}
                               {format(dateRange.to, "P", { locale: es })}
