@@ -47,11 +47,11 @@ const App = () => {
             <Route
               path="*"
               element={
-                <div className="h-screen flex select-none">
+                <div className="h-screen flex">
                   <div className="fixed left-0 top-0 h-screen">
                     <Sidebar isCollapsed={isCollapsed} onToggle={setIsCollapsed} />
                   </div>
-                  <div className={`flex-1 flex flex-col fixed left-[${isCollapsed ? '64px' : '256px'}] right-0 top-0 bottom-0`}>
+                  <div className={`flex-1 flex flex-col ${isCollapsed ? "ml-16" : "ml-64"}`}>
                     <Header className="sticky top-0 z-10" />
                     <main className="flex-1 p-6 overflow-auto">
                       <Routes>
