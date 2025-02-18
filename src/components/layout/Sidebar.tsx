@@ -1,192 +1,216 @@
 
-import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  ChevronFirst,
-  ChevronLast,
-  Box,
-  BarChart3,
-  Boxes,
-  PackageOpen,
-  BookOpen,
+  LayoutDashboard,
+  ClipboardList,
+  Package,
+  Share2,
+  FileCog,
   Settings,
-  Printer,
+  Wrench,
+  FileText,
+  History,
+  ChevronLeft,
+  ChevronRight,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  FileOutput,
   Building2,
-  Computer,
+  Box,
+  Tag,
+  Users,
+  Laptop2,
+  Cable,
+  UserCog,
+  LogOut,
+  Printer,
+  Database,
 } from "lucide-react";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
-export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onToggle: (collapsed: boolean) => void }) {
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: <BarChart3 className="w-4 h-4" />,
-      to: "/dashboard",
-    },
-    {
-      title: "Productos",
-      icon: <Box className="w-4 h-4" />,
-      submenu: [
-        {
-          title: "Ingreso",
-          to: "/productos/ingreso",
-        },
-        {
-          title: "Lista de Inventario",
-          to: "/productos/lista",
-        },
-        {
-          title: "Salidas",
-          to: "/productos/salidas/prestamos",
-        },
-        {
-          title: "Traslados",
-          to: "/productos/salidas/traslados",
-        },
-        {
-          title: "Actas",
-          to: "/productos/actas",
-        },
-      ],
-    },
-    {
-      title: "Baja de Equipos",
-      icon: <PackageOpen className="w-4 h-4" />,
-      to: "/baja-equipos",
-    },
-    {
-      title: "Mantenimientos",
-      icon: <Settings className="w-4 h-4" />,
-      to: "/mantenimientos",
-    },
-    {
-      title: "Toners",
-      icon: <Printer className="w-4 h-4" />,
-      submenu: [
-        {
-          title: "Ingreso",
-          to: "/toners/ingreso",
-        },
-        {
-          title: "Existencia",
-          to: "/toners/existencia",
-        },
-        {
-          title: "Salida",
-          to: "/toners/salida",
-        },
-      ],
-    },
-    {
-      title: "Configuración",
-      icon: <Settings className="w-4 h-4" />,
-      submenu: [
-        {
-          title: "Sedes",
-          to: "/configuracion/maestros/sedes",
-          icon: <Building2 className="w-4 h-4" />,
-        },
-        {
-          title: "Bodegas",
-          to: "/configuracion/maestros/bodegas",
-          icon: <Boxes className="w-4 h-4" />,
-        },
-        {
-          title: "Marcas",
-          to: "/configuracion/maestros/marcas",
-          icon: <BookOpen className="w-4 h-4" />,
-        },
-        {
-          title: "Periféricos",
-          to: "/configuracion/maestros/perifericos",
-          icon: <Computer className="w-4 h-4" />,
-        },
-      ],
-    },
-  ];
+const menuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/dashboard",
+  },
+  {
+    title: "Lista de Inventario",
+    icon: ClipboardList,
+    path: "/productos/lista",
+  },
+  {
+    title: "Productos",
+    icon: Package,
+    path: "/productos",
+    submenu: [
+      { title: "Ingreso", icon: ArrowDownToLine, path: "/productos/ingreso" },
+      { 
+        title: "Salidas", 
+        icon: ArrowUpFromLine, 
+        path: "/productos/salidas",
+        submenu: [
+          { title: "Préstamos", icon: Share2, path: "/productos/salidas/prestamos" },
+          { title: "Traslados", icon: Share2, path: "/productos/salidas/traslados" },
+        ]
+      },
+      { title: "Actas Generadas", icon: FileText, path: "/productos/actas" },
+    ],
+  },
+  {
+    title: "Baja de Equipos",
+    icon: FileOutput,
+    path: "/baja-equipos",
+  },
+  {
+    title: "Actas",
+    icon: FileText,
+    path: "/actas",
+  },
+  {
+    title: "Configuración",
+    icon: Settings,
+    path: "/configuracion",
+    submenu: [
+      { 
+        title: "Maestros", 
+        icon: FileCog, 
+        path: "/configuracion/maestros",
+        submenu: [
+          { title: "Sedes", icon: Building2, path: "/configuracion/maestros/sedes" },
+          { title: "Bodegas", icon: Box, path: "/configuracion/maestros/bodegas" },
+          { title: "Marcas", icon: Tag, path: "/configuracion/maestros/marcas" },
+          { title: "Periféricos", icon: Cable, path: "/configuracion/maestros/perifericos" },
+          { title: "Accesorios", icon: Laptop2, path: "/configuracion/maestros/accesorios" },
+          { title: "Categorias", icon: Tag, path: "/configuracion/maestros/categorias" },
+        ]
+      },
+      {
+        title: "Usuarios",
+        icon: Users,
+        path: "/configuracion/usuarios",
+        submenu: [
+          { title: "Agentes", icon: UserCog, path: "/configuracion/usuarios/agentes" },
+          { title: "Responsables", icon: UserCog, path: "/configuracion/usuarios/responsables" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Toners",
+    icon: Printer,
+    path: "/toners",
+    submenu: [
+      { title: "Ingreso", icon: ArrowDownToLine, path: "/toners/ingreso" },
+      { title: "Salida", icon: ArrowUpFromLine, path: "/toners/salida" },
+      { title: "Existencia", icon: Database, path: "/toners/existencia" },
+    ],
+  },
+  {
+    title: "Mantenimientos",
+    icon: Wrench,
+    path: "/mantenimientos",
+  },
+  {
+    title: "Hojas de Vida Equipos",
+    icon: FileText,
+    path: "/hojas-vida",
+  },
+  {
+    title: "Trazabilidad de Inventario",
+    icon: History,
+    path: "/trazabilidad",
+  },
+];
+
+const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const hasSubmenu = item.submenu && item.submenu.length > 0;
+  const navigate = useNavigate();
+
+  const Icon = item.icon;
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasSubmenu) {
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    } else {
+      navigate(item.path);
+    }
+  };
 
   return (
-    <aside className={`h-full bg-white border-r p-4 ${isCollapsed ? "w-16" : "w-64"} transition-all duration-300`}>
-      <nav className="h-full flex flex-col gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="self-end"
+    <div className="mb-1">
+      <div
+        className={`flex items-center px-3 py-2 text-white hover:bg-white/10 rounded-lg transition-all duration-200 cursor-pointer ${
+          isOpen ? "bg-white/10" : ""
+        }`}
+        onClick={handleClick}
+      >
+        <div className="flex items-center flex-1">
+          {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F2E205]`} />}
+          {!isCollapsed && (
+            <span className="flex-1 whitespace-nowrap">{item.title}</span>
+          )}
+        </div>
+        {!isCollapsed && hasSubmenu && (
+          <ChevronRight
+            className={`w-4 h-4 transition-transform duration-200 text-[#F2E205] ${
+              isOpen ? "rotate-90" : ""
+            }`}
+          />
+        )}
+      </div>
+      {!isCollapsed && isOpen && hasSubmenu && (
+        <div className="ml-4 mt-1 space-y-1">
+          {item.submenu.map((subItem: any) => (
+            <MenuItem key={subItem.path} item={subItem} isCollapsed={isCollapsed} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const Sidebar = ({ 
+  isCollapsed, 
+  onToggle 
+}: { 
+  isCollapsed: boolean; 
+  onToggle: (isCollapsed: boolean) => void;
+}) => {
+  return (
+    <div
+      className={`h-screen bg-[#0B2559] border-r border-white/10 transition-all duration-300 flex flex-col ${
+        isCollapsed ? "w-16" : "w-64"
+      }`}
+    >
+      <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
+        {!isCollapsed && (
+          <span className="text-xl font-semibold text-white">Smart TI</span>
+        )}
+        <button
           onClick={() => onToggle(!isCollapsed)}
+          className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
         >
           {isCollapsed ? (
-            <ChevronLast className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5 text-[#F2E205]" />
           ) : (
-            <ChevronFirst className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5 text-[#F2E205]" />
           )}
-        </Button>
-
-        {menuItems.map((item, idx) => {
-          if (item.submenu) {
-            return (
-              <NavigationMenu key={idx} orientation="vertical">
-                <NavigationMenuList className="flex-col items-start">
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger
-                      className={`w-full justify-start gap-2 px-2 ${
-                        isCollapsed ? "justify-center" : ""
-                      }`}
-                    >
-                      {item.icon}
-                      {!isCollapsed && item.title}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid w-48 gap-1 p-2">
-                        {item.submenu.map((subItem, subIdx) => (
-                          <li key={subIdx}>
-                            <NavigationMenuLink asChild>
-                              <NavLink
-                                to={subItem.to}
-                                className={({ isActive }) =>
-                                  `block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
-                                    isActive ? "bg-accent" : ""
-                                  }`
-                                }
-                              >
-                                <div className="flex items-center gap-2">
-                                  {subItem.icon}
-                                  <span>{subItem.title}</span>
-                                </div>
-                              </NavLink>
-                            </NavigationMenuLink>
-                          </li>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-            );
-          }
-
-          return (
-            <NavLink
-              key={idx}
-              to={item.to}
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-2 py-2 rounded hover:bg-accent ${
-                  isActive ? "bg-accent" : ""
-                } ${isCollapsed ? "justify-center" : ""}`
-              }
-            >
-              {item.icon}
-              {!isCollapsed && <span>{item.title}</span>}
-            </NavLink>
-          );
-        })}
+        </button>
+      </div>
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent hover:scrollbar-thumb-white/20">
+        {menuItems.map((item) => (
+          <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
+        ))}
       </nav>
-    </aside>
+      <div className="p-2 border-t border-white/10 flex-shrink-0">
+        <button className="w-full flex items-center px-3 py-2 text-white hover:bg-white/10 rounded-lg transition-all duration-200">
+          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F2E205]`} />
+          {!isCollapsed && <span>Cerrar Sesión</span>}
+        </button>
+      </div>
+    </div>
   );
-}
+};
