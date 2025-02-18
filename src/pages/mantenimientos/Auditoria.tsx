@@ -55,13 +55,7 @@ const AuditoriaMantenimiento = () => {
               selected={selectedDate}
               onSelect={setSelectedDate}
               locale={es}
-              className="w-full"
-              styles={{
-                head_cell: "w-12",
-                cell: "w-12 h-12",
-                button: "w-12 h-12",
-                nav_button: "h-8 w-8",
-              }}
+              className="w-full [&_.rdp-day]:w-12 [&_.rdp-day]:h-12 [&_.rdp-head_th]:w-12 [&_.rdp-nav]:h-8"
             />
           </CardContent>
         </Card>
