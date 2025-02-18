@@ -39,16 +39,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface FormValues {
-  equipo: string;
   tipo: string;
   periodicidad: string;
   fechaInicio: Date;
+  sede: string;
+  bodega: string;
   responsable: string;
   descripcion: string;
+  equipos: string[];
+  tipoRegistro: "individual" | "masivo";
 }
 
 const ProgramacionMantenimiento = () => {
@@ -58,17 +62,19 @@ const ProgramacionMantenimiento = () => {
 
   const form = useForm<FormValues>({
     defaultValues: {
-      equipo: "",
       tipo: "preventivo",
       periodicidad: "mensual",
       responsable: "",
       descripcion: "",
+      tipoRegistro: "individual",
+      sede: "",
+      bodega: "",
+      equipos: [],
     },
   });
 
   const onSubmit = (data: FormValues) => {
     console.log(data);
-    // Aquí iría la lógica para guardar el mantenimiento
     setIsDialogOpen(false);
     form.reset();
   };
@@ -101,7 +107,7 @@ const ProgramacionMantenimiento = () => {
               Nuevo Mantenimiento
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Programar Nuevo Mantenimiento</DialogTitle>
               <DialogDescription>
@@ -110,120 +116,210 @@ const ProgramacionMantenimiento = () => {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="equipo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Equipo</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ingrese el equipo" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <Tabs defaultValue="general" className="w-full">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="general" className="flex-1">Información General</TabsTrigger>
+                    <TabsTrigger value="equipos" className="flex-1">Equipos</TabsTrigger>
+                    <TabsTrigger value="detalles" className="flex-1">Detalles Adicionales</TabsTrigger>
+                  </TabsList>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="tipo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo de Mantenimiento</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                  <TabsContent value="general" className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="sede"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sede</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccione la sede" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="sede1">Sede 1</SelectItem>
+                                <SelectItem value="sede2">Sede 2</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="bodega"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Bodega</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccione la bodega" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="bodega1">Bodega 1</SelectItem>
+                                <SelectItem value="bodega2">Bodega 2</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="tipoRegistro"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo de Registro</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccione el tipo de registro" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="individual">Individual</SelectItem>
+                                <SelectItem value="masivo">Masivo</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="tipo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo de Mantenimiento</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccione el tipo" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="preventivo">Preventivo</SelectItem>
+                                <SelectItem value="correctivo">Correctivo</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="periodicidad"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Periodicidad</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccione la periodicidad" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="mensual">Mensual</SelectItem>
+                                <SelectItem value="trimestral">Trimestral</SelectItem>
+                                <SelectItem value="anual">Anual</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="equipos" className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="equipos"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Equipos</FormLabel>
+                          <div className="border rounded-md p-4">
+                            <div className="mb-4">
+                              <Input placeholder="Buscar equipos..." />
+                            </div>
+                            {/* Aquí iría la lista de equipos según el tipo de registro (individual/masivo) */}
+                            <div className="h-[200px] overflow-y-auto border rounded-md p-2">
+                              <p className="text-sm text-muted-foreground">
+                                La lista de equipos se cargará según la sede y bodega seleccionada
+                              </p>
+                            </div>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="detalles" className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="fechaInicio"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Fecha de Inicio</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione el tipo" />
-                            </SelectTrigger>
+                            <CalendarComponent
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              locale={es}
+                              className="rounded-md border"
+                            />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="preventivo">Preventivo</SelectItem>
-                            <SelectItem value="correctivo">Correctivo</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="periodicidad"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Periodicidad</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                    <FormField
+                      control={form.control}
+                      name="responsable"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Responsable</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione la periodicidad" />
-                            </SelectTrigger>
+                            <Input placeholder="Nombre del responsable" {...field} />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="mensual">Mensual</SelectItem>
-                            <SelectItem value="trimestral">Trimestral</SelectItem>
-                            <SelectItem value="anual">Anual</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="fechaInicio"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Fecha de Inicio</FormLabel>
-                      <FormControl>
-                        <CalendarComponent
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          locale={es}
-                          className="rounded-md border"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="descripcion"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descripción</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Detalles del mantenimiento"
+                              className="min-h-[100px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TabsContent>
+                </Tabs>
 
-                <FormField
-                  control={form.control}
-                  name="responsable"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Responsable</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre del responsable" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="descripcion"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descripción</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Detalles del mantenimiento"
-                          className="min-h-[100px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Cancelar
                   </Button>
