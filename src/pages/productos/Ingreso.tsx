@@ -30,6 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
   // Información Básica
@@ -121,17 +122,19 @@ const IngresoProducto = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="flex-1 container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold text-[#040d50] mb-6">Ingreso de Producto</h1>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid gap-6">
-              {/* Información Básica */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">Información Básica</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+    <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Ingreso de Producto</h1>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid gap-6">
+            {/* Información Básica */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">Información Básica</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="descripcion"
@@ -173,7 +176,9 @@ const IngresoProducto = () => {
                       </FormItem>
                     )}
                   />
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                   <FormField
                     control={form.control}
                     name="marca"
@@ -220,50 +225,48 @@ const IngresoProducto = () => {
                     )}
                   />
 
-                  <div className="col-span-2">
-                    <FormField
-                      control={form.control}
-                      name="imagen"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Imagen del Equipo</FormLabel>
-                          <FormControl>
-                            <div className="flex items-center justify-center w-full">
-                              <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                  <Upload className="w-8 h-8 mb-4 text-gray-500" />
-                                  <p className="mb-2 text-sm text-gray-500">
-                                    <span className="font-semibold">Click para subir</span> o
-                                    arrastrar y soltar
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    PNG, JPG or JPEG
-                                  </p>
-                                </div>
-                                <input
-                                  type="file"
-                                  className="hidden"
-                                  onChange={(e) =>
-                                    field.onChange(e.target.files ? e.target.files[0] : null)
-                                  }
-                                />
-                              </label>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="imagen"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Imagen del Equipo</FormLabel>
+                        <FormControl>
+                          <div className="flex items-center justify-center w-full">
+                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                                <p className="text-sm text-gray-500">
+                                  <span className="font-semibold">Click para subir</span>
+                                </p>
+                              </div>
+                              <input
+                                type="file"
+                                className="hidden"
+                                onChange={(e) =>
+                                  field.onChange(e.target.files ? e.target.files[0] : null)
+                                }
+                              />
+                            </label>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Especificaciones Técnicas */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+            {/* Especificaciones Técnicas */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">
                   Especificaciones Técnicas
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="procesador"
@@ -359,19 +362,23 @@ const IngresoProducto = () => {
                     />
                   )}
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Información de Adquisición */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+            {/* Información de Adquisición */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">
                   Información de Adquisición
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="fechaCompra"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem>
                         <FormLabel>Fecha de Compra</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -455,7 +462,7 @@ const IngresoProducto = () => {
                     control={form.control}
                     name="garantiaInicio"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem>
                         <FormLabel>Inicio de Garantía</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -495,7 +502,7 @@ const IngresoProducto = () => {
                     control={form.control}
                     name="garantiaFin"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem>
                         <FormLabel>Fin de Garantía</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -545,14 +552,18 @@ const IngresoProducto = () => {
                     )}
                   />
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Estado y Ubicación */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+            {/* Estado y Ubicación */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">
                   Estado y Ubicación
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="estado"
@@ -666,14 +677,18 @@ const IngresoProducto = () => {
                     )}
                   />
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Mantenimiento */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+            {/* Mantenimiento */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">
                   Mantenimiento
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="frecuenciaMantenimiento"
@@ -702,7 +717,7 @@ const IngresoProducto = () => {
                     control={form.control}
                     name="ultimaFechaMantenimiento"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem>
                         <FormLabel>Última Fecha de Mantenimiento</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -754,14 +769,18 @@ const IngresoProducto = () => {
                     )}
                   />
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Documentación Relacionada */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+            {/* Documentación Relacionada */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">
                   Documentación Relacionada
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="manualUsuario"
@@ -818,14 +837,18 @@ const IngresoProducto = () => {
                     )}
                   />
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Campos Personalizables */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-[#040d50] mb-4">
+            {/* Campos Personalizables */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-[#040d50]">
                   Campos Personalizables
-                </h2>
-                <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
                     name="observaciones"
@@ -861,26 +884,3 @@ const IngresoProducto = () => {
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Botones de acción */}
-            <div className="flex justify-end space-x-4 sticky bottom-0 bg-white py-4 px-4 sm:px-6 border-t mt-6">
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-[#040d50] hover:bg-[#0a1668]">
-                Guardar
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
-  );
-};
-
-export default IngresoProducto;
