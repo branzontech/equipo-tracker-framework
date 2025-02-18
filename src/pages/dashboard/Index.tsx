@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -49,14 +48,14 @@ export default function Dashboard() {
       title: 'Total Equipos',
       size: 'small',
       component: (
-        <>
-          <div className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            Total Equipos
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <Package className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Total Equipos</span>
           </div>
-          <div className="text-2xl font-bold">415</div>
-          <p className="text-xs text-muted-foreground">Activos en inventario</p>
-        </>
+          <div className="text-2xl font-bold mt-2">415</div>
+          <p className="text-xs text-muted-foreground mt-1 truncate">Activos en inventario</p>
+        </div>
       )
     },
     {
@@ -65,14 +64,14 @@ export default function Dashboard() {
       title: 'Mantenimientos Vencidos',
       size: 'small',
       component: (
-        <>
-          <div className="flex items-center gap-2">
-            <Wrench className="h-4 w-4" />
-            Mantenimientos Vencidos
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <Wrench className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Mantenimientos Vencidos</span>
           </div>
-          <div className="text-2xl font-bold text-red-500">12</div>
-          <p className="text-xs text-muted-foreground">Requieren atención inmediata</p>
-        </>
+          <div className="text-2xl font-bold mt-2 text-red-500">12</div>
+          <p className="text-xs text-muted-foreground mt-1 truncate">Requieren atención inmediata</p>
+        </div>
       )
     },
     {
@@ -81,14 +80,14 @@ export default function Dashboard() {
       title: 'Tóner Disponible',
       size: 'small',
       component: (
-        <>
-          <div className="flex items-center gap-2">
-            <Printer className="h-4 w-4" />
-            Tóner Disponible
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <Printer className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Tóner Disponible</span>
           </div>
-          <div className="text-2xl font-bold">85%</div>
-          <p className="text-xs text-muted-foreground">Stock saludable</p>
-        </>
+          <div className="text-2xl font-bold mt-2">85%</div>
+          <p className="text-xs text-muted-foreground mt-1 truncate">Stock saludable</p>
+        </div>
       )
     },
     {
@@ -97,14 +96,14 @@ export default function Dashboard() {
       title: 'Sedes Activas',
       size: 'small',
       component: (
-        <>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            Sedes Activas
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <Building2 className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Sedes Activas</span>
           </div>
-          <div className="text-2xl font-bold">8</div>
-          <p className="text-xs text-muted-foreground">Con equipos asignados</p>
-        </>
+          <div className="text-2xl font-bold mt-2">8</div>
+          <p className="text-xs text-muted-foreground mt-1 truncate">Con equipos asignados</p>
+        </div>
       )
     },
     {
@@ -114,7 +113,7 @@ export default function Dashboard() {
       size: 'large',
       chartType: 'bar',
       data: equiposData,
-      component: <></> // Componente vacío para satisfacer TypeScript
+      component: <></>
     },
     {
       id: 'estado-mantenimientos',
@@ -123,7 +122,7 @@ export default function Dashboard() {
       size: 'large',
       chartType: 'pie',
       data: mantenimientosData,
-      component: <></> // Componente vacío para satisfacer TypeScript
+      component: <></>
     },
     {
       id: 'estado-toner',
@@ -132,7 +131,7 @@ export default function Dashboard() {
       size: 'large',
       chartType: 'pie',
       data: tonerData,
-      component: <></> // Componente vacío para satisfacer TypeScript
+      component: <></>
     },
     {
       id: 'equipos-sede',
@@ -141,7 +140,7 @@ export default function Dashboard() {
       size: 'large',
       chartType: 'bar',
       data: sedesData,
-      component: <></> // Componente vacío para satisfacer TypeScript
+      component: <></>
     }
   ]);
 
@@ -262,9 +261,9 @@ export default function Dashboard() {
             className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
-              <CardTitle className="text-sm sm:text-base font-medium">
-                <div className="flex items-center gap-2">
-                  <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardTitle className="text-sm sm:text-base font-medium w-full">
+                <div className="flex items-center gap-2 w-full">
+                  <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                   {item.component}
                 </div>
               </CardTitle>
@@ -287,7 +286,7 @@ export default function Dashboard() {
           >
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
-                <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 {item.title}
               </CardTitle>
             </CardHeader>
