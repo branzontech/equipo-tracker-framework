@@ -98,49 +98,53 @@ const MantenimientosIndex = () => {
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Gestión de Mantenimientos</h1>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-[#040d50] mb-4 sm:mb-6">
+        Gestión de Mantenimientos
+      </h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-[#040d50] text-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="h-5 w-5" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span>Nuevo Mantenimiento</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm opacity-90">Crear un nuevo registro de mantenimiento para un equipo.</p>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <p className="text-xs sm:text-sm opacity-90">
+                  Crear un nuevo registro de mantenimiento para un equipo.
+                </p>
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <DialogTitle>Nuevo Mantenimiento</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">Nuevo Mantenimiento</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
                 <div className="space-y-4">
                   <div className="relative">
-                    <Label>Buscar Equipo</Label>
+                    <Label className="text-sm sm:text-base">Buscar Equipo</Label>
                     <Input
                       placeholder="Buscar por nombre, serial, responsable o área"
                       value={busqueda}
                       onChange={(e) => handleSearch(e.target.value)}
-                      className="w-full"
+                      className="w-full mt-1.5"
                     />
                     {equiposFiltrados.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 sm:max-h-60 overflow-auto">
                         {equiposFiltrados.map((equipo) => (
                           <div
                             key={equipo.id}
-                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                            className="p-2 sm:p-3 hover:bg-gray-100 cursor-pointer"
                             onClick={() => selectEquipo(equipo)}
                           >
-                            <div className="font-medium">{equipo.nombre}</div>
-                            <div className="text-sm text-gray-600">
+                            <div className="font-medium text-sm sm:text-base">{equipo.nombre}</div>
+                            <div className="text-xs sm:text-sm text-gray-600">
                               Serial: {equipo.serial} | Responsable: {equipo.responsable} | Área: {equipo.area}
                             </div>
                           </div>
@@ -150,9 +154,9 @@ const MantenimientosIndex = () => {
                   </div>
 
                   {equipoSeleccionado && (
-                    <div className="p-3 bg-gray-50 rounded-md">
+                    <div className="p-3 bg-gray-50 rounded-md text-sm sm:text-base">
                       <h4 className="font-medium mb-1">Equipo Seleccionado:</h4>
-                      <p className="text-sm">
+                      <p className="text-xs sm:text-sm">
                         {equipoSeleccionado.nombre} - Serial: {equipoSeleccionado.serial}
                       </p>
                     </div>
@@ -163,14 +167,15 @@ const MantenimientosIndex = () => {
                     name="itemsChequeo"
                     render={() => (
                       <FormItem>
-                        <div className="mb-4">
-                          <FormLabel>Lista de Chequeo</FormLabel>
+                        <div className="mb-2 sm:mb-4">
+                          <FormLabel className="text-sm sm:text-base">Lista de Chequeo</FormLabel>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           {listadoChequeo.map((item) => (
-                            <div key={item} className="flex items-center space-x-2">
+                            <div key={item} className="flex items-start space-x-2">
                               <Checkbox
                                 id={item}
+                                className="mt-0.5"
                                 onCheckedChange={(checked) => {
                                   const currentItems = form.getValues("itemsChequeo");
                                   if (checked) {
@@ -185,7 +190,7 @@ const MantenimientosIndex = () => {
                               />
                               <label
                                 htmlFor={item}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                className="text-xs sm:text-sm font-medium leading-tight"
                               >
                                 {item}
                               </label>
@@ -201,10 +206,11 @@ const MantenimientosIndex = () => {
                     name="descripcion"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Descripción del Mantenimiento</FormLabel>
+                        <FormLabel className="text-sm sm:text-base">Descripción del Mantenimiento</FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Describe el mantenimiento a realizar"
+                            className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
                             {...field}
                           />
                         </FormControl>
@@ -217,10 +223,11 @@ const MantenimientosIndex = () => {
                     name="observaciones"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Observaciones Adicionales</FormLabel>
+                        <FormLabel className="text-sm sm:text-base">Observaciones Adicionales</FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Agrega observaciones o notas importantes"
+                            className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
                             {...field}
                           />
                         </FormControl>
@@ -229,7 +236,7 @@ const MantenimientosIndex = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full text-sm sm:text-base py-2 sm:py-2.5">
                   Crear Mantenimiento
                 </Button>
               </form>
@@ -237,51 +244,71 @@ const MantenimientosIndex = () => {
           </DialogContent>
         </Dialog>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/mantenimientos/programacion")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#040d50]" />
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer" 
+          onClick={() => navigate("/mantenimientos/programacion")}
+        >
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-[#040d50]" />
               <span className="text-[#040d50]">Programación</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">Programa y gestiona los mantenimientos preventivos y correctivos.</p>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <p className="text-xs sm:text-sm text-gray-600">
+              Programa y gestiona los mantenimientos preventivos y correctivos.
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/mantenimientos/ejecucion")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-[#040d50]" />
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer" 
+          onClick={() => navigate("/mantenimientos/ejecucion")}
+        >
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-[#040d50]" />
               <span className="text-[#040d50]">Ejecución</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">Registra y actualiza los mantenimientos en curso.</p>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <p className="text-xs sm:text-sm text-gray-600">
+              Registra y actualiza los mantenimientos en curso.
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/mantenimientos/documentacion")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#040d50]" />
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer" 
+          onClick={() => navigate("/mantenimientos/documentacion")}
+        >
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-[#040d50]" />
               <span className="text-[#040d50]">Documentación</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">Gestiona la documentación y evidencias de los mantenimientos.</p>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <p className="text-xs sm:text-sm text-gray-600">
+              Gestiona la documentación y evidencias de los mantenimientos.
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/mantenimientos/auditoria")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-[#040d50]" />
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer" 
+          onClick={() => navigate("/mantenimientos/auditoria")}
+        >
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5 text-[#040d50]" />
               <span className="text-[#040d50]">Auditoría</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">Revisa y audita los mantenimientos realizados.</p>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <p className="text-xs sm:text-sm text-gray-600">
+              Revisa y audita los mantenimientos realizados.
+            </p>
           </CardContent>
         </Card>
       </div>
