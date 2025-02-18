@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -129,17 +130,24 @@ const ProgramacionMantenimiento = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/mantenimientos")}>
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/mantenimientos")}
+          className="mb-2 sm:mb-0"
+        >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold text-[#040d50]">Programación de Mantenimientos</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-[#040d50]">
+          Programación de Mantenimientos
+        </h1>
       </div>
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="Tipo de mantenimiento" />
           </SelectTrigger>
           <SelectContent>
@@ -151,35 +159,35 @@ const ProgramacionMantenimiento = () => {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#040d50]">
+            <Button className="w-full sm:w-auto bg-[#040d50]">
               <Plus className="h-4 w-4 mr-2" />
               Nuevo Mantenimiento
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <DialogTitle>Programar Nuevo Mantenimiento</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg sm:text-xl">Programar Nuevo Mantenimiento</DialogTitle>
+              <DialogDescription className="text-sm sm:text-base">
                 Complete los detalles para programar un nuevo mantenimiento.
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <Tabs defaultValue="general" className="w-full">
-                  <TabsList className="w-full">
-                    <TabsTrigger value="general" className="flex-1">Información General</TabsTrigger>
-                    <TabsTrigger value="equipos" className="flex-1">Equipos</TabsTrigger>
-                    <TabsTrigger value="detalles" className="flex-1">Detalles Adicionales</TabsTrigger>
+                  <TabsList className="w-full grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-0">
+                    <TabsTrigger value="general" className="text-sm sm:text-base">Información General</TabsTrigger>
+                    <TabsTrigger value="equipos" className="text-sm sm:text-base">Equipos</TabsTrigger>
+                    <TabsTrigger value="detalles" className="text-sm sm:text-base">Detalles Adicionales</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="general" className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                  <TabsContent value="general" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="sede"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Sede</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Sede</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -201,7 +209,7 @@ const ProgramacionMantenimiento = () => {
                         name="bodega"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Bodega</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Bodega</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -223,7 +231,7 @@ const ProgramacionMantenimiento = () => {
                         name="tipoRegistro"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Tipo de Registro</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Tipo de Registro</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -241,13 +249,13 @@ const ProgramacionMantenimiento = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="tipo"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Tipo de Mantenimiento</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Tipo de Mantenimiento</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -269,7 +277,7 @@ const ProgramacionMantenimiento = () => {
                         name="periodicidad"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Periodicidad</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Periodicidad</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -289,11 +297,11 @@ const ProgramacionMantenimiento = () => {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="equipos" className="space-y-4">
+                  <TabsContent value="equipos" className="space-y-4 mt-4">
                     <div className="space-y-4">
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
-                          <FormLabel>Búsqueda</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">Búsqueda</FormLabel>
                           <div className="relative">
                             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
@@ -304,8 +312,8 @@ const ProgramacionMantenimiento = () => {
                             />
                           </div>
                         </div>
-                        <div className="w-[200px]">
-                          <FormLabel>Sede</FormLabel>
+                        <div className="w-full sm:w-[200px]">
+                          <FormLabel className="text-sm sm:text-base">Sede</FormLabel>
                           <Select value={filtroSede} onValueChange={setFiltroSede}>
                             <SelectTrigger>
                               <SelectValue placeholder="Filtrar por sede" />
@@ -318,8 +326,8 @@ const ProgramacionMantenimiento = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="w-[200px]">
-                          <FormLabel>Área</FormLabel>
+                        <div className="w-full sm:w-[200px]">
+                          <FormLabel className="text-sm sm:text-base">Área</FormLabel>
                           <Select value={filtroArea} onValueChange={setFiltroArea}>
                             <SelectTrigger>
                               <SelectValue placeholder="Filtrar por área" />
@@ -334,8 +342,8 @@ const ProgramacionMantenimiento = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="w-[200px]">
-                          <FormLabel>Tipo</FormLabel>
+                        <div className="w-full sm:w-[200px]">
+                          <FormLabel className="text-sm sm:text-base">Tipo</FormLabel>
                           <Select value={filtroTipo} onValueChange={setFiltroTipo}>
                             <SelectTrigger>
                               <SelectValue placeholder="Filtrar por tipo" />
@@ -352,7 +360,7 @@ const ProgramacionMantenimiento = () => {
                         </div>
                       </div>
 
-                      <div className="border rounded-md">
+                      <div className="border rounded-md overflow-x-auto">
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -363,9 +371,9 @@ const ProgramacionMantenimiento = () => {
                                 />
                               </TableHead>
                               <TableHead>Equipo</TableHead>
-                              <TableHead>Tipo</TableHead>
-                              <TableHead>Sede</TableHead>
-                              <TableHead>Área</TableHead>
+                              <TableHead className="hidden sm:table-cell">Tipo</TableHead>
+                              <TableHead className="hidden sm:table-cell">Sede</TableHead>
+                              <TableHead className="hidden sm:table-cell">Área</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -384,10 +392,15 @@ const ProgramacionMantenimiento = () => {
                                       onCheckedChange={() => handleSelectEquipo(equipo.id)}
                                     />
                                   </TableCell>
-                                  <TableCell>{equipo.nombre}</TableCell>
-                                  <TableCell>{equipo.tipo}</TableCell>
-                                  <TableCell>{equipo.sede}</TableCell>
-                                  <TableCell>{equipo.area}</TableCell>
+                                  <TableCell className="font-medium">
+                                    <div>{equipo.nombre}</div>
+                                    <div className="text-xs text-gray-500 sm:hidden">
+                                      {equipo.tipo} - {equipo.sede} - {equipo.area}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="hidden sm:table-cell">{equipo.tipo}</TableCell>
+                                  <TableCell className="hidden sm:table-cell">{equipo.sede}</TableCell>
+                                  <TableCell className="hidden sm:table-cell">{equipo.area}</TableCell>
                                 </TableRow>
                               ))
                             )}
@@ -400,21 +413,23 @@ const ProgramacionMantenimiento = () => {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="detalles" className="space-y-4">
+                  <TabsContent value="detalles" className="space-y-4 mt-4">
                     <FormField
                       control={form.control}
                       name="fechaInicio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Fecha de Inicio</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">Fecha de Inicio</FormLabel>
                           <FormControl>
-                            <CalendarComponent
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              locale={es}
-                              className="rounded-md border"
-                            />
+                            <div className="overflow-x-auto">
+                              <CalendarComponent
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                locale={es}
+                                className="rounded-md border w-full sm:w-auto"
+                              />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -426,7 +441,7 @@ const ProgramacionMantenimiento = () => {
                       name="responsable"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Responsable</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">Responsable</FormLabel>
                           <FormControl>
                             <Input placeholder="Nombre del responsable" {...field} />
                           </FormControl>
@@ -440,7 +455,7 @@ const ProgramacionMantenimiento = () => {
                       name="descripcion"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Descripción</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">Descripción</FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Detalles del mantenimiento"
@@ -455,11 +470,19 @@ const ProgramacionMantenimiento = () => {
                   </TabsContent>
                 </Tabs>
 
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsDialogOpen(false)}
+                    className="w-full sm:w-auto order-2 sm:order-1"
+                  >
                     Cancelar
                   </Button>
-                  <Button type="submit" className="bg-[#040d50]">
+                  <Button 
+                    type="submit" 
+                    className="w-full sm:w-auto bg-[#040d50] order-1 sm:order-2"
+                  >
                     Programar Mantenimiento
                   </Button>
                 </div>
@@ -471,21 +494,23 @@ const ProgramacionMantenimiento = () => {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-[#040d50]">Equipo</TableHead>
-                <TableHead className="text-[#040d50]">Tipo</TableHead>
-                <TableHead className="text-[#040d50]">Fecha Programada</TableHead>
-                <TableHead className="text-[#040d50]">Responsable</TableHead>
-                <TableHead className="text-[#040d50]">Estado</TableHead>
-                <TableHead className="text-[#040d50]">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Aquí irían los datos de mantenimientos programados */}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-[#040d50]">Equipo</TableHead>
+                  <TableHead className="text-[#040d50] hidden sm:table-cell">Tipo</TableHead>
+                  <TableHead className="text-[#040d50]">Fecha Programada</TableHead>
+                  <TableHead className="text-[#040d50] hidden sm:table-cell">Responsable</TableHead>
+                  <TableHead className="text-[#040d50] hidden sm:table-cell">Estado</TableHead>
+                  <TableHead className="text-[#040d50]">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {/* Aquí irían los datos de mantenimientos programados */}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
