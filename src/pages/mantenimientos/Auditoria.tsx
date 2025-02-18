@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle } from "lucide-react";
+import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 const estados = [
@@ -28,6 +34,13 @@ const AuditoriaMantenimiento = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedEstados, setSelectedEstados] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: new Date(),
+    to: undefined,
+  });
 
   const toggleEstado = (estado: string) => {
     setSelectedEstados(prev =>
@@ -51,11 +64,12 @@ const AuditoriaMantenimiento = () => {
         <Card className="md:col-span-2">
           <CardContent className="p-6">
             <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
+              mode="range"
+              selected={dateRange}
+              onSelect={setDateRange}
               locale={es}
               className="w-full [&_.rdp-day]:w-12 [&_.rdp-day]:h-12 [&_.rdp-head_th]:w-12 [&_.rdp-nav]:h-8"
+              numberOfMonths={2}
             />
           </CardContent>
         </Card>
@@ -65,6 +79,45 @@ const AuditoriaMantenimiento = () => {
           <CardContent className="p-6 space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-4">Filtros</h3>
+              
+              {/* Filtro de Rango de Fechas */}
+              <div className="space-y-2 mb-4">
+                <h4 className="text-sm font-medium">Rango de Fechas</h4>
+                <div className="grid gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={`w-full justify-start text-left font-normal ${!dateRange.from && "text-muted-foreground"}`}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateRange.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "P", { locale: es })} -{" "}
+                              {format(dateRange.to, "P", { locale: es })}
+                            </>
+                          ) : (
+                            format(dateRange.from, "P", { locale: es })
+                          )
+                        ) : (
+                          <span>Seleccione un rango de fechas</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        initialFocus
+                        locale={es}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
               <div className="relative mb-4">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -125,7 +178,7 @@ const AuditoriaMantenimiento = () => {
       <Card className="mt-6">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold mb-4">
-            Mantenimientos para el día {selectedDate?.toLocaleDateString()}
+            Mantenimientos para el período seleccionado
           </h3>
           <div className="space-y-4">
             {/* Ejemplo de mantenimiento */}
