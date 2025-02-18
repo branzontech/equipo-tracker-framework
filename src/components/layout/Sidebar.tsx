@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -25,6 +26,7 @@ import {
   LogOut,
   Printer,
   Database,
+  Cpu,
 } from "lucide-react";
 
 const menuItems = [
@@ -178,15 +180,33 @@ export const Sidebar = ({
   isCollapsed: boolean; 
   onToggle: (isCollapsed: boolean) => void;
 }) => {
+  const [hovering, setHovering] = useState(false);
+
+  useEffect(() => {
+    if (hovering && isCollapsed) {
+      onToggle(false);
+    }
+  }, [hovering, isCollapsed, onToggle]);
+
   return (
     <div
       className={`h-screen bg-[#0B2559] border-r border-white/10 transition-all duration-300 flex flex-col ${
         isCollapsed ? "w-16" : "w-64"
       }`}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => {
+        setHovering(false);
+        if (!isCollapsed) {
+          onToggle(true);
+        }
+      }}
     >
       <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
         {!isCollapsed && (
-          <span className="text-xl font-semibold text-white">Smart TI</span>
+          <div className="flex items-center gap-2">
+            <Cpu className="w-6 h-6 text-[#F2E205]" />
+            <span className="text-xl font-semibold text-white tracking-wider">SMART TI</span>
+          </div>
         )}
         <button
           onClick={() => onToggle(!isCollapsed)}
