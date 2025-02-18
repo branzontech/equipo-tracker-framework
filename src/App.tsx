@@ -21,6 +21,9 @@ import ExistenciaToners from "./pages/toners/Existencia";
 import SalidaToners from "./pages/toners/Salida";
 import BajaEquipos from "./pages/productos/BajaEquipos";
 import Login from "./pages/auth/Login";
+import Agentes from "./pages/configuracion/usuarios/Agentes";
+import Responsables from "./pages/configuracion/usuarios/Responsables";
+import Permisos from "./pages/configuracion/usuarios/Permisos";
 import { Sidebar } from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
 import { useState } from "react";
@@ -67,6 +70,9 @@ const App = () => {
                         <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                         <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
                         <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
+                        <Route path="/configuracion/usuarios/agentes" element={<Agentes />} />
+                        <Route path="/configuracion/usuarios/responsables" element={<Responsables />} />
+                        <Route path="/configuracion/usuarios/permisos" element={<Permisos />} />
                         <Route path="/toners/ingreso" element={<IngresoToner />} />
                         <Route path="/toners/existencia" element={<ExistenciaToners />} />
                         <Route path="/toners/salida" element={<SalidaToners />} />
