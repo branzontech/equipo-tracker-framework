@@ -198,7 +198,7 @@ export const Sidebar = ({
     <div
       className={`h-screen bg-[#0B2559] border-r border-white/10 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
-      }`}
+      } flex flex-col`}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
         setHovering(false);
@@ -207,7 +207,7 @@ export const Sidebar = ({
         }
       }}
     >
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
         <div className={`flex items-center gap-2 transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
           <Cpu className="w-6 h-6 text-[#F2E205] flex-shrink-0" />
           <span className="text-xl font-semibold text-white tracking-wider whitespace-nowrap overflow-hidden">SMART TI</span>
@@ -223,12 +223,14 @@ export const Sidebar = ({
           )}
         </button>
       </div>
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent hover:scrollbar-thumb-white/20">
-        {menuItems.map((item) => (
-          <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
-        ))}
-      </nav>
-      <div className="p-2 border-t border-white/10">
+      <div className="flex-1 overflow-hidden">
+        <nav className="h-full p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent hover:scrollbar-thumb-white/20">
+          {menuItems.map((item) => (
+            <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
+          ))}
+        </nav>
+      </div>
+      <div className="p-2 border-t border-white/10 flex-shrink-0">
         <button className="w-full flex items-center px-3 py-2 text-white hover:bg-white/10 rounded-lg transition-all duration-200">
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#F2E205]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
