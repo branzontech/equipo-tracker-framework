@@ -1,69 +1,145 @@
-# Welcome to your Lovable project
 
-## Project info
+# SMART TI - Sistema de Gestión de Inventario y Mantenimiento
 
-**URL**: https://lovable.dev/projects/a6634caa-af1d-4f25-a01d-91af976b8a27
+## Descripción General
+SMART TI es una aplicación web diseñada para la gestión integral de inventario y mantenimiento de equipos tecnológicos. Permite administrar el ciclo de vida completo de los equipos, desde su ingreso hasta su baja, incluyendo préstamos, traslados y mantenimientos.
 
-## How can I edit this code?
+## Características Principales
 
-There are several ways of editing your application.
+### 1. Gestión de Inventario
 
-**Use Lovable**
+#### Lista de Inventario
+- Visualización completa del inventario con información detallada de cada equipo
+- Filtrado y búsqueda avanzada de equipos
+- Sistema de columnas personalizables mediante drag and drop
+- Exportación de datos a CSV
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a6634caa-af1d-4f25-a01d-91af976b8a27) and start prompting.
+#### Ingreso de Equipos
+- Registro detallado de nuevos equipos
+- Asignación de números de serie y activos fijos
+- Registro de características y especificaciones técnicas
+- Asociación con ubicaciones y responsables
 
-Changes made via Lovable will be committed automatically to this repo.
+#### Salidas de Equipos
+- **Préstamos**: Gestión de préstamos temporales de equipos
+- **Traslados**: Control de movimientos entre sedes y departamentos
+- Generación automática de actas de entrega
+- Seguimiento del estado actual de los equipos prestados o trasladados
 
-**Use your preferred IDE**
+#### Baja de Equipos
+- Proceso de dar de baja equipos obsoletos o dañados
+- Registro de motivos de baja
+- Documentación del proceso con evidencias
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 2. Gestión de Mantenimientos
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+#### Programación
+- Calendario de mantenimientos preventivos
+- Asignación de técnicos responsables
+- Recordatorios y notificaciones de mantenimientos próximos
 
-Follow these steps:
+#### Ejecución
+- Registro de actividades realizadas
+- Documentación de repuestos utilizados
+- Control de tiempos de ejecución
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+#### Documentación
+- Registro fotográfico de mantenimientos
+- Historial completo de intervenciones
+- Generación de informes técnicos
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+#### Auditoría
+- Seguimiento de cumplimiento de mantenimientos
+- Indicadores de gestión
+- Reportes de eficiencia
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 3. Gestión de Toners
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+#### Control de Existencias
+- Inventario actualizado de toners
+- Alertas de stock mínimo
+- Clasificación por modelos y compatibilidad
 
-**Edit a file directly in GitHub**
+#### Movimientos
+- Registro de ingresos de nuevos toners
+- Control de salidas y asignaciones
+- Histórico de consumo por impresora
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 4. Configuración del Sistema
 
-**Use GitHub Codespaces**
+#### Maestros
+- **Sedes**: Gestión de ubicaciones físicas
+- **Bodegas**: Control de espacios de almacenamiento
+- **Marcas**: Catálogo de fabricantes
+- **Periféricos**: Tipos de dispositivos adicionales
+- **Accesorios**: Complementos de equipos
+- **Categorías**: Clasificación de equipos
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+#### Gestión de Usuarios
+- **Agentes**: Personal técnico y administrativo
+- **Responsables**: Usuarios finales de equipos
+- Control de permisos y accesos
 
-## What technologies are used for this project?
+### 5. Funcionalidades Transversales
 
-This project is built with .
+#### Trazabilidad
+- Seguimiento completo del ciclo de vida de los equipos
+- Registro de todas las operaciones realizadas
+- Auditoría de cambios y modificaciones
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+#### Hojas de Vida
+- Documentación completa de cada equipo
+- Historial de mantenimientos y reparaciones
+- Registro de garantías y servicios
 
-## How can I deploy this project?
+#### Actas y Documentación
+- Generación automática de documentos
+- Plantillas personalizables
+- Exportación en formato PDF
 
-Simply open [Lovable](https://lovable.dev/projects/a6634caa-af1d-4f25-a01d-91af976b8a27) and click on Share -> Publish.
+## Interfaz de Usuario
 
-## I want to use a custom domain - is that possible?
+### Navegación
+- Menú lateral colapsable para optimizar el espacio de trabajo
+- Organización jerárquica de funciones
+- Accesos rápidos a funciones frecuentes
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### Diseño Responsivo
+- Adaptación a diferentes tamaños de pantalla
+- Optimización para uso en tablets y dispositivos móviles
+- Interfaz intuitiva y fácil de usar
+
+## Tecnologías Utilizadas
+
+### Frontend
+- React con TypeScript para una base de código robusta y mantenible
+- Vite como herramienta de construcción para un desarrollo más rápido
+- Tailwind CSS para estilos consistentes y personalizables
+- Shadcn/ui para componentes de interfaz reutilizables
+
+### Librerías Principales
+- React Router DOM para la navegación
+- React Query para la gestión del estado y caché
+- React Hook Form para manejo de formularios
+- Lucide React para iconografía consistente
+- React-PDF para generación de documentos
+
+## Requerimientos del Sistema
+- Navegador web moderno (Chrome, Firefox, Safari, Edge)
+- Conexión a Internet estable
+- Resolución mínima de pantalla: 1024x768
+
+## Acceso al Sistema
+- URL de acceso: [URL_DE_LA_APLICACION]
+- Sistema de autenticación requerido
+- Diferentes niveles de acceso según rol del usuario
+
+## Soporte y Contacto
+- Documentación técnica disponible
+- Sistema de reporte de incidencias
+- Soporte técnico disponible en horario laboral
+
+---
+
+Esta documentación está en constante actualización para reflejar las mejoras y nuevas funcionalidades que se agreguen al sistema.
+
