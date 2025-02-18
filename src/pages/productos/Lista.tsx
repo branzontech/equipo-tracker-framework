@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -120,21 +121,68 @@ const sampleData = [
   },
 ];
 
+type ColumnConfig = {
+  id: string;
+  label: string;
+  key: string;
+  isVisible: boolean;
+  order: number;
+};
+
 const ListaInventario = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
 
-  const [visibleColumns, setVisibleColumns] = useState({
-    numeroSerie: true,
-    descripcion: true,
-    marca: true,
-    estado: true,
-    ubicacion: true,
-    responsable: true,
-  });
+  const [columns, setColumns] = useState<ColumnConfig[]>([
+    { id: "numeroSerie", label: "N° Serie", key: "numeroSerie", isVisible: true, order: 0 },
+    { id: "descripcion", label: "Descripción", key: "descripcion", isVisible: true, order: 1 },
+    { id: "marca", label: "Marca", key: "marca", isVisible: true, order: 2 },
+    { id: "estado", label: "Estado", key: "estado", isVisible: true, order: 3 },
+    { id: "ubicacion", label: "Ubicación", key: "ubicacion", isVisible: true, order: 4 },
+    { id: "responsable", label: "Responsable", key: "responsable", isVisible: true, order: 5 }
+  ]);
+
+  const handleDragStart = (columnId: string) => {
+    setDraggedColumn(columnId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
+    if (!draggedColumn || draggedColumn === targetColumnId) return;
+  };
+
+  const handleDrop = (targetColumnId: string) => {
+    if (!draggedColumn || draggedColumn === targetColumnId) return;
+
+    setColumns(prevColumns => {
+      const draggedColumnOrder = prevColumns.find(col => col.id === draggedColumn)?.order || 0;
+      const targetColumnOrder = prevColumns.find(col => col.id === targetColumnId)?.order || 0;
+
+      return prevColumns.map(column => {
+        if (column.id === draggedColumn) {
+          return { ...column, order: targetColumnOrder };
+        }
+        if (column.id === targetColumnId) {
+          return { ...column, order: draggedColumnOrder };
+        }
+        return column;
+      });
+    });
+
+    setDraggedColumn(null);
+  };
+
+  const toggleColumnVisibility = (columnId: string, isChecked: boolean) => {
+    setColumns(prevColumns =>
+      prevColumns.map(column =>
+        column.id === columnId ? { ...column, isVisible: isChecked } : column
+      )
+    );
+  };
 
   const filteredData = sampleData.filter((item) =>
     Object.values(item).some(
@@ -182,6 +230,8 @@ const ListaInventario = () => {
     document.body.removeChild(a);
   };
 
+  const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-[#040d50] mb-6">Lista de Inventario</h1>
@@ -206,54 +256,23 @@ const ListaInventario = () => {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Columnas visibles</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={visibleColumns.numeroSerie}
-                onCheckedChange={(checked) => 
-                  setVisibleColumns(prev => ({ ...prev, numeroSerie: checked }))
-                }
-              >
-                N° Serie
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={visibleColumns.descripcion}
-                onCheckedChange={(checked) =>
-                  setVisibleColumns(prev => ({ ...prev, descripcion: checked }))
-                }
-              >
-                Descripción
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={visibleColumns.marca}
-                onCheckedChange={(checked) =>
-                  setVisibleColumns(prev => ({ ...prev, marca: checked }))
-                }
-              >
-                Marca
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={visibleColumns.estado}
-                onCheckedChange={(checked) =>
-                  setVisibleColumns(prev => ({ ...prev, estado: checked }))
-                }
-              >
-                Estado
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={visibleColumns.ubicacion}
-                onCheckedChange={(checked) =>
-                  setVisibleColumns(prev => ({ ...prev, ubicacion: checked }))
-                }
-              >
-                Ubicación
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={visibleColumns.responsable}
-                onCheckedChange={(checked) =>
-                  setVisibleColumns(prev => ({ ...prev, responsable: checked }))
-                }
-              >
-                Responsable
-              </DropdownMenuCheckboxItem>
+              {columns.map((column) => (
+                <div key={column.id} className="px-2 py-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={column.isVisible}
+                      onCheckedChange={(checked) => toggleColumnVisibility(column.id, checked as boolean)}
+                      id={`checkbox-${column.id}`}
+                    />
+                    <label
+                      htmlFor={`checkbox-${column.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {column.label}
+                    </label>
+                  </div>
+                </div>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="outline" onClick={handleDownload}>
@@ -267,53 +286,27 @@ const ListaInventario = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              {visibleColumns.numeroSerie && (
-                <TableHead onClick={() => handleSort("numeroSerie")} className="cursor-pointer">
-                  N° Serie
-                  {sortField === "numeroSerie" && (
-                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                  )}
-                </TableHead>
-              )}
-              {visibleColumns.descripcion && (
-                <TableHead onClick={() => handleSort("descripcion")} className="cursor-pointer">
-                  Descripción
-                  {sortField === "descripcion" && (
-                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                  )}
-                </TableHead>
-              )}
-              {visibleColumns.marca && (
-                <TableHead onClick={() => handleSort("marca")} className="cursor-pointer">
-                  Marca
-                  {sortField === "marca" && (
-                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                  )}
-                </TableHead>
-              )}
-              {visibleColumns.estado && (
-                <TableHead onClick={() => handleSort("estado")} className="cursor-pointer">
-                  Estado
-                  {sortField === "estado" && (
-                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                  )}
-                </TableHead>
-              )}
-              {visibleColumns.ubicacion && (
-                <TableHead onClick={() => handleSort("ubicacion")} className="cursor-pointer">
-                  Ubicación
-                  {sortField === "ubicacion" && (
-                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                  )}
-                </TableHead>
-              )}
-              {visibleColumns.responsable && (
-                <TableHead onClick={() => handleSort("responsable")} className="cursor-pointer">
-                  Responsable
-                  {sortField === "responsable" && (
-                    sortDirection === "asc" ? <ArrowUp className="inline ml-1 h-4 w-4" /> : <ArrowDown className="inline ml-1 h-4 w-4" />
-                  )}
-                </TableHead>
+              {sortedColumns.map((column) => 
+                column.isVisible && (
+                  <TableHead
+                    key={column.id}
+                    onClick={() => handleSort(column.key)}
+                    className="cursor-pointer select-none"
+                    draggable
+                    onDragStart={() => handleDragStart(column.id)}
+                    onDragOver={(e) => handleDragOver(e, column.id)}
+                    onDrop={() => handleDrop(column.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      {column.label}
+                      {sortField === column.key && (
+                        sortDirection === "asc" ? 
+                          <ArrowUp className="inline h-4 w-4" /> : 
+                          <ArrowDown className="inline h-4 w-4" />
+                      )}
+                    </div>
+                  </TableHead>
+                )
               )}
               <TableHead>Acciones</TableHead>
             </TableRow>
@@ -321,12 +314,13 @@ const ListaInventario = () => {
           <TableBody>
             {paginatedData.map((item) => (
               <TableRow key={item.id}>
-                {visibleColumns.numeroSerie && <TableCell>{item.numeroSerie}</TableCell>}
-                {visibleColumns.descripcion && <TableCell>{item.descripcion}</TableCell>}
-                {visibleColumns.marca && <TableCell>{item.marca}</TableCell>}
-                {visibleColumns.estado && <TableCell>{item.estado}</TableCell>}
-                {visibleColumns.ubicacion && <TableCell>{item.ubicacion}</TableCell>}
-                {visibleColumns.responsable && <TableCell>{item.responsable}</TableCell>}
+                {sortedColumns.map((column) =>
+                  column.isVisible && (
+                    <TableCell key={`${item.id}-${column.id}`}>
+                      {item[column.key as keyof typeof item]}
+                    </TableCell>
+                  )
+                )}
                 <TableCell>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon">
