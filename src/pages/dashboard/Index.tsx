@@ -258,10 +258,10 @@ export default function Dashboard() {
   const largeItems = sortedItems.filter(item => item.size === 'large');
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
         {smallItems.map((item) => (
           <Card
             key={item.id}
@@ -273,8 +273,8 @@ export default function Dashboard() {
             onDrop={(e) => handleDrop(e, item.id)}
             className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
                 <div className="flex items-center gap-2">
                   <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   {item.component}
@@ -285,7 +285,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
         {largeItems.map((item) => (
           <Card
             key={item.id}
@@ -297,14 +297,57 @@ export default function Dashboard() {
             onDrop={(e) => handleDrop(e, item.id)}
             className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
           >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
                 <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 {item.title}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {item.component}
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="h-[250px] sm:h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  {item.component.type === Bar ? (
+                    <BarChart data={item.component.props.data}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fontSize: 12 }}
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={60}
+                      />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip />
+                      <Legend wrapperStyle={{ fontSize: '12px' }} />
+                      <Bar dataKey="cantidad" fill="#3b82f6" />
+                    </BarChart>
+                  ) : (
+                    <PieChart>
+                      <Pie
+                        data={item.component.props.data}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={window.innerWidth < 640 ? 80 : 100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {item.component.props.data.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend 
+                        wrapperStyle={{ fontSize: '12px' }}
+                        verticalAlign="bottom"
+                        height={36}
+                      />
+                    </PieChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
         ))}
