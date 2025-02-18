@@ -884,3 +884,26 @@ const IngresoProducto = () => {
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Botones de acción */}
+            <div className="flex justify-end gap-4 sticky bottom-0 bg-white py-4 border-t mt-6">
+              <Button variant="outline" type="button">
+                Cancelar
+              </Button>
+              <Button type="submit" className="bg-[#040d50] hover:bg-[#0a1668]">
+                Guardar Producto
+              </Button>
+            </div>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default IngresoProducto;
