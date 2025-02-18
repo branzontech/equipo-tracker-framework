@@ -281,20 +281,9 @@ const IngresoProducto = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Memoria RAM</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione la memoria RAM" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="4GB">4 GB</SelectItem>
-                        <SelectItem value="8GB">8 GB</SelectItem>
-                        <SelectItem value="16GB">16 GB</SelectItem>
-                        <SelectItem value="32GB">32 GB</SelectItem>
-                        <SelectItem value="64GB">64 GB</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="Ej: 16 GB" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -306,20 +295,9 @@ const IngresoProducto = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Capacidad Disco Duro</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione la capacidad" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="128GB">128 GB</SelectItem>
-                        <SelectItem value="256GB">256 GB</SelectItem>
-                        <SelectItem value="512GB">512 GB</SelectItem>
-                        <SelectItem value="1TB">1 TB</SelectItem>
-                        <SelectItem value="2TB">2 TB</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="Ej: 512 GB" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -331,18 +309,9 @@ const IngresoProducto = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Disco Duro</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione el tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="SSD">SSD</SelectItem>
-                        <SelectItem value="HDD">HDD</SelectItem>
-                        <SelectItem value="NVMe">NVMe</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="Ej: SSD, HDD, NVMe" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
