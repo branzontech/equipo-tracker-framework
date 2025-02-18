@@ -130,7 +130,7 @@ SMART TI es una aplicación web diseñada para la gestión integral de inventari
 - Resolución mínima de pantalla: 1024x768
 
 ## Acceso al Sistema
-- URL de acceso: [URL_DE_LA_APLICACION]
+- URL de acceso: https://equipo-tracker-framework.lovable.app/
 - Sistema de autenticación requerido
 - Diferentes niveles de acceso según rol del usuario
 
