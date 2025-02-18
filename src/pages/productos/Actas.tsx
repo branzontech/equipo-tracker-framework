@@ -40,6 +40,7 @@ type Acta = {
     marca: string;
     activoFijo: string;
     accesorios: string;
+    descripcion?: string;
   }[];
   firmaEntrega?: string;
   firmaRecibe?: string;
@@ -61,12 +62,14 @@ const actasEjemplo: Acta[] = [
       {
         serial: "LP2023001",
         marca: "Dell",
+        descripcion: "Laptop Dell XPS 15 - i7 11th Gen",
         activoFijo: "AF001",
         accesorios: "Cargador, Mouse, Maletín",
       },
       {
         serial: "LP2023002",
         marca: "HP",
+        descripcion: "Laptop HP EliteBook - i5 12th Gen",
         activoFijo: "AF002",
         accesorios: "Cargador, Teclado externo",
       }
@@ -85,12 +88,14 @@ const actasEjemplo: Acta[] = [
       {
         serial: "PC2023001",
         marca: "Lenovo",
+        descripcion: "PC Lenovo ThinkCentre - i7 12th Gen",
         activoFijo: "AF003",
         accesorios: "Monitor, Teclado, Mouse",
       },
       {
         serial: "PC2023002",
         marca: "HP",
+        descripcion: "PC HP ProDesk - i7 13th Gen",
         activoFijo: "AF004",
         accesorios: "Monitor Doble, Dock Station",
       }
@@ -112,6 +117,7 @@ const actasEjemplo: Acta[] = [
       {
         serial: "LP2023003",
         marca: "MacBook",
+        descripcion: "MacBook Pro 16' - M2 Pro",
         activoFijo: "AF005",
         accesorios: "Cargador, Adaptador HDMI, Mouse Magic",
       }

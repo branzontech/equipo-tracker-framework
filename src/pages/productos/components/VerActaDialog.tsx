@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,7 @@ type Acta = {
     marca: string;
     activoFijo: string;
     accesorios: string;
+    descripcion?: string;
   }[];
   firmaEntrega?: string;
   firmaRecibe?: string;
@@ -103,6 +103,7 @@ export function VerActaDialog({ acta, open, onOpenChange }: VerActaDialogProps) 
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activo Fijo</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accesorios</th>
@@ -112,6 +113,7 @@ export function VerActaDialog({ acta, open, onOpenChange }: VerActaDialogProps) 
                   {acta.equipos?.map((equipo, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{equipo.serial}</td>
+                      <td className="px-6 py-4 text-sm">{equipo.descripcion || "-"}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{equipo.marca}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{equipo.activoFijo}</td>
                       <td className="px-6 py-4 text-sm">{equipo.accesorios}</td>
