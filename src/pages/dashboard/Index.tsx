@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -33,8 +34,8 @@ type DashboardItem = {
   id: string;
   order: number;
   title: string;
-  component: JSX.Element;
   size: 'small' | 'large';
+  component?: JSX.Element;
   chartType?: 'bar' | 'pie';
   data?: any[];
 };
@@ -112,7 +113,8 @@ export default function Dashboard() {
       title: 'Distribución de Equipos por Tipo',
       size: 'large',
       chartType: 'bar',
-      data: equiposData
+      data: equiposData,
+      component: <></> // Componente vacío para satisfacer TypeScript
     },
     {
       id: 'estado-mantenimientos',
@@ -120,7 +122,8 @@ export default function Dashboard() {
       title: 'Estado de Mantenimientos',
       size: 'large',
       chartType: 'pie',
-      data: mantenimientosData
+      data: mantenimientosData,
+      component: <></> // Componente vacío para satisfacer TypeScript
     },
     {
       id: 'estado-toner',
@@ -128,7 +131,8 @@ export default function Dashboard() {
       title: 'Estado de Tóner',
       size: 'large',
       chartType: 'pie',
-      data: tonerData
+      data: tonerData,
+      component: <></> // Componente vacío para satisfacer TypeScript
     },
     {
       id: 'equipos-sede',
@@ -136,7 +140,8 @@ export default function Dashboard() {
       title: 'Equipos por Sede',
       size: 'large',
       chartType: 'bar',
-      data: sedesData
+      data: sedesData,
+      component: <></> // Componente vacío para satisfacer TypeScript
     }
   ]);
 
@@ -193,7 +198,7 @@ export default function Dashboard() {
   const largeItems = sortedItems.filter(item => item.size === 'large');
 
   const renderChart = (item: DashboardItem) => {
-    if (item.chartType === 'bar') {
+    if (item.chartType === 'bar' && item.data) {
       return (
         <BarChart data={item.data}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -211,7 +216,7 @@ export default function Dashboard() {
           <Bar dataKey="cantidad" fill="#3b82f6" />
         </BarChart>
       );
-    } else if (item.chartType === 'pie') {
+    } else if (item.chartType === 'pie' && item.data) {
       return (
         <PieChart>
           <Pie
@@ -224,7 +229,7 @@ export default function Dashboard() {
             fill="#8884d8"
             dataKey="value"
           >
-            {item.data?.map((entry, index) => (
+            {item.data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
