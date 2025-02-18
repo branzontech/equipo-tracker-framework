@@ -67,9 +67,9 @@ const ProgramacionMantenimiento = () => {
   const navigate = useNavigate();
   const [tipoMantenimiento, setTipoMantenimiento] = useState<string>("todos");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [filtroSede, setFiltroSede] = useState<string>("");
-  const [filtroArea, setFiltroArea] = useState<string>("");
-  const [filtroTipo, setFiltroTipo] = useState<string>("");
+  const [filtroSede, setFiltroSede] = useState<string>("all");
+  const [filtroArea, setFiltroArea] = useState<string>("all");
+  const [filtroTipo, setFiltroTipo] = useState<string>("all");
   const [busqueda, setBusqueda] = useState<string>("");
   const [selectedEquipos, setSelectedEquipos] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -88,9 +88,9 @@ const ProgramacionMantenimiento = () => {
   });
 
   const equiposFiltrados = equiposMock.filter(equipo => {
-    const cumpleFiltroSede = !filtroSede || equipo.sede === filtroSede;
-    const cumpleFiltroArea = !filtroArea || equipo.area === filtroArea;
-    const cumpleFiltroTipo = !filtroTipo || equipo.tipo === filtroTipo;
+    const cumpleFiltroSede = filtroSede === "all" || equipo.sede === filtroSede;
+    const cumpleFiltroArea = filtroArea === "all" || equipo.area === filtroArea;
+    const cumpleFiltroTipo = filtroTipo === "all" || equipo.tipo === filtroTipo;
     const cumpleBusqueda = !busqueda || 
       equipo.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
       equipo.tipo.toLowerCase().includes(busqueda.toLowerCase());
@@ -311,7 +311,7 @@ const ProgramacionMantenimiento = () => {
                               <SelectValue placeholder="Filtrar por sede" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Todas</SelectItem>
+                              <SelectItem value="all">Todas</SelectItem>
                               <SelectItem value="Sede 1">Sede 1</SelectItem>
                               <SelectItem value="Sede 2">Sede 2</SelectItem>
                               <SelectItem value="Sede 3">Sede 3</SelectItem>
@@ -325,7 +325,7 @@ const ProgramacionMantenimiento = () => {
                               <SelectValue placeholder="Filtrar por área" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Todas</SelectItem>
+                              <SelectItem value="all">Todas</SelectItem>
                               <SelectItem value="Sistemas">Sistemas</SelectItem>
                               <SelectItem value="Administración">Administración</SelectItem>
                               <SelectItem value="Ventas">Ventas</SelectItem>
@@ -341,7 +341,7 @@ const ProgramacionMantenimiento = () => {
                               <SelectValue placeholder="Filtrar por tipo" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Todos</SelectItem>
+                              <SelectItem value="all">Todos</SelectItem>
                               <SelectItem value="Laptop">Laptop</SelectItem>
                               <SelectItem value="Desktop">Desktop</SelectItem>
                               <SelectItem value="Impresora">Impresora</SelectItem>
