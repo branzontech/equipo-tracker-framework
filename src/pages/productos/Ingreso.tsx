@@ -4,6 +4,7 @@ import * as z from "zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Upload } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -92,9 +93,12 @@ const IngresoProducto = () => {
       numeroActivoFijo: "",
       marca: "",
       categoria: "",
-      descripcionTecnica: "",
-      especificacionesFabricante: "",
-      accesoriosIncluidos: "",
+      procesador: "",
+      discoDuro: "",
+      tipoDisco: "",
+      memoriaRam: "",
+      tieneCargador: false,
+      serialCargador: "",
       proveedor: "",
       numeroFactura: "",
       costoAdquisicion: "",
@@ -109,12 +113,6 @@ const IngresoProducto = () => {
       proveedorServicio: "",
       observaciones: "",
       tags: "",
-      procesador: "",
-      discoDuro: "",
-      tipoDisco: "",
-      memoriaRam: "",
-      tieneCargador: false,
-      serialCargador: "",
     },
   });
 
