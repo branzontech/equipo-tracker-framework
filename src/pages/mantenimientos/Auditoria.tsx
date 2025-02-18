@@ -178,20 +178,88 @@ const AuditoriaMantenimiento = () => {
             Mantenimientos para el período seleccionado
           </h3>
           <div className="space-y-4">
-            {/* Ejemplo de mantenimiento */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
+            {/* Mantenimiento Programado */}
+            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
               <div className="flex items-center gap-4">
                 <Badge variant="outline" className="bg-blue-500 text-white">
                   Programado
                 </Badge>
                 <div>
                   <h4 className="font-medium">Mantenimiento Preventivo</h4>
-                  <p className="text-sm text-muted-foreground">Equipo XYZ - Sede Principal</p>
+                  <p className="text-sm text-muted-foreground">Impresora HP LaserJet - Sede Principal</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="font-medium">09:00 AM</p>
                 <p className="text-sm text-muted-foreground">Juan Pérez</p>
+              </div>
+            </div>
+
+            {/* Mantenimiento Ejecutado */}
+            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="bg-green-500 text-white">
+                  Ejecutado
+                </Badge>
+                <div>
+                  <h4 className="font-medium">Mantenimiento Correctivo</h4>
+                  <p className="text-sm text-muted-foreground">Computador Dell XPS - Departamento TI</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">11:30 AM</p>
+                <p className="text-sm text-muted-foreground">María González</p>
+              </div>
+            </div>
+
+            {/* Mantenimiento Pendiente */}
+            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="bg-yellow-500 text-white">
+                  Pendiente
+                </Badge>
+                <div>
+                  <h4 className="font-medium">Actualización de Software</h4>
+                  <p className="text-sm text-muted-foreground">Servidor Principal - Data Center</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">14:00 PM</p>
+                <p className="text-sm text-muted-foreground">Carlos Rodríguez</p>
+              </div>
+            </div>
+
+            {/* Mantenimiento Atrasado */}
+            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="bg-red-500 text-white">
+                  Atrasado
+                </Badge>
+                <div>
+                  <h4 className="font-medium">Reemplazo de Componentes</h4>
+                  <p className="text-sm text-muted-foreground">Router Cisco - Sala de Comunicaciones</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">16:30 PM</p>
+                <p className="text-sm text-muted-foreground">Ana Martínez</p>
+              </div>
+            </div>
+
+            {/* Mantenimiento Programado Futuro */}
+            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="bg-blue-500 text-white">
+                  Programado
+                </Badge>
+                <div>
+                  <h4 className="font-medium">Limpieza de Equipos</h4>
+                  <p className="text-sm text-muted-foreground">Laboratorio de Pruebas - Piso 3</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">10:00 AM</p>
+                <p className="text-sm text-muted-foreground">Luis Sánchez</p>
               </div>
             </div>
           </div>
