@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,11 @@ import Login from "./pages/auth/Login";
 import { Sidebar } from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
 import { useState } from "react";
+import MantenimientosIndex from "./pages/mantenimientos/Index";
+import ProgramacionMantenimiento from "./pages/mantenimientos/Programacion";
+import EjecucionMantenimiento from "./pages/mantenimientos/Ejecucion";
+import DocumentacionMantenimiento from "./pages/mantenimientos/Documentacion";
+import AuditoriaMantenimiento from "./pages/mantenimientos/Auditoria";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +68,11 @@ const App = () => {
                         <Route path="/toners/ingreso" element={<IngresoToner />} />
                         <Route path="/toners/existencia" element={<ExistenciaToners />} />
                         <Route path="/toners/salida" element={<SalidaToners />} />
+                        <Route path="/mantenimientos" element={<MantenimientosIndex />} />
+                        <Route path="/mantenimientos/programacion" element={<ProgramacionMantenimiento />} />
+                        <Route path="/mantenimientos/ejecucion" element={<EjecucionMantenimiento />} />
+                        <Route path="/mantenimientos/documentacion" element={<DocumentacionMantenimiento />} />
+                        <Route path="/mantenimientos/auditoria" element={<AuditoriaMantenimiento />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>
