@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -41,9 +40,12 @@ const formSchema = z.object({
   imagen: z.any(),
 
   // Especificaciones Técnicas
-  descripcionTecnica: z.string(),
-  especificacionesFabricante: z.string(),
-  accesoriosIncluidos: z.string(),
+  procesador: z.string().min(1, "El procesador es requerido"),
+  discoDuro: z.string().min(1, "La capacidad del disco duro es requerida"),
+  tipoDisco: z.string().min(1, "El tipo de disco duro es requerido"),
+  memoriaRam: z.string().min(1, "La memoria RAM es requerida"),
+  tieneCargador: z.boolean().default(false),
+  serialCargador: z.string().optional(),
 
   // Información de Adquisición
   fechaCompra: z.date(),
@@ -107,6 +109,12 @@ const IngresoProducto = () => {
       proveedorServicio: "",
       observaciones: "",
       tags: "",
+      procesador: "",
+      discoDuro: "",
+      tipoDisco: "",
+      memoriaRam: "",
+      tieneCargador: false,
+      serialCargador: "",
     },
   });
 
@@ -254,24 +262,132 @@ const IngresoProducto = () => {
             <h2 className="text-xl font-semibold text-[#040d50] mb-4">
               Especificaciones Técnicas
             </h2>
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
-                name="descripcionTecnica"
+                name="procesador"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descripción Técnica</FormLabel>
+                    <FormLabel>Procesador</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Ingrese la descripción técnica"
-                        className="min-h-[100px]"
-                        {...field}
-                      />
+                      <Input placeholder="Ej: Intel Core i5 11th Gen" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="memoriaRam"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Memoria RAM</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione la memoria RAM" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="4GB">4 GB</SelectItem>
+                        <SelectItem value="8GB">8 GB</SelectItem>
+                        <SelectItem value="16GB">16 GB</SelectItem>
+                        <SelectItem value="32GB">32 GB</SelectItem>
+                        <SelectItem value="64GB">64 GB</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="discoDuro"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Capacidad Disco Duro</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione la capacidad" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="128GB">128 GB</SelectItem>
+                        <SelectItem value="256GB">256 GB</SelectItem>
+                        <SelectItem value="512GB">512 GB</SelectItem>
+                        <SelectItem value="1TB">1 TB</SelectItem>
+                        <SelectItem value="2TB">2 TB</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tipoDisco"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Disco Duro</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione el tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="SSD">SSD</SelectItem>
+                        <SelectItem value="HDD">HDD</SelectItem>
+                        <SelectItem value="NVMe">NVMe</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tieneCargador"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Tiene Cargador
+                      </FormLabel>
+                      <FormDescription>
+                        Marque esta casilla si el equipo incluye cargador
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch("tieneCargador") && (
+                <FormField
+                  control={form.control}
+                  name="serialCargador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Serial del Cargador</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ingrese el serial del cargador" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
 
