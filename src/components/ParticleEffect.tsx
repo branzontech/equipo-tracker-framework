@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 
 const Colors = [
@@ -140,7 +139,8 @@ const ParticleEffect = () => {
     const animate = () => {
       if (!ctx || !canvas) return;
 
-      ctx.fillStyle = 'rgba(20,20,20,0.2)';
+      // Reducimos la opacidad del fondo para hacer las partículas más visibles
+      ctx.fillStyle = 'rgba(11,37,89,0.1)'; // Color de fondo más transparente que coincide con el tema
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle) => {
@@ -149,13 +149,13 @@ const ParticleEffect = () => {
         particle.render(ctx, 10);
       });
 
-      // Render mouse light effect
-      ctx.fillStyle = 'white';
+      // Hacemos el efecto del mouse más visible
+      ctx.fillStyle = '#F2E205'; // Color amarillo que coincide con el tema
       ctx.beginPath();
       ctx.arc(mouseRef.current.x, mouseRef.current.y, 5, 0, Math.PI * 2);
       ctx.closePath();
       ctx.shadowBlur = 20;
-      ctx.shadowColor = 'white';
+      ctx.shadowColor = '#F2E205';
       ctx.fill();
       ctx.shadowBlur = 0;
 
