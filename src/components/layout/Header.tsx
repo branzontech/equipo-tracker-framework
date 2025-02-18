@@ -4,7 +4,11 @@ import { Bell, Settings, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-const Header = () => {
+interface HeaderProps {
+  className?: string;
+}
+
+const Header = ({ className = "" }: HeaderProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -16,7 +20,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="h-16 bg-white shadow-sm px-6 flex items-center justify-between">
+    <header className={`h-16 bg-white shadow-sm px-6 flex items-center justify-between ${className}`}>
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Clock className="w-4 h-4" />
         <span className="font-medium">
