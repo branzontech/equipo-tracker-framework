@@ -122,20 +122,20 @@ const IngresoProducto = () => {
   }
 
   return (
-    <div className="w-full max-w-[100vw] overflow-x-hidden">
-      <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+    <div className="relative w-full overflow-x-hidden">
+      <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-4 max-w-full">
         <h1 className="text-2xl font-bold text-[#040d50] mb-6">Ingreso de Producto</h1>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid gap-6 w-full">
+            <div className="grid gap-6 max-w-full">
               {/* Información Básica */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">Información Básica</CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="descripcion"
@@ -260,14 +260,14 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Especificaciones Técnicas */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Especificaciones Técnicas
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="procesador"
@@ -367,14 +367,14 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Información de Adquisición */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Información de Adquisición
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="fechaCompra"
@@ -557,14 +557,14 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Estado y Ubicación */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Estado y Ubicación
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="estado"
@@ -682,14 +682,14 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Mantenimiento */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Mantenimiento
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="frecuenciaMantenimiento"
@@ -774,14 +774,14 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Documentación Relacionada */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Documentación Relacionada
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="manualUsuario"
@@ -842,14 +842,14 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Campos Personalizables */}
-              <Card className="w-full overflow-hidden">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Campos Personalizables
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <div className="grid grid-cols-1 gap-4 min-w-0">
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-4">
                     <FormField
                       control={form.control}
                       name="observaciones"
