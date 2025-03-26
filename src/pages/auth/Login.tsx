@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -71,7 +70,7 @@ const Login = () => {
 
           <Button 
             type="submit" 
-            className="w-full bg-[#bff036] hover:bg-[#01242c] text-[#01242c] hover:text-white font-semibold transition-colors duration-300"
+            className="w-full"
           >
             Ingresar
           </Button>
