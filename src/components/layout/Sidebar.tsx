@@ -203,7 +203,7 @@ export const Sidebar = ({
 
   return (
     <div
-      className={`h-screen bg-[#0B2559] border-r border-white/10 transition-all duration-300 ${
+      className={`h-screen bg-gradient-to-br from-[#0B2559] via-[#1A3E7C] to-[#0D2C5E] border-r border-white/10 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       } flex flex-col`}
       onMouseEnter={() => setHovering(true)}
