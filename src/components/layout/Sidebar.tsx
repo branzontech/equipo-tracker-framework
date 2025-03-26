@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -161,14 +162,14 @@ const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) =>
         onClick={handleClick}
       >
         <div className="flex items-center flex-1">
-          {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#33C3F0]`} />}
+          {Icon && <Icon className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#bff036]`} />}
           {!isCollapsed && (
             <span className="flex-1 whitespace-nowrap">{item.title}</span>
           )}
         </div>
         {!isCollapsed && hasSubmenu && (
           <ChevronRight
-            className={`w-4 h-4 transition-transform duration-200 text-[#33C3F0] ${
+            className={`w-4 h-4 transition-transform duration-200 text-[#bff036] ${
               isOpen ? "rotate-90" : ""
             }`}
           />
@@ -202,7 +203,7 @@ export const Sidebar = ({
 
   return (
     <div
-      className={`h-screen bg-gradient-to-tr from-[rgba(30,39,107,1)] to-[rgba(77,118,221,1)] border-r border-white/10 transition-all duration-300 ${
+      className={`h-screen bg-[#01242c] border-r border-white/10 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       } flex flex-col`}
       onMouseEnter={() => setHovering(true)}
@@ -215,7 +216,7 @@ export const Sidebar = ({
     >
       <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
         <div className={`flex items-center gap-2 transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
-          <Cpu className="w-6 h-6 text-[#33C3F0] flex-shrink-0" />
+          <Cpu className="w-6 h-6 text-[#bff036] flex-shrink-0" />
           <span className="text-xl font-semibold text-white tracking-wider whitespace-nowrap overflow-hidden">SMART TI</span>
         </div>
         <button
@@ -223,9 +224,9 @@ export const Sidebar = ({
           className={`p-1.5 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0 ${isCollapsed ? 'ml-auto' : ''}`}
         >
           {isCollapsed ? (
-            <ChevronRight className="w-5 h-5 text-[#33C3F0]" />
+            <ChevronRight className="w-5 h-5 text-[#bff036]" />
           ) : (
-            <ChevronLeft className="w-5 h-5 text-[#33C3F0]" />
+            <ChevronLeft className="w-5 h-5 text-[#bff036]" />
           )}
         </button>
       </div>
@@ -239,11 +240,11 @@ export const Sidebar = ({
       <div className="p-2 border-t border-white/10 flex-shrink-0">
         <button 
           className="w-full flex items-center px-3 py-2 text-white 
-            bg-gradient-to-r from-[rgba(30,39,107,0.8)] to-[rgba(77,118,221,0.8)] 
-            hover:from-[rgba(30,39,107,0.9)] hover:to-[rgba(77,118,221,0.9)] 
+            bg-[#01242c] 
+            hover:bg-white/10 
             rounded-lg transition-all duration-200"
         >
-          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#33C3F0]`} />
+          <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#bff036]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
       </div>
