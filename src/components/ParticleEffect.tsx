@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 
 const Colors = [
@@ -108,6 +109,7 @@ const ParticleEffect = () => {
   const mouseRef = useRef(new Vector2(0, 0));
   const particlesRef = useRef<Particle[]>([]);
   const animationFrameRef = useRef<number>();
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -117,11 +119,15 @@ const ParticleEffect = () => {
     if (!ctx) return;
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
 
     const createParticles = () => {
+      if (!canvas) return [];
+      
       const particles: Particle[] = [];
       const amount = 50;
       for (let i = 0; i < amount; i++) {
@@ -140,7 +146,7 @@ const ParticleEffect = () => {
       if (!ctx || !canvas) return;
 
       // Reducimos la opacidad del fondo para hacer las partículas más visibles
-      ctx.fillStyle = 'rgba(11,37,89,0.1)'; // Color de fondo más transparente que coincide con el tema
+      ctx.fillStyle = 'rgba(1,36,44,0.1)'; // Usando color primario más transparente para igualar el fondo
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle) => {
@@ -150,12 +156,12 @@ const ParticleEffect = () => {
       });
 
       // Hacemos el efecto del mouse más visible
-      ctx.fillStyle = '#F2E205'; // Color amarillo que coincide con el tema
+      ctx.fillStyle = '#bff036'; // Color secundario para el cursor
       ctx.beginPath();
       ctx.arc(mouseRef.current.x, mouseRef.current.y, 5, 0, Math.PI * 2);
       ctx.closePath();
       ctx.shadowBlur = 20;
-      ctx.shadowColor = '#F2E205';
+      ctx.shadowColor = '#bff036';
       ctx.fill();
       ctx.shadowBlur = 0;
 
@@ -163,25 +169,40 @@ const ParticleEffect = () => {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.set({ x: e.pageX, y: e.pageY });
+      if (mouseRef.current) {
+        mouseRef.current.set({ x: e.clientX, y: e.clientY });
+      }
     };
 
-    // Initialize
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('mousemove', handleMouseMove);
-    mouseRef.current = new Vector2(canvas.width / 2, canvas.height / 2);
-    particlesRef.current = createParticles();
-    animate();
+    // Only initialize once to prevent multiple event listeners
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+      
+      // Initialize
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('mousemove', handleMouseMove);
+      
+      // Set default mouse position to center of screen
+      mouseRef.current = new Vector2(
+        canvas.width / 2,
+        canvas.height / 2
+      );
+      
+      // Create particles
+      particlesRef.current = createParticles();
+      
+      // Start animation
+      animate();
+    }
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
+      // Only remove event listeners when component truly unmounts
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, []); // Empty dependency array to run only on mount
 
   return (
     <canvas
