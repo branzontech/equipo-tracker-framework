@@ -196,7 +196,7 @@ const ParticleEffect = () => {
       // Initialize
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
-      canvas.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mousemove', handleMouseMove);
       
       // Set default mouse position to center of screen
       mouseRef.current = new Vector2(
@@ -216,7 +216,7 @@ const ParticleEffect = () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      canvas.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []); // Empty dependency array to run only on mount
 
