@@ -896,7 +896,7 @@ const IngresoProducto = () => {
                 <Button variant="outline" type="button">
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-[#040d50] hover:bg-[#0a1668]">
+                <Button type="submit">
                   Guardar Producto
                 </Button>
               </div>
