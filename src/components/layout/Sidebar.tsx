@@ -237,7 +237,12 @@ export const Sidebar = ({
         </nav>
       </div>
       <div className="p-2 border-t border-white/10 flex-shrink-0">
-        <button className="w-full flex items-center px-3 py-2 text-white hover:bg-white/10 rounded-lg transition-all duration-200">
+        <button 
+          className="w-full flex items-center px-3 py-2 text-white 
+            bg-gradient-to-r from-[rgba(30,39,107,0.8)] to-[rgba(77,118,221,0.8)] 
+            hover:from-[rgba(30,39,107,0.9)] hover:to-[rgba(77,118,221,0.9)] 
+            rounded-lg transition-all duration-200"
+        >
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#33C3F0]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
