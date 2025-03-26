@@ -77,10 +77,21 @@ class Particle {
   }
 
   lookFor(tar: Vector2) {
-    const dir = tar.copy();
-    const steer = dir.sub(this.speed);
-    steer.limit(this.maxSpeed);
-    this.force(steer);
+    // Calculate the direction vector from the particle to the target
+    const direction = new Vector2(
+      tar.x - this.pos.x,
+      tar.y - this.pos.y
+    );
+    
+    // Normalize and scale the direction vector
+    const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+    if (magnitude > 0) {
+      direction.x = (direction.x / magnitude) * this.maxSpeed;
+      direction.y = (direction.y / magnitude) * this.maxSpeed;
+    }
+    
+    // Apply the direction as a force
+    this.force(direction);
   }
 
   force(f: Vector2) {
@@ -145,8 +156,8 @@ const ParticleEffect = () => {
     const animate = () => {
       if (!ctx || !canvas) return;
 
-      // Reducimos la opacidad del fondo para hacer las partículas más visibles
-      ctx.fillStyle = 'rgba(1,36,44,0.1)'; // Usando color primario más transparente para igualar el fondo
+      // Reduce background opacity for better particle visibility
+      ctx.fillStyle = 'rgba(1,36,44,0.1)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle) => {
@@ -155,8 +166,8 @@ const ParticleEffect = () => {
         particle.render(ctx, 10);
       });
 
-      // Hacemos el efecto del mouse más visible
-      ctx.fillStyle = '#bff036'; // Color secundario para el cursor
+      // Make the mouse cursor effect more visible
+      ctx.fillStyle = '#bff036';
       ctx.beginPath();
       ctx.arc(mouseRef.current.x, mouseRef.current.y, 5, 0, Math.PI * 2);
       ctx.closePath();
@@ -170,7 +181,11 @@ const ParticleEffect = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       if (mouseRef.current) {
-        mouseRef.current.set({ x: e.clientX, y: e.clientY });
+        // Get the correct mouse position relative to the canvas
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        mouseRef.current.set({ x, y });
       }
     };
 
@@ -181,7 +196,7 @@ const ParticleEffect = () => {
       // Initialize
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
-      window.addEventListener('mousemove', handleMouseMove);
+      canvas.addEventListener('mousemove', handleMouseMove);
       
       // Set default mouse position to center of screen
       mouseRef.current = new Vector2(
@@ -201,6 +216,7 @@ const ParticleEffect = () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      canvas.removeEventListener('mousemove', handleMouseMove);
     };
   }, []); // Empty dependency array to run only on mount
 
