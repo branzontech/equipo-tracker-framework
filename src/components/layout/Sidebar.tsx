@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -203,7 +202,7 @@ export const Sidebar = ({
 
   return (
     <div
-      className={`h-screen bg-gradient-to-tr from-[#0093E9] to-[#80D0C7] border-r border-white/10 transition-all duration-300 ${
+      className={`h-screen bg-gradient-to-tr from-[rgba(30,39,107,1)] to-[rgba(77,118,221,1)] border-r border-white/10 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       } flex flex-col`}
       onMouseEnter={() => setHovering(true)}
