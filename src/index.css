@@ -84,6 +84,14 @@
     --sidebar-border: 222 47% 16%;
     --sidebar-ring: 210 40% 96%;
   }
+
+  h1, h2, h3 {
+    @apply text-[#01242c];
+  }
+
+  label {
+    @apply text-[#01242c];
+  }
 }
 
 @layer base {
