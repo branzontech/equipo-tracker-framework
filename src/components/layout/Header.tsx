@@ -20,7 +20,7 @@ const Header = ({ className = "" }: HeaderProps) => {
   }, []);
 
   return (
-    <header className={`h-16 bg-gradient-to-r from-[#e2d1c3] to-[#fdfcfb] shadow-sm px-6 flex items-center justify-between ${className}`}>
+    <header className={`h-16 bg-white shadow-sm px-6 flex items-center justify-between ${className}`}>
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Clock className="w-4 h-4" />
         <span className="font-medium">
