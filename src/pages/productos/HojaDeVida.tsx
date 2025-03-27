@@ -15,7 +15,15 @@ import {
   CheckCircle2,
   ArrowRightLeft,
   Timer,
-  Info
+  Info,
+  Monitor,
+  HardDrive,
+  Cpu,
+  Wifi,
+  BookOpen,
+  DollarSign,
+  Tag,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,6 +64,40 @@ const equipoInfo = {
     sede: "Sede Principal",
     area: "Desarrollo",
     responsable: "Juan Pérez"
+  },
+  // Información técnica adicional
+  especificaciones: {
+    procesador: "Intel Core i7-12700H",
+    memoriaRam: "32GB DDR5",
+    almacenamiento: "1TB SSD NVMe",
+    tarjetaGrafica: "NVIDIA GeForce RTX 3050Ti",
+    pantalla: "15.6\" OLED 3.5K (3456 x 2160)",
+    sistemaOperativo: "Windows 11 Pro",
+    bateria: "86Whr",
+    puertos: "2x Thunderbolt 4, 1x USB-C, 1x SD card, 1x audio jack"
+  },
+  adquisicion: {
+    ordenCompra: "OC-2023-001",
+    fechaCompra: "2022-12-20",
+    precioCompra: 5000000,
+    formaPago: "Transferencia bancaria",
+    plazoPago: "Contado",
+    numeroFactura: "F-2023-0456"
+  },
+  informacionAdministrativa: {
+    codigoInventario: "INV-COMP-001",
+    centroCoste: "TI-DEV",
+    autorizadoPor: "Carlos Gómez",
+    fechaActivacion: "2023-01-16",
+    estadoContable: "Activo fijo",
+    valorDepreciado: 4500000,
+    vidaUtilRestante: "4 años y 2 meses"
+  },
+  seguridad: {
+    nivelAcceso: "Confidencial",
+    softwareSeguridad: "Bitdefender Endpoint Security",
+    cifradoDisco: "BitLocker activado",
+    politicasAplicadas: ["Bloqueo automático", "Actualizaciones obligatorias", "VPN corporativa"]
   }
 };
 
@@ -264,22 +306,94 @@ const HojaDeVida = () => {
               <CardTitle>Detalles del Equipo</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-semibold mb-2">Información Básica</h3>
-                  <div className="space-y-2">
-                    <p><span className="text-muted-foreground">Marca:</span> {equipoInfo.marca}</p>
-                    <p><span className="text-muted-foreground">Modelo:</span> {equipoInfo.modelo}</p>
-                    <p><span className="text-muted-foreground">Tipo:</span> {equipoInfo.tipoActivo}</p>
-                    <p><span className="text-muted-foreground">Fecha Ingreso:</span> {format(new Date(equipoInfo.fechaIngreso), "PPP", { locale: es })}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      <Monitor className="h-5 w-5 mr-2" /> Información Básica
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p><span className="font-medium text-slate-700">ID:</span> {equipoInfo.id}</p>
+                      <p><span className="font-medium text-slate-700">Número de Serie:</span> {equipoInfo.numeroSerie}</p>
+                      <p><span className="font-medium text-slate-700">Descripción:</span> {equipoInfo.descripcion}</p>
+                      <p><span className="font-medium text-slate-700">Marca:</span> {equipoInfo.marca}</p>
+                      <p><span className="font-medium text-slate-700">Modelo:</span> {equipoInfo.modelo}</p>
+                      <p><span className="font-medium text-slate-700">Tipo de Activo:</span> {equipoInfo.tipoActivo}</p>
+                      <p><span className="font-medium text-slate-700">Fecha Ingreso:</span> {format(new Date(equipoInfo.fechaIngreso), "PPP", { locale: es })}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      <HardDrive className="h-5 w-5 mr-2" /> Especificaciones Técnicas
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p><span className="font-medium text-slate-700">Procesador:</span> {equipoInfo.especificaciones.procesador}</p>
+                      <p><span className="font-medium text-slate-700">Memoria RAM:</span> {equipoInfo.especificaciones.memoriaRam}</p>
+                      <p><span className="font-medium text-slate-700">Almacenamiento:</span> {equipoInfo.especificaciones.almacenamiento}</p>
+                      <p><span className="font-medium text-slate-700">Tarjeta Gráfica:</span> {equipoInfo.especificaciones.tarjetaGrafica}</p>
+                      <p><span className="font-medium text-slate-700">Pantalla:</span> {equipoInfo.especificaciones.pantalla}</p>
+                      <p><span className="font-medium text-slate-700">Sistema Operativo:</span> {equipoInfo.especificaciones.sistemaOperativo}</p>
+                      <p><span className="font-medium text-slate-700">Batería:</span> {equipoInfo.especificaciones.bateria}</p>
+                      <p><span className="font-medium text-slate-700">Puertos:</span> {equipoInfo.especificaciones.puertos}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      <Shield className="h-5 w-5 mr-2" /> Información de Seguridad
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p><span className="font-medium text-slate-700">Nivel de Acceso:</span> {equipoInfo.seguridad.nivelAcceso}</p>
+                      <p><span className="font-medium text-slate-700">Software de Seguridad:</span> {equipoInfo.seguridad.softwareSeguridad}</p>
+                      <p><span className="font-medium text-slate-700">Cifrado de Disco:</span> {equipoInfo.seguridad.cifradoDisco}</p>
+                      <p><span className="font-medium text-slate-700">Políticas Aplicadas:</span> {equipoInfo.seguridad.politicasAplicadas.join(", ")}</p>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Información Adicional</h3>
-                  <div className="space-y-2">
-                    <p><span className="text-muted-foreground">Garantía hasta:</span> {format(new Date(equipoInfo.garantia), "PPP", { locale: es })}</p>
-                    <p><span className="text-muted-foreground">Proveedor:</span> {equipoInfo.proveedor}</p>
-                    <p><span className="text-muted-foreground">Valor:</span> ${equipoInfo.valor.toLocaleString()}</p>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      <DollarSign className="h-5 w-5 mr-2" /> Información de Adquisición
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p><span className="font-medium text-slate-700">Orden de Compra:</span> {equipoInfo.adquisicion.ordenCompra}</p>
+                      <p><span className="font-medium text-slate-700">Fecha de Compra:</span> {format(new Date(equipoInfo.adquisicion.fechaCompra), "PPP", { locale: es })}</p>
+                      <p><span className="font-medium text-slate-700">Precio de Compra:</span> ${equipoInfo.adquisicion.precioCompra.toLocaleString()}</p>
+                      <p><span className="font-medium text-slate-700">Forma de Pago:</span> {equipoInfo.adquisicion.formaPago}</p>
+                      <p><span className="font-medium text-slate-700">Plazo de Pago:</span> {equipoInfo.adquisicion.plazoPago}</p>
+                      <p><span className="font-medium text-slate-700">Número de Factura:</span> {equipoInfo.adquisicion.numeroFactura}</p>
+                      <p><span className="font-medium text-slate-700">Proveedor:</span> {equipoInfo.proveedor}</p>
+                      <p><span className="font-medium text-slate-700">Garantía hasta:</span> {format(new Date(equipoInfo.garantia), "PPP", { locale: es })}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      <BookOpen className="h-5 w-5 mr-2" /> Información Administrativa
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p><span className="font-medium text-slate-700">Código de Inventario:</span> {equipoInfo.informacionAdministrativa.codigoInventario}</p>
+                      <p><span className="font-medium text-slate-700">Centro de Coste:</span> {equipoInfo.informacionAdministrativa.centroCoste}</p>
+                      <p><span className="font-medium text-slate-700">Autorizado Por:</span> {equipoInfo.informacionAdministrativa.autorizadoPor}</p>
+                      <p><span className="font-medium text-slate-700">Fecha de Activación:</span> {format(new Date(equipoInfo.informacionAdministrativa.fechaActivacion), "PPP", { locale: es })}</p>
+                      <p><span className="font-medium text-slate-700">Estado Contable:</span> {equipoInfo.informacionAdministrativa.estadoContable}</p>
+                      <p><span className="font-medium text-slate-700">Valor Actual:</span> ${equipoInfo.informacionAdministrativa.valorDepreciado.toLocaleString()}</p>
+                      <p><span className="font-medium text-slate-700">Vida Útil Restante:</span> {equipoInfo.informacionAdministrativa.vidaUtilRestante}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      <Wifi className="h-5 w-5 mr-2" /> Ubicación Actual
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p><span className="font-medium text-slate-700">Sede:</span> {equipoInfo.ubicacionActual.sede}</p>
+                      <p><span className="font-medium text-slate-700">Área:</span> {equipoInfo.ubicacionActual.area}</p>
+                      <p><span className="font-medium text-slate-700">Responsable:</span> {equipoInfo.ubicacionActual.responsable}</p>
+                      <p><span className="font-medium text-slate-700">Estado:</span> {equipoInfo.estado}</p>
+                    </div>
                   </div>
                 </div>
               </div>
