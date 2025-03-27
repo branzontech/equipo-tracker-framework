@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical } from "lucide-react";
+import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -130,6 +131,7 @@ type ColumnConfig = {
 };
 
 const ListaInventario = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -250,9 +252,19 @@ const ListaInventario = () => {
 
   const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
 
+  const handleNuevoProducto = () => {
+    navigate('/productos/ingreso');
+  };
+
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Lista de Inventario</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-[#040d50]">Lista de Inventario</h1>
+        <Button onClick={handleNuevoProducto}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nuevo Producto
+        </Button>
+      </div>
       
       <div className="flex justify-between mb-6">
         <div className="relative w-full max-w-md">
