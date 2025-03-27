@@ -26,14 +26,18 @@ TableHeader.displayName = "TableHeader"
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
-    {...props}
-  />
-))
+  React.HTMLAttributes<HTMLTableSectionElement> & {
+    onReorder?: (startIndex: number, endIndex: number) => void;
+  }
+>(({ className, onReorder, ...props }, ref) => {
+  return (
+    <tbody
+      ref={ref}
+      className={cn("[&_tr:last-child]:border-0", className)}
+      {...props}
+    />
+  )
+})
 TableBody.displayName = "TableBody"
 
 const TableFooter = React.forwardRef<
@@ -51,16 +55,32 @@ const TableFooter = React.forwardRef<
 ))
 TableFooter.displayName = "TableFooter"
 
+interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+  index?: number;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragEnter?: (e: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragEnd?: (e: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragOver?: (e: React.DragEvent<HTMLTableRowElement>) => void;
+}
+
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
+  TableRowProps
+>(({ className, draggable, index, onDragStart, onDragEnter, onDragEnd, onDragOver, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-slate-100/50 data-[state=selected]:bg-slate-100 relative group",
+      draggable && "cursor-move",
       className
     )}
+    draggable={draggable}
+    data-index={index}
+    onDragStart={onDragStart}
+    onDragEnter={onDragEnter}
+    onDragEnd={onDragEnd}
+    onDragOver={onDragOver}
     {...props}
   />
 ))
@@ -73,7 +93,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-[#040d50] uppercase tracking-wider text-xs whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+      "h-12 px-4 text-left align-middle font-medium text-[#01242c] uppercase tracking-wider text-xs whitespace-nowrap [&:has([role=checkbox])]:pr-0",
       className
     )}
     {...props}
@@ -88,7 +108,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-4 align-middle [&:has([role=checkbox])]:pr-0 group-hover:text-[#040d50] transition-colors duration-200",
+      "p-4 align-middle [&:has([role=checkbox])]:pr-0 group-hover:text-[#01242c] transition-colors duration-200",
       className
     )}
     {...props}

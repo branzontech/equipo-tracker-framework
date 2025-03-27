@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square } from "lucide-react";
+
+import { useState, useRef } from "react";
+import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square, GripVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,6 +43,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { toast } from "sonner";
 
 const equiposMock = [
   { id: 1, nombre: "Laptop Dell XPS", tipo: "Laptop", sede: "Sede 1", area: "Sistemas", estado: "Activo" },
@@ -49,6 +51,15 @@ const equiposMock = [
   { id: 3, nombre: "Monitor LG 27'", tipo: "Monitor", sede: "Sede 1", area: "Ventas", estado: "Activo" },
   { id: 4, nombre: "Desktop Lenovo", tipo: "Desktop", sede: "Sede 3", area: "Recursos Humanos", estado: "Activo" },
   { id: 5, nombre: "Servidor Dell PowerEdge", tipo: "Servidor", sede: "Sede 1", area: "IT", estado: "Activo" },
+];
+
+// Datos mock para la tabla de mantenimientos programados
+const mantenimientosMock = [
+  { id: 1, equipo: "Laptop Dell XPS", tipo: "Preventivo", fechaProgramada: "2023-11-15", responsable: "Juan Pérez", estado: "Pendiente" },
+  { id: 2, equipo: "Impresora HP LaserJet", tipo: "Correctivo", fechaProgramada: "2023-11-18", responsable: "María López", estado: "Programado" },
+  { id: 3, equipo: "Monitor LG 27'", tipo: "Preventivo", fechaProgramada: "2023-11-20", responsable: "Carlos Gómez", estado: "Pendiente" },
+  { id: 4, equipo: "Desktop Lenovo", tipo: "Preventivo", fechaProgramada: "2023-11-22", responsable: "Ana Martínez", estado: "Programado" },
+  { id: 5, equipo: "Servidor Dell PowerEdge", tipo: "Correctivo", fechaProgramada: "2023-11-25", responsable: "Pedro Sánchez", estado: "Pendiente" },
 ];
 
 interface FormValues {
@@ -73,6 +84,8 @@ const ProgramacionMantenimiento = () => {
   const [busqueda, setBusqueda] = useState<string>("");
   const [selectedEquipos, setSelectedEquipos] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [mantenimientos, setMantenimientos] = useState([...mantenimientosMock]);
+  const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -126,6 +139,73 @@ const ProgramacionMantenimiento = () => {
     form.reset();
     setSelectedEquipos([]);
     setSelectAll(false);
+    toast.success("Mantenimiento programado correctamente");
+  };
+
+  // Funciones para el drag and drop de los equipos seleccionados
+  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+    setDraggedItem(index);
+    e.dataTransfer.effectAllowed = "move";
+    // Add a custom class to indicate the dragged item
+    e.currentTarget.classList.add("opacity-50");
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+    e.preventDefault();
+    if (draggedItem === null || draggedItem === index) return;
+    
+    // Reorder the mantenimientos list
+    const updatedMantenimientos = [...mantenimientos];
+    const draggedItemContent = updatedMantenimientos[draggedItem];
+    updatedMantenimientos.splice(draggedItem, 1);
+    updatedMantenimientos.splice(index, 0, draggedItemContent);
+    
+    setMantenimientos(updatedMantenimientos);
+    setDraggedItem(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLTableRowElement>) => {
+    e.currentTarget.classList.remove("opacity-50");
+    setDraggedItem(null);
+    toast.success("Orden actualizado correctamente");
+  };
+
+  // Funciones para el drag and drop de equipos en el modal de selección
+  const handleEquipoDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+    e.currentTarget.classList.add("opacity-50");
+  };
+
+  const handleEquipoDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleEquipoDrop = (e: React.DragEvent<HTMLTableRowElement>, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex === dropIndex) return;
+    
+    const newEquiposFiltrados = [...equiposFiltrados];
+    const draggedEquipo = newEquiposFiltrados[dragIndex];
+    
+    // Remove the dragged item
+    newEquiposFiltrados.splice(dragIndex, 1);
+    // Insert it at the drop position
+    newEquiposFiltrados.splice(dropIndex, 0, draggedEquipo);
+    
+    // Since we can't modify equiposMock directly (it's just for display), we just show a toast
+    toast.success(`Reordenado: ${draggedEquipo.nombre}`);
+  };
+
+  const handleEquipoDragEnd = (e: React.DragEvent<HTMLTableRowElement>) => {
+    e.currentTarget.classList.remove("opacity-50");
   };
 
   return (
@@ -369,6 +449,7 @@ const ProgramacionMantenimiento = () => {
                                   onCheckedChange={handleSelectAll}
                                 />
                               </TableHead>
+                              <TableHead className="w-[50px]"></TableHead>
                               <TableHead>Equipo</TableHead>
                               <TableHead className="hidden sm:table-cell">Tipo</TableHead>
                               <TableHead className="hidden sm:table-cell">Sede</TableHead>
@@ -378,18 +459,29 @@ const ProgramacionMantenimiento = () => {
                           <TableBody>
                             {equiposFiltrados.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                                <TableCell colSpan={6} className="text-center text-muted-foreground">
                                   No se encontraron equipos con los filtros seleccionados
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              equiposFiltrados.map((equipo) => (
-                                <TableRow key={equipo.id}>
+                              equiposFiltrados.map((equipo, index) => (
+                                <TableRow 
+                                  key={equipo.id}
+                                  draggable
+                                  index={index}
+                                  onDragStart={(e) => handleEquipoDragStart(e, index)}
+                                  onDragOver={handleEquipoDragOver}
+                                  onDragEnter={(e) => handleEquipoDrop(e, index)}
+                                  onDragEnd={handleEquipoDragEnd}
+                                >
                                   <TableCell>
                                     <Checkbox
                                       checked={selectedEquipos.includes(equipo.id)}
                                       onCheckedChange={() => handleSelectEquipo(equipo.id)}
                                     />
+                                  </TableCell>
+                                  <TableCell className="w-[40px]">
+                                    <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
                                   </TableCell>
                                   <TableCell className="font-medium">
                                     <div>{equipo.nombre}</div>
@@ -497,6 +589,7 @@ const ProgramacionMantenimiento = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="text-[#01242c]">Equipo</TableHead>
                   <TableHead className="text-[#01242c] hidden sm:table-cell">Tipo</TableHead>
                   <TableHead className="text-[#01242c]">Fecha Programada</TableHead>
@@ -506,7 +599,58 @@ const ProgramacionMantenimiento = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {/* Aquí irían los datos de mantenimientos programados */}
+                {mantenimientos.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      No hay mantenimientos programados
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  mantenimientos.map((mantenimiento, index) => (
+                    <TableRow 
+                      key={mantenimiento.id}
+                      draggable
+                      index={index} 
+                      onDragStart={(e) => handleDragStart(e, index)}
+                      onDragEnter={(e) => handleDragEnter(e, index)}
+                      onDragOver={handleDragOver}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <TableCell className="w-[40px]">
+                        <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <div>{mantenimiento.equipo}</div>
+                        <div className="text-xs text-gray-500 sm:hidden">
+                          {mantenimiento.tipo} - {mantenimiento.fechaProgramada}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">{mantenimiento.tipo}</TableCell>
+                      <TableCell>{mantenimiento.fechaProgramada}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{mantenimiento.responsable}</TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          mantenimiento.estado === 'Pendiente' 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {mantenimiento.estado}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            toast.info(`Ver detalles de ${mantenimiento.equipo}`);
+                          }}
+                        >
+                          Ver
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
