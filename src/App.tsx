@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,6 +35,11 @@ import DocumentacionMantenimiento from "./pages/mantenimientos/Documentacion";
 import AuditoriaMantenimiento from "./pages/mantenimientos/Auditoria";
 import HojaDeVida from "./pages/productos/HojaDeVida";
 import Devoluciones from "./pages/productos/Devoluciones";
+import ListaContratos from "./pages/contratos/Lista";
+import AgregarContrato from "./pages/contratos/Agregar";
+import ContratosLicencias from "./pages/contratos/tipos/Licencias";
+import ContratosProveedores from "./pages/contratos/tipos/Proveedores";
+import ContratosSoftware from "./pages/contratos/tipos/Software";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +76,14 @@ const App = () => {
                         <Route path="/productos/devoluciones" element={<Devoluciones />} />
                         <Route path="/productos/actas" element={<Actas />} />
                         <Route path="/baja-equipos" element={<BajaEquipos />} />
+                        
+                        {/* Rutas de Contratos */}
+                        <Route path="/contratos/lista" element={<ListaContratos />} />
+                        <Route path="/contratos/agregar" element={<AgregarContrato />} />
+                        <Route path="/contratos/tipos/licencias" element={<ContratosLicencias />} />
+                        <Route path="/contratos/tipos/proveedores" element={<ContratosProveedores />} />
+                        <Route path="/contratos/tipos/software" element={<ContratosSoftware />} />
+                        
                         <Route path="/configuracion/maestros/sedes" element={<Sedes />} />
                         <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
                         <Route path="/configuracion/maestros/marcas" element={<Marcas />} />

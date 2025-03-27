@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -29,6 +28,11 @@ import {
   Cpu,
   Shield,
   RotateCcw,
+  FileContract,
+  BookCheck,
+  Building,
+  Cog,
+  AppWindow,
 } from "lucide-react";
 
 const menuItems = [
@@ -63,6 +67,25 @@ const menuItems = [
         path: "/productos/devoluciones" 
       },
       { title: "Actas Generadas", icon: FileText, path: "/productos/actas" },
+    ],
+  },
+  {
+    title: "Contratos",
+    icon: FileContract,
+    path: "/contratos",
+    submenu: [
+      { title: "Lista de Contratos", icon: ClipboardList, path: "/contratos/lista" },
+      { title: "Agregar Contrato", icon: ArrowDownToLine, path: "/contratos/agregar" },
+      { 
+        title: "Tipos de Contratos", 
+        icon: BookCheck, 
+        path: "/contratos/tipos",
+        submenu: [
+          { title: "Licencias", icon: AppWindow, path: "/contratos/tipos/licencias" },
+          { title: "Proveedores", icon: Building, path: "/contratos/tipos/proveedores" },
+          { title: "Software", icon: Cog, path: "/contratos/tipos/software" },
+        ]
+      },
     ],
   },
   {
