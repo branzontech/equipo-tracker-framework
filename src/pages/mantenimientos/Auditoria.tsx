@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useEffect } from "react";
 import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -32,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { format, subMonths, subDays, addMonths, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
+import { format, subMonths, subDays, addMonths, startOfMonth, endOfMonth, startOfYear, endOfYear, isSameDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -122,12 +124,13 @@ const AuditoriaMantenimiento = () => {
   const [selectedResponsable, setSelectedResponsable] = useState<string | undefined>(undefined);
   const [tipoMantenimiento, setTipoMantenimiento] = useState<string | undefined>(undefined);
   const [showCalendar, setShowCalendar] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     if (selectedPeriodo) {
       const periodo = periodos.find(p => p.value === selectedPeriodo);
       if (periodo) {
-        setNumberOfMonths(isMobile ? 1 : Math.min(periodo.months, 4));
+        setNumberOfMonths(isMobile ? 1 : Math.min(periodo.months, 3)); // Limiting to 3 months at a time
         setCalendarKey(prev => prev + 1);
       }
     }
@@ -195,10 +198,12 @@ const AuditoriaMantenimiento = () => {
       
       const matchesResponsable = 
         !selectedResponsable || 
+        selectedResponsable === "todos" ||
         item.responsable === selectedResponsable;
       
       const matchesTipo = 
         !tipoMantenimiento || 
+        tipoMantenimiento === "todos" ||
         item.tipo === tipoMantenimiento;
       
       return matchesSearch && matchesStatus && matchesDateRange && matchesResponsable && matchesTipo;
@@ -226,12 +231,59 @@ const AuditoriaMantenimiento = () => {
       case 1:
         return "w-full [&_.rdp-day]:w-12 [&_.rdp-day]:h-12 [&_.rdp-head_th]:w-12 [&_.rdp-nav]:h-8";
       case 2:
-        return "w-full [&_.rdp-day]:w-10 [&_.rdp-day]:h-10 [&_.rdp-head_th]:w-10 [&_.rdp-nav]:h-8";
-      case 3:
         return "w-full [&_.rdp-day]:w-9 [&_.rdp-day]:h-9 [&_.rdp-head_th]:w-9 [&_.rdp-nav]:h-8";
-      default:
+      case 3:
         return "w-full [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp-head_th]:w-8 [&_.rdp-nav]:h-7";
+      default:
+        return "w-full [&_.rdp-day]:w-6 [&_.rdp-day]:h-6 [&_.rdp-head_th]:w-6 [&_.rdp-nav]:h-6";
     }
+  };
+
+  // Calculate events for selected date
+  const selectedDateEvents = useMemo(() => {
+    if (!selectedDate) return [];
+    return filteredMantenimientos.filter(item => 
+      isSameDay(item.fecha, selectedDate)
+    );
+  }, [selectedDate, filteredMantenimientos]);
+
+  // Function to render modifiers for days with activities
+  const modifiersStyles = {
+    hasEvent: {
+      fontWeight: "bold" as const,
+      border: "2px solid var(--accent-9)",
+      backgroundColor: "var(--accent-2)"
+    }
+  };
+
+  // Function to determine if a day has events
+  const daysWithEvents = filteredMantenimientos.reduce((acc, item) => {
+    const dateStr = format(item.fecha, "yyyy-MM-dd");
+    acc[dateStr] = true;
+    return acc;
+  }, {} as Record<string, boolean>);
+
+  // Prepare modifiers for the calendar
+  const modifiers = {
+    hasEvent: (date: Date) => {
+      const dateStr = format(date, "yyyy-MM-dd");
+      return !!daysWithEvents[dateStr];
+    }
+  };
+
+  // Handle day click to show activities
+  const handleDayClick = (day: Date | undefined) => {
+    setSelectedDate(day);
+  };
+
+  // Calculate total pages for multipage calendar display
+  const totalPages = selectedPeriodo === "anual" ? Math.ceil(12 / numberOfMonths) : 1;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // Function to calculate the month offset for multipage calendars
+  const getMonthOffset = () => {
+    if (selectedPeriodo !== "anual") return 0;
+    return currentPage * numberOfMonths;
   };
 
   return (
@@ -285,6 +337,9 @@ const AuditoriaMantenimiento = () => {
                   locale={es}
                   className={getCalendarClasses()}
                   numberOfMonths={1}
+                  modifiers={modifiers}
+                  modifiersStyles={modifiersStyles}
+                  onDayClick={handleDayClick}
                 />
               </div>
               
@@ -324,6 +379,34 @@ const AuditoriaMantenimiento = () => {
                   </Popover>
                 </div>
               </div>
+
+              {selectedDate && selectedDateEvents.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  <h4 className="text-sm font-medium text-[#01242c]">
+                    Actividades del {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                  </h4>
+                  <div className="space-y-2 max-h-40 overflow-y-auto rounded-md border p-2">
+                    {selectedDateEvents.map((event) => {
+                      const estadoInfo = estados.find(e => e.value === event.estado);
+                      const Icon = estadoInfo?.icon || Clock;
+                      
+                      return (
+                        <div key={event.id} className="p-2 text-sm border-b last:border-0">
+                          <div className="font-medium">{event.tipo}</div>
+                          <div className="text-muted-foreground">{event.equipo}</div>
+                          <div className="flex justify-between items-center mt-1">
+                            <span>{event.hora}</span>
+                            <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs`}>
+                              <Icon className="h-3 w-3 mr-1" />
+                              {estadoInfo?.label}
+                            </Badge>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="relative mb-4">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -431,17 +514,94 @@ const AuditoriaMantenimiento = () => {
               
               {showCalendar && (
                 <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <Calendar
-                    key={calendarKey}
-                    mode="range"
-                    selected={dateRange}
-                    onSelect={setDateRange}
-                    locale={es}
-                    className={getCalendarClasses()}
-                    numberOfMonths={numberOfMonths}
-                    showOutsideDays={numberOfMonths < 3}
-                    pagedNavigation={numberOfMonths > 1}
-                  />
+                  {/* Implement calendar grid layout for annual view */}
+                  {selectedPeriodo === "anual" && numberOfMonths < 12 ? (
+                    <div className="space-y-4">
+                      <ScrollArea className="h-[500px]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {Array.from({ length: Math.ceil(12 / 3) }).map((_, gridIndex) => (
+                            <div key={gridIndex} className="flex-1">
+                              <Calendar
+                                key={`calendar-grid-${gridIndex}`}
+                                mode="range"
+                                selected={dateRange}
+                                onSelect={setDateRange}
+                                onDayClick={handleDayClick}
+                                locale={es}
+                                className={getCalendarClasses()}
+                                month={new Date(new Date().getFullYear(), gridIndex * 3, 1)}
+                                numberOfMonths={Math.min(3, 12 - gridIndex * 3)}
+                                showOutsideDays={false}
+                                fixedWeeks
+                                modifiers={modifiers}
+                                modifiersStyles={modifiersStyles}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  ) : (
+                    <Calendar
+                      key={calendarKey}
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                      onDayClick={handleDayClick}
+                      locale={es}
+                      className={getCalendarClasses()}
+                      month={new Date(new Date().getFullYear(), getMonthOffset(), 1)}
+                      numberOfMonths={numberOfMonths}
+                      showOutsideDays={numberOfMonths < 3}
+                      modifiers={modifiers}
+                      modifiersStyles={modifiersStyles}
+                    />
+                  )}
+                  
+                  {totalPages > 1 && (
+                    <div className="flex justify-center gap-2 mt-4">
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <Button
+                          key={i}
+                          variant={currentPage === i ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(i)}
+                          className={currentPage === i ? "bg-[#01242c] text-white" : ""}
+                        >
+                          {i + 1}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Daily events display */}
+                  {selectedDate && selectedDateEvents.length > 0 && (
+                    <div className="mt-4 border-t pt-3">
+                      <h4 className="text-sm font-medium mb-2 text-[#01242c]">
+                        Actividades del {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                      </h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {selectedDateEvents.map((event) => {
+                          const estadoInfo = estados.find(e => e.value === event.estado);
+                          const Icon = estadoInfo?.icon || Clock;
+                          
+                          return (
+                            <div key={event.id} className="p-2 rounded-md border text-sm">
+                              <div className="font-medium">{event.tipo}</div>
+                              <div className="text-muted-foreground">{event.equipo}</div>
+                              <div className="flex justify-between items-center mt-1">
+                                <span>{event.hora}</span>
+                                <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs`}>
+                                  <Icon className="h-3 w-3 mr-1" />
+                                  {estadoInfo?.label}
+                                </Badge>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
