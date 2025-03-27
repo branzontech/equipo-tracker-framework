@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square, GripVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -53,7 +52,6 @@ const equiposMock = [
   { id: 5, nombre: "Servidor Dell PowerEdge", tipo: "Servidor", sede: "Sede 1", area: "IT", estado: "Activo" },
 ];
 
-// Datos mock para la tabla de mantenimientos programados
 const mantenimientosMock = [
   { id: 1, equipo: "Laptop Dell XPS", tipo: "Preventivo", fechaProgramada: "2023-11-15", responsable: "Juan Pérez", estado: "Pendiente" },
   { id: 2, equipo: "Impresora HP LaserJet", tipo: "Correctivo", fechaProgramada: "2023-11-18", responsable: "María López", estado: "Programado" },
@@ -74,6 +72,15 @@ interface FormValues {
   tipoRegistro: "individual" | "masivo";
 }
 
+interface TableColumn {
+  id: string;
+  label: string;
+  accessor: string;
+  isVisible: boolean;
+  order: number;
+  className?: string;
+}
+
 const ProgramacionMantenimiento = () => {
   const navigate = useNavigate();
   const [tipoMantenimiento, setTipoMantenimiento] = useState<string>("todos");
@@ -85,7 +92,26 @@ const ProgramacionMantenimiento = () => {
   const [selectedEquipos, setSelectedEquipos] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [mantenimientos, setMantenimientos] = useState([...mantenimientosMock]);
-  const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
+
+  const [mainTableColumns, setMainTableColumns] = useState<TableColumn[]>([
+    { id: "grip", label: "", accessor: "", isVisible: true, order: 0, className: "w-[40px]" },
+    { id: "equipo", label: "Equipo", accessor: "equipo", isVisible: true, order: 1 },
+    { id: "tipo", label: "Tipo", accessor: "tipo", isVisible: true, order: 2, className: "hidden sm:table-cell" },
+    { id: "fechaProgramada", label: "Fecha Programada", accessor: "fechaProgramada", isVisible: true, order: 3 },
+    { id: "responsable", label: "Responsable", accessor: "responsable", isVisible: true, order: 4, className: "hidden sm:table-cell" },
+    { id: "estado", label: "Estado", accessor: "estado", isVisible: true, order: 5, className: "hidden sm:table-cell" },
+    { id: "acciones", label: "Acciones", accessor: "", isVisible: true, order: 6 },
+  ]);
+
+  const [equipoTableColumns, setEquipoTableColumns] = useState<TableColumn[]>([
+    { id: "checkbox", label: "", accessor: "", isVisible: true, order: 0, className: "w-[50px]" },
+    { id: "grip", label: "", accessor: "", isVisible: true, order: 1, className: "w-[50px]" },
+    { id: "nombre", label: "Equipo", accessor: "nombre", isVisible: true, order: 2 },
+    { id: "tipo", label: "Tipo", accessor: "tipo", isVisible: true, order: 3, className: "hidden sm:table-cell" },
+    { id: "sede", label: "Sede", accessor: "sede", isVisible: true, order: 4, className: "hidden sm:table-cell" },
+    { id: "area", label: "Área", accessor: "area", isVisible: true, order: 5, className: "hidden sm:table-cell" },
+  ]);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -142,70 +168,58 @@ const ProgramacionMantenimiento = () => {
     toast.success("Mantenimiento programado correctamente");
   };
 
-  // Funciones para el drag and drop de los equipos seleccionados
-  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
-    setDraggedItem(index);
+  const handleColumnDragStart = (e: React.DragEvent<HTMLTableCellElement>, columnId: string) => {
+    setDraggedColumn(columnId);
+    e.currentTarget.classList.add('opacity-70');
     e.dataTransfer.effectAllowed = "move";
-    // Add a custom class to indicate the dragged item
-    e.currentTarget.classList.add("opacity-50");
   };
 
-  const handleDragEnter = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
-    e.preventDefault();
-    if (draggedItem === null || draggedItem === index) return;
-    
-    // Reorder the mantenimientos list
-    const updatedMantenimientos = [...mantenimientos];
-    const draggedItemContent = updatedMantenimientos[draggedItem];
-    updatedMantenimientos.splice(draggedItem, 1);
-    updatedMantenimientos.splice(index, 0, draggedItemContent);
-    
-    setMantenimientos(updatedMantenimientos);
-    setDraggedItem(index);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+  const handleColumnDragOver = (e: React.DragEvent<HTMLTableCellElement>) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDragEnd = (e: React.DragEvent<HTMLTableRowElement>) => {
-    e.currentTarget.classList.remove("opacity-50");
-    setDraggedItem(null);
-    toast.success("Orden actualizado correctamente");
-  };
-
-  // Funciones para el drag and drop de equipos en el modal de selección
-  const handleEquipoDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
-    e.dataTransfer.setData('text/plain', index.toString());
-    e.currentTarget.classList.add("opacity-50");
-  };
-
-  const handleEquipoDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+  const handleColumnDragEnter = (e: React.DragEvent<HTMLTableCellElement>, columnId: string) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    if (!draggedColumn || draggedColumn === columnId) return;
+    e.currentTarget.classList.add('bg-slate-100');
   };
 
-  const handleEquipoDrop = (e: React.DragEvent<HTMLTableRowElement>, dropIndex: number) => {
+  const handleColumnDragLeave = (e: React.DragEvent<HTMLTableCellElement>) => {
+    e.currentTarget.classList.remove('bg-slate-100');
+  };
+
+  const handleColumnDrop = (e: React.DragEvent<HTMLTableCellElement>, targetColumnId: string, isMainTable: boolean) => {
     e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    if (!draggedColumn || draggedColumn === targetColumnId) return;
     
-    if (dragIndex === dropIndex) return;
+    e.currentTarget.classList.remove('bg-slate-100');
     
-    const newEquiposFiltrados = [...equiposFiltrados];
-    const draggedEquipo = newEquiposFiltrados[dragIndex];
+    const columns = isMainTable ? mainTableColumns : equipoTableColumns;
+    const setColumns = isMainTable ? setMainTableColumns : setEquipoTableColumns;
     
-    // Remove the dragged item
-    newEquiposFiltrados.splice(dragIndex, 1);
-    // Insert it at the drop position
-    newEquiposFiltrados.splice(dropIndex, 0, draggedEquipo);
+    const draggedCol = columns.find(col => col.id === draggedColumn);
+    const targetCol = columns.find(col => col.id === targetColumnId);
     
-    // Since we can't modify equiposMock directly (it's just for display), we just show a toast
-    toast.success(`Reordenado: ${draggedEquipo.nombre}`);
+    if (!draggedCol || !targetCol) return;
+    
+    const newColumns = columns.map(col => {
+      if (col.id === draggedColumn) {
+        return { ...col, order: targetCol.order };
+      }
+      if (col.id === targetColumnId) {
+        return { ...col, order: draggedCol.order };
+      }
+      return col;
+    });
+    
+    setColumns(newColumns);
+    toast.success(`Columnas reordenadas: ${draggedCol.label} y ${targetCol.label}`);
   };
 
-  const handleEquipoDragEnd = (e: React.DragEvent<HTMLTableRowElement>) => {
-    e.currentTarget.classList.remove("opacity-50");
+  const handleColumnDragEnd = (e: React.DragEvent<HTMLTableCellElement>) => {
+    e.currentTarget.classList.remove('opacity-70');
+    setDraggedColumn(null);
   };
 
   return (
@@ -443,55 +457,87 @@ const ProgramacionMantenimiento = () => {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[50px]">
-                                <Checkbox
-                                  checked={selectAll}
-                                  onCheckedChange={handleSelectAll}
-                                />
-                              </TableHead>
-                              <TableHead className="w-[50px]"></TableHead>
-                              <TableHead>Equipo</TableHead>
-                              <TableHead className="hidden sm:table-cell">Tipo</TableHead>
-                              <TableHead className="hidden sm:table-cell">Sede</TableHead>
-                              <TableHead className="hidden sm:table-cell">Área</TableHead>
+                              {equipoTableColumns
+                                .sort((a, b) => a.order - b.order)
+                                .filter(col => col.isVisible)
+                                .map((column) => (
+                                  <TableHead 
+                                    key={column.id}
+                                    className={column.className}
+                                    draggable={column.id !== "checkbox" && column.id !== "grip"}
+                                    columnId={column.id}
+                                    onDragStart={(e) => handleColumnDragStart(e, column.id)}
+                                    onDragOver={handleColumnDragOver}
+                                    onDragEnter={(e) => handleColumnDragEnter(e, column.id)}
+                                    onDragLeave={handleColumnDragLeave}
+                                    onDrop={(e) => handleColumnDrop(e, column.id, false)}
+                                    onDragEnd={handleColumnDragEnd}
+                                  >
+                                    {column.id === "checkbox" ? (
+                                      <Checkbox
+                                        checked={selectAll}
+                                        onCheckedChange={handleSelectAll}
+                                      />
+                                    ) : column.id === "grip" ? (
+                                      <div></div>
+                                    ) : (
+                                      <div className="flex items-center gap-2">
+                                        {column.id !== "checkbox" && column.id !== "grip" && (
+                                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                        )}
+                                        {column.label}
+                                      </div>
+                                    )}
+                                  </TableHead>
+                                ))}
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {equiposFiltrados.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                <TableCell colSpan={equipoTableColumns.filter(col => col.isVisible).length} className="text-center text-muted-foreground">
                                   No se encontraron equipos con los filtros seleccionados
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              equiposFiltrados.map((equipo, index) => (
-                                <TableRow 
-                                  key={equipo.id}
-                                  draggable
-                                  index={index}
-                                  onDragStart={(e) => handleEquipoDragStart(e, index)}
-                                  onDragOver={handleEquipoDragOver}
-                                  onDragEnter={(e) => handleEquipoDrop(e, index)}
-                                  onDragEnd={handleEquipoDragEnd}
-                                >
-                                  <TableCell>
-                                    <Checkbox
-                                      checked={selectedEquipos.includes(equipo.id)}
-                                      onCheckedChange={() => handleSelectEquipo(equipo.id)}
-                                    />
-                                  </TableCell>
-                                  <TableCell className="w-[40px]">
-                                    <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                                  </TableCell>
-                                  <TableCell className="font-medium">
-                                    <div>{equipo.nombre}</div>
-                                    <div className="text-xs text-gray-500 sm:hidden">
-                                      {equipo.tipo} - {equipo.sede} - {equipo.area}
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="hidden sm:table-cell">{equipo.tipo}</TableCell>
-                                  <TableCell className="hidden sm:table-cell">{equipo.sede}</TableCell>
-                                  <TableCell className="hidden sm:table-cell">{equipo.area}</TableCell>
+                              equiposFiltrados.map((equipo) => (
+                                <TableRow key={equipo.id}>
+                                  {equipoTableColumns
+                                    .sort((a, b) => a.order - b.order)
+                                    .filter(col => col.isVisible)
+                                    .map((column) => {
+                                      if (column.id === "checkbox") {
+                                        return (
+                                          <TableCell key={`${equipo.id}-${column.id}`}>
+                                            <Checkbox
+                                              checked={selectedEquipos.includes(equipo.id)}
+                                              onCheckedChange={() => handleSelectEquipo(equipo.id)}
+                                            />
+                                          </TableCell>
+                                        );
+                                      } else if (column.id === "grip") {
+                                        return (
+                                          <TableCell key={`${equipo.id}-${column.id}`}>
+                                            <GripVertical className="h-4 w-4 text-gray-400" />
+                                          </TableCell>
+                                        );
+                                      } else if (column.id === "nombre") {
+                                        return (
+                                          <TableCell key={`${equipo.id}-${column.id}`} className="font-medium">
+                                            <div>{equipo.nombre}</div>
+                                            <div className="text-xs text-gray-500 sm:hidden">
+                                              {equipo.tipo} - {equipo.sede} - {equipo.area}
+                                            </div>
+                                          </TableCell>
+                                        );
+                                      } else {
+                                        return (
+                                          <TableCell key={`${equipo.id}-${column.id}`} className={column.className}>
+                                            {equipo[column.accessor as keyof typeof equipo]}
+                                          </TableCell>
+                                        );
+                                      }
+                                    })}
                                 </TableRow>
                               ))
                             )}
@@ -589,65 +635,101 @@ const ProgramacionMantenimiento = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]"></TableHead>
-                  <TableHead className="text-[#01242c]">Equipo</TableHead>
-                  <TableHead className="text-[#01242c] hidden sm:table-cell">Tipo</TableHead>
-                  <TableHead className="text-[#01242c]">Fecha Programada</TableHead>
-                  <TableHead className="text-[#01242c] hidden sm:table-cell">Responsable</TableHead>
-                  <TableHead className="text-[#01242c] hidden sm:table-cell">Estado</TableHead>
-                  <TableHead className="text-[#01242c]">Acciones</TableHead>
+                  {mainTableColumns
+                    .sort((a, b) => a.order - b.order)
+                    .filter(col => col.isVisible)
+                    .map((column) => (
+                      <TableHead 
+                        key={column.id}
+                        className={column.className}
+                        draggable={column.id !== "acciones" && column.id !== "grip"}
+                        columnId={column.id}
+                        onDragStart={(e) => handleColumnDragStart(e, column.id)}
+                        onDragOver={handleColumnDragOver}
+                        onDragEnter={(e) => handleColumnDragEnter(e, column.id)}
+                        onDragLeave={handleColumnDragLeave}
+                        onDrop={(e) => handleColumnDrop(e, column.id, true)}
+                        onDragEnd={handleColumnDragEnd}
+                      >
+                        {column.id === "grip" ? (
+                          <div></div>
+                        ) : (
+                          <div className="flex items-center gap-2 text-[#01242c]">
+                            {column.id !== "acciones" && column.id !== "grip" && (
+                              <GripVertical className="h-4 w-4 text-muted-foreground" />
+                            )}
+                            {column.label}
+                          </div>
+                        )}
+                      </TableHead>
+                    ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mantenimientos.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={mainTableColumns.filter(col => col.isVisible).length} className="text-center py-8 text-muted-foreground">
                       No hay mantenimientos programados
                     </TableCell>
                   </TableRow>
                 ) : (
-                  mantenimientos.map((mantenimiento, index) => (
-                    <TableRow 
-                      key={mantenimiento.id}
-                      draggable
-                      index={index} 
-                      onDragStart={(e) => handleDragStart(e, index)}
-                      onDragEnter={(e) => handleDragEnter(e, index)}
-                      onDragOver={handleDragOver}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <TableCell className="w-[40px]">
-                        <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <div>{mantenimiento.equipo}</div>
-                        <div className="text-xs text-gray-500 sm:hidden">
-                          {mantenimiento.tipo} - {mantenimiento.fechaProgramada}
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">{mantenimiento.tipo}</TableCell>
-                      <TableCell>{mantenimiento.fechaProgramada}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{mantenimiento.responsable}</TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          mantenimiento.estado === 'Pendiente' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {mantenimiento.estado}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            toast.info(`Ver detalles de ${mantenimiento.equipo}`);
-                          }}
-                        >
-                          Ver
-                        </Button>
-                      </TableCell>
+                  mantenimientos.map((mantenimiento) => (
+                    <TableRow key={mantenimiento.id}>
+                      {mainTableColumns
+                        .sort((a, b) => a.order - b.order)
+                        .filter(col => col.isVisible)
+                        .map((column) => {
+                          if (column.id === "grip") {
+                            return (
+                              <TableCell key={`${mantenimiento.id}-${column.id}`} className={column.className}>
+                                <GripVertical className="h-4 w-4 text-gray-400" />
+                              </TableCell>
+                            );
+                          } else if (column.id === "equipo") {
+                            return (
+                              <TableCell key={`${mantenimiento.id}-${column.id}`} className="font-medium">
+                                <div>{mantenimiento.equipo}</div>
+                                <div className="text-xs text-gray-500 sm:hidden">
+                                  {mantenimiento.tipo} - {mantenimiento.fechaProgramada}
+                                </div>
+                              </TableCell>
+                            );
+                          } else if (column.id === "estado") {
+                            return (
+                              <TableCell key={`${mantenimiento.id}-${column.id}`} className={column.className}>
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  mantenimiento.estado === 'Pendiente' 
+                                    ? 'bg-yellow-100 text-yellow-800' 
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}>
+                                  {mantenimiento.estado}
+                                </span>
+                              </TableCell>
+                            );
+                          } else if (column.id === "acciones") {
+                            return (
+                              <TableCell key={`${mantenimiento.id}-${column.id}`}>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    toast.info(`Ver detalles de ${mantenimiento.equipo}`);
+                                  }}
+                                >
+                                  Ver
+                                </Button>
+                              </TableCell>
+                            );
+                          } else if (column.accessor) {
+                            return (
+                              <TableCell key={`${mantenimiento.id}-${column.id}`} className={column.className}>
+                                {mantenimiento[column.accessor as keyof typeof mantenimiento]}
+                              </TableCell>
+                            );
+                          } else {
+                            return <TableCell key={`${mantenimiento.id}-${column.id}`}></TableCell>;
+                          }
+                        })}
                     </TableRow>
                   ))
                 )}

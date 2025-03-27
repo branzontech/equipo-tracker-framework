@@ -86,31 +86,58 @@ const TableRow = React.forwardRef<
 ))
 TableRow.displayName = "TableRow"
 
+interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  draggable?: boolean;
+  index?: number;
+  columnId?: string;
+  onDragStart?: (e: React.DragEvent<HTMLTableCellElement>) => void;
+  onDragOver?: (e: React.DragEvent<HTMLTableCellElement>) => void;
+  onDragEnter?: (e: React.DragEvent<HTMLTableCellElement>) => void;
+  onDragLeave?: (e: React.DragEvent<HTMLTableCellElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLTableCellElement>) => void;
+  onDragEnd?: (e: React.DragEvent<HTMLTableCellElement>) => void;
+}
+
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  TableHeadProps
+>(({ className, draggable, index, columnId, onDragStart, onDragOver, onDragEnter, onDragLeave, onDrop, onDragEnd, ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
       "h-12 px-4 text-left align-middle font-medium text-[#01242c] uppercase tracking-wider text-xs whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+      draggable && "cursor-grab active:cursor-grabbing",
       className
     )}
+    draggable={draggable}
+    data-index={index}
+    data-column-id={columnId}
+    onDragStart={onDragStart}
+    onDragOver={onDragOver}
+    onDragEnter={onDragEnter}
+    onDragLeave={onDragLeave}
+    onDrop={onDrop}
+    onDragEnd={onDragEnd}
     {...props}
   />
 ))
 TableHead.displayName = "TableHead"
 
+interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  columnId?: string;
+}
+
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  TableCellProps
+>(({ className, columnId, ...props }, ref) => (
   <td
     ref={ref}
     className={cn(
       "p-4 align-middle [&:has([role=checkbox])]:pr-0 group-hover:text-[#01242c] transition-colors duration-200",
       className
     )}
+    data-column-id={columnId}
     {...props}
   />
 ))
