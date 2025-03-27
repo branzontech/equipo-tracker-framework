@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -140,7 +139,7 @@ const ProgramacionMantenimiento = () => {
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-xl sm:text-2xl font-bold text-[#040d50]">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#01242c]">
           Programación de Mantenimientos
         </h1>
       </div>
@@ -159,14 +158,14 @@ const ProgramacionMantenimiento = () => {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full sm:w-auto bg-[#040d50]">
+            <Button className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]">
               <Plus className="h-4 w-4 mr-2" />
               Nuevo Mantenimiento
             </Button>
           </DialogTrigger>
           <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl">Programar Nuevo Mantenimiento</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl text-[#01242c]">Programar Nuevo Mantenimiento</DialogTitle>
               <DialogDescription className="text-sm sm:text-base">
                 Complete los detalles para programar un nuevo mantenimiento.
               </DialogDescription>
@@ -481,7 +480,7 @@ const ProgramacionMantenimiento = () => {
                   </Button>
                   <Button 
                     type="submit" 
-                    className="w-full sm:w-auto bg-[#040d50] order-1 sm:order-2"
+                    className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f] order-1 sm:order-2"
                   >
                     Programar Mantenimiento
                   </Button>
@@ -498,12 +497,12 @@ const ProgramacionMantenimiento = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[#040d50]">Equipo</TableHead>
-                  <TableHead className="text-[#040d50] hidden sm:table-cell">Tipo</TableHead>
-                  <TableHead className="text-[#040d50]">Fecha Programada</TableHead>
-                  <TableHead className="text-[#040d50] hidden sm:table-cell">Responsable</TableHead>
-                  <TableHead className="text-[#040d50] hidden sm:table-cell">Estado</TableHead>
-                  <TableHead className="text-[#040d50]">Acciones</TableHead>
+                  <TableHead className="text-[#01242c]">Equipo</TableHead>
+                  <TableHead className="text-[#01242c] hidden sm:table-cell">Tipo</TableHead>
+                  <TableHead className="text-[#01242c]">Fecha Programada</TableHead>
+                  <TableHead className="text-[#01242c] hidden sm:table-cell">Responsable</TableHead>
+                  <TableHead className="text-[#01242c] hidden sm:table-cell">Estado</TableHead>
+                  <TableHead className="text-[#01242c]">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
