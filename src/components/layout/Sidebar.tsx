@@ -28,7 +28,7 @@ import {
   Cpu,
   Shield,
   RotateCcw,
-  FileContract,
+  ScrollText,
   BookCheck,
   Building,
   Cog,
@@ -71,7 +71,7 @@ const menuItems = [
   },
   {
     title: "Contratos",
-    icon: FileContract,
+    icon: ScrollText,
     path: "/contratos",
     submenu: [
       { title: "Lista de Contratos", icon: ClipboardList, path: "/contratos/lista" },
@@ -226,13 +226,8 @@ export const Sidebar = ({
   }, [hovering, isCollapsed, onToggle]);
 
   const handleLogout = () => {
-    // 1. Clear any authentication data from localStorage
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    
-    // 2. Any other cleanup needed for logged in state
-    
-    // 3. Redirect to login page
     navigate('/login');
   };
 
