@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -46,11 +46,11 @@ const estados = [
 ];
 
 const periodos = [
-  { value: "mensual", label: "Mensual" },
-  { value: "bimestral", label: "Bimestral" },
-  { value: "trimestral", label: "Trimestral" },
-  { value: "cuatrimestral", label: "Cuatrimestral" },
-  { value: "anual", label: "Anual" },
+  { value: "mensual", label: "Mensual", months: 1 },
+  { value: "bimestral", label: "Bimestral", months: 2 },
+  { value: "trimestral", label: "Trimestral", months: 3 },
+  { value: "cuatrimestral", label: "Cuatrimestral", months: 4 },
+  { value: "anual", label: "Anual", months: 12 },
 ];
 
 const mantenimientos = [
@@ -117,9 +117,21 @@ const AuditoriaMantenimiento = () => {
   });
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
   const [selectedPeriodo, setSelectedPeriodo] = useState<string | undefined>(undefined);
+  const [numberOfMonths, setNumberOfMonths] = useState(1);
+  const [calendarKey, setCalendarKey] = useState(0);
   const [selectedResponsable, setSelectedResponsable] = useState<string | undefined>(undefined);
   const [tipoMantenimiento, setTipoMantenimiento] = useState<string | undefined>(undefined);
   const [showCalendar, setShowCalendar] = useState(true);
+
+  useEffect(() => {
+    if (selectedPeriodo) {
+      const periodo = periodos.find(p => p.value === selectedPeriodo);
+      if (periodo) {
+        setNumberOfMonths(isMobile ? 1 : Math.min(periodo.months, 4));
+        setCalendarKey(prev => prev + 1);
+      }
+    }
+  }, [selectedPeriodo, isMobile]);
 
   const toggleEstado = (estado: string) => {
     setSelectedEstados(prev =>
@@ -205,6 +217,23 @@ const AuditoriaMantenimiento = () => {
   const uniqueResponsables = [...new Set(mantenimientos.map(m => m.responsable))];
   const uniqueTipos = [...new Set(mantenimientos.map(m => m.tipo))];
 
+  const getCalendarClasses = () => {
+    if (isMobile) {
+      return "w-full [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp-head_th]:w-8 [&_.rdp-nav]:h-6";
+    }
+    
+    switch (numberOfMonths) {
+      case 1:
+        return "w-full [&_.rdp-day]:w-12 [&_.rdp-day]:h-12 [&_.rdp-head_th]:w-12 [&_.rdp-nav]:h-8";
+      case 2:
+        return "w-full [&_.rdp-day]:w-10 [&_.rdp-day]:h-10 [&_.rdp-head_th]:w-10 [&_.rdp-nav]:h-8";
+      case 3:
+        return "w-full [&_.rdp-day]:w-9 [&_.rdp-day]:h-9 [&_.rdp-head_th]:w-9 [&_.rdp-nav]:h-8";
+      default:
+        return "w-full [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp-head_th]:w-8 [&_.rdp-nav]:h-7";
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center gap-4 mb-6">
@@ -247,14 +276,17 @@ const AuditoriaMantenimiento = () => {
                 </SelectContent>
               </Select>
               
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={setDateRange}
-                locale={es}
-                className="w-full [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp-head_th]:w-8 [&_.rdp-nav]:h-6"
-                numberOfMonths={1}
-              />
+              <div className="bg-white rounded-lg p-2 shadow-sm">
+                <Calendar
+                  key={calendarKey}
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  locale={es}
+                  className={getCalendarClasses()}
+                  numberOfMonths={1}
+                />
+              </div>
               
               <div className="space-y-2 mb-4">
                 <h4 className="text-sm font-medium text-[#01242c]">Rango de Fechas</h4>
@@ -398,14 +430,19 @@ const AuditoriaMantenimiento = () => {
               </div>
               
               {showCalendar && (
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  locale={es}
-                  className="w-full [&_.rdp-day]:w-10 [&_.rdp-day]:h-10 [&_.rdp-head_th]:w-10 [&_.rdp-nav]:h-8"
-                  numberOfMonths={2}
-                />
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <Calendar
+                    key={calendarKey}
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    locale={es}
+                    className={getCalendarClasses()}
+                    numberOfMonths={numberOfMonths}
+                    showOutsideDays={numberOfMonths < 3}
+                    pagedNavigation={numberOfMonths > 1}
+                  />
+                </div>
               )}
             </CardContent>
           </Card>
