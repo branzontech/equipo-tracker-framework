@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { toast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
-import { CalendarIcon, Save } from 'lucide-react';
+import { CalendarIcon, Save, X, Paperclip, FileText } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from 'date-fns';
@@ -23,12 +23,13 @@ interface ContratoFormValues {
   fechaFin: Date;
   estado: string;
   descripcion: string;
-  archivoPdf?: File | null;
+  documentos: File[];
 }
 
 const AgregarContrato = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [documentos, setDocumentos] = useState<File[]>([]);
   
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ContratoFormValues>({
     defaultValues: {
@@ -37,12 +38,27 @@ const AgregarContrato = () => {
       tipo: '',
       estado: 'activo',
       descripcion: '',
-      archivoPdf: null,
+      documentos: [],
     }
   });
 
   const fechaInicio = watch('fechaInicio');
   const fechaFin = watch('fechaFin');
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      setDocumentos(prev => [...prev, ...newFiles]);
+      setValue('documentos', [...documentos, ...newFiles]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    const updatedFiles = [...documentos];
+    updatedFiles.splice(index, 1);
+    setDocumentos(updatedFiles);
+    setValue('documentos', updatedFiles);
+  };
 
   const onSubmit = (data: ContratoFormValues) => {
     setIsSubmitting(true);
@@ -184,14 +200,63 @@ const AgregarContrato = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="archivoPdf">Documento del Contrato (PDF)</Label>
-              <Input
-                id="archivoPdf"
-                type="file"
-                accept=".pdf"
-                className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
-                onChange={(e) => setValue('archivoPdf', e.target.files ? e.target.files[0] : null)}
-              />
+              <Label>Documentos del Contrato</Label>
+              <div className="border border-dashed rounded-md p-6 bg-slate-50">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Paperclip className="h-8 w-8 text-slate-400" />
+                  <p className="text-sm text-center text-slate-600">
+                    Arrastre aquí sus documentos o haga clic para seleccionarlos
+                  </p>
+                  <Input
+                    id="documentos"
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('documentos')?.click()}
+                    className="mt-2"
+                  >
+                    Seleccionar archivos
+                  </Button>
+                </div>
+              </div>
+              
+              {documentos.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium">Archivos seleccionados:</p>
+                  <div className="space-y-2">
+                    {documentos.map((file, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center justify-between bg-white border rounded-md p-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-blue-500" />
+                          <span className="text-sm truncate max-w-[240px]">{file.name}</span>
+                          <span className="text-xs text-gray-500">
+                            ({(file.size / 1024).toFixed(0)} KB)
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFile(index)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end space-x-4">
