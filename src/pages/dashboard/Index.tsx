@@ -1,7 +1,17 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Package, Wrench, Building2, Printer, GripVertical } from "lucide-react";
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
+  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, 
+  AreaChart, Area 
+} from 'recharts';
+import { 
+  Package, Wrench, Building2, Printer, GripVertical, Gauge, 
+  ChartBar, ChartLine, ChartPie, ActivitySquare, TrendingUp, TrendingDown
+} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const equiposData = [
   { name: 'Laptops', cantidad: 120 },
@@ -29,24 +39,77 @@ const sedesData = [
   { name: 'Sede D', cantidad: 65 },
 ];
 
+const rendimientoTonerData = [
+  { name: 'Ene', rendimiento: 85 },
+  { name: 'Feb', rendimiento: 82 },
+  { name: 'Mar', rendimiento: 78 },
+  { name: 'Abr', rendimiento: 90 },
+  { name: 'May', rendimiento: 92 },
+  { name: 'Jun', rendimiento: 87 },
+];
+
+const incidentesData = [
+  { name: 'Ene', hardware: 25, software: 15 },
+  { name: 'Feb', hardware: 18, software: 22 },
+  { name: 'Mar', hardware: 22, software: 19 },
+  { name: 'Abr', hardware: 15, software: 25 },
+  { name: 'May', hardware: 20, software: 18 },
+  { name: 'Jun', hardware: 12, software: 14 },
+];
+
+const serviciosActivosData = [
+  { name: 'Office 365', valor: 230 },
+  { name: 'Adobe CC', valor: 85 },
+  { name: 'Antivirus', valor: 350 },
+  { name: 'Desarrollo', valor: 40 },
+  { name: 'ERP', valor: 125 },
+];
+
+const tiempoRespuestaData = [
+  { name: 'Ene', tiempo: 4.5 },
+  { name: 'Feb', tiempo: 3.8 },
+  { name: 'Mar', tiempo: 4.2 },
+  { name: 'Abr', tiempo: 3.5 },
+  { name: 'May', tiempo: 3.2 },
+  { name: 'Jun', tiempo: 2.8 },
+];
+
+const solicitudesData = [
+  { name: 'Hardware', value: 35, color: '#3b82f6' },
+  { name: 'Software', value: 25, color: '#8b5cf6' },
+  { name: 'Red', value: 15, color: '#f43f5e' },
+  { name: 'Otros', value: 25, color: '#f97316' },
+];
+
+const rendimientoEquiposData = [
+  { nombre: 'Laptops HP', rendimiento: 85 },
+  { nombre: 'Laptops Dell', rendimiento: 92 },
+  { nombre: 'Desktops HP', rendimiento: 78 },
+  { nombre: 'Desktops Dell', rendimiento: 90 },
+  { nombre: 'Servidores', rendimiento: 95 },
+];
+
 type DashboardItem = {
   id: string;
   order: number;
   title: string;
   size: 'small' | 'large';
   component?: JSX.Element;
-  chartType?: 'bar' | 'pie';
+  chartType?: 'bar' | 'pie' | 'line' | 'area';
   data?: any[];
+  tab?: string;
 };
 
 export default function Dashboard() {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("general");
   const [dashboardItems, setDashboardItems] = useState<DashboardItem[]>([
     {
       id: 'total-equipos',
       order: 0,
       title: 'Total Equipos',
       size: 'small',
+      tab: 'general',
       component: (
         <div className="w-full">
           <div className="flex items-center gap-2 text-sm">
@@ -63,6 +126,7 @@ export default function Dashboard() {
       order: 1,
       title: 'Mantenimientos Vencidos',
       size: 'small',
+      tab: 'general',
       component: (
         <div className="w-full">
           <div className="flex items-center gap-2 text-sm">
@@ -79,6 +143,7 @@ export default function Dashboard() {
       order: 2,
       title: 'Tóner Disponible',
       size: 'small',
+      tab: 'general',
       component: (
         <div className="w-full">
           <div className="flex items-center gap-2 text-sm">
@@ -95,6 +160,7 @@ export default function Dashboard() {
       order: 3,
       title: 'Sedes Activas',
       size: 'small',
+      tab: 'general',
       component: (
         <div className="w-full">
           <div className="flex items-center gap-2 text-sm">
@@ -106,40 +172,182 @@ export default function Dashboard() {
         </div>
       )
     },
+    
+    {
+      id: 'rendimiento-promedio',
+      order: 4,
+      title: 'Rendimiento Promedio',
+      size: 'small',
+      tab: 'rendimiento',
+      component: (
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <Gauge className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Rendimiento Promedio</span>
+          </div>
+          <div className="text-2xl font-bold mt-2 text-blue-500">88%</div>
+          <div className="mt-2">
+            <Progress value={88} className="h-2" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-1 truncate">Todos los equipos</p>
+        </div>
+      )
+    },
+    {
+      id: 'tiempo-respuesta',
+      order: 5,
+      title: 'Tiempo de Respuesta',
+      size: 'small',
+      tab: 'rendimiento',
+      component: (
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <TrendingDown className="h-4 w-4 flex-shrink-0 text-green-500" />
+            <span className="truncate">Tiempo de Respuesta</span>
+          </div>
+          <div className="text-2xl font-bold mt-2">3.2 <span className="text-sm font-normal">hrs</span></div>
+          <p className="text-xs text-green-500 mt-1 truncate">↓ 12% vs mes anterior</p>
+        </div>
+      )
+    },
+    {
+      id: 'incidentes-mes',
+      order: 6,
+      title: 'Incidentes del Mes',
+      size: 'small',
+      tab: 'rendimiento',
+      component: (
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <ActivitySquare className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Incidentes del Mes</span>
+          </div>
+          <div className="text-2xl font-bold mt-2">38</div>
+          <p className="text-xs text-red-500 mt-1 truncate">↑ 5% vs mes anterior</p>
+        </div>
+      )
+    },
+    {
+      id: 'satisfaccion',
+      order: 7,
+      title: 'Satisfacción Usuario',
+      size: 'small',
+      tab: 'rendimiento',
+      component: (
+        <div className="w-full">
+          <div className="flex items-center gap-2 text-sm">
+            <TrendingUp className="h-4 w-4 flex-shrink-0 text-green-500" />
+            <span className="truncate">Satisfacción Usuario</span>
+          </div>
+          <div className="text-2xl font-bold mt-2 text-green-500">92%</div>
+          <div className="mt-2">
+            <Progress value={92} className="h-2 bg-muted" />
+          </div>
+          <p className="text-xs text-green-500 mt-1 truncate">↑ 3% vs mes anterior</p>
+        </div>
+      )
+    },
+    
     {
       id: 'distribucion-equipos',
-      order: 4,
+      order: 8,
       title: 'Distribución de Equipos por Tipo',
       size: 'large',
+      tab: 'general',
       chartType: 'bar',
       data: equiposData,
       component: <></>
     },
     {
       id: 'estado-mantenimientos',
-      order: 5,
+      order: 9,
       title: 'Estado de Mantenimientos',
       size: 'large',
+      tab: 'general',
       chartType: 'pie',
       data: mantenimientosData,
       component: <></>
     },
     {
       id: 'estado-toner',
-      order: 6,
+      order: 10,
       title: 'Estado de Tóner',
       size: 'large',
+      tab: 'general',
       chartType: 'pie',
       data: tonerData,
       component: <></>
     },
     {
       id: 'equipos-sede',
-      order: 7,
+      order: 11,
       title: 'Equipos por Sede',
       size: 'large',
+      tab: 'general',
       chartType: 'bar',
       data: sedesData,
+      component: <></>
+    },
+    
+    {
+      id: 'rendimiento-toner',
+      order: 12,
+      title: 'Rendimiento de Tóner',
+      size: 'large',
+      tab: 'rendimiento',
+      chartType: 'line',
+      data: rendimientoTonerData,
+      component: <></>
+    },
+    {
+      id: 'incidentes-por-mes',
+      order: 13,
+      title: 'Incidentes por Mes',
+      size: 'large',
+      tab: 'rendimiento',
+      chartType: 'area',
+      data: incidentesData,
+      component: <></>
+    },
+    {
+      id: 'solicitudes-tipo',
+      order: 14,
+      title: 'Solicitudes por Tipo',
+      size: 'large',
+      tab: 'rendimiento',
+      chartType: 'pie',
+      data: solicitudesData,
+      component: <></>
+    },
+    {
+      id: 'rendimiento-equipos',
+      order: 15,
+      title: 'Rendimiento por Equipo',
+      size: 'large',
+      tab: 'rendimiento',
+      chartType: 'bar',
+      data: rendimientoEquiposData.map(item => ({ name: item.nombre, cantidad: item.rendimiento })),
+      component: <></>
+    },
+    
+    {
+      id: 'servicios-activos',
+      order: 16,
+      title: 'Servicios Activos',
+      size: 'large',
+      tab: 'servicios',
+      chartType: 'bar',
+      data: serviciosActivosData.map(item => ({ name: item.name, cantidad: item.valor })),
+      component: <></>
+    },
+    {
+      id: 'tiempo-respuesta-chart',
+      order: 17,
+      title: 'Evolución Tiempo de Respuesta',
+      size: 'large',
+      tab: 'servicios',
+      chartType: 'line',
+      data: tiempoRespuestaData.map(item => ({ name: item.name, cantidad: item.tiempo })),
       component: <></>
     }
   ]);
@@ -193,8 +401,18 @@ export default function Dashboard() {
   };
 
   const sortedItems = [...dashboardItems].sort((a, b) => a.order - b.order);
-  const smallItems = sortedItems.filter(item => item.size === 'small');
-  const largeItems = sortedItems.filter(item => item.size === 'large');
+  
+  const getFilteredItems = (tab: string) => {
+    return sortedItems.filter(item => item.tab === tab);
+  };
+
+  const getSmallItems = (tab: string) => {
+    return getFilteredItems(tab).filter(item => item.size === 'small');
+  };
+
+  const getLargeItems = (tab: string) => {
+    return getFilteredItems(tab).filter(item => item.size === 'large');
+  };
 
   const renderChart = (item: DashboardItem) => {
     if (item.chartType === 'bar' && item.data) {
@@ -240,6 +458,32 @@ export default function Dashboard() {
           />
         </PieChart>
       );
+    } else if (item.chartType === 'line' && item.data) {
+      return (
+        <LineChart data={item.data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis 
+            dataKey="name" 
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis tick={{ fontSize: 12 }} />
+          <Tooltip />
+          <Legend wrapperStyle={{ fontSize: '12px' }} />
+          <Line type="monotone" dataKey="cantidad" stroke="#3b82f6" activeDot={{ r: 8 }} />
+        </LineChart>
+      );
+    } else if (item.chartType === 'area' && item.data) {
+      return (
+        <AreaChart data={item.data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Area type="monotone" dataKey="hardware" stackId="1" stroke="#3b82f6" fill="#3b82f6" />
+          <Area type="monotone" dataKey="software" stackId="1" stroke="#8b5cf6" fill="#8b5cf6" />
+        </AreaChart>
+      );
     }
     return item.component;
   };
@@ -248,58 +492,210 @@ export default function Dashboard() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard</h1>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
-        {smallItems.map((item) => (
-          <Card
-            key={item.id}
-            draggable
-            onDragStart={(e) => handleDragStart(e, item.id)}
-            onDragEnd={handleDragEnd}
-            onDragOver={(e) => handleDragOver(e, item.id)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, item.id)}
-            className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
-              <CardTitle className="text-sm sm:text-base font-medium w-full">
-                <div className="flex items-center gap-2 w-full">
-                  <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                  {item.component}
-                </div>
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="rendimiento">Rendimiento</TabsTrigger>
+          <TabsTrigger value="servicios">Servicios</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="general" className="mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
+            {getSmallItems('general').map((item) => (
+              <Card
+                key={item.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, item.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, item.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, item.id)}
+                className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
+                  <CardTitle className="text-sm sm:text-base font-medium w-full">
+                    <div className="flex items-center gap-2 w-full">
+                      <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                      {item.component}
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
-        {largeItems.map((item) => (
-          <Card
-            key={item.id}
-            draggable
-            onDragStart={(e) => handleDragStart(e, item.id)}
-            onDragEnd={handleDragEnd}
-            onDragOver={(e) => handleDragOver(e, item.id)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, item.id)}
-            className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
-          >
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
-                <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                {item.title}
-              </CardTitle>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+            {getLargeItems('general').map((item) => (
+              <Card
+                key={item.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, item.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, item.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, item.id)}
+                className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
+              >
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
+                    <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    {item.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="h-[250px] sm:h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {renderChart(item)}
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="rendimiento" className="mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
+            {getSmallItems('rendimiento').map((item) => (
+              <Card
+                key={item.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, item.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, item.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, item.id)}
+                className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
+                  <CardTitle className="text-sm sm:text-base font-medium w-full">
+                    <div className="flex items-center gap-2 w-full">
+                      <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                      {item.component}
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+            {getLargeItems('rendimiento').map((item) => (
+              <Card
+                key={item.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, item.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, item.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, item.id)}
+                className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
+              >
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
+                    <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    {item.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="h-[250px] sm:h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {renderChart(item)}
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="servicios" className="mt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 mb-6">
+            {getLargeItems('servicios').map((item) => (
+              <Card
+                key={item.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, item.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, item.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, item.id)}
+                className="cursor-grab transition-all duration-200 hover:bg-muted/50 group"
+              >
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
+                    <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    {item.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="h-[250px] sm:h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {renderChart(item)}
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg">Licencias Activas</CardTitle>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6 pt-0">
-              <div className="h-[250px] sm:h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  {renderChart(item)}
-                </ResponsiveContainer>
-              </div>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Software</TableHead>
+                    <TableHead>Licencias</TableHead>
+                    <TableHead>Utilizadas</TableHead>
+                    <TableHead>Disponibles</TableHead>
+                    <TableHead>Renovación</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">Office 365</TableCell>
+                    <TableCell>250</TableCell>
+                    <TableCell>230</TableCell>
+                    <TableCell>20</TableCell>
+                    <TableCell>15/12/2024</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Adobe Creative Cloud</TableCell>
+                    <TableCell>100</TableCell>
+                    <TableCell>85</TableCell>
+                    <TableCell>15</TableCell>
+                    <TableCell>30/09/2024</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Antivirus Corporativo</TableCell>
+                    <TableCell>400</TableCell>
+                    <TableCell>350</TableCell>
+                    <TableCell>50</TableCell>
+                    <TableCell>01/01/2025</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Software Desarrollo</TableCell>
+                    <TableCell>50</TableCell>
+                    <TableCell>40</TableCell>
+                    <TableCell>10</TableCell>
+                    <TableCell>10/11/2024</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">ERP Empresarial</TableCell>
+                    <TableCell>150</TableCell>
+                    <TableCell>125</TableCell>
+                    <TableCell>25</TableCell>
+                    <TableCell>22/07/2024</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
