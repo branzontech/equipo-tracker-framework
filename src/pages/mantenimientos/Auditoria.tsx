@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +51,6 @@ const periodos = [
   { value: "anual", label: "Anual" },
 ];
 
-// Mock data for demonstration
 const mantenimientos = [
   {
     id: 1,
@@ -128,7 +126,6 @@ const AuditoriaMantenimiento = () => {
     );
   };
 
-  // Set date range based on selected period
   const setPredefinedPeriod = (period: string) => {
     setSelectedPeriodo(period);
     const today = new Date();
@@ -163,10 +160,8 @@ const AuditoriaMantenimiento = () => {
     setDateRange({ from, to });
   };
 
-  // Filter maintenance based on all filters
   const filteredMantenimientos = useMemo(() => {
     return mantenimientos.filter(item => {
-      // Filter by search term
       const matchesSearch = 
         searchTerm === "" || 
         item.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -174,23 +169,19 @@ const AuditoriaMantenimiento = () => {
         item.responsable.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.ubicacion.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // Filter by status
       const matchesStatus = 
         selectedEstados.length === 0 || 
         selectedEstados.includes(item.estado);
       
-      // Filter by date range
       const matchesDateRange = 
         !dateRange.from || 
         (item.fecha >= dateRange.from && 
           (!dateRange.to || item.fecha <= dateRange.to));
       
-      // Filter by responsable
       const matchesResponsable = 
         !selectedResponsable || 
         item.responsable === selectedResponsable;
       
-      // Filter by maintenance type
       const matchesTipo = 
         !tipoMantenimiento || 
         item.tipo === tipoMantenimiento;
@@ -199,7 +190,6 @@ const AuditoriaMantenimiento = () => {
     });
   }, [searchTerm, selectedEstados, dateRange, selectedResponsable, tipoMantenimiento]);
 
-  // Statistics calculation
   const statistics = useMemo(() => {
     return estados.map(estado => {
       return {
@@ -209,7 +199,6 @@ const AuditoriaMantenimiento = () => {
     });
   }, [filteredMantenimientos]);
 
-  // Get unique values for filters
   const uniqueResponsables = [...new Set(mantenimientos.map(m => m.responsable))];
   const uniqueTipos = [...new Set(mantenimientos.map(m => m.tipo))];
 
@@ -228,7 +217,6 @@ const AuditoriaMantenimiento = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Calendar and Filters Panel */}
         <Card className="md:col-span-2">
           <CardContent className="p-6">
             <div className="flex justify-between items-center mb-4">
@@ -270,7 +258,6 @@ const AuditoriaMantenimiento = () => {
           </CardContent>
         </Card>
 
-        {/* Filters Panel */}
         <Card>
           <CardContent className="p-6 space-y-6">
             <div>
@@ -287,7 +274,6 @@ const AuditoriaMantenimiento = () => {
                 </Button>
               </div>
               
-              {/* Date Range Filter */}
               <div className="space-y-2 mb-4">
                 <h4 className="text-sm font-medium text-[#01242c]">Rango de Fechas</h4>
                 <div className="grid gap-2">
@@ -335,10 +321,8 @@ const AuditoriaMantenimiento = () => {
                 />
               </div>
 
-              {/* Advanced filters - collapsible */}
               <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
                 <CollapsibleContent className="space-y-4">
-                  {/* Responsable filter */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-[#01242c]">Responsable</h4>
                     <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
@@ -346,7 +330,7 @@ const AuditoriaMantenimiento = () => {
                         <SelectValue placeholder="Seleccionar responsable" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
+                        <SelectItem value="todos">Todos</SelectItem>
                         {uniqueResponsables.map((responsable) => (
                           <SelectItem key={responsable} value={responsable}>
                             {responsable}
@@ -356,7 +340,6 @@ const AuditoriaMantenimiento = () => {
                     </Select>
                   </div>
                   
-                  {/* Tipo de mantenimiento filter */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-[#01242c]">Tipo de Mantenimiento</h4>
                     <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
@@ -364,7 +347,7 @@ const AuditoriaMantenimiento = () => {
                         <SelectValue placeholder="Seleccionar tipo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
+                        <SelectItem value="todos">Todos</SelectItem>
                         {uniqueTipos.map((tipo) => (
                           <SelectItem key={tipo} value={tipo}>
                             {tipo}
@@ -401,7 +384,6 @@ const AuditoriaMantenimiento = () => {
               </div>
             </div>
 
-            {/* Statistics */}
             <div>
               <h3 className="text-lg font-semibold mb-4 text-[#01242c]">Estadísticas</h3>
               <div className="space-y-3">
@@ -426,7 +408,6 @@ const AuditoriaMantenimiento = () => {
         </Card>
       </div>
 
-      {/* Lista de Mantenimientos con tabla */}
       <Card className="mt-6">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold mb-4 text-[#01242c]">
