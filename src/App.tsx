@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import IngresoProducto from "./pages/productos/Ingreso";
@@ -48,6 +48,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route
               path="*"
               element={
@@ -59,7 +60,8 @@ const App = () => {
                     <Header className="sticky top-0 z-10" />
                     <main className="flex-1 p-6 overflow-auto">
                       <Routes>
-                        <Route path="/" element={<Index />} />
+                        {/* Update default route to redirect to login if not authenticated */}
+                        <Route path="/" element={<Navigate to="/login" replace />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/productos/ingreso" element={<IngresoProducto />} />
                         <Route path="/productos/lista" element={<ListaInventario />} />
