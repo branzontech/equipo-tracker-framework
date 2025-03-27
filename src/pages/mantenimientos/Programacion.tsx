@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square, GripVertical } from "lucide-react";
+import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square, GripVertical, X, Search as SearchIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +43,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const equiposMock = [
   { id: 1, nombre: "Laptop Dell XPS", tipo: "Laptop", sede: "Sede 1", area: "Sistemas", estado: "Activo" },
@@ -93,6 +103,14 @@ const ProgramacionMantenimiento = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [mantenimientos, setMantenimientos] = useState([...mantenimientosMock]);
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
+  
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filtroResponsable, setFiltroResponsable] = useState<string>("all");
+  const [filtroEstado, setFiltroEstado] = useState<string>("all");
+  const [filtroFechaDesde, setFiltroFechaDesde] = useState<Date | undefined>(undefined);
+  const [filtroFechaHasta, setFiltroFechaHasta] = useState<Date | undefined>(undefined);
+  const [isSearching, setIsSearching] = useState(false);
 
   const [mainTableColumns, setMainTableColumns] = useState<TableColumn[]>([
     { id: "grip", label: "", accessor: "", isVisible: true, order: 0, className: "w-[40px]" },
@@ -136,6 +154,48 @@ const ProgramacionMantenimiento = () => {
 
     return cumpleFiltroSede && cumpleFiltroArea && cumpleFiltroTipo && cumpleBusqueda;
   });
+
+  const mantenimientosFiltrados = mantenimientos.filter(mantenimiento => {
+    const cumpleTipo = tipoMantenimiento === "todos" || 
+      mantenimiento.tipo.toLowerCase() === tipoMantenimiento.toLowerCase();
+    
+    const cumpleSearch = !searchQuery || 
+      mantenimiento.equipo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mantenimiento.responsable.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mantenimiento.estado.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mantenimiento.tipo.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const cumpleResponsable = filtroResponsable === "all" || 
+      mantenimiento.responsable === filtroResponsable;
+    
+    const cumpleEstado = filtroEstado === "all" || 
+      mantenimiento.estado === filtroEstado;
+    
+    const fechaProgramada = new Date(mantenimiento.fechaProgramada);
+    const cumpleFechaDesde = !filtroFechaDesde || 
+      fechaProgramada >= filtroFechaDesde;
+    
+    const cumpleFechaHasta = !filtroFechaHasta || 
+      fechaProgramada <= filtroFechaHasta;
+    
+    return cumpleTipo && cumpleSearch && cumpleResponsable && 
+           cumpleEstado && cumpleFechaDesde && cumpleFechaHasta;
+  });
+
+  const resetFilters = () => {
+    setTipoMantenimiento("todos");
+    setSearchQuery("");
+    setFiltroResponsable("all");
+    setFiltroEstado("all");
+    setFiltroFechaDesde(undefined);
+    setFiltroFechaHasta(undefined);
+    setIsSearching(false);
+  };
+
+  const handleSearch = () => {
+    setIsSearching(true);
+    toast.success("Filtros aplicados correctamente");
+  };
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -238,18 +298,170 @@ const ProgramacionMantenimiento = () => {
         </h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="Tipo de mantenimiento" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos</SelectItem>
-            <SelectItem value="preventivo">Preventivo</SelectItem>
-            <SelectItem value="correctivo">Correctivo</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-4">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="relative flex-1">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input 
+                placeholder="Buscar mantenimientos..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            
+            <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Tipo de mantenimiento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="preventivo">Preventivo</SelectItem>
+                <SelectItem value="correctivo">Correctivo</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline" 
+              size="default"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="w-full sm:w-auto"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros Avanzados
+            </Button>
+            
+            <Button 
+              variant="default" 
+              onClick={handleSearch}
+              className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              Buscar
+            </Button>
+          </div>
+          
+          <Collapsible open={showAdvancedFilters} onOpenChange={setShowAdvancedFilters}>
+            <CollapsibleContent className="pt-3 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <FormLabel>Responsable</FormLabel>
+                  <Select value={filtroResponsable} onValueChange={setFiltroResponsable}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filtrar por responsable" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="Juan Pérez">Juan Pérez</SelectItem>
+                      <SelectItem value="María López">María López</SelectItem>
+                      <SelectItem value="Carlos Gómez">Carlos Gómez</SelectItem>
+                      <SelectItem value="Ana Martínez">Ana Martínez</SelectItem>
+                      <SelectItem value="Pedro Sánchez">Pedro Sánchez</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <FormLabel>Estado</FormLabel>
+                  <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filtrar por estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="Pendiente">Pendiente</SelectItem>
+                      <SelectItem value="Programado">Programado</SelectItem>
+                      <SelectItem value="En Progreso">En Progreso</SelectItem>
+                      <SelectItem value="Completado">Completado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <FormLabel>Fecha desde</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {filtroFechaDesde ? format(filtroFechaDesde, "PP", { locale: es }) : "Seleccionar fecha"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={filtroFechaDesde}
+                        onSelect={setFiltroFechaDesde}
+                        initialFocus
+                        locale={es}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <FormLabel>Fecha hasta</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {filtroFechaHasta ? format(filtroFechaHasta, "PP", { locale: es }) : "Seleccionar fecha"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={filtroFechaHasta}
+                        onSelect={setFiltroFechaHasta}
+                        initialFocus
+                        locale={es}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={resetFilters}
+                  className="flex items-center"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Limpiar Filtros
+                </Button>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+          
+          {isSearching && (
+            <div className="flex items-center pt-2">
+              <div className="text-sm text-gray-500">
+                {mantenimientosFiltrados.length} resultados encontrados
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={resetFilters}
+                className="ml-auto text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Limpiar
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
 
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]">
@@ -666,14 +878,14 @@ const ProgramacionMantenimiento = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mantenimientos.length === 0 ? (
+                {mantenimientosFiltrados.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={mainTableColumns.filter(col => col.isVisible).length} className="text-center py-8 text-muted-foreground">
-                      No hay mantenimientos programados
+                      No hay mantenimientos programados que coincidan con los criterios de búsqueda
                     </TableCell>
                   </TableRow>
                 ) : (
-                  mantenimientos.map((mantenimiento) => (
+                  mantenimientosFiltrados.map((mantenimiento) => (
                     <TableRow key={mantenimiento.id}>
                       {mainTableColumns
                         .sort((a, b) => a.order - b.order)
