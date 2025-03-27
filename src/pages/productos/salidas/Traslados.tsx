@@ -1,3 +1,4 @@
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import * as z from "zod";
@@ -35,10 +36,13 @@ import {
   View, 
   StyleSheet, 
   PDFViewer,
-  PDFDownloadLink 
+  PDFDownloadLink,
+  Image
 } from "@react-pdf/renderer";
 import { useToast } from "@/components/ui/use-toast";
 import { AccesoriosContainer } from "@/components/AccesorioItem";
+import SignatureCanvas from "@/components/SignatureCanvas";
+import ResponsibleSearch from "@/components/ResponsibleSearch";
 
 const formSchema = z.object({
   fechaTraslado: z.date({
@@ -58,6 +62,14 @@ const formSchema = z.object({
     })).optional().default([]),
   })),
   observaciones: z.string(),
+  responsableEntregaId: z.string().min(1, "El responsable de entrega es requerido"),
+  responsableEntregaName: z.string(),
+  responsableEntregaPosition: z.string(),
+  responsableEntregaDepartment: z.string(),
+  responsableRecibeId: z.string().min(1, "El responsable de recepción es requerido"),
+  responsableRecibeName: z.string(),
+  responsableRecibePosition: z.string(),
+  responsableRecibeDepartment: z.string(),
   firmaEntrega: z.string().min(1, "La firma de quien entrega es requerida"),
   firmaRecibe: z.string().min(1, "La firma de quien recibe es requerida"),
 });
@@ -217,11 +229,15 @@ const ActaEntregaPDF = ({ data }) => {
 
         <View style={styles.signatures}>
           <View style={styles.signature}>
-            <Text>{data.firmaEntrega || ''}</Text>
+            {data.firmaEntrega && <Image src={data.firmaEntrega} style={{ width: 150, height: 70 }} />}
+            <Text>{data.responsableEntregaName || ''}</Text>
+            <Text style={{ fontSize: 8 }}>{data.responsableEntregaPosition || ''}</Text>
             <Text>Entrega</Text>
           </View>
           <View style={styles.signature}>
-            <Text>{data.firmaRecibe || ''}</Text>
+            {data.firmaRecibe && <Image src={data.firmaRecibe} style={{ width: 150, height: 70 }} />}
+            <Text>{data.responsableRecibeName || ''}</Text>
+            <Text style={{ fontSize: 8 }}>{data.responsableRecibePosition || ''}</Text>
             <Text>Recibe</Text>
           </View>
         </View>
@@ -243,6 +259,16 @@ const Traslados = () => {
         accesorios: [] 
       }],
       observaciones: "",
+      responsableEntregaId: "",
+      responsableEntregaName: "",
+      responsableEntregaPosition: "",
+      responsableEntregaDepartment: "",
+      responsableRecibeId: "",
+      responsableRecibeName: "",
+      responsableRecibePosition: "",
+      responsableRecibeDepartment: "",
+      firmaEntrega: "",
+      firmaRecibe: "",
     },
   });
 
@@ -515,6 +541,18 @@ const Traslados = () => {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ResponsibleSearch 
+                name="responsableEntrega" 
+                label="Responsable de Entrega" 
+              />
+              
+              <ResponsibleSearch 
+                name="responsableRecibe" 
+                label="Responsable de Recepción" 
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={methods.control}
                 name="firmaEntrega"
@@ -522,7 +560,10 @@ const Traslados = () => {
                   <FormItem>
                     <FormLabel>Firma de quien entrega</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <SignatureCanvas
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -536,7 +577,10 @@ const Traslados = () => {
                   <FormItem>
                     <FormLabel>Firma de quien recibe</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <SignatureCanvas
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
