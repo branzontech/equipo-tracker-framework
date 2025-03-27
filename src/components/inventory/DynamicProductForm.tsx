@@ -56,7 +56,7 @@ export function DynamicProductForm() {
     
     Object.entries(productTypeDefinition.fields).forEach(([key, field]) => {
       // Construir validación Zod según el tipo de campo
-      let fieldSchema = z.any();
+      let fieldSchema: any;
       
       switch (field.type) {
         case 'text':
@@ -79,11 +79,11 @@ export function DynamicProductForm() {
           defaultValues[key] = field.defaultValue || "";
           break;
         case 'date':
-          fieldSchema = z.date();
+          fieldSchema = z.date().optional();
           defaultValues[key] = field.defaultValue || undefined;
           break;
         case 'checkbox':
-          fieldSchema = z.boolean();
+          fieldSchema = z.boolean().default(false);
           defaultValues[key] = field.defaultValue || false;
           break;
         case 'textarea':
@@ -95,6 +95,8 @@ export function DynamicProductForm() {
           fieldSchema = z.any();
           defaultValues[key] = field.defaultValue || null;
           break;
+        default:
+          fieldSchema = z.any();
       }
       
       schemaMap[key] = fieldSchema;
