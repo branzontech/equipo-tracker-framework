@@ -194,12 +194,24 @@ export const Sidebar = ({
   onToggle: (isCollapsed: boolean) => void;
 }) => {
   const [hovering, setHovering] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (hovering && isCollapsed) {
       onToggle(false);
     }
   }, [hovering, isCollapsed, onToggle]);
+
+  const handleLogout = () => {
+    // 1. Clear any authentication data from localStorage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
+    // 2. Any other cleanup needed for logged in state
+    
+    // 3. Redirect to login page
+    navigate('/login');
+  };
 
   return (
     <div
@@ -243,6 +255,7 @@ export const Sidebar = ({
             bg-[#01242c] 
             hover:bg-white/10 
             rounded-lg transition-all duration-200"
+          onClick={handleLogout}
         >
           <LogOut className={`w-5 h-5 ${!isCollapsed ? "mr-2" : ""} text-[#bff036]`} />
           {!isCollapsed && <span>Cerrar Sesión</span>}
