@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Plus, Trash } from "lucide-react";
+import { CalendarIcon, Plus, Trash, FileX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -88,6 +88,20 @@ const BajaEquipos = () => {
     form.setValue("equipos", updatedEquipos);
   };
 
+  // Function to reset the form and start a new equipment withdrawal
+  const nuevaBajaEquipo = () => {
+    form.reset({
+      observaciones: "",
+      equipos: [{ serial: "", activoFijo: "", motivo: "", descripcionEstado: "" }],
+    });
+    setEquipos([{ id: Date.now().toString() }]);
+    
+    toast({
+      title: "Nueva baja de equipos",
+      description: "Se ha iniciado un nuevo formulario de baja de equipos.",
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Aquí iría la lógica para procesar la baja del equipo
@@ -111,7 +125,17 @@ const BajaEquipos = () => {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-[#0B2559] mb-6">Baja de Equipos</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-[#0B2559]">Baja de Equipos</h1>
+        <Button
+          onClick={nuevaBajaEquipo}
+          className="bg-[#bff036] hover:bg-[#bff036]/90 text-[#01242c]"
+          variant="secondary"
+        >
+          <FileX className="mr-2 h-4 w-4" />
+          Nueva Baja
+        </Button>
+      </div>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
