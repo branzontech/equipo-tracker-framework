@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -447,7 +446,7 @@ const ListaInventario = () => {
                             <SelectValue placeholder="Seleccionar marca" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Todas</SelectItem>
+                            <SelectItem value="todas">Todas</SelectItem>
                             {uniqueMarcas.map((marca) => (
                               <SelectItem key={marca} value={marca}>
                                 {marca}
@@ -467,7 +466,7 @@ const ListaInventario = () => {
                             <SelectValue placeholder="Seleccionar estado" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Todos</SelectItem>
+                            <SelectItem value="todos">Todos</SelectItem>
                             {uniqueEstados.map((estado) => (
                               <SelectItem key={estado} value={estado}>
                                 {estado}
@@ -487,7 +486,7 @@ const ListaInventario = () => {
                             <SelectValue placeholder="Seleccionar sede" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Todas</SelectItem>
+                            <SelectItem value="todas">Todas</SelectItem>
                             {uniqueSedes.map((sede) => (
                               <SelectItem key={sede} value={sede}>
                                 {sede}
@@ -507,7 +506,7 @@ const ListaInventario = () => {
                             <SelectValue placeholder="Seleccionar bodega" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Todas</SelectItem>
+                            <SelectItem value="todas">Todas</SelectItem>
                             {uniqueBodegas.map((bodega) => (
                               <SelectItem key={bodega} value={bodega}>
                                 {bodega}
