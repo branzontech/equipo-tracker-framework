@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -420,6 +421,113 @@ const ListaInventario = () => {
                     <Filter className="h-4 w-4" />
                   </Button>
                 </CollapsibleTrigger>
+                
+                <CollapsibleContent className="mb-6">
+                  <div className="bg-slate-50 border rounded-lg p-4 mt-2 shadow-sm">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-md font-semibold text-[#040d50]">Filtros Avanzados</h3>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={resetFilters}
+                      >
+                        <X className="h-3.5 w-3.5 mr-1" />
+                        Limpiar
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Marca</label>
+                        <Select 
+                          value={filters.marca} 
+                          onValueChange={(value) => handleFilterChange("marca", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar marca" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Todas</SelectItem>
+                            {uniqueMarcas.map((marca) => (
+                              <SelectItem key={marca} value={marca}>
+                                {marca}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Estado</label>
+                        <Select 
+                          value={filters.estado} 
+                          onValueChange={(value) => handleFilterChange("estado", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar estado" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Todos</SelectItem>
+                            {uniqueEstados.map((estado) => (
+                              <SelectItem key={estado} value={estado}>
+                                {estado}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Sede</label>
+                        <Select 
+                          value={filters.sede} 
+                          onValueChange={(value) => handleFilterChange("sede", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar sede" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Todas</SelectItem>
+                            {uniqueSedes.map((sede) => (
+                              <SelectItem key={sede} value={sede}>
+                                {sede}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Bodega</label>
+                        <Select 
+                          value={filters.bodega} 
+                          onValueChange={(value) => handleFilterChange("bodega", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar bodega" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Todas</SelectItem>
+                            {uniqueBodegas.map((bodega) => (
+                              <SelectItem key={bodega} value={bodega}>
+                                {bodega}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Responsable</label>
+                        <Input 
+                          placeholder="Buscar por responsable" 
+                          value={filters.responsable}
+                          onChange={(e) => handleFilterChange("responsable", e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
               </Collapsible>
               
               <DropdownMenu>
@@ -457,113 +565,6 @@ const ListaInventario = () => {
               </Button>
             </div>
           </div>
-
-          <CollapsibleContent className="mb-6">
-            <div className="bg-slate-50 border rounded-lg p-4 mt-2 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-md font-semibold text-[#040d50]">Filtros Avanzados</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={resetFilters}
-                >
-                  <X className="h-3.5 w-3.5 mr-1" />
-                  Limpiar
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Marca</label>
-                  <Select 
-                    value={filters.marca} 
-                    onValueChange={(value) => handleFilterChange("marca", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar marca" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todas</SelectItem>
-                      {uniqueMarcas.map((marca) => (
-                        <SelectItem key={marca} value={marca}>
-                          {marca}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Estado</label>
-                  <Select 
-                    value={filters.estado} 
-                    onValueChange={(value) => handleFilterChange("estado", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
-                      {uniqueEstados.map((estado) => (
-                        <SelectItem key={estado} value={estado}>
-                          {estado}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Sede</label>
-                  <Select 
-                    value={filters.sede} 
-                    onValueChange={(value) => handleFilterChange("sede", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar sede" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todas</SelectItem>
-                      {uniqueSedes.map((sede) => (
-                        <SelectItem key={sede} value={sede}>
-                          {sede}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Bodega</label>
-                  <Select 
-                    value={filters.bodega} 
-                    onValueChange={(value) => handleFilterChange("bodega", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar bodega" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todas</SelectItem>
-                      {uniqueBodegas.map((bodega) => (
-                        <SelectItem key={bodega} value={bodega}>
-                          {bodega}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Responsable</label>
-                  <Input 
-                    placeholder="Buscar por responsable" 
-                    value={filters.responsable}
-                    onChange={(e) => handleFilterChange("responsable", e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </CollapsibleContent>
 
           <div className="border rounded-lg shadow-sm overflow-hidden">
             <Table>
