@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus } from "lucide-react";
+import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,6 +34,18 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import ListaPerifericos from "@/components/perifericos/ListaPerifericos";
 
@@ -199,6 +211,17 @@ const ListaInventario = () => {
   const itemsPerPage = 5;
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("inventario");
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  
+  const [filters, setFilters] = useState({
+    marca: "",
+    estado: "",
+    sede: "",
+    bodega: "",
+    fechaDesde: "",
+    fechaHasta: "",
+    responsable: "",
+  });
 
   const [columns, setColumns] = useState<ColumnConfig[]>([
     { id: "numeroSerie", label: "N° Serie", key: "numeroSerie", isVisible: true, order: 0 },
@@ -267,13 +290,43 @@ const ListaInventario = () => {
     );
   };
 
-  const filteredData = sampleData.filter((item) =>
-    Object.values(item).some(
-      (value) =>
-        value &&
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const applyFilters = (data: typeof sampleData) => {
+    return data.filter(item => {
+      const matchesSearch = Object.values(item).some(
+        value => value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      
+      if (!matchesSearch) return false;
+      
+      if (filters.marca && item.marca.toLowerCase() !== filters.marca.toLowerCase()) return false;
+      if (filters.estado && item.estado.toLowerCase() !== filters.estado.toLowerCase()) return false;
+      if (filters.sede && item.sede.toLowerCase() !== filters.sede.toLowerCase()) return false;
+      if (filters.bodega && item.bodega.toLowerCase() !== filters.bodega.toLowerCase()) return false;
+      if (filters.responsable && !item.responsable.toLowerCase().includes(filters.responsable.toLowerCase())) return false;
+      
+      return true;
+    });
+  };
+
+  const handleFilterChange = (field: keyof typeof filters, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+    setCurrentPage(1);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      marca: "",
+      estado: "",
+      sede: "",
+      bodega: "",
+      fechaDesde: "",
+      fechaHasta: "",
+      responsable: "",
+    });
+    setCurrentPage(1);
+  };
+
+  const filteredData = applyFilters(sampleData);
 
   const sortedData = [...filteredData].sort((a: any, b: any) => {
     if (!sortField) return 0;
@@ -319,6 +372,11 @@ const ListaInventario = () => {
     navigate('/productos/ingreso');
   };
 
+  const uniqueMarcas = Array.from(new Set(sampleData.map(item => item.marca)));
+  const uniqueEstados = Array.from(new Set(sampleData.map(item => item.estado)));
+  const uniqueSedes = Array.from(new Set(sampleData.map(item => item.sede)));
+  const uniqueBodegas = Array.from(new Set(sampleData.map(item => item.bodega)));
+
   return (
     <div className="p-8">
       <Tabs defaultValue="inventario" onValueChange={setActiveTab} className="w-full">
@@ -337,7 +395,7 @@ const ListaInventario = () => {
         </div>
         
         <TabsContent value="inventario" className="mt-0">
-          <div className="flex justify-between mb-6">
+          <div className="flex justify-between mb-4">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -348,6 +406,22 @@ const ListaInventario = () => {
               />
             </div>
             <div className="flex gap-2">
+              <Collapsible 
+                open={showAdvancedFilters} 
+                onOpenChange={setShowAdvancedFilters}
+                className="w-full"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className={showAdvancedFilters ? "bg-slate-100" : ""}
+                  >
+                    <Filter className="h-4 w-4" />
+                  </Button>
+                </CollapsibleTrigger>
+              </Collapsible>
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
@@ -376,12 +450,120 @@ const ListaInventario = () => {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+              
               <Button variant="outline" onClick={handleDownload}>
                 <Download className="h-4 w-4 mr-2" />
                 Descargar CSV
               </Button>
             </div>
           </div>
+
+          <CollapsibleContent className="mb-6">
+            <div className="bg-slate-50 border rounded-lg p-4 mt-2 shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-md font-semibold text-[#040d50]">Filtros Avanzados</h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={resetFilters}
+                >
+                  <X className="h-3.5 w-3.5 mr-1" />
+                  Limpiar
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Marca</label>
+                  <Select 
+                    value={filters.marca} 
+                    onValueChange={(value) => handleFilterChange("marca", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar marca" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todas</SelectItem>
+                      {uniqueMarcas.map((marca) => (
+                        <SelectItem key={marca} value={marca}>
+                          {marca}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Estado</label>
+                  <Select 
+                    value={filters.estado} 
+                    onValueChange={(value) => handleFilterChange("estado", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todos</SelectItem>
+                      {uniqueEstados.map((estado) => (
+                        <SelectItem key={estado} value={estado}>
+                          {estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Sede</label>
+                  <Select 
+                    value={filters.sede} 
+                    onValueChange={(value) => handleFilterChange("sede", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar sede" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todas</SelectItem>
+                      {uniqueSedes.map((sede) => (
+                        <SelectItem key={sede} value={sede}>
+                          {sede}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Bodega</label>
+                  <Select 
+                    value={filters.bodega} 
+                    onValueChange={(value) => handleFilterChange("bodega", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar bodega" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todas</SelectItem>
+                      {uniqueBodegas.map((bodega) => (
+                        <SelectItem key={bodega} value={bodega}>
+                          {bodega}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Responsable</label>
+                  <Input 
+                    placeholder="Buscar por responsable" 
+                    value={filters.responsable}
+                    onChange={(e) => handleFilterChange("responsable", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </CollapsibleContent>
 
           <div className="border rounded-lg shadow-sm overflow-hidden">
             <Table>
@@ -417,36 +599,47 @@ const ListaInventario = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedData.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-slate-50">
-                    {sortedColumns.map((column) =>
-                      column.isVisible && (
-                        <TableCell key={`${item.id}-${column.id}`} className="py-3">
-                          {column.id === "estado" ? (
-                            <StatusBadge status={item[column.key as keyof typeof item] as string} />
-                          ) : (
-                            item[column.key as keyof typeof item]
-                          )}
-                        </TableCell>
-                      )
-                    )}
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="hover:bg-slate-100">
-                          <Eye className="h-4 w-4 text-[#01242c]" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="hover:bg-slate-100">
-                          <Pencil className="h-4 w-4 text-[#01242c]" />
-                        </Button>
-                      </div>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-slate-50">
+                      {sortedColumns.map((column) =>
+                        column.isVisible && (
+                          <TableCell key={`${item.id}-${column.id}`} className="py-3">
+                            {column.id === "estado" ? (
+                              <StatusBadge status={item[column.key as keyof typeof item] as string} />
+                            ) : (
+                              item[column.key as keyof typeof item]
+                            )}
+                          </TableCell>
+                        )
+                      )}
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="icon" className="hover:bg-slate-100">
+                            <Eye className="h-4 w-4 text-[#01242c]" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="hover:bg-slate-100">
+                            <Pencil className="h-4 w-4 text-[#01242c]" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={sortedColumns.filter(col => col.isVisible).length + 1} className="h-24 text-center">
+                      No se encontraron resultados.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>
 
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex justify-between items-center">
+            <div className="text-sm text-gray-500">
+              Mostrando {paginatedData.length} de {filteredData.length} registros
+            </div>
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
