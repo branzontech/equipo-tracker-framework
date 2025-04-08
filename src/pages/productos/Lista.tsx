@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import ListaPerifericos from "@/components/perifericos/ListaPerifericos";
 
 const sampleData = [
@@ -211,7 +219,6 @@ const ListaInventario = () => {
   const itemsPerPage = 5;
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("inventario");
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   const [filters, setFilters] = useState({
     marca: "",
@@ -298,10 +305,10 @@ const ListaInventario = () => {
       
       if (!matchesSearch) return false;
       
-      if (filters.marca && item.marca.toLowerCase() !== filters.marca.toLowerCase()) return false;
-      if (filters.estado && item.estado.toLowerCase() !== filters.estado.toLowerCase()) return false;
-      if (filters.sede && item.sede.toLowerCase() !== filters.sede.toLowerCase()) return false;
-      if (filters.bodega && item.bodega.toLowerCase() !== filters.bodega.toLowerCase()) return false;
+      if (filters.marca && filters.marca !== "todas" && item.marca.toLowerCase() !== filters.marca.toLowerCase()) return false;
+      if (filters.estado && filters.estado !== "todos" && item.estado.toLowerCase() !== filters.estado.toLowerCase()) return false;
+      if (filters.sede && filters.sede !== "todas" && item.sede.toLowerCase() !== filters.sede.toLowerCase()) return false;
+      if (filters.bodega && filters.bodega !== "todas" && item.bodega.toLowerCase() !== filters.bodega.toLowerCase()) return false;
       if (filters.responsable && !item.responsable.toLowerCase().includes(filters.responsable.toLowerCase())) return false;
       
       return true;
@@ -377,6 +384,8 @@ const ListaInventario = () => {
   const uniqueSedes = Array.from(new Set(sampleData.map(item => item.sede)));
   const uniqueBodegas = Array.from(new Set(sampleData.map(item => item.bodega)));
 
+  const activeFiltersCount = Object.values(filters).filter(value => value && value !== "todas" && value !== "todos").length;
+
   return (
     <div className="p-8">
       <Tabs defaultValue="inventario" onValueChange={setActiveTab} className="w-full">
@@ -406,43 +415,34 @@ const ListaInventario = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Collapsible 
-                open={showAdvancedFilters} 
-                onOpenChange={setShowAdvancedFilters}
-                className="w-full"
-              >
-                <CollapsibleTrigger asChild>
+              <Sheet>
+                <SheetTrigger asChild>
                   <Button 
                     variant="outline" 
-                    size="icon" 
-                    className={showAdvancedFilters ? "bg-slate-100" : ""}
+                    size="icon"
+                    className={activeFiltersCount > 0 ? "relative bg-slate-100" : ""}
                   >
                     <Filter className="h-4 w-4" />
+                    {activeFiltersCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                        {activeFiltersCount}
+                      </span>
+                    )}
                   </Button>
-                </CollapsibleTrigger>
-                
-                <CollapsibleContent className="mb-6">
-                  <div className="bg-slate-50 border rounded-lg p-4 mt-2 shadow-sm">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-md font-semibold text-[#040d50]">Filtros Avanzados</h3>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={resetFilters}
-                      >
-                        <X className="h-3.5 w-3.5 mr-1" />
-                        Limpiar
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full max-w-md sm:max-w-lg">
+                  <SheetHeader>
+                    <SheetTitle className="text-xl font-semibold mb-2">Filtros Avanzados</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-6">
+                    <div className="grid grid-cols-1 gap-y-6">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Marca</label>
                         <Select 
                           value={filters.marca} 
                           onValueChange={(value) => handleFilterChange("marca", value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Seleccionar marca" />
                           </SelectTrigger>
                           <SelectContent>
@@ -462,7 +462,7 @@ const ListaInventario = () => {
                           value={filters.estado} 
                           onValueChange={(value) => handleFilterChange("estado", value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Seleccionar estado" />
                           </SelectTrigger>
                           <SelectContent>
@@ -482,7 +482,7 @@ const ListaInventario = () => {
                           value={filters.sede} 
                           onValueChange={(value) => handleFilterChange("sede", value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Seleccionar sede" />
                           </SelectTrigger>
                           <SelectContent>
@@ -502,7 +502,7 @@ const ListaInventario = () => {
                           value={filters.bodega} 
                           onValueChange={(value) => handleFilterChange("bodega", value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Seleccionar bodega" />
                           </SelectTrigger>
                           <SelectContent>
@@ -525,9 +525,22 @@ const ListaInventario = () => {
                         />
                       </div>
                     </div>
+                    
+                    <div className="pt-4 border-t flex justify-end">
+                      <Button 
+                        variant="outline" 
+                        onClick={resetFilters}
+                        className="mr-2"
+                      >
+                        Limpiar filtros
+                      </Button>
+                      <Button>
+                        Aplicar filtros
+                      </Button>
+                    </div>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                </SheetContent>
+              </Sheet>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -565,6 +578,46 @@ const ListaInventario = () => {
             </div>
           </div>
 
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {Object.entries(filters).map(([key, value]) => {
+                if (!value || (value === "todas" || value === "todos")) return null;
+                
+                const label = {
+                  marca: "Marca",
+                  estado: "Estado",
+                  sede: "Sede",
+                  bodega: "Bodega",
+                  fechaDesde: "Desde",
+                  fechaHasta: "Hasta",
+                  responsable: "Responsable",
+                }[key];
+                
+                return (
+                  <Badge key={key} variant="outline" className="px-3 py-1 bg-slate-100 gap-2">
+                    <span className="font-medium">{label}:</span>
+                    <span>{value}</span>
+                    <button 
+                      className="ml-1 hover:text-destructive"
+                      onClick={() => handleFilterChange(key as keyof typeof filters, "")}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+              
+              {activeFiltersCount > 1 && (
+                <button 
+                  className="text-xs text-muted-foreground underline hover:text-destructive"
+                  onClick={resetFilters}
+                >
+                  Limpiar todos
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="border rounded-lg shadow-sm overflow-hidden">
             <Table>
               <TableHeader className="bg-slate-100">
@@ -599,7 +652,7 @@ const ListaInventario = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedData.length > 0 ? (
+                {filteredData.length > 0 ? (
                   paginatedData.map((item) => (
                     <TableRow key={item.id} className="hover:bg-slate-50">
                       {sortedColumns.map((column) =>
