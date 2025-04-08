@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import ListaPerifericos from "@/components/perifericos/ListaPerifericos";
 
 const sampleData = [
   {
@@ -138,6 +146,7 @@ const ListaInventario = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("inventario");
 
   const [columns, setColumns] = useState<ColumnConfig[]>([
     { id: "numeroSerie", label: "N° Serie", key: "numeroSerie", isVisible: true, order: 0 },
@@ -258,147 +267,161 @@ const ListaInventario = () => {
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[#040d50]">Lista de Inventario</h1>
-        <Button onClick={handleNuevoProducto}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Producto
-        </Button>
-      </div>
-      
-      <div className="flex justify-between mb-6">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar equipos..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <SlidersHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Columnas visibles</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {columns.map((column) => (
-                <div key={column.id} className="px-2 py-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={column.isVisible}
-                      onCheckedChange={(checked) => toggleColumnVisibility(column.id, checked as boolean)}
-                      id={`checkbox-${column.id}`}
-                    />
-                    <label
-                      htmlFor={`checkbox-${column.id}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {column.label}
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline" onClick={handleDownload}>
-            <Download className="h-4 w-4 mr-2" />
-            Descargar CSV
+      <Tabs defaultValue="inventario" onValueChange={setActiveTab} className="w-full">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-[#040d50]">Lista de Inventario</h1>
+            <TabsList className="mt-4">
+              <TabsTrigger value="inventario">Equipos</TabsTrigger>
+              <TabsTrigger value="perifericos">Periféricos</TabsTrigger>
+            </TabsList>
+          </div>
+          <Button onClick={activeTab === "inventario" ? handleNuevoProducto : undefined}>
+            <Plus className="h-4 w-4 mr-2" />
+            {activeTab === "inventario" ? "Nuevo Producto" : "Nuevo Periférico"}
           </Button>
         </div>
-      </div>
-
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {sortedColumns.map((column) => 
-                column.isVisible && (
-                  <TableHead
-                    key={column.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, column.id)}
-                    onDragEnd={handleDragEnd}
-                    onDragOver={(e) => handleDragOver(e, column.id)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, column.id)}
-                    className="cursor-grab transition-all duration-200 hover:bg-muted/50"
-                  >
-                    <div className="flex items-center gap-2 select-none">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex items-center gap-2" onClick={() => handleSort(column.key)}>
-                        {column.label}
-                        {sortField === column.key && (
-                          sortDirection === "asc" ? 
-                            <ArrowUp className="inline h-4 w-4" /> : 
-                            <ArrowDown className="inline h-4 w-4" />
-                        )}
+        
+        <TabsContent value="inventario" className="mt-0">
+          <div className="flex justify-between mb-6">
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar equipos..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <SlidersHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Columnas visibles</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {columns.map((column) => (
+                    <div key={column.id} className="px-2 py-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={column.isVisible}
+                          onCheckedChange={(checked) => toggleColumnVisibility(column.id, checked as boolean)}
+                          id={`checkbox-${column.id}`}
+                        />
+                        <label
+                          htmlFor={`checkbox-${column.id}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {column.label}
+                        </label>
                       </div>
                     </div>
-                  </TableHead>
-                )
-              )}
-              <TableHead>Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedData.map((item) => (
-              <TableRow key={item.id}>
-                {sortedColumns.map((column) =>
-                  column.isVisible && (
-                    <TableCell key={`${item.id}-${column.id}`}>
-                      {item[column.key as keyof typeof item]}
-                    </TableCell>
-                  )
-                )}
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="outline" onClick={handleDownload}>
+                <Download className="h-4 w-4 mr-2" />
+                Descargar CSV
+              </Button>
+            </div>
+          </div>
 
-      <div className="mt-4">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(page => Math.max(1, page - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index + 1}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => setCurrentPage(page => Math.min(totalPages, page + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {sortedColumns.map((column) => 
+                    column.isVisible && (
+                      <TableHead
+                        key={column.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, column.id)}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={(e) => handleDragOver(e, column.id)}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, column.id)}
+                        className="cursor-grab transition-all duration-200 hover:bg-muted/50"
+                      >
+                        <div className="flex items-center gap-2 select-none">
+                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                          <div className="flex items-center gap-2" onClick={() => handleSort(column.key)}>
+                            {column.label}
+                            {sortField === column.key && (
+                              sortDirection === "asc" ? 
+                                <ArrowUp className="inline h-4 w-4" /> : 
+                                <ArrowDown className="inline h-4 w-4" />
+                            )}
+                          </div>
+                        </div>
+                      </TableHead>
+                    )
+                  )}
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedData.map((item) => (
+                  <TableRow key={item.id}>
+                    {sortedColumns.map((column) =>
+                      column.isVisible && (
+                        <TableCell key={`${item.id}-${column.id}`}>
+                          {item[column.key as keyof typeof item]}
+                        </TableCell>
+                      )
+                    )}
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(page => Math.max(1, page - 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {[...Array(totalPages)].map((_, index) => (
+                  <PaginationItem key={index + 1}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(index + 1)}
+                      isActive={currentPage === index + 1}
+                    >
+                      {index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setCurrentPage(page => Math.min(totalPages, page + 1))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="perifericos" className="mt-0">
+          <ListaPerifericos />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
