@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Eye, Pencil, Search, ArrowUp, ArrowDown, Download, SlidersHorizontal, GripVertical, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -35,6 +34,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import ListaPerifericos from "@/components/perifericos/ListaPerifericos";
 
 const sampleData = [
@@ -46,6 +46,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "TI",
     responsable: "Juan Pérez",
+    sede: "Sede Central",
+    bodega: "Bodega Principal",
   },
   {
     id: 2,
@@ -55,6 +57,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "Desarrollo",
     responsable: "María García",
+    sede: "Sede Norte",
+    bodega: "Bodega Equipos",
   },
   {
     id: 3,
@@ -64,6 +68,8 @@ const sampleData = [
     estado: "Mantenimiento",
     ubicacion: "Administración",
     responsable: "Pedro López",
+    sede: "Sede Sur",
+    bodega: "Bodega Impresoras",
   },
   {
     id: 4,
@@ -73,6 +79,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "Diseño",
     responsable: "Ana Martínez",
+    sede: "Sede Central",
+    bodega: "Bodega Portátiles",
   },
   {
     id: 5,
@@ -82,6 +90,8 @@ const sampleData = [
     estado: "Inactivo",
     ubicacion: "Sala Reuniones",
     responsable: "Carlos Sánchez",
+    sede: "Sede Este",
+    bodega: "Bodega Audiovisuales",
   },
   {
     id: 6,
@@ -91,6 +101,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "Redes",
     responsable: "Luis Ramírez",
+    sede: "Sede Central",
+    bodega: "Bodega Redes",
   },
   {
     id: 7,
@@ -100,6 +112,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "Recepción",
     responsable: "Diana Torres",
+    sede: "Sede Norte",
+    bodega: "Bodega Principal",
   },
   {
     id: 8,
@@ -109,6 +123,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "Servidor",
     responsable: "Roberto Flores",
+    sede: "Sede Central",
+    bodega: "Bodega Servidores",
   },
   {
     id: 9,
@@ -118,6 +134,8 @@ const sampleData = [
     estado: "Reparación",
     ubicacion: "Ventas",
     responsable: "Patricia Ruiz",
+    sede: "Sede Oeste",
+    bodega: "Bodega Móviles",
   },
   {
     id: 10,
@@ -127,6 +145,8 @@ const sampleData = [
     estado: "Activo",
     ubicacion: "Contabilidad",
     responsable: "Miguel Ángel",
+    sede: "Sede Central",
+    bodega: "Bodega Principal",
   },
 ];
 
@@ -136,6 +156,38 @@ type ColumnConfig = {
   key: string;
   isVisible: boolean;
   order: number;
+};
+
+const StatusBadge = ({ status }: { status: string }) => {
+  let variant: "default" | "secondary" | "destructive" | "outline" = "default";
+  let className = "";
+  
+  switch (status.toLowerCase()) {
+    case "activo":
+      variant = "default";
+      className = "bg-[#bff036] text-[#01242c] hover:bg-[#a5d81c]";
+      break;
+    case "inactivo":
+      variant = "outline";
+      className = "bg-gray-100 text-gray-500 border-gray-200";
+      break;
+    case "mantenimiento":
+      variant = "secondary";
+      className = "bg-amber-100 text-amber-700 border-amber-200";
+      break;
+    case "reparación":
+      variant = "destructive";
+      className = "bg-red-100 text-red-700 border-red-200";
+      break;
+    default:
+      variant = "outline";
+  }
+
+  return (
+    <Badge variant={variant} className={className}>
+      {status}
+    </Badge>
+  );
 };
 
 const ListaInventario = () => {
@@ -152,9 +204,11 @@ const ListaInventario = () => {
     { id: "numeroSerie", label: "N° Serie", key: "numeroSerie", isVisible: true, order: 0 },
     { id: "descripcion", label: "Descripción", key: "descripcion", isVisible: true, order: 1 },
     { id: "marca", label: "Marca", key: "marca", isVisible: true, order: 2 },
-    { id: "estado", label: "Estado", key: "estado", isVisible: true, order: 3 },
-    { id: "ubicacion", label: "Ubicación", key: "ubicacion", isVisible: true, order: 4 },
-    { id: "responsable", label: "Responsable", key: "responsable", isVisible: true, order: 5 }
+    { id: "sede", label: "Sede", key: "sede", isVisible: true, order: 3 },
+    { id: "bodega", label: "Bodega", key: "bodega", isVisible: true, order: 4 },
+    { id: "estado", label: "Estado", key: "estado", isVisible: true, order: 5 },
+    { id: "ubicacion", label: "Ubicación", key: "ubicacion", isVisible: true, order: 6 },
+    { id: "responsable", label: "Responsable", key: "responsable", isVisible: true, order: 7 }
   ]);
 
   const handleDragStart = (e: React.DragEvent, columnId: string) => {
@@ -329,9 +383,9 @@ const ListaInventario = () => {
             </div>
           </div>
 
-          <div className="border rounded-lg">
+          <div className="border rounded-lg shadow-sm overflow-hidden">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-slate-100">
                 <TableRow>
                   {sortedColumns.map((column) => 
                     column.isVisible && (
@@ -343,7 +397,7 @@ const ListaInventario = () => {
                         onDragOver={(e) => handleDragOver(e, column.id)}
                         onDragLeave={handleDragLeave}
                         onDrop={(e) => handleDrop(e, column.id)}
-                        className="cursor-grab transition-all duration-200 hover:bg-muted/50"
+                        className="cursor-grab transition-all duration-200 hover:bg-slate-200 font-semibold"
                       >
                         <div className="flex items-center gap-2 select-none">
                           <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -359,26 +413,30 @@ const ListaInventario = () => {
                       </TableHead>
                     )
                   )}
-                  <TableHead>Acciones</TableHead>
+                  <TableHead className="font-semibold">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.map((item) => (
-                  <TableRow key={item.id}>
+                  <TableRow key={item.id} className="hover:bg-slate-50">
                     {sortedColumns.map((column) =>
                       column.isVisible && (
-                        <TableCell key={`${item.id}-${column.id}`}>
-                          {item[column.key as keyof typeof item]}
+                        <TableCell key={`${item.id}-${column.id}`} className="py-3">
+                          {column.id === "estado" ? (
+                            <StatusBadge status={item[column.key as keyof typeof item] as string} />
+                          ) : (
+                            item[column.key as keyof typeof item]
+                          )}
                         </TableCell>
                       )
                     )}
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="hover:bg-slate-100">
+                          <Eye className="h-4 w-4 text-[#01242c]" />
                         </Button>
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="hover:bg-slate-100">
+                          <Pencil className="h-4 w-4 text-[#01242c]" />
                         </Button>
                       </div>
                     </TableCell>
@@ -388,7 +446,7 @@ const ListaInventario = () => {
             </Table>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-6 flex justify-center">
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
@@ -402,6 +460,7 @@ const ListaInventario = () => {
                     <PaginationLink
                       onClick={() => setCurrentPage(index + 1)}
                       isActive={currentPage === index + 1}
+                      className={currentPage === index + 1 ? "bg-[#01242c] text-white" : ""}
                     >
                       {index + 1}
                     </PaginationLink>
