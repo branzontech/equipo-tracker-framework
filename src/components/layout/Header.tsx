@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Bell, Settings, Clock } from "lucide-react";
+import { BellRing, Settings, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -22,7 +22,7 @@ const Header = ({ className = "" }: HeaderProps) => {
   return (
     <header className={`h-16 bg-white shadow-sm px-6 flex items-center justify-between ${className}`}>
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Clock className="w-4 h-4" />
+        <Clock className="w-5 h-5" />
         <span className="font-medium">
           {format(currentTime, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}
         </span>
@@ -33,7 +33,7 @@ const Header = ({ className = "" }: HeaderProps) => {
       
       <div className="flex items-center gap-4">
         <button className="relative hover:bg-gray-100 p-2 rounded-full transition-colors">
-          <Bell className="w-5 h-5 text-gray-600" />
+          <BellRing className="w-5 h-5 text-gray-600" />
           <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
         <button className="hover:bg-gray-100 p-2 rounded-full transition-colors">
