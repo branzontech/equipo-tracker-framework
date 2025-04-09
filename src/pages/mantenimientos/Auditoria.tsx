@@ -1,10 +1,10 @@
 
 import { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter, X } from "lucide-react";
+import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter, ArrowLeft, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,10 +21,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -33,12 +35,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { format, subMonths, subDays, addMonths, startOfMonth, endOfMonth, startOfYear, endOfYear, isSameDay } from "date-fns";
+import { format, subDays, addMonths, isSameDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const estados = [
   { value: "ejecutado", label: "Ejecutado", icon: Check, color: "bg-green-500" },
@@ -48,11 +50,11 @@ const estados = [
 ];
 
 const periodos = [
-  { value: "mensual", label: "Mensual", months: 1 },
-  { value: "bimestral", label: "Bimestral", months: 2 },
-  { value: "trimestral", label: "Trimestral", months: 3 },
-  { value: "cuatrimestral", label: "Cuatrimestral", months: 4 },
-  { value: "anual", label: "Anual", months: 12 },
+  { value: "mensual", label: "Mensual" },
+  { value: "bimestral", label: "Bimestral" },
+  { value: "trimestral", label: "Trimestral" },
+  { value: "cuatrimestral", label: "Cuatrimestral" },
+  { value: "anual", label: "Anual" },
 ];
 
 const mantenimientos = [
@@ -113,28 +115,19 @@ const AuditoriaMantenimiento = () => {
   const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEstados, setSelectedEstados] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: new Date(),
-    to: undefined,
-  });
-  const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
-  const [selectedPeriodo, setSelectedPeriodo] = useState<string | undefined>(undefined);
-  const [numberOfMonths, setNumberOfMonths] = useState(1);
-  const [calendarKey, setCalendarKey] = useState(0);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>("mensual");
   const [selectedResponsable, setSelectedResponsable] = useState<string | undefined>(undefined);
   const [tipoMantenimiento, setTipoMantenimiento] = useState<string | undefined>(undefined);
-  const [showCalendar, setShowCalendar] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [activeTab, setActiveTab] = useState("calendar");
+  
+  // Manejar cambios de período
   useEffect(() => {
-    if (selectedPeriodo) {
-      const periodo = periodos.find(p => p.value === selectedPeriodo);
-      if (periodo) {
-        setNumberOfMonths(isMobile ? 1 : Math.min(periodo.months, 3)); // Limiting to 3 months at a time
-        setCalendarKey(prev => prev + 1);
-      }
-    }
-  }, [selectedPeriodo, isMobile]);
+    // Reset date range when period changes
+    setDateRange(undefined);
+  }, [selectedPeriodo]);
 
   const toggleEstado = (estado: string) => {
     setSelectedEstados(prev =>
@@ -144,40 +137,7 @@ const AuditoriaMantenimiento = () => {
     );
   };
 
-  const setPredefinedPeriod = (period: string) => {
-    setSelectedPeriodo(period);
-    const today = new Date();
-    
-    let from, to;
-    switch (period) {
-      case "mensual":
-        from = startOfMonth(today);
-        to = endOfMonth(today);
-        break;
-      case "bimestral":
-        from = startOfMonth(subMonths(today, 1));
-        to = endOfMonth(today);
-        break;
-      case "trimestral":
-        from = startOfMonth(subMonths(today, 2));
-        to = endOfMonth(today);
-        break;
-      case "cuatrimestral":
-        from = startOfMonth(subMonths(today, 3));
-        to = endOfMonth(today);
-        break;
-      case "anual":
-        from = startOfYear(today);
-        to = endOfYear(today);
-        break;
-      default:
-        from = today;
-        to = undefined;
-    }
-    
-    setDateRange({ from, to });
-  };
-
+  // Filtrar mantenimientos
   const filteredMantenimientos = useMemo(() => {
     return mantenimientos.filter(item => {
       const matchesSearch = 
@@ -192,7 +152,7 @@ const AuditoriaMantenimiento = () => {
         selectedEstados.includes(item.estado);
       
       const matchesDateRange = 
-        !dateRange.from || 
+        !dateRange?.from || 
         (item.fecha >= dateRange.from && 
           (!dateRange.to || item.fecha <= dateRange.to));
       
@@ -210,6 +170,7 @@ const AuditoriaMantenimiento = () => {
     });
   }, [searchTerm, selectedEstados, dateRange, selectedResponsable, tipoMantenimiento]);
 
+  // Estadísticas por estado
   const statistics = useMemo(() => {
     return estados.map(estado => {
       return {
@@ -219,27 +180,11 @@ const AuditoriaMantenimiento = () => {
     });
   }, [filteredMantenimientos]);
 
+  // Datos únicos para los filtros
   const uniqueResponsables = [...new Set(mantenimientos.map(m => m.responsable))];
   const uniqueTipos = [...new Set(mantenimientos.map(m => m.tipo))];
 
-  const getCalendarClasses = () => {
-    if (isMobile) {
-      return "w-full [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp-head_th]:w-8 [&_.rdp-nav]:h-6";
-    }
-    
-    switch (numberOfMonths) {
-      case 1:
-        return "w-full [&_.rdp-day]:w-12 [&_.rdp-day]:h-12 [&_.rdp-head_th]:w-12 [&_.rdp-nav]:h-8";
-      case 2:
-        return "w-full [&_.rdp-day]:w-9 [&_.rdp-day]:h-9 [&_.rdp-head_th]:w-9 [&_.rdp-nav]:h-8";
-      case 3:
-        return "w-full [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp-head_th]:w-8 [&_.rdp-nav]:h-7";
-      default:
-        return "w-full [&_.rdp-day]:w-6 [&_.rdp-day]:h-6 [&_.rdp-head_th]:w-6 [&_.rdp-nav]:h-6";
-    }
-  };
-
-  // Calculate events for selected date
+  // Eventos para el día seleccionado
   const selectedDateEvents = useMemo(() => {
     if (!selectedDate) return [];
     return filteredMantenimientos.filter(item => 
@@ -247,47 +192,109 @@ const AuditoriaMantenimiento = () => {
     );
   }, [selectedDate, filteredMantenimientos]);
 
-  // Function to render modifiers for days with activities
+  // Preparar modificadores para días con eventos
+  const daysWithEvents = useMemo(() => {
+    const eventsMap: Record<string, { count: number, states: Record<string, boolean> }> = {};
+    
+    filteredMantenimientos.forEach(item => {
+      const dateStr = format(item.fecha, "yyyy-MM-dd");
+      if (!eventsMap[dateStr]) {
+        eventsMap[dateStr] = { count: 0, states: {} };
+      }
+      eventsMap[dateStr].count += 1;
+      eventsMap[dateStr].states[item.estado] = true;
+    });
+    
+    return eventsMap;
+  }, [filteredMantenimientos]);
+  
+  // Modificadores para el calendario
+  const modifiers = useMemo(() => ({
+    hasEvent: (date: Date) => {
+      const dateStr = format(date, "yyyy-MM-dd");
+      return !!daysWithEvents[dateStr];
+    },
+    hasAlertEvent: (date: Date) => {
+      const dateStr = format(date, "yyyy-MM-dd");
+      return !!daysWithEvents[dateStr]?.states?.atrasado;
+    },
+    selectedDay: (date: Date) => selectedDate ? isSameDay(date, selectedDate) : false,
+  }), [daysWithEvents, selectedDate]);
+
+  // Estilos para los modificadores
   const modifiersStyles = {
     hasEvent: {
       fontWeight: "bold" as const,
       border: "2px solid var(--accent-9)",
-      backgroundColor: "var(--accent-2)"
+    },
+    hasAlertEvent: {
+      color: "white",
+      backgroundColor: "#ef4444",
+    },
+    selectedDay: {
+      color: "white",
+      backgroundColor: "#01242c"
     }
   };
 
-  // Function to determine if a day has events
-  const daysWithEvents = filteredMantenimientos.reduce((acc, item) => {
-    const dateStr = format(item.fecha, "yyyy-MM-dd");
-    acc[dateStr] = true;
-    return acc;
-  }, {} as Record<string, boolean>);
-
-  // Prepare modifiers for the calendar
-  const modifiers = {
-    hasEvent: (date: Date) => {
-      const dateStr = format(date, "yyyy-MM-dd");
-      return !!daysWithEvents[dateStr];
-    }
-  };
-
-  // Handle day click to show activities
+  // Manejar clic en día
   const handleDayClick = (day: Date | undefined) => {
     setSelectedDate(day);
+    if (isMobile) {
+      setActiveTab("events");
+    }
   };
 
-  // Calculate total pages for multipage calendar display
-  const totalPages = selectedPeriodo === "anual" ? Math.ceil(12 / numberOfMonths) : 1;
-  const [currentPage, setCurrentPage] = useState(0);
+  // Navegar entre meses
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setSelectedMonth(prev => {
+      const newDate = new Date(prev);
+      if (direction === 'prev') {
+        newDate.setMonth(prev.getMonth() - 1);
+      } else {
+        newDate.setMonth(prev.getMonth() + 1);
+      }
+      return newDate;
+    });
+  };
 
-  // Function to calculate the month offset for multipage calendars
-  const getMonthOffset = () => {
-    if (selectedPeriodo !== "anual") return 0;
-    return currentPage * numberOfMonths;
+  // Obtener la cantidad de eventos por día
+  const getEventCount = (date: Date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    return daysWithEvents[dateStr]?.count || 0;
+  };
+
+  // Obtener estados de eventos por día
+  const getEventStates = (date: Date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    return daysWithEvents[dateStr]?.states || {};
+  };
+
+  // Componente para renderizar un indicador de puntos para eventos
+  const EventIndicator = ({ date }: { date: Date }) => {
+    const count = getEventCount(date);
+    if (count === 0) return null;
+    
+    const states = getEventStates(date);
+    
+    return (
+      <div className="flex justify-center gap-1 mt-1">
+        {Object.keys(states).map((state) => {
+          const stateInfo = estados.find(s => s.value === state);
+          return (
+            <div 
+              key={state}
+              className={`w-1.5 h-1.5 rounded-full ${stateInfo?.color || 'bg-gray-400'}`}
+            />
+          );
+        })}
+      </div>
+    );
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Encabezado */}
       <div className="flex items-center gap-4 mb-6">
         <Button 
           variant="ghost" 
@@ -300,197 +307,42 @@ const AuditoriaMantenimiento = () => {
         <h1 className="text-xl md:text-2xl font-bold text-[#01242c]">Auditoría de Mantenimientos</h1>
       </div>
 
+      {/* Versión móvil */}
       {isMobile ? (
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="w-full mb-4 text-[#01242c] border-[#01242c]/20 hover:bg-[#01242c]/10 hover:text-[#bff036]"
-            >
-              <Filter className="h-4 w-4 mr-2" /> Filtros y Periodo
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle className="text-[#01242c]">Filtros y Periodo</SheetTitle>
-            </SheetHeader>
-            <div className="space-y-4">
-              <Select value={selectedPeriodo} onValueChange={setPredefinedPeriod}>
-                <SelectTrigger className="w-full border-[#01242c]/20">
-                  <SelectValue placeholder="Seleccionar período" />
-                </SelectTrigger>
-                <SelectContent>
-                  {periodos.map((periodo) => (
-                    <SelectItem key={periodo.value} value={periodo.value}>
-                      {periodo.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <div className="bg-white rounded-lg p-2 shadow-sm">
-                <Calendar
-                  key={calendarKey}
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  locale={es}
-                  className={getCalendarClasses()}
-                  numberOfMonths={1}
-                  modifiers={modifiers}
-                  modifiersStyles={modifiersStyles}
-                  onDayClick={handleDayClick}
-                />
-              </div>
-              
-              <div className="space-y-2 mb-4">
-                <h4 className="text-sm font-medium text-[#01242c]">Rango de Fechas</h4>
-                <div className="grid gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={`w-full justify-start text-left font-normal border-[#01242c]/20 hover:bg-[#01242c]/10 hover:text-[#bff036] ${!dateRange?.from && "text-muted-foreground"}`}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange?.from ? (
-                          dateRange?.to ? (
-                            <>
-                              {format(dateRange.from, "P", { locale: es })} -{" "}
-                              {format(dateRange.to, "P", { locale: es })}
-                            </>
-                          ) : (
-                            format(dateRange.from, "P", { locale: es })
-                          )
-                        ) : (
-                          <span>Seleccione un rango de fechas</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        initialFocus
-                        locale={es}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
+        <>
+          {/* Pestañas para versión móvil */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="calendar">Calendario</TabsTrigger>
+              <TabsTrigger value="events">Eventos</TabsTrigger>
+              <TabsTrigger value="filters">Filtros</TabsTrigger>
+            </TabsList>
 
-              {selectedDate && selectedDateEvents.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  <h4 className="text-sm font-medium text-[#01242c]">
-                    Actividades del {format(selectedDate, "d 'de' MMMM", { locale: es })}
-                  </h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto rounded-md border p-2">
-                    {selectedDateEvents.map((event) => {
-                      const estadoInfo = estados.find(e => e.value === event.estado);
-                      const Icon = estadoInfo?.icon || Clock;
-                      
-                      return (
-                        <div key={event.id} className="p-2 text-sm border-b last:border-0">
-                          <div className="font-medium">{event.tipo}</div>
-                          <div className="text-muted-foreground">{event.equipo}</div>
-                          <div className="flex justify-between items-center mt-1">
-                            <span>{event.hora}</span>
-                            <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs`}>
-                              <Icon className="h-3 w-3 mr-1" />
-                              {estadoInfo?.label}
-                            </Badge>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              <div className="relative mb-4">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar mantenimientos..."
-                  className="pl-8 border-[#01242c]/20 focus-visible:ring-[#01242c]"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-              <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
-                <CollapsibleContent className="space-y-4">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-[#01242c]">Responsable</h4>
-                    <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
-                      <SelectTrigger className="w-full border-[#01242c]/20">
-                        <SelectValue placeholder="Seleccionar responsable" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todos">Todos</SelectItem>
-                        {uniqueResponsables.map((responsable) => (
-                          <SelectItem key={responsable} value={responsable}>
-                            {responsable}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-[#01242c]">Tipo de Mantenimiento</h4>
-                    <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
-                      <SelectTrigger className="w-full border-[#01242c]/20">
-                        <SelectValue placeholder="Seleccionar tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todos">Todos</SelectItem>
-                        {uniqueTipos.map((tipo) => (
-                          <SelectItem key={tipo} value={tipo}>
-                            {tipo}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-
-              <div className="space-y-2 mt-4">
-                <h4 className="text-sm font-medium mb-2 text-[#01242c]">Estado</h4>
-                <div className="space-y-2">
-                  {estados.map((estado) => {
-                    const Icon = estado.icon;
-                    const isSelected = selectedEstados.includes(estado.value);
-                    return (
-                      <button
-                        key={estado.value}
-                        className={`w-full flex items-center gap-2 p-2 rounded-md transition-colors ${
-                          isSelected 
-                            ? estado.color + " text-white hover:opacity-90" 
-                            : "hover:bg-[#01242c]/10 text-[#01242c]"
-                        }`}
-                        onClick={() => toggleEstado(estado.value)}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span>{estado.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-2">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-[#01242c]">Período de Auditoría</h3>
-                <div className="flex gap-2">
-                  <Select value={selectedPeriodo} onValueChange={setPredefinedPeriod}>
-                    <SelectTrigger className="w-36 border-[#01242c]/20">
+            {/* Contenido de pestañas */}
+            <TabsContent value="calendar" className="mt-0">
+              <Card>
+                <CardHeader className="p-4 flex flex-row items-center justify-between">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => navigateMonth('prev')}
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <h3 className="font-medium">
+                    {format(selectedMonth, "MMMM yyyy", { locale: es })}
+                  </h3>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => navigateMonth('next')}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
+                    <SelectTrigger className="w-full mb-3">
                       <SelectValue placeholder="Seleccionar período" />
                     </SelectTrigger>
                     <SelectContent>
@@ -501,136 +353,130 @@ const AuditoriaMantenimiento = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    className="text-[#01242c] border-[#01242c]/20 hover:bg-[#01242c]/10 hover:text-[#bff036]"
-                    onClick={() => setShowCalendar(!showCalendar)}
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              
-              {showCalendar && (
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  {/* Implement calendar grid layout for annual view */}
-                  {selectedPeriodo === "anual" && numberOfMonths < 12 ? (
-                    <div className="space-y-4">
-                      <ScrollArea className="h-[500px]">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {Array.from({ length: Math.ceil(12 / 3) }).map((_, gridIndex) => (
-                            <div key={gridIndex} className="flex-1">
-                              <Calendar
-                                key={`calendar-grid-${gridIndex}`}
-                                mode="range"
-                                selected={dateRange}
-                                onSelect={setDateRange}
-                                onDayClick={handleDayClick}
-                                locale={es}
-                                className={getCalendarClasses()}
-                                month={new Date(new Date().getFullYear(), gridIndex * 3, 1)}
-                                numberOfMonths={Math.min(3, 12 - gridIndex * 3)}
-                                showOutsideDays={false}
-                                fixedWeeks
-                                modifiers={modifiers}
-                                modifiersStyles={modifiersStyles}
-                              />
-                            </div>
-                          ))}
+                  
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDayClick}
+                    month={selectedMonth}
+                    onMonthChange={setSelectedMonth}
+                    locale={es}
+                    className="p-0"
+                    classNames={{
+                      day_today: "bg-gray-100",
+                    }}
+                    modifiers={modifiers}
+                    modifiersStyles={modifiersStyles}
+                    components={{
+                      DayContent: ({ date, ...props }) => (
+                        <div className="relative w-full h-full flex flex-col justify-center items-center">
+                          <div {...props} />
+                          <EventIndicator date={date} />
                         </div>
-                      </ScrollArea>
-                    </div>
-                  ) : (
-                    <Calendar
-                      key={calendarKey}
-                      mode="range"
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      onDayClick={handleDayClick}
-                      locale={es}
-                      className={getCalendarClasses()}
-                      month={new Date(new Date().getFullYear(), getMonthOffset(), 1)}
-                      numberOfMonths={numberOfMonths}
-                      showOutsideDays={numberOfMonths < 3}
-                      modifiers={modifiers}
-                      modifiersStyles={modifiersStyles}
-                    />
-                  )}
+                      )
+                    }}
+                  />
                   
-                  {totalPages > 1 && (
-                    <div className="flex justify-center gap-2 mt-4">
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <Button
-                          key={i}
-                          variant={currentPage === i ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(i)}
-                          className={currentPage === i ? "bg-[#01242c] text-white" : ""}
-                        >
-                          {i + 1}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Daily events display */}
-                  {selectedDate && selectedDateEvents.length > 0 && (
-                    <div className="mt-4 border-t pt-3">
-                      <h4 className="text-sm font-medium mb-2 text-[#01242c]">
-                        Actividades del {format(selectedDate, "d 'de' MMMM", { locale: es })}
-                      </h4>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {selectedDateEvents.map((event) => {
-                          const estadoInfo = estados.find(e => e.value === event.estado);
-                          const Icon = estadoInfo?.icon || Clock;
-                          
-                          return (
-                            <div key={event.id} className="p-2 rounded-md border text-sm">
-                              <div className="font-medium">{event.tipo}</div>
-                              <div className="text-muted-foreground">{event.equipo}</div>
-                              <div className="flex justify-between items-center mt-1">
-                                <span>{event.hora}</span>
-                                <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs`}>
+                  <div className="flex justify-center mt-4 gap-3">
+                    {estados.map((estado) => (
+                      <div key={estado.value} className="flex items-center gap-1">
+                        <div className={`w-2 h-2 rounded-full ${estado.color}`} />
+                        <span className="text-xs">{estado.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="events" className="mt-0">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">
+                    {selectedDate 
+                      ? `Eventos del ${format(selectedDate, "d 'de' MMMM", { locale: es })}` 
+                      : "Seleccione una fecha"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selectedDateEvents.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedDateEvents.map((event) => {
+                        const estadoInfo = estados.find(e => e.value === event.estado);
+                        const Icon = estadoInfo?.icon || Clock;
+                        
+                        return (
+                          <Card key={event.id} className="shadow-sm">
+                            <CardContent className="p-3">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-medium">{event.tipo}</h4>
+                                  <p className="text-sm text-muted-foreground">{event.equipo}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">{event.ubicacion}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-xs">{event.hora}</span>
+                                  </div>
+                                </div>
+                                <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs whitespace-nowrap`}>
                                   <Icon className="h-3 w-3 mr-1" />
                                   {estadoInfo?.label}
                                 </Badge>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      No hay eventos para esta fecha
                     </div>
                   )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+              
+              <Card className="mt-4">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Estadísticas</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-3">
+                  {statistics.map((estado) => (
+                    <div 
+                      key={estado.value} 
+                      className={`p-3 rounded-lg flex flex-col items-center ${estado.color} bg-opacity-20`}
+                    >
+                      <span className="text-sm font-medium text-[#01242c]">{estado.label}</span>
+                      <span className="text-xl font-bold mt-1">{estado.count}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-[#01242c]">Filtros</h3>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setIsAdvancedFilterOpen(!isAdvancedFilterOpen)}
-                    className="text-[#01242c] border-[#01242c]/20 hover:bg-[#01242c]/10 hover:text-[#bff036]"
-                  >
-                    <Filter className="h-4 w-4 mr-2" />
-                    {isAdvancedFilterOpen ? "Ocultar filtros" : "Filtros avanzados"}
-                  </Button>
-                </div>
-                
-                <div className="space-y-2 mb-4">
-                  <h4 className="text-sm font-medium text-[#01242c]">Rango de Fechas</h4>
-                  <div className="grid gap-2">
+            <TabsContent value="filters" className="mt-0">
+              <Card>
+                <CardContent className="p-4 space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Búsqueda</h3>
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar mantenimientos..."
+                        className="pl-8"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Rango de Fechas</h3>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className={`w-full justify-start text-left font-normal border-[#01242c]/20 hover:bg-[#01242c]/10 hover:text-[#bff036] ${!dateRange?.from && "text-muted-foreground"}`}
+                          className="w-full justify-start text-left font-normal"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {dateRange?.from ? (
@@ -647,69 +493,319 @@ const AuditoriaMantenimiento = () => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="center">
                         <Calendar
                           mode="range"
                           selected={dateRange}
                           onSelect={setDateRange}
                           initialFocus
                           locale={es}
+                          className="pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>
                   </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Responsable</h3>
+                    <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar responsable" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todos">Todos</SelectItem>
+                        {uniqueResponsables.map((responsable) => (
+                          <SelectItem key={responsable} value={responsable}>
+                            {responsable}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Tipo de Mantenimiento</h3>
+                    <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todos">Todos</SelectItem>
+                        {uniqueTipos.map((tipo) => (
+                          <SelectItem key={tipo} value={tipo}>
+                            {tipo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Estado</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {estados.map((estado) => {
+                        const Icon = estado.icon;
+                        const isSelected = selectedEstados.includes(estado.value);
+                        return (
+                          <button
+                            key={estado.value}
+                            className={`flex items-center gap-2 p-2 rounded-md transition-colors ${
+                              isSelected 
+                                ? estado.color + " text-white hover:opacity-90" 
+                                : "border hover:bg-[#01242c]/10 text-[#01242c]"
+                            }`}
+                            onClick={() => toggleEstado(estado.value)}
+                          >
+                            <Icon className="h-4 w-4" />
+                            <span className="text-sm">{estado.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    className="w-full bg-[#01242c] text-white hover:bg-[#01242c]/90 hover:text-[#bff036]"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Exportar Reporte
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+          
+          {/* Tabla de mantenimientos (siempre visible en móvil) */}
+          <Card className="mt-4">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">
+                Mantenimientos ({filteredMantenimientos.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <ScrollArea className="h-[300px]">
+                <div className="p-3 space-y-3">
+                  {filteredMantenimientos.length > 0 ? (
+                    filteredMantenimientos.map((item) => {
+                      const estadoInfo = estados.find(e => e.value === item.estado);
+                      const Icon = estadoInfo?.icon || Clock;
+                      
+                      return (
+                        <Card key={item.id} className="shadow-sm">
+                          <CardContent className="p-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium">{item.tipo}</h4>
+                                <p className="text-sm text-muted-foreground">{item.equipo}</p>
+                                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                                  <span>{format(item.fecha, "P", { locale: es })}</span>
+                                  <span>•</span>
+                                  <span>{item.hora}</span>
+                                </div>
+                              </div>
+                              <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs whitespace-nowrap`}>
+                                <Icon className="h-3 w-3 mr-1" />
+                                {estadoInfo?.label}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      No hay mantenimientos que coincidan con los filtros
+                    </div>
+                  )}
                 </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        /* Versión escritorio */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Calendario principal - ocupa 8 columnas */}
+          <Card className="lg:col-span-8">
+            <CardHeader className="pb-0">
+              <div className="flex justify-between items-center">
+                <CardTitle>Calendario de Mantenimientos</CardTitle>
+                <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Seleccionar período" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {periodos.map((periodo) => (
+                      <SelectItem key={periodo.value} value={periodo.value}>
+                        {periodo.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="bg-white rounded-lg shadow-sm p-4">
+                <div className="flex items-center justify-between mb-6">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigateMonth('prev')}
+                    className="text-[#01242c]"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    Anterior
+                  </Button>
+                  <h3 className="text-lg font-medium text-[#01242c]">
+                    {format(selectedMonth, "MMMM yyyy", { locale: es })}
+                  </h3>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigateMonth('next')}
+                    className="text-[#01242c]"
+                  >
+                    Siguiente
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+                
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDayClick}
+                  month={selectedMonth}
+                  onMonthChange={setSelectedMonth}
+                  locale={es}
+                  className="pointer-events-auto"
+                  classNames={{
+                    day: "h-14 w-14 p-0 font-normal aria-selected:opacity-100", // Día más grande
+                    caption: "text-base",
+                    day_today: "bg-gray-100",
+                  }}
+                  modifiers={modifiers}
+                  modifiersStyles={modifiersStyles}
+                  components={{
+                    DayContent: ({ date, ...props }) => (
+                      <div className="w-full h-full flex flex-col justify-start items-center pt-2">
+                        <div {...props} className="mb-1" />
+                        <EventIndicator date={date} />
+                        {getEventCount(date) > 0 && (
+                          <span className="text-xs mt-1 font-medium">
+                            {getEventCount(date)} {getEventCount(date) === 1 ? 'evento' : 'eventos'}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  }}
+                />
+                
+                {/* Leyenda del calendario */}
+                <div className="flex flex-wrap justify-center mt-6 gap-4">
+                  {estados.map((estado) => (
+                    <div key={estado.value} className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${estado.color}`} />
+                      <span className="text-sm">{estado.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="relative mb-4">
+          {/* Panel lateral - ocupa 4 columnas */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Filtros */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Filter className="h-5 w-5 mr-2" />
+                  Filtros
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Buscar mantenimientos..."
-                    className="pl-8 border-[#01242c]/20 focus-visible:ring-[#01242c]"
+                    className="pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-
-                <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
-                  <CollapsibleContent className="space-y-4">
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-[#01242c]">Responsable</h4>
-                      <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
-                        <SelectTrigger className="w-full border-[#01242c]/20">
-                          <SelectValue placeholder="Seleccionar responsable" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="todos">Todos</SelectItem>
-                          {uniqueResponsables.map((responsable) => (
-                            <SelectItem key={responsable} value={responsable}>
-                              {responsable}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-[#01242c]">Tipo de Mantenimiento</h4>
-                      <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
-                        <SelectTrigger className="w-full border-[#01242c]/20">
-                          <SelectValue placeholder="Seleccionar tipo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="todos">Todos</SelectItem>
-                          {uniqueTipos.map((tipo) => (
-                            <SelectItem key={tipo} value={tipo}>
-                              {tipo}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <div className="space-y-2 mt-4">
-                  <h4 className="text-sm font-medium mb-2 text-[#01242c]">Estado</h4>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Rango de Fechas</h3>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateRange?.from ? (
+                          dateRange?.to ? (
+                            <>
+                              {format(dateRange.from, "P", { locale: es })} -{" "}
+                              {format(dateRange.to, "P", { locale: es })}
+                            </>
+                          ) : (
+                            format(dateRange.from, "P", { locale: es })
+                          )
+                        ) : (
+                          <span>Seleccione un rango de fechas</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="center">
+                      <Calendar
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        initialFocus
+                        locale={es}
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Responsable</h3>
+                  <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar responsable" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos</SelectItem>
+                      {uniqueResponsables.map((responsable) => (
+                        <SelectItem key={responsable} value={responsable}>
+                          {responsable}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Tipo de Mantenimiento</h3>
+                  <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos</SelectItem>
+                      {uniqueTipos.map((tipo) => (
+                        <SelectItem key={tipo} value={tipo}>
+                          {tipo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Estado</h3>
                   <div className="space-y-2">
                     {estados.map((estado) => {
                       const Icon = estado.icon;
@@ -720,7 +816,7 @@ const AuditoriaMantenimiento = () => {
                           className={`w-full flex items-center gap-2 p-2 rounded-md transition-colors ${
                             isSelected 
                               ? estado.color + " text-white hover:opacity-90" 
-                              : "hover:bg-[#01242c]/10 text-[#01242c]"
+                              : "border hover:bg-[#01242c]/10 text-[#01242c]"
                           }`}
                           onClick={() => toggleEstado(estado.value)}
                         >
@@ -731,98 +827,153 @@ const AuditoriaMantenimiento = () => {
                     })}
                   </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4 text-[#01242c]">Estadísticas</h3>
-                <div className="space-y-3">
-                  {statistics.map((estado) => (
-                    <div key={estado.value} className="flex justify-between items-center">
-                      <span className="text-sm text-[#01242c]">{estado.label}</span>
-                      <Badge variant="outline" className={estado.color + " text-white"}>
-                        {estado.count}
-                      </Badge>
+            {/* Eventos del día seleccionado */}
+            {selectedDate && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">
+                    Eventos del {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="max-h-[400px] overflow-y-auto">
+                  {selectedDateEvents.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedDateEvents.map((event) => {
+                        const estadoInfo = estados.find(e => e.value === event.estado);
+                        const Icon = estadoInfo?.icon || Clock;
+                        
+                        return (
+                          <Card key={event.id} className="shadow-sm">
+                            <CardContent className="p-3">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-medium">{event.tipo}</h4>
+                                  <p className="text-sm text-muted-foreground">{event.equipo}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">{event.ubicacion}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-xs">{event.hora}</span>
+                                  </div>
+                                </div>
+                                <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs whitespace-nowrap`}>
+                                  <Icon className="h-3 w-3 mr-1" />
+                                  {estadoInfo?.label}
+                                </Badge>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      No hay eventos para esta fecha
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
-              <Button 
-                className="w-full bg-[#01242c] text-white hover:bg-[#01242c]/90 hover:text-[#bff036]"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar Reporte
-              </Button>
-            </CardContent>
-          </Card>
+            {/* Estadísticas */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Estadísticas</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-3">
+                {statistics.map((estado) => (
+                  <div 
+                    key={estado.value} 
+                    className={`p-3 rounded-lg flex flex-col items-center ${estado.color} bg-opacity-20`}
+                  >
+                    <span className="text-sm font-medium text-[#01242c]">{estado.label}</span>
+                    <span className="text-xl font-bold mt-1">{estado.count}</span>
+                  </div>
+                ))}
+                
+                <Button 
+                  className="col-span-2 mt-2 bg-[#01242c] text-white hover:bg-[#01242c]/90 hover:text-[#bff036]"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar Reporte
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
-      <Card className="mt-6">
-        <CardContent className="p-4 md:p-6">
-          <h3 className="text-lg font-semibold mb-4 text-[#01242c]">
-            Mantenimientos para el período seleccionado ({filteredMantenimientos.length})
-          </h3>
-          
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox />
-                  </TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Equipo/Ubicación</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Fecha/Hora</TableHead>
-                  <TableHead>Responsable</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredMantenimientos.length > 0 ? (
-                  filteredMantenimientos.map((mantenimiento) => {
-                    const estadoInfo = estados.find(e => e.value === mantenimiento.estado);
-                    const Icon = estadoInfo?.icon || Clock;
-                    
-                    return (
-                      <TableRow 
-                        key={mantenimiento.id}
-                        className="hover:bg-[#01242c]/5 cursor-pointer"
-                      >
-                        <TableCell>
-                          <Checkbox />
-                        </TableCell>
-                        <TableCell className="font-medium">{mantenimiento.tipo}</TableCell>
-                        <TableCell>
-                          <div>{mantenimiento.equipo}</div>
-                          <div className="text-sm text-muted-foreground">{mantenimiento.ubicacion}</div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={`${estadoInfo?.color} text-white`}>
-                            <Icon className="h-3 w-3 mr-1" />
-                            {estadoInfo?.label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div>{format(mantenimiento.fecha, "dd/MM/yyyy")}</div>
-                          <div className="text-sm text-muted-foreground">{mantenimiento.hora}</div>
-                        </TableCell>
-                        <TableCell>{mantenimiento.responsable}</TableCell>
-                      </TableRow>
-                    );
-                  })
-                ) : (
+      {/* Tabla de mantenimientos (solo versión escritorio) */}
+      {!isMobile && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">
+              Mantenimientos para el período seleccionado ({filteredMantenimientos.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
-                      No se encontraron mantenimientos para los filtros seleccionados
-                    </TableCell>
+                    <TableHead className="w-12">
+                      <Checkbox />
+                    </TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Equipo/Ubicación</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Fecha/Hora</TableHead>
+                    <TableHead>Responsable</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredMantenimientos.length > 0 ? (
+                    filteredMantenimientos.map((mantenimiento) => {
+                      const estadoInfo = estados.find(e => e.value === mantenimiento.estado);
+                      const Icon = estadoInfo?.icon || Clock;
+                      
+                      return (
+                        <TableRow 
+                          key={mantenimiento.id}
+                          className="hover:bg-[#01242c]/5 cursor-pointer"
+                        >
+                          <TableCell>
+                            <Checkbox />
+                          </TableCell>
+                          <TableCell className="font-medium">{mantenimiento.tipo}</TableCell>
+                          <TableCell>
+                            <div>{mantenimiento.equipo}</div>
+                            <div className="text-sm text-muted-foreground">{mantenimiento.ubicacion}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={`${estadoInfo?.color} text-white`}>
+                              <Icon className="h-3 w-3 mr-1" />
+                              {estadoInfo?.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div>{format(mantenimiento.fecha, "dd/MM/yyyy")}</div>
+                            <div className="text-sm text-muted-foreground">{mantenimiento.hora}</div>
+                          </TableCell>
+                          <TableCell>{mantenimiento.responsable}</TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+                        No se encontraron mantenimientos para los filtros seleccionados
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

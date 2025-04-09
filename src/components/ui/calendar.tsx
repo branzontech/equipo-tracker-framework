@@ -1,19 +1,33 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, DayMouseEventHandler } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  onDayClick?: (day: Date | undefined) => void;
+};
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  onDayClick,
   ...props
 }: CalendarProps) {
+  // Handler for day click that calls the custom onDayClick callback
+  const handleDayClick: DayMouseEventHandler = (day, modifiers, e) => {
+    if (onDayClick) {
+      onDayClick(day);
+    }
+    // Allow the default DayPicker onDayClick to still work
+    if (props.onDayClick) {
+      props.onDayClick(day, modifiers, e);
+    }
+  };
+  
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -56,6 +70,7 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
+      onDayClick={handleDayClick}
       {...props}
     />
   );
