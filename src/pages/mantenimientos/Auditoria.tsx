@@ -1,47 +1,24 @@
+
 import { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter, ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
 import { format, subDays, addMonths, isSameDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const estados = [
+// Importing our new components
+import { CalendarView } from "@/components/mantenimientos/CalendarView";
+import { FiltersPanel } from "@/components/mantenimientos/FiltersPanel";
+import { SelectedDateEvents } from "@/components/mantenimientos/SelectedDateEvents";
+import { Statistics } from "@/components/mantenimientos/Statistics";
+import { MobileMantenimientosList } from "@/components/mantenimientos/MobileMantenimientosList";
+import { MobileTabView } from "@/components/mantenimientos/MobileTabView";
+import { EstadoInfo, MantenimientoItem } from "@/types/mantenimiento";
+
+const estados: EstadoInfo[] = [
   { value: "ejecutado", label: "Ejecutado", icon: Check, color: "bg-green-500" },
   { value: "pendiente", label: "Pendiente", icon: Pause, color: "bg-yellow-500" },
   { value: "programado", label: "Programado", icon: Clock, color: "bg-blue-500" },
@@ -56,7 +33,7 @@ const periodos = [
   { value: "anual", label: "Anual" },
 ];
 
-const mantenimientos = [
+const mantenimientos: MantenimientoItem[] = [
   {
     id: 1,
     tipo: "Mantenimiento Preventivo",
@@ -257,51 +234,6 @@ const AuditoriaMantenimiento = () => {
     });
   };
 
-  // Obtener la cantidad de eventos por día
-  const getEventCount = (date: Date) => {
-    const dateStr = format(date, "yyyy-MM-dd");
-    return daysWithEvents[dateStr]?.count || 0;
-  };
-
-  // Obtener estados de eventos por día
-  const getEventStates = (date: Date) => {
-    const dateStr = format(date, "yyyy-MM-dd");
-    return daysWithEvents[dateStr]?.states || {};
-  };
-
-  // Componente para renderizar un indicador de puntos para eventos
-  const EventIndicator = ({ date }: { date: Date }) => {
-    const count = getEventCount(date);
-    if (count === 0) return null;
-    
-    const states = getEventStates(date);
-    
-    return (
-      <div className="flex justify-center gap-1 mt-1">
-        {Object.keys(states).map((state) => {
-          const stateInfo = estados.find(s => s.value === state);
-          return (
-            <div 
-              key={state}
-              className={`w-1.5 h-1.5 rounded-full ${stateInfo?.color || 'bg-gray-400'}`}
-            />
-          );
-        })}
-      </div>
-    );
-  };
-
-  // Custom DayContent component for the calendar
-  const CustomDayContent = (props: React.HTMLProps<HTMLDivElement> & { date: Date }) => {
-    const { date, ...rest } = props;
-    return (
-      <div className="relative w-full h-full flex flex-col justify-center items-center">
-        <div {...rest} />
-        <EventIndicator date={date} />
-      </div>
-    );
-  };
-
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Encabezado */}
@@ -321,561 +253,110 @@ const AuditoriaMantenimiento = () => {
       {isMobile ? (
         <>
           {/* Pestañas para versión móvil */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="calendar">Calendario</TabsTrigger>
-              <TabsTrigger value="events">Eventos</TabsTrigger>
-              <TabsTrigger value="filters">Filtros</TabsTrigger>
-            </TabsList>
-
-            {/* Contenido de pestañas */}
-            <TabsContent value="calendar" className="mt-0">
-              <Card>
-                <CardHeader className="p-4 flex flex-row items-center justify-between">
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => navigateMonth('prev')}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                  <h3 className="font-medium">
-                    {format(selectedMonth, "MMMM yyyy", { locale: es })}
-                  </h3>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => navigateMonth('next')}
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
-                    <SelectTrigger className="w-full mb-3">
-                      <SelectValue placeholder="Seleccionar período" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {periodos.map((periodo) => (
-                        <SelectItem key={periodo.value} value={periodo.value}>
-                          {periodo.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDayClick}
-                    month={selectedMonth}
-                    onMonthChange={setSelectedMonth}
-                    locale={es}
-                    className="p-0"
-                    classNames={{
-                      day_today: "bg-gray-100",
-                    }}
-                    modifiers={modifiers}
-                    modifiersStyles={modifiersStyles}
-                    components={{
-                      DayContent: CustomDayContent
-                    }}
-                  />
-                  
-                  <div className="flex justify-center mt-4 gap-3">
-                    {estados.map((estado) => (
-                      <div key={estado.value} className="flex items-center gap-1">
-                        <div className={`w-2 h-2 rounded-full ${estado.color}`} />
-                        <span className="text-xs">{estado.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="events" className="mt-0">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">
-                    {selectedDate 
-                      ? `Eventos del ${format(selectedDate, "d 'de' MMMM", { locale: es })}` 
-                      : "Seleccione una fecha"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {selectedDateEvents.length > 0 ? (
-                    <div className="space-y-3">
-                      {selectedDateEvents.map((event) => {
-                        const estadoInfo = estados.find(e => e.value === event.estado);
-                        const Icon = estadoInfo?.icon || Clock;
-                        
-                        return (
-                          <Card key={event.id} className="shadow-sm">
-                            <CardContent className="p-3">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h4 className="font-medium">{event.tipo}</h4>
-                                  <p className="text-sm text-muted-foreground">{event.equipo}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">{event.ubicacion}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                    <span className="text-xs">{event.hora}</span>
-                                  </div>
-                                </div>
-                                <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs whitespace-nowrap`}>
-                                  <Icon className="h-3 w-3 mr-1" />
-                                  {estadoInfo?.label}
-                                </Badge>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6 text-muted-foreground">
-                      No hay eventos para esta fecha
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card className="mt-4">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Estadísticas</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-3">
-                  {statistics.map((estado) => (
-                    <div 
-                      key={estado.value} 
-                      className={`p-3 rounded-lg flex flex-col items-center ${estado.color} bg-opacity-20`}
-                    >
-                      <span className="text-sm font-medium text-[#01242c]">{estado.label}</span>
-                      <span className="text-xl font-bold mt-1">{estado.count}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="filters" className="mt-0">
-              <Card>
-                <CardContent className="p-4 space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Búsqueda</h3>
-                    <div className="relative">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Buscar mantenimientos..."
-                        className="pl-8"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Rango de Fechas</h3>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {dateRange?.from ? (
-                            dateRange?.to ? (
-                              <>
-                                {format(dateRange.from, "P", { locale: es })} -{" "}
-                                {format(dateRange.to, "P", { locale: es })}
-                              </>
-                            ) : (
-                              format(dateRange.from, "P", { locale: es })
-                            )
-                          ) : (
-                            <span>Seleccione un rango de fechas</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="center">
-                        <Calendar
-                          mode="range"
-                          selected={dateRange}
-                          onSelect={setDateRange}
-                          initialFocus
-                          locale={es}
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Responsable</h3>
-                    <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar responsable" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todos">Todos</SelectItem>
-                        {uniqueResponsables.map((responsable) => (
-                          <SelectItem key={responsable} value={responsable}>
-                            {responsable}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Tipo de Mantenimiento</h3>
-                    <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todos">Todos</SelectItem>
-                        {uniqueTipos.map((tipo) => (
-                          <SelectItem key={tipo} value={tipo}>
-                            {tipo}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Estado</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {estados.map((estado) => {
-                        const Icon = estado.icon;
-                        const isSelected = selectedEstados.includes(estado.value);
-                        return (
-                          <button
-                            key={estado.value}
-                            className={`flex items-center gap-2 p-2 rounded-md transition-colors ${
-                              isSelected 
-                                ? estado.color + " text-white hover:opacity-90" 
-                                : "border hover:bg-[#01242c]/10 text-[#01242c]"
-                            }`}
-                            onClick={() => toggleEstado(estado.value)}
-                          >
-                            <Icon className="h-4 w-4" />
-                            <span className="text-sm">{estado.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    className="w-full bg-[#01242c] text-white hover:bg-[#01242c]/90 hover:text-[#bff036]"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Exportar Reporte
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <MobileTabView
+            activeTab={activeTab}
+            selectedDate={selectedDate}
+            selectedMonth={selectedMonth}
+            selectedPeriodo={selectedPeriodo}
+            periodos={periodos}
+            searchTerm={searchTerm}
+            dateRange={dateRange}
+            selectedResponsable={selectedResponsable}
+            tipoMantenimiento={tipoMantenimiento}
+            selectedEstados={selectedEstados}
+            daysWithEvents={daysWithEvents}
+            modifiers={modifiers}
+            modifiersStyles={modifiersStyles}
+            estados={estados}
+            statistics={statistics}
+            selectedDateEvents={selectedDateEvents}
+            uniqueResponsables={uniqueResponsables}
+            uniqueTipos={uniqueTipos}
+            onTabChange={setActiveTab}
+            onDayClick={handleDayClick}
+            onMonthChange={setSelectedMonth}
+            onPeriodoChange={setSelectedPeriodo}
+            navigateMonth={navigateMonth}
+            onSearchChange={setSearchTerm}
+            onDateRangeChange={setDateRange}
+            onResponsableChange={setSelectedResponsable}
+            onTipoChange={setTipoMantenimiento}
+            toggleEstado={toggleEstado}
+          />
           
           {/* Tabla de mantenimientos (siempre visible en móvil) */}
-          <Card className="mt-4">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">
-                Mantenimientos ({filteredMantenimientos.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[300px]">
-                <div className="p-3 space-y-3">
-                  {filteredMantenimientos.length > 0 ? (
-                    filteredMantenimientos.map((item) => {
-                      const estadoInfo = estados.find(e => e.value === item.estado);
-                      const Icon = estadoInfo?.icon || Clock;
-                      
-                      return (
-                        <Card key={item.id} className="shadow-sm">
-                          <CardContent className="p-3">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h4 className="font-medium">{item.tipo}</h4>
-                                <p className="text-sm text-muted-foreground">{item.equipo}</p>
-                                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                                  <span>{format(item.fecha, "P", { locale: es })}</span>
-                                  <span>•</span>
-                                  <span>{item.hora}</span>
-                                </div>
-                              </div>
-                              <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs whitespace-nowrap`}>
-                                <Icon className="h-3 w-3 mr-1" />
-                                {estadoInfo?.label}
-                              </Badge>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })
-                  ) : (
-                    <div className="text-center py-6 text-muted-foreground">
-                      No hay mantenimientos que coincidan con los filtros
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          <MobileMantenimientosList
+            mantenimientos={filteredMantenimientos}
+            estados={estados}
+          />
         </>
       ) : (
         /* Versión escritorio */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Calendario principal - ocupa 8 columnas */}
-          <Card className="lg:col-span-8">
-            <CardHeader className="pb-0">
-              <div className="flex justify-between items-center">
-                <CardTitle>Calendario de Mantenimientos</CardTitle>
-                <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Seleccionar período" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {periodos.map((periodo) => (
-                      <SelectItem key={periodo.value} value={periodo.value}>
-                        {periodo.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <div className="flex items-center justify-between mb-6">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigateMonth('prev')}
-                    className="text-[#01242c]"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    Anterior
-                  </Button>
-                  <h3 className="text-lg font-medium text-[#01242c]">
-                    {format(selectedMonth, "MMMM yyyy", { locale: es })}
-                  </h3>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigateMonth('next')}
-                    className="text-[#01242c]"
-                  >
-                    Siguiente
-                    <ArrowRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </div>
-                
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onDayClick={handleDayClick}
-                  month={selectedMonth}
-                  onMonthChange={setSelectedMonth}
-                  locale={es}
-                  className="pointer-events-auto"
-                  classNames={{
-                    day: "h-14 w-14 p-0 font-normal aria-selected:opacity-100", // Día más grande
-                    caption: "text-base",
-                    day_today: "bg-gray-100",
-                  }}
-                  modifiers={modifiers}
-                  modifiersStyles={modifiersStyles}
-                  components={{
-                    DayContent: CustomDayContent
-                  }}
-                />
-                
-                {/* Leyenda del calendario */}
-                <div className="flex flex-wrap justify-center mt-6 gap-4">
-                  {estados.map((estado) => (
-                    <div key={estado.value} className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${estado.color}`} />
-                      <span className="text-sm">{estado.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <CalendarView
+            isMobile={false}
+            selectedDate={selectedDate}
+            selectedMonth={selectedMonth}
+            selectedPeriodo={selectedPeriodo}
+            periodos={periodos}
+            estados={estados}
+            daysWithEvents={daysWithEvents}
+            modifiers={modifiers}
+            modifiersStyles={modifiersStyles}
+            onDayClick={handleDayClick}
+            onMonthChange={setSelectedMonth}
+            onPeriodoChange={setSelectedPeriodo}
+            navigateMonth={navigateMonth}
+          />
 
           {/* Panel lateral - ocupa 4 columnas */}
           <div className="lg:col-span-4 space-y-6">
             {/* Filtros */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <Filter className="h-5 w-5 mr-2" />
-                  Filtros
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar mantenimientos..."
-                    className="pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Rango de Fechas</h3>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange?.from ? (
-                          dateRange?.to ? (
-                            <>
-                              {format(dateRange.from, "P", { locale: es })} -{" "}
-                              {format(dateRange.to, "P", { locale: es })}
-                            </>
-                          ) : (
-                            format(dateRange.from, "P", { locale: es })
-                          )
-                        ) : (
-                          <span>Seleccione un rango de fechas</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="center">
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        initialFocus
-                        locale={es}
-                        className="pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Responsable</h3>
-                  <Select value={selectedResponsable} onValueChange={setSelectedResponsable}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar responsable" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todos">Todos</SelectItem>
-                      {uniqueResponsables.map((responsable) => (
-                        <SelectItem key={responsable} value={responsable}>
-                          {responsable}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Tipo de Mantenimiento</h3>
-                  <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todos">Todos</SelectItem>
-                      {uniqueTipos.map((tipo) => (
-                        <SelectItem key={tipo} value={tipo}>
-                          {tipo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Estado</h3>
-                  <div className="space-y-2">
-                    {estados.map((estado) => {
-                      const Icon = estado.icon;
-                      const isSelected = selectedEstados.includes(estado.value);
-                      return (
-                        <button
-                          key={estado.value}
-                          className={`w-full flex items-center gap-2 p-2 rounded-md transition-colors ${
-                            isSelected 
-                              ? estado.color + " text-white hover:opacity-90" 
-                              : "border hover:bg-[#01242c]/10 text-[#01242c]"
-                          }`}
-                          onClick={() => toggleEstado(estado.value)}
-                        >
-                          <Icon className="h-4 w-4" />
-                          <span>{estado.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <FiltersPanel
+              searchTerm={searchTerm}
+              dateRange={dateRange}
+              selectedResponsable={selectedResponsable}
+              tipoMantenimiento={tipoMantenimiento}
+              selectedEstados={selectedEstados}
+              estados={estados}
+              uniqueResponsables={uniqueResponsables}
+              uniqueTipos={uniqueTipos}
+              onSearchChange={setSearchTerm}
+              onDateRangeChange={setDateRange}
+              onResponsableChange={setSelectedResponsable}
+              onTipoChange={setTipoMantenimiento}
+              toggleEstado={toggleEstado}
+            />
 
             {/* Eventos del día seleccionado */}
             {selectedDate && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">
-                    Eventos del {format(selectedDate, "d 'de' MMMM", { locale: es })}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="max-h-[400px] overflow-y-auto">
-                  {selectedDateEvents.length > 0 ? (
-                    <div className="space-y-3">
-                      {selectedDateEvents.map((event) => {
-                        const estadoInfo = estados.find(e => e.value === event.estado);
-                        const Icon = estadoInfo?.icon || Clock;
-                        
-                        return (
-                          <Card key={event.id} className="shadow-sm">
-                            <CardContent className="p-3">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h4 className="font-medium">{event.tipo}</h4>
-                                  <p className="text-sm text-muted-foreground">{event.equipo}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">{event.ubicacion}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                    <span className="text-xs">{event.hora}</span>
-                                  </div>
-                                </div>
-                                <Badge variant="outline" className={`${estadoInfo?.color} text-white text-xs whitespace-nowrap`}>
-                                  <Icon className="h-3 w-3 mr-1" />
-                                  {estadoInfo?.label}
-                                </Badge>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6 text-muted-foreground">
-                      No hay eventos para esta fecha
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <SelectedDateEvents
+                selectedDate={selectedDate}
+                events={selectedDateEvents}
+                estados={estados}
+              />
             )}
 
             {/* Estadísticas */}
+            <Statistics statistics={statistics} />
+
+            {/* Botón de exportar */}
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Estadísticas</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-3">
-                {statistics.map((estado) =>
+              <CardContent className="p-4">
+                <Button 
+                  className="w-full bg-[#01242c] text-white hover:bg-[#01242c]/90 hover:text-[#bff036]"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar Reporte
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AuditoriaMantenimiento;
