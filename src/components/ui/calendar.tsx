@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, SelectSingleEventHandler, SelectRangeEventHandler } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,12 +17,15 @@ function Calendar({
   onDayClick,
   ...props
 }: CalendarProps) {
-  // Handle day selection and call the custom onDayClick prop if provided
-  const handleSelect = React.useCallback((day: Date | undefined) => {
-    if (onDayClick) {
-      onDayClick(day);
-    }
-  }, [onDayClick]);
+  // Create a type-safe onSelect handler based on the mode
+  const handleSelect = React.useCallback(
+    (day: Date | undefined | { from?: Date; to?: Date }) => {
+      if (onDayClick && day instanceof Date) {
+        onDayClick(day);
+      }
+    },
+    [onDayClick]
+  );
   
   return (
     <DayPicker
@@ -66,8 +69,10 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      // Use onSelect to handle day selection and call our custom onDayClick
-      onSelect={handleSelect}
+      // Use the appropriate onSelect handler based on mode
+      {...(props.mode === "range" 
+        ? {} 
+        : { onSelect: handleSelect as SelectSingleEventHandler })}
       {...props}
     />
   );
