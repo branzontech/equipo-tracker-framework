@@ -33,6 +33,7 @@ import {
   Building,
   Cog,
   AppWindow,
+  Computer
 } from "lucide-react";
 
 const menuItems = [
@@ -246,7 +247,7 @@ export const Sidebar = ({
     >
       <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
         <div className={`flex items-center gap-2 transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
-          <Cpu className="w-6 h-6 text-[#bff036] flex-shrink-0" />
+          <Computer className="w-6 h-6 text-[#bff036] flex-shrink-0" />
           <span className="text-xl font-semibold text-white tracking-wider whitespace-nowrap overflow-hidden">SMART TI</span>
         </div>
         <button
