@@ -1,20 +1,42 @@
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { FileText, MapPin, User, Calendar, Info, CheckCircle } from "lucide-react";
+import { 
+  FileText, 
+  MapPin, 
+  User, 
+  Calendar, 
+  Info, 
+  CheckCircle, 
+  Tag, 
+  FileX, 
+  Clock, 
+  ArrowUpFromLine, 
+  Banknote, 
+  Truck, 
+  RotateCw, 
+  DollarSign,
+  Building,
+  AlertCircle
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+
+type TipoActa = "prestamo" | "traslado" | "baja" | "donacion" | "venta" | "reposicion";
 
 type Acta = {
   id: string;
-  tipo: "prestamo" | "traslado";
+  tipo: TipoActa;
   fecha: Date;
   usuario: string;
-  estado: "vigente" | "finalizada";
+  estado: "vigente" | "finalizada" | "en_proceso" | "cancelada" | "pendiente_devolucion";
   descripcion: string;
   equipos?: {
     serial: string;
@@ -28,6 +50,14 @@ type Acta = {
   regionalDestino?: string;
   bodegaDestino?: string;
   motivoTraslado?: string;
+  fechaDevolucion?: Date;
+  observaciones?: string;
+  motivoBaja?: string;
+  autorizadoPor?: string;
+  valorVenta?: number;
+  empresaCompradora?: string;
+  tipoReposicion?: "garantia" | "seguro" | "otro";
+  anexos?: string[];
 };
 
 interface VerActaDialogProps {
@@ -39,62 +69,259 @@ interface VerActaDialogProps {
 export function VerActaDialog({ acta, open, onOpenChange }: VerActaDialogProps) {
   if (!acta) return null;
 
+  const getTipoIcon = (tipo: TipoActa) => {
+    switch (tipo) {
+      case "prestamo":
+        return <Banknote className="h-5 w-5 text-blue-500" />;
+      case "traslado":
+        return <Truck className="h-5 w-5 text-green-500" />;
+      case "baja":
+        return <FileX className="h-5 w-5 text-red-500" />;
+      case "donacion":
+        return <ArrowUpFromLine className="h-5 w-5 text-purple-500" />;
+      case "venta":
+        return <Tag className="h-5 w-5 text-orange-500" />;
+      case "reposicion":
+        return <RotateCw className="h-5 w-5 text-teal-500" />;
+      default:
+        return <FileText className="h-5 w-5" />;
+    }
+  };
+
+  const getTipoLabel = (tipo: TipoActa) => {
+    const labels: Record<TipoActa, string> = {
+      "prestamo": "Préstamo",
+      "traslado": "Traslado",
+      "baja": "Baja",
+      "donacion": "Donación",
+      "venta": "Venta",
+      "reposicion": "Reposición"
+    };
+    return labels[tipo] || tipo;
+  };
+
+  const getEstadoLabel = (estado: Acta["estado"]) => {
+    const labels: Record<Acta["estado"], string> = {
+      "vigente": "Vigente",
+      "finalizada": "Finalizada",
+      "en_proceso": "En proceso",
+      "cancelada": "Cancelada",
+      "pendiente_devolucion": "Pendiente de devolución"
+    };
+    return labels[estado] || estado;
+  };
+
+  const getEstadoBadge = (estado: Acta["estado"]) => {
+    switch (estado) {
+      case "vigente":
+        return "bg-green-100 text-green-800";
+      case "finalizada":
+        return "bg-gray-100 text-gray-800";
+      case "en_proceso":
+        return "bg-blue-100 text-blue-800";
+      case "cancelada":
+        return "bg-red-100 text-red-800";
+      case "pendiente_devolucion":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-CO', { 
+      style: 'currency', 
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <FileText className="h-5 w-5" />
+            {getTipoIcon(acta.tipo)}
             Acta {acta.id}
           </DialogTitle>
+          <DialogDescription>
+            {getTipoLabel(acta.tipo)} de equipos - {format(acta.fecha, "PPP")}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Información Principal */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>Fecha</span>
-                </div>
-                <p className="mt-1 font-medium">{format(acta.fecha, "PPP")}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <User className="h-4 w-4" />
-                  <span>Usuario</span>
-                </div>
-                <p className="mt-1 font-medium">{acta.usuario}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Info className="h-4 w-4" />
-                  <span>Estado</span>
-                </div>
-                <p className={`mt-1 font-medium ${
-                  acta.estado === "vigente" ? "text-green-600" : "text-gray-600"
-                }`}>
-                  <span className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4" />
-                    {acta.estado.charAt(0).toUpperCase() + acta.estado.slice(1)}
-                  </span>
-                </p>
-              </CardContent>
-            </Card>
+          {/* Información Principal y Estado */}
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>Creada: {format(acta.fecha, "PPP")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span>{acta.usuario}</span>
+              </div>
+            </div>
+            <Badge className={`capitalize text-sm px-3 py-1 ${getEstadoBadge(acta.estado)}`}>
+              <span className="flex items-center gap-2">
+                {acta.estado === "vigente" && <CheckCircle className="h-3.5 w-3.5" />}
+                {acta.estado === "finalizada" && <CheckCircle className="h-3.5 w-3.5" />}
+                {acta.estado === "en_proceso" && <RotateCw className="h-3.5 w-3.5" />}
+                {acta.estado === "cancelada" && <FileX className="h-3.5 w-3.5" />}
+                {acta.estado === "pendiente_devolucion" && <AlertCircle className="h-3.5 w-3.5" />}
+                {getEstadoLabel(acta.estado)}
+              </span>
+            </Badge>
           </div>
 
-          {/* Tipo de Acta y Detalles */}
+          {/* Descripción */}
+          {acta.descripcion && (
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-gray-700">{acta.descripcion}</p>
+            </div>
+          )}
+
+          {/* Información específica según tipo */}
+          {acta.tipo === "prestamo" && acta.fechaDevolucion && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <Clock className="h-4 w-4 text-blue-500" />
+                  Información de Préstamo
+                </h3>
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-sm text-gray-500">Fecha de devolución programada:</span>
+                    <p className="font-medium">{format(acta.fechaDevolucion, "PPP")}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {acta.tipo === "traslado" && acta.regionalDestino && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <MapPin className="h-4 w-4 text-green-500" />
+                  Información de Traslado
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-sm text-gray-500">Regional destino:</span>
+                    <p className="font-medium">{acta.regionalDestino}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Bodega destino:</span>
+                    <p className="font-medium">{acta.bodegaDestino}</p>
+                  </div>
+                  {acta.motivoTraslado && (
+                    <div className="col-span-2">
+                      <span className="text-sm text-gray-500">Motivo de traslado:</span>
+                      <p>{acta.motivoTraslado}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {acta.tipo === "baja" && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <FileX className="h-4 w-4 text-red-500" />
+                  Información de Baja de Equipo
+                </h3>
+                <div className="space-y-3">
+                  {acta.motivoBaja && (
+                    <div>
+                      <span className="text-sm text-gray-500">Motivo de baja:</span>
+                      <p className="font-medium">{acta.motivoBaja}</p>
+                    </div>
+                  )}
+                  {acta.autorizadoPor && (
+                    <div>
+                      <span className="text-sm text-gray-500">Autorizado por:</span>
+                      <p className="font-medium">{acta.autorizadoPor}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {acta.tipo === "venta" && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <DollarSign className="h-4 w-4 text-orange-500" />
+                  Información de Venta
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {acta.valorVenta && (
+                    <div>
+                      <span className="text-sm text-gray-500">Valor de venta:</span>
+                      <p className="font-medium text-lg">{formatCurrency(acta.valorVenta)}</p>
+                    </div>
+                  )}
+                  {acta.empresaCompradora && (
+                    <div>
+                      <span className="text-sm text-gray-500">Empresa compradora:</span>
+                      <p className="font-medium">{acta.empresaCompradora}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {acta.tipo === "donacion" && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <ArrowUpFromLine className="h-4 w-4 text-purple-500" />
+                  Información de Donación
+                </h3>
+                {acta.firmaRecibe && (
+                  <div>
+                    <span className="text-sm text-gray-500">Entidad receptora:</span>
+                    <p className="font-medium">{acta.firmaRecibe}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {acta.tipo === "reposicion" && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <RotateCw className="h-4 w-4 text-teal-500" />
+                  Información de Reposición
+                </h3>
+                <div className="space-y-3">
+                  {acta.tipoReposicion && (
+                    <div>
+                      <span className="text-sm text-gray-500">Tipo de reposición:</span>
+                      <p className="font-medium capitalize">
+                        {acta.tipoReposicion === "garantia" ? "Garantía" : 
+                         acta.tipoReposicion === "seguro" ? "Seguro" : 
+                         acta.tipoReposicion}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Tabla de Equipos */}
           <div className="bg-gray-50 p-6 rounded-lg">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              {acta.tipo === "prestamo" ? "Préstamo de Equipos" : "Traslado de Equipos"}
+              <Info className="h-4 w-4" />
+              Equipos incluidos
             </h3>
 
             {/* Tabla de Equipos */}
@@ -124,38 +351,13 @@ export function VerActaDialog({ acta, open, onOpenChange }: VerActaDialogProps) 
             </div>
           </div>
 
-          {acta.descripcion && (
+          {/* Observaciones */}
+          {acta.observaciones && (
             <>
               <Separator />
               <div className="space-y-2">
-                <h3 className="font-semibold">Descripción</h3>
-                <p className="text-muted-foreground">{acta.descripcion}</p>
-              </div>
-            </>
-          )}
-
-          {acta.tipo === "traslado" && acta.regionalDestino && (
-            <>
-              <Separator />
-              <div className="space-y-4">
-                <h3 className="font-semibold">Información de Traslado</h3>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 mt-1 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Regional {acta.regionalDestino}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {acta.bodegaDestino}
-                      </p>
-                    </div>
-                  </div>
-                  {acta.motivoTraslado && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      <span className="font-medium">Motivo: </span>
-                      {acta.motivoTraslado}
-                    </p>
-                  )}
-                </div>
+                <h3 className="font-semibold">Observaciones</h3>
+                <p className="text-muted-foreground">{acta.observaciones}</p>
               </div>
             </>
           )}
