@@ -27,6 +27,14 @@ function Calendar({
     [onDayClick]
   );
   
+  // Create a separate props object based on the calendar mode
+  let modeSpecificProps = {};
+  if (props.mode === "single" || !props.mode) {
+    modeSpecificProps = { 
+      onSelect: handleSelectSingle
+    };
+  }
+  
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -69,13 +77,8 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      // Conditionally apply the appropriate onSelect handler based on the mode
-      {...(props.mode === "range" 
-        ? {} // For range mode, don't override the handler
-        : props.mode === "multiple" 
-          ? {} // For multiple mode, don't override the handler
-          : { onSelect: handleSelectSingle as SelectSingleEventHandler })} // For single mode (default)
       {...props}
+      {...modeSpecificProps}
     />
   );
 }
