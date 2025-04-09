@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker, SelectSingleEventHandler, SelectRangeEventHandler } from "react-day-picker";
+import { DayPicker, SelectSingleEventHandler, SelectRangeEventHandler, SelectMultipleEventHandler } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,10 +17,10 @@ function Calendar({
   onDayClick,
   ...props
 }: CalendarProps) {
-  // Create a type-safe onSelect handler based on the mode
-  const handleSelect = React.useCallback(
-    (day: Date | undefined | { from?: Date; to?: Date }) => {
-      if (onDayClick && day instanceof Date) {
+  // Create proper type-safe handlers based on the mode
+  const handleSelectSingle = React.useCallback(
+    (day: Date | undefined) => {
+      if (onDayClick) {
         onDayClick(day);
       }
     },
@@ -69,10 +69,12 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      // Use the appropriate onSelect handler based on mode
+      // Conditionally apply the appropriate onSelect handler based on the mode
       {...(props.mode === "range" 
-        ? {} 
-        : { onSelect: handleSelect as SelectSingleEventHandler })}
+        ? {} // For range mode, don't override the handler
+        : props.mode === "multiple" 
+          ? {} // For multiple mode, don't override the handler
+          : { onSelect: handleSelectSingle as SelectSingleEventHandler })} // For single mode (default)
       {...props}
     />
   );
