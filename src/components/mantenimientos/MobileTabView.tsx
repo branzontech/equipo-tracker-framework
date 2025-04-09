@@ -1,12 +1,16 @@
 
 import React from "react";
 import { Download } from "lucide-react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarView } from "./CalendarView";
 import { SelectedDateEvents } from "./SelectedDateEvents";
 import { FiltersPanel } from "./FiltersPanel";
 import { Statistics } from "./Statistics";
+import { EventsList } from "./EventsList";
 import { DateRange } from "react-day-picker";
 import { EstadoInfo, MantenimientoItem, StatItem } from "@/types/mantenimiento";
 

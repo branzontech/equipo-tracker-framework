@@ -17,12 +17,12 @@ function Calendar({
   onDayClick,
   ...props
 }: CalendarProps) {
-  // Use the onSelect prop instead of onDayClick for handling day selections
-  const handleSelect = (day: Date | undefined) => {
+  // Handle day selection and call the custom onDayClick prop if provided
+  const handleSelect = React.useCallback((day: Date | undefined) => {
     if (onDayClick) {
       onDayClick(day);
     }
-  };
+  }, [onDayClick]);
   
   return (
     <DayPicker
@@ -66,6 +66,7 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
+      // Use onSelect to handle day selection and call our custom onDayClick
       onSelect={handleSelect}
       {...props}
     />
