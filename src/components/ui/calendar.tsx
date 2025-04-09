@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker, DayMouseEventHandler } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,14 +17,10 @@ function Calendar({
   onDayClick,
   ...props
 }: CalendarProps) {
-  // Handler for day click that calls the custom onDayClick callback
-  const handleDayClick: DayMouseEventHandler = (day, modifiers, e) => {
+  // Use the onSelect prop instead of onDayClick for handling day selections
+  const handleSelect = (day: Date | undefined) => {
     if (onDayClick) {
       onDayClick(day);
-    }
-    // Allow the default DayPicker onDayClick to still work
-    if (props.onDayClick) {
-      props.onDayClick(day, modifiers, e);
     }
   };
   
@@ -70,7 +66,7 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      onDayClick={handleDayClick}
+      onSelect={handleSelect}
       {...props}
     />
   );

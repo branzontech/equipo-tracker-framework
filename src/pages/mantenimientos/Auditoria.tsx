@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { ChevronLeft, Search, Download, Clock, Check, Pause, AlertCircle, CalendarIcon, Filter, ArrowLeft, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -292,6 +291,17 @@ const AuditoriaMantenimiento = () => {
     );
   };
 
+  // Custom DayContent component for the calendar
+  const CustomDayContent = (props: React.HTMLProps<HTMLDivElement> & { date: Date }) => {
+    const { date, ...rest } = props;
+    return (
+      <div className="relative w-full h-full flex flex-col justify-center items-center">
+        <div {...rest} />
+        <EventIndicator date={date} />
+      </div>
+    );
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Encabezado */}
@@ -368,12 +378,7 @@ const AuditoriaMantenimiento = () => {
                     modifiers={modifiers}
                     modifiersStyles={modifiersStyles}
                     components={{
-                      DayContent: ({ date, ...props }) => (
-                        <div className="relative w-full h-full flex flex-col justify-center items-center">
-                          <div {...props} />
-                          <EventIndicator date={date} />
-                        </div>
-                      )
+                      DayContent: CustomDayContent
                     }}
                   />
                   
@@ -673,7 +678,7 @@ const AuditoriaMantenimiento = () => {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={handleDayClick}
+                  onDayClick={handleDayClick}
                   month={selectedMonth}
                   onMonthChange={setSelectedMonth}
                   locale={es}
@@ -686,17 +691,7 @@ const AuditoriaMantenimiento = () => {
                   modifiers={modifiers}
                   modifiersStyles={modifiersStyles}
                   components={{
-                    DayContent: ({ date, ...props }) => (
-                      <div className="w-full h-full flex flex-col justify-start items-center pt-2">
-                        <div {...props} className="mb-1" />
-                        <EventIndicator date={date} />
-                        {getEventCount(date) > 0 && (
-                          <span className="text-xs mt-1 font-medium">
-                            {getEventCount(date)} {getEventCount(date) === 1 ? 'evento' : 'eventos'}
-                          </span>
-                        )}
-                      </div>
-                    )
+                    DayContent: CustomDayContent
                   }}
                 />
                 
@@ -883,99 +878,4 @@ const AuditoriaMantenimiento = () => {
                 <CardTitle className="text-lg">Estadísticas</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-3">
-                {statistics.map((estado) => (
-                  <div 
-                    key={estado.value} 
-                    className={`p-3 rounded-lg flex flex-col items-center ${estado.color} bg-opacity-20`}
-                  >
-                    <span className="text-sm font-medium text-[#01242c]">{estado.label}</span>
-                    <span className="text-xl font-bold mt-1">{estado.count}</span>
-                  </div>
-                ))}
-                
-                <Button 
-                  className="col-span-2 mt-2 bg-[#01242c] text-white hover:bg-[#01242c]/90 hover:text-[#bff036]"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exportar Reporte
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* Tabla de mantenimientos (solo versión escritorio) */}
-      {!isMobile && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">
-              Mantenimientos para el período seleccionado ({filteredMantenimientos.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Checkbox />
-                    </TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Equipo/Ubicación</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Fecha/Hora</TableHead>
-                    <TableHead>Responsable</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredMantenimientos.length > 0 ? (
-                    filteredMantenimientos.map((mantenimiento) => {
-                      const estadoInfo = estados.find(e => e.value === mantenimiento.estado);
-                      const Icon = estadoInfo?.icon || Clock;
-                      
-                      return (
-                        <TableRow 
-                          key={mantenimiento.id}
-                          className="hover:bg-[#01242c]/5 cursor-pointer"
-                        >
-                          <TableCell>
-                            <Checkbox />
-                          </TableCell>
-                          <TableCell className="font-medium">{mantenimiento.tipo}</TableCell>
-                          <TableCell>
-                            <div>{mantenimiento.equipo}</div>
-                            <div className="text-sm text-muted-foreground">{mantenimiento.ubicacion}</div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className={`${estadoInfo?.color} text-white`}>
-                              <Icon className="h-3 w-3 mr-1" />
-                              {estadoInfo?.label}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div>{format(mantenimiento.fecha, "dd/MM/yyyy")}</div>
-                            <div className="text-sm text-muted-foreground">{mantenimiento.hora}</div>
-                          </TableCell>
-                          <TableCell>{mantenimiento.responsable}</TableCell>
-                        </TableRow>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
-                        No se encontraron mantenimientos para los filtros seleccionados
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-};
-
-export default AuditoriaMantenimiento;
+                {statistics.map((estado) =>
