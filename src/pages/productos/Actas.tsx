@@ -58,6 +58,7 @@ import { useToast } from "@/hooks/use-toast";
 
 // Expanded tipo field to include more types of outputs
 type TipoActa = "prestamo" | "traslado" | "baja" | "donacion" | "venta" | "reposicion";
+type EstadoActa = "vigente" | "finalizada" | "en_proceso" | "cancelada" | "pendiente_devolucion";
 
 // Tipo de acta for TypeScript with expanded functionality
 type Acta = {
@@ -65,7 +66,7 @@ type Acta = {
   tipo: TipoActa;
   fecha: Date;
   usuario: string;
-  estado: "vigente" | "finalizada" | "en_proceso" | "cancelada" | "pendiente_devolucion";
+  estado: EstadoActa;
   descripcion: string;
   equipos?: {
     serial: string;
@@ -301,7 +302,7 @@ const Actas = () => {
     });
   };
 
-  const handleStatusChange = (acta: Acta, newStatus: Acta["estado"]) => {
+  const handleStatusChange = (acta: Acta, newStatus: EstadoActa) => {
     // Update the acta status in the state
     const updatedActas = actasData.map((item) => 
       item.id === acta.id ? { ...item, estado: newStatus } : item
@@ -324,7 +325,7 @@ const Actas = () => {
     // Process the return of loaned equipment
     if (acta.tipo === "prestamo" && (acta.estado === "vigente" || acta.estado === "pendiente_devolucion")) {
       const updatedActas = actasData.map((item) => 
-        item.id === acta.id ? { ...item, estado: "finalizada" } : item
+        item.id === acta.id ? { ...item, estado: "finalizada" as EstadoActa } : item
       );
       
       setActasData(updatedActas);
@@ -343,7 +344,7 @@ const Actas = () => {
     // Cancel an acta that is still in process
     if (acta.estado === "vigente" || acta.estado === "en_proceso" || acta.estado === "pendiente_devolucion") {
       const updatedActas = actasData.map((item) => 
-        item.id === acta.id ? { ...item, estado: "cancelada" } : item
+        item.id === acta.id ? { ...item, estado: "cancelada" as EstadoActa } : item
       );
       
       setActasData(updatedActas);
@@ -362,7 +363,7 @@ const Actas = () => {
     // Mark a loan as pending return
     if (acta.tipo === "prestamo" && acta.estado === "vigente") {
       const updatedActas = actasData.map((item) => 
-        item.id === acta.id ? { ...item, estado: "pendiente_devolucion" } : item
+        item.id === acta.id ? { ...item, estado: "pendiente_devolucion" as EstadoActa } : item
       );
       
       setActasData(updatedActas);
@@ -808,4 +809,3 @@ const Actas = () => {
 };
 
 export default Actas;
-
