@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Card,
@@ -55,12 +54,18 @@ import { Toggle } from "@/components/ui/toggle";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-// Expanded tipo field to include more types of outputs
 type TipoActa = "prestamo" | "traslado" | "baja" | "donacion" | "venta" | "reposicion";
 type EstadoActa = "vigente" | "finalizada" | "en_proceso" | "cancelada" | "pendiente_devolucion";
 
-// Tipo de acta for TypeScript with expanded functionality
 type Acta = {
   id: string;
   tipo: TipoActa;
@@ -90,7 +95,6 @@ type Acta = {
   anexos?: string[];
 };
 
-// Datos de ejemplo más completos con los nuevos tipos
 const actasEjemplo: Acta[] = [
   {
     id: "ACT001",
@@ -279,6 +283,9 @@ const Actas = () => {
   const [managementSheetOpen, setManagementSheetOpen] = useState(false);
   const [currentActa, setCurrentActa] = useState<Acta | null>(null);
   const { toast } = useToast();
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const handleVerActa = (acta: Acta) => {
     setSelectedActa(acta);
@@ -303,7 +310,6 @@ const Actas = () => {
   };
 
   const handleStatusChange = (acta: Acta, newStatus: EstadoActa) => {
-    // Update the acta status in the state
     const updatedActas = actasData.map((item) => 
       item.id === acta.id ? { ...item, estado: newStatus } : item
     );
@@ -315,14 +321,12 @@ const Actas = () => {
       description: `El acta ${acta.id} ahora tiene el estado: ${getEstadoLabel(newStatus)}`,
     });
     
-    // If we're changing the current acta in the management sheet
     if (currentActa && currentActa.id === acta.id) {
       setCurrentActa({ ...acta, estado: newStatus });
     }
   };
 
   const handleProcessReturn = (acta: Acta) => {
-    // Process the return of loaned equipment
     if (acta.tipo === "prestamo" && (acta.estado === "vigente" || acta.estado === "pendiente_devolucion")) {
       const updatedActas = actasData.map((item) => 
         item.id === acta.id ? { ...item, estado: "finalizada" as EstadoActa } : item
@@ -335,13 +339,11 @@ const Actas = () => {
         description: `Los equipos del acta ${acta.id} han sido devueltos correctamente.`,
       });
       
-      // Close the management sheet
       setManagementSheetOpen(false);
     }
   };
 
   const handleCancelActa = (acta: Acta) => {
-    // Cancel an acta that is still in process
     if (acta.estado === "vigente" || acta.estado === "en_proceso" || acta.estado === "pendiente_devolucion") {
       const updatedActas = actasData.map((item) => 
         item.id === acta.id ? { ...item, estado: "cancelada" as EstadoActa } : item
@@ -354,13 +356,11 @@ const Actas = () => {
         description: `El acta ${acta.id} ha sido cancelada.`,
       });
       
-      // Close the management sheet
       setManagementSheetOpen(false);
     }
   };
 
   const handleRequestReturn = (acta: Acta) => {
-    // Mark a loan as pending return
     if (acta.tipo === "prestamo" && acta.estado === "vigente") {
       const updatedActas = actasData.map((item) => 
         item.id === acta.id ? { ...item, estado: "pendiente_devolucion" as EstadoActa } : item
@@ -450,10 +450,26 @@ const Actas = () => {
   };
 
   const actasFiltradas = filtrarActas();
+  const totalPages = Math.ceil(actasFiltradas.length / itemsPerPage);
+  
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentActas = actasFiltradas.slice(indexOfFirstItem, indexOfLastItem);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const GridView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {actasFiltradas.map((acta) => (
+      {currentActas.map((acta) => (
         <Card key={acta.id} className="hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -519,7 +535,7 @@ const Actas = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {actasFiltradas.map((acta) => (
+          {currentActas.map((acta) => (
             <TableRow key={acta.id}>
               <TableCell className="font-medium">{acta.id}</TableCell>
               <TableCell>{format(acta.fecha, "PPP")}</TableCell>
@@ -727,6 +743,41 @@ const Actas = () => {
     );
   };
 
+  const PaginationControls = () => {
+    if (totalPages <= 1) return null;
+    
+    return (
+      <Pagination className="mt-6">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious 
+              onClick={() => handlePageChange(currentPage - 1)}
+              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+          
+          {pageNumbers.map(number => (
+            <PaginationItem key={number}>
+              <PaginationLink 
+                isActive={currentPage === number}
+                onClick={() => handlePageChange(number)}
+              >
+                {number}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          
+          <PaginationItem>
+            <PaginationNext 
+              onClick={() => handlePageChange(currentPage + 1)}
+              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -794,7 +845,10 @@ const Actas = () => {
           <p className="text-gray-500 mt-1">Pruebe con otros filtros de búsqueda</p>
         </div>
       ) : (
-        viewMode === "grid" ? <GridView /> : <TableView />
+        <>
+          {viewMode === "grid" ? <GridView /> : <TableView />}
+          <PaginationControls />
+        </>
       )}
 
       <VerActaDialog 
