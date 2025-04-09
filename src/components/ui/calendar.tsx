@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker, SelectSingleEventHandler, SelectRangeEventHandler, SelectMultipleEventHandler } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -18,7 +18,7 @@ function Calendar({
   ...props
 }: CalendarProps) {
   // Create proper type-safe handlers based on the mode
-  const handleSelectSingle = React.useCallback(
+  const handleDayClick = React.useCallback(
     (day: Date | undefined) => {
       if (onDayClick) {
         onDayClick(day);
@@ -27,12 +27,12 @@ function Calendar({
     [onDayClick]
   );
   
-  // Create a separate props object based on the calendar mode
-  let modeSpecificProps = {};
-  if (props.mode === "single" || !props.mode) {
-    modeSpecificProps = { 
-      onSelect: handleSelectSingle
-    };
+  // Create separate props objects based on the calendar mode
+  let modeSpecificProps: Record<string, any> = {};
+  
+  // Only add onSelect if we have onDayClick and we're in single mode
+  if ((props.mode === "single" || !props.mode) && onDayClick) {
+    modeSpecificProps.onSelect = handleDayClick;
   }
   
   return (
