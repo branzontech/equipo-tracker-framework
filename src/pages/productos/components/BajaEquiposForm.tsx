@@ -56,6 +56,9 @@ const formSchema = z.object({
   solicitadoPorFirma: z.string().min(1, "La firma de solicitud es requerida"),
 });
 
+// Define a type based on the zod schema for better type checking
+type EquipoType = z.infer<typeof equipoSchema>;
+
 export function BajaEquiposForm() {
   const { toast } = useToast();
   const [equipos, setEquipos] = useState([{ id: Date.now().toString() }]);
@@ -68,19 +71,14 @@ export function BajaEquiposForm() {
     },
   });
   
-  const agregarEquipo = (nuevoEquipo: {
-    serial: string;
-    activoFijo: string;
-    motivo: string;
-    descripcionEstado: string;
-  }) => {
+  const agregarEquipo = (nuevoEquipo: EquipoType) => {
     const equipoId = { id: Date.now().toString() };
     setEquipos([...equipos, equipoId]);
     
     const currentEquipos = form.getValues().equipos || [];
     form.setValue("equipos", [
       ...currentEquipos, 
-      { ...nuevoEquipo }
+      nuevoEquipo
     ]);
     
     toast({
@@ -132,7 +130,7 @@ export function BajaEquiposForm() {
   const handleBulkImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     // This would be implemented with a CSV/Excel parsing library
     // For demo purposes, we'll just simulate adding multiple items
-    const mockData = [
+    const mockData: EquipoType[] = [
       {
         serial: "SER1001",
         activoFijo: "AF2001",
