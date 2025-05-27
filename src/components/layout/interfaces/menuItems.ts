@@ -1,0 +1,156 @@
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Package,
+  Share2,
+  FileCog,
+  Settings,
+  Wrench,
+  FileText,
+  History,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  FileOutput,
+  Building2,
+  Box,
+  Tag,
+  Users,
+  Laptop2,
+  Cable,
+  UserCog,
+  LogOut,
+  Printer,
+  Database,
+  Shield,
+  RotateCcw,
+  ScrollText,
+  BookCheck,
+  Building,
+  Cog,
+  AppWindow,
+} from "lucide-react";
+
+export const menuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/dashboard",
+  },
+  {
+    title: "Lista de Inventario",
+    icon: ClipboardList,
+    path: "/productos/lista",
+  },
+  {
+    title: "Productos",
+    icon: Package,
+    path: "/productos",
+    submenu: [
+      { title: "Ingreso", icon: ArrowDownToLine, path: "/productos/ingreso" },
+      { 
+        title: "Salidas", 
+        icon: ArrowUpFromLine, 
+        path: "/productos/salidas",
+        submenu: [
+          { title: "Préstamos", icon: Share2, path: "/productos/salidas/prestamos" },
+          { title: "Traslados", icon: Share2, path: "/productos/salidas/traslados" },
+        ]
+      },
+      { 
+        title: "Devoluciones", 
+        icon: RotateCcw, 
+        path: "/productos/devoluciones" 
+      },
+      { title: "Actas Generadas", icon: FileText, path: "/productos/actas" },
+    ],
+  },
+  {
+    title: "Contratos",
+    icon: ScrollText,
+    path: "/contratos",
+    submenu: [
+      { title: "Lista de Contratos", icon: ClipboardList, path: "/contratos/lista" },
+      { title: "Agregar Contrato", icon: ArrowDownToLine, path: "/contratos/agregar" },
+      { 
+        title: "Tipos de Contratos", 
+        icon: BookCheck, 
+        path: "/contratos/tipos",
+        submenu: [
+          { title: "Licencias", icon: AppWindow, path: "/contratos/tipos/licencias" },
+          { title: "Proveedores", icon: Building, path: "/contratos/tipos/proveedores" },
+          { title: "Software", icon: Cog, path: "/contratos/tipos/software" },
+        ]
+      },
+    ],
+  },
+  {
+    title: "Baja de Equipos",
+    icon: FileOutput,
+    path: "/baja-equipos",
+  },
+  {
+    title: "Actas",
+    icon: FileText,
+    path: "/productos/actas",
+  },
+  {
+    title: "Configuración",
+    icon: Settings,
+    path: "/configuracion",
+    submenu: [
+      { 
+        title: "Maestros", 
+        icon: FileCog, 
+        path: "/configuracion/maestros",
+        submenu: [
+          { title: "Sedes", icon: Building2, path: "/configuracion/maestros/sedes" },
+          { title: "Bodegas", icon: Box, path: "/configuracion/maestros/bodegas" },
+          { title: "Marcas", icon: Tag, path: "/configuracion/maestros/marcas" },
+          { title: "Periféricos", icon: Cable, path: "/configuracion/maestros/perifericos" },
+          { title: "Accesorios", icon: Laptop2, path: "/configuracion/maestros/accesorios" },
+          { title: "Categorias", icon: Tag, path: "/configuracion/maestros/categorias" },
+          { title: "Perfiles de Acceso", icon: Shield, path: "/configuracion/maestros/perfiles-acceso" },
+        ]
+      },
+      {
+        title: "Usuarios",
+        icon: Users,
+        path: "/configuracion/usuarios",
+        submenu: [
+          { title: "Agentes", icon: UserCog, path: "/configuracion/usuarios/agentes" },
+          { title: "Responsables", icon: UserCog, path: "/configuracion/usuarios/responsables" },
+        ],
+      },
+      {
+        title: "Nivel de Acceso",
+        icon: Shield,
+        path: "/configuracion/nivel-acceso",
+      },
+    ],
+  },
+  {
+    title: "Toners",
+    icon: Printer,
+    path: "/toners",
+    submenu: [
+      { title: "Ingreso", icon: ArrowDownToLine, path: "/toners/ingreso" },
+      { title: "Salida", icon: ArrowUpFromLine, path: "/toners/salida" },
+      { title: "Existencia", icon: Database, path: "/toners/existencia" },
+    ],
+  },
+  {
+    title: "Mantenimientos",
+    icon: Wrench,
+    path: "/mantenimientos",
+  },
+  {
+    title: "Hojas de Vida Equipos",
+    icon: FileText,
+    path: "/hojas-vida",
+  },
+  {
+    title: "Trazabilidad Inventario",
+    icon: History,
+    path: "/trazabilidad",
+  },
+];
