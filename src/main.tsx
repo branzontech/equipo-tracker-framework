@@ -1,18 +1,35 @@
-// src/main.tsx o src/index.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
-import "./styles/index.css";
 import { PersistGate } from "redux-persist/integration/react";
+import Cookies from "js-cookie";
+import "./styles/index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+// Import the userId from cookies
+const userId = Cookies.get("userId");
+
+// Create the root element for the React application
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+
+// Render the application
+root.render(
+  // Wrap the entire app in Redux's Provider to give access to the store
+  <Provider store={store}>
+    {
+      // Check if the userId cookie exists (meaning the user has logged in before)
+      userId ? (
+        // If the user is logged in, use PersistGate to rehydrate Redux state from storage
+        // This allows redux-persist to restore the auth state (e.g., the logged-in user)
+        <PersistGate loading={null} persistor={persistor}>
+          <App />
+        </PersistGate>
+      ) : (
+        // If the user is NOT logged in, skip redux-persist to avoid hydration errors
+        // The App will render normally without loading persisted auth state
         <App />
-      </PersistGate>
-    </Provider>
-  </React.StrictMode>
+      )
+    }
+  </Provider>
 );
