@@ -2,15 +2,12 @@
 import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/redux/authSlice";
 
 export const useLogin = () => {
-  const [user, setUser] = useState<Usuario | null>(null);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const [user, setUser] = useState<Usuario | null>(null);
+
 
   // useEffect(() => {
   //   const getUserData = async () => {
@@ -29,7 +26,7 @@ export const useLogin = () => {
   //   getUserData();
   // }, []);
 
-  const SignIn = async (nombre: string, contraseña: string) => {
+  const SignIn = async (nombre: string, contraseña: string, dispatch: any, navigate: any) => {
     try {
       const response = await axios.post("http://192.168.1.4:3003/api/login", {
         nombre,
@@ -50,5 +47,5 @@ export const useLogin = () => {
     }
   };
   
-  return { user, SignIn };
+  return { SignIn };
 };
