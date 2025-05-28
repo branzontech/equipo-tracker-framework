@@ -1,32 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
-import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { loginSuccess } from "@/redux/authSlice";
 
 export const useLogin = () => {
-  // const [user, setUser] = useState<Usuario | null>(null);
-
-
-  // useEffect(() => {
-  //   const getUserData = async () => {
-  //     try {
-  //       const response = await fetch("http://192.168.1.4:3003/api/usuarios");
-  //       if (!response.ok) {
-  //         throw new Error("Error al obtener los datos");
-  //       }
-  //       const data = await response.json();
-
-  //       setUser(data);
-  //     } catch (err: any) {
-  //       throw new Error(err.message);
-  //     }
-  //   };
-  //   getUserData();
-  // }, []);
-
-  const SignIn = async (nombre: string, contraseña: string, dispatch: any, navigate: any) => {
+  const SignIn = async (
+    nombre: string,
+    contraseña: string,
+    dispatch: any,
+    navigate: any
+  ) => {
     try {
       const response = await axios.post("http://192.168.1.4:3003/api/login", {
         nombre,
@@ -34,7 +17,7 @@ export const useLogin = () => {
       });
 
       const { user } = response.data;
-      
+
       dispatch(loginSuccess(user));
       Cookies.set("userId", user.id_usuario, { expires: 1 });
       navigate("/dashboard");
@@ -46,6 +29,6 @@ export const useLogin = () => {
       );
     }
   };
-  
+
   return { SignIn };
 };
