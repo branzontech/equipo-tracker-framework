@@ -7,6 +7,8 @@ import { User, Lock } from "lucide-react";
 import ParticleEffect from "@/components/ParticleEffect";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useLogin } from "./hooks/use-login";
 
 const Login = () => {
@@ -16,13 +18,15 @@ const Login = () => {
     contraseña: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     try {
-      await SignIn(user.nombre, user.contraseña);
+      await SignIn(user.nombre, user.contraseña, dispatch, navigate);
     } catch (err: any) {
       setError(err.message);
 
@@ -37,7 +41,9 @@ const Login = () => {
       <div className="fixed top-5 right-5 z-50 ">
         {error && (
           <Alert variant="destructive">
-            <AlertTitle className="text-white">Error al iniciar sesión</AlertTitle>
+            <AlertTitle className="text-white">
+              Error al iniciar sesión
+            </AlertTitle>
             <AlertDescription className="text-white">{error}</AlertDescription>
           </Alert>
         )}
