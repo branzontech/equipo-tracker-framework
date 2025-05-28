@@ -40,7 +40,7 @@ const Header = ({ className = "" }: HeaderProps) => {
 
       <div></div>
 
-      <div className="flex items-center gap-4">
+      {/* <div className="flex items-center gap-4">
         <button className="relative hover:bg-gray-100 p-2 rounded-full transition-colors">
           <BellRing className="w-5 h-5 text-gray-600" />
           <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -48,7 +48,7 @@ const Header = ({ className = "" }: HeaderProps) => {
         <button className="hover:bg-gray-100 p-2 rounded-full transition-colors">
           <Settings className="w-5 h-5 text-gray-600" />
         </button>
-      </div>
+      </div> */}
 
       {/* <div className="flex items-center gap-2">
         <img
