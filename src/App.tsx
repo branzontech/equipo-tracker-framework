@@ -40,8 +40,6 @@ import AgregarContrato from "./pages/contratos/Agregar";
 import ContratosLicencias from "./pages/contratos/tipos/Licencias";
 import ContratosProveedores from "./pages/contratos/tipos/Proveedores";
 import ContratosSoftware from "./pages/contratos/interfaces/Software";
-import { store, persistor } from "./redux/store";
-
 
 const queryClient = new QueryClient();
 
