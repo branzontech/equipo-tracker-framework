@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { config } from '../config/config.js';
-import router from '../api/router/router.js';
+import router from '../router/router.js';
 import pkg from 'pg';
 
 const { Pool } = pkg;
