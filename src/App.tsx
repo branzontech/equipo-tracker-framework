@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,7 +20,6 @@ import IngresoToner from "./pages/toners/Ingreso";
 import ExistenciaToners from "./pages/toners/Existencia";
 import SalidaToners from "./pages/toners/Salida";
 import BajaEquipos from "./pages/productos/BajaEquipos";
-import Login from "./pages/auth/Login";
 import Agentes from "./pages/configuracion/usuarios/Agentes";
 import Responsables from "./pages/configuracion/usuarios/Responsables";
 import Permisos from "./pages/configuracion/usuarios/Permisos";
@@ -40,6 +38,8 @@ import AgregarContrato from "./pages/contratos/Agregar";
 import ContratosLicencias from "./pages/contratos/tipos/Licencias";
 import ContratosProveedores from "./pages/contratos/tipos/Proveedores";
 import ContratosSoftware from "./pages/contratos/interfaces/Software";
+import ProtectedRoute from "./context/protectedRoutes";
+import Login from "./pages/auth/views/Login";
 
 const queryClient = new QueryClient();
 
@@ -58,54 +58,147 @@ const App = () => {
             <Route
               path="*"
               element={
-                <div className="h-screen flex">
-                  <div className="fixed left-0 top-0 h-screen">
-                    <Sidebar isCollapsed={isCollapsed} onToggle={setIsCollapsed} />
+                <ProtectedRoute>
+                  <div className="h-screen flex">
+                    <div className="fixed left-0 top-0 h-screen">
+                      <Sidebar
+                        isCollapsed={isCollapsed}
+                        onToggle={setIsCollapsed}
+                      />
+                    </div>
+                    <div
+                      className={`flex-1 flex flex-col ${
+                        isCollapsed ? "ml-16" : "ml-64"
+                      }`}
+                    >
+                      <Header className="sticky top-0 z-10" />
+                      <main className="flex-1 p-6 overflow-auto">
+                        <Routes>
+                          {/* Update default route to redirect to login if not authenticated */}
+                          <Route
+                            path="/"
+                            element={<Navigate to="/login" replace />}
+                          />
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route
+                            path="/productos/ingreso"
+                            element={<IngresoProducto />}
+                          />
+                          <Route
+                            path="/productos/lista"
+                            element={<ListaInventario />}
+                          />
+                          <Route
+                            path="/productos/salidas/prestamos"
+                            element={<Salidas />}
+                          />
+                          <Route
+                            path="/productos/salidas/traslados"
+                            element={<Traslados />}
+                          />
+                          <Route
+                            path="/productos/devoluciones"
+                            element={<Devoluciones />}
+                          />
+                          <Route path="/productos/actas" element={<Actas />} />
+                          <Route
+                            path="/baja-equipos"
+                            element={<BajaEquipos />}
+                          />
+
+                          {/* Rutas de Contratos */}
+                          <Route
+                            path="/contratos/lista"
+                            element={<ListaContratos />}
+                          />
+                          <Route
+                            path="/contratos/agregar"
+                            element={<AgregarContrato />}
+                          />
+                          <Route
+                            path="/contratos/tipos/licencias"
+                            element={<ContratosLicencias />}
+                          />
+                          <Route
+                            path="/contratos/tipos/proveedores"
+                            element={<ContratosProveedores />}
+                          />
+                          <Route
+                            path="/contratos/tipos/software"
+                            element={<ContratosSoftware />}
+                          />
+
+                          <Route
+                            path="/configuracion/maestros/sedes"
+                            element={<Sedes />}
+                          />
+                          <Route
+                            path="/configuracion/maestros/bodegas"
+                            element={<Bodegas />}
+                          />
+                          <Route
+                            path="/configuracion/maestros/marcas"
+                            element={<Marcas />}
+                          />
+                          <Route
+                            path="/configuracion/maestros/perifericos"
+                            element={<Perifericos />}
+                          />
+                          <Route
+                            path="/configuracion/maestros/perfiles-acceso"
+                            element={<PerfilesAcceso />}
+                          />
+                          <Route
+                            path="/configuracion/usuarios/agentes"
+                            element={<Agentes />}
+                          />
+                          <Route
+                            path="/configuracion/usuarios/responsables"
+                            element={<Responsables />}
+                          />
+                          <Route
+                            path="/configuracion/nivel-acceso"
+                            element={<Permisos />}
+                          />
+                          <Route
+                            path="/toners/ingreso"
+                            element={<IngresoToner />}
+                          />
+                          <Route
+                            path="/toners/existencia"
+                            element={<ExistenciaToners />}
+                          />
+                          <Route
+                            path="/toners/salida"
+                            element={<SalidaToners />}
+                          />
+                          <Route
+                            path="/mantenimientos"
+                            element={<MantenimientosIndex />}
+                          />
+                          <Route
+                            path="/mantenimientos/programacion"
+                            element={<ProgramacionMantenimiento />}
+                          />
+                          <Route
+                            path="/mantenimientos/ejecucion"
+                            element={<EjecucionMantenimiento />}
+                          />
+                          <Route
+                            path="/mantenimientos/documentacion"
+                            element={<DocumentacionMantenimiento />}
+                          />
+                          <Route
+                            path="/mantenimientos/auditoria"
+                            element={<AuditoriaMantenimiento />}
+                          />
+                          <Route path="/hojas-vida" element={<HojaDeVida />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </main>
+                    </div>
                   </div>
-                  <div className={`flex-1 flex flex-col ${isCollapsed ? "ml-16" : "ml-64"}`}>
-                    <Header className="sticky top-0 z-10" />
-                    <main className="flex-1 p-6 overflow-auto">
-                      <Routes>
-                        {/* Update default route to redirect to login if not authenticated */}
-                        <Route path="/" element={<Navigate to="/login" replace />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/productos/ingreso" element={<IngresoProducto />} />
-                        <Route path="/productos/lista" element={<ListaInventario />} />
-                        <Route path="/productos/salidas/prestamos" element={<Salidas />} />
-                        <Route path="/productos/salidas/traslados" element={<Traslados />} />
-                        <Route path="/productos/devoluciones" element={<Devoluciones />} />
-                        <Route path="/productos/actas" element={<Actas />} />
-                        <Route path="/baja-equipos" element={<BajaEquipos />} />
-                        
-                        {/* Rutas de Contratos */}
-                        <Route path="/contratos/lista" element={<ListaContratos />} />
-                        <Route path="/contratos/agregar" element={<AgregarContrato />} />
-                        <Route path="/contratos/tipos/licencias" element={<ContratosLicencias />} />
-                        <Route path="/contratos/tipos/proveedores" element={<ContratosProveedores />} />
-                        <Route path="/contratos/tipos/software" element={<ContratosSoftware />} />
-                        
-                        <Route path="/configuracion/maestros/sedes" element={<Sedes />} />
-                        <Route path="/configuracion/maestros/bodegas" element={<Bodegas />} />
-                        <Route path="/configuracion/maestros/marcas" element={<Marcas />} />
-                        <Route path="/configuracion/maestros/perifericos" element={<Perifericos />} />
-                        <Route path="/configuracion/maestros/perfiles-acceso" element={<PerfilesAcceso />} />
-                        <Route path="/configuracion/usuarios/agentes" element={<Agentes />} />
-                        <Route path="/configuracion/usuarios/responsables" element={<Responsables />} />
-                        <Route path="/configuracion/nivel-acceso" element={<Permisos />} />
-                        <Route path="/toners/ingreso" element={<IngresoToner />} />
-                        <Route path="/toners/existencia" element={<ExistenciaToners />} />
-                        <Route path="/toners/salida" element={<SalidaToners />} />
-                        <Route path="/mantenimientos" element={<MantenimientosIndex />} />
-                        <Route path="/mantenimientos/programacion" element={<ProgramacionMantenimiento />} />
-                        <Route path="/mantenimientos/ejecucion" element={<EjecucionMantenimiento />} />
-                        <Route path="/mantenimientos/documentacion" element={<DocumentacionMantenimiento />} />
-                        <Route path="/mantenimientos/auditoria" element={<AuditoriaMantenimiento />} />
-                        <Route path="/hojas-vida" element={<HojaDeVida />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </main>
-                  </div>
-                </div>
+                </ProtectedRoute>
               }
             />
           </Routes>
