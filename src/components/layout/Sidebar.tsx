@@ -9,6 +9,9 @@ import {
   Computer
 } from "lucide-react";
 import { menuItems } from "@/components/layout/interfaces/menuItems";
+import { logout } from "@/redux/authSlice";
+import { useDispatch } from "react-redux";
+
 
 const MenuItem = ({ item, isCollapsed }: { item: any; isCollapsed: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,6 +71,7 @@ export const Sidebar = ({
 }) => {
   const [hovering, setHovering] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (hovering && isCollapsed) {
@@ -76,8 +80,7 @@ export const Sidebar = ({
   }, [hovering, isCollapsed, onToggle]);
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    dispatch(logout());
     navigate('/login');
   };
 
