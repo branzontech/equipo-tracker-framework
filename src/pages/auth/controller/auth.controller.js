@@ -7,7 +7,7 @@ const login = async (req, res) => {
     if (!nombre || !contraseña) {
       return res
         .status(400)
-        .json({ error: "Nombre and contraseña are required" });
+        .json({ error: "Name and password are required" });
     }
     const user = await AuthService.login(nombre, contraseña);
     res.json({ success: true, user });
