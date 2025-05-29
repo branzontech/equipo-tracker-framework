@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
+import { getSedes } from "@/api/axios/sedes.api";
 import { useEffect, useState } from "react";
 
 export const useSedes = () => {
@@ -8,10 +8,10 @@ export const useSedes = () => {
   useEffect(() => {
     const fetchSedesCount = async () => {
       try {
-        const response = await axios.get("http://192.168.1.4:3003/api/get");
-        const data = response.data?.sedes;
-        if (Array.isArray(data)) {
-          setCount(data.length);
+        const sedes = await getSedes();
+
+        if (Array.isArray(sedes)) {
+          setCount(sedes.length);
         } else {
           throw new Error("Formato inesperado en la respuesta");
         }
