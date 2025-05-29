@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
+// src/hooks/useLogin.ts
 import Cookies from "js-cookie";
+import { loginUser } from "@/api/axios/auth.api";
 import { loginSuccess } from "@/redux/authSlice";
 
 export const useLogin = () => {
@@ -11,12 +12,7 @@ export const useLogin = () => {
     navigate: any
   ) => {
     try {
-      const response = await axios.post("http://192.168.1.4:3003/api/login", {
-        nombre,
-        contraseña,
-      });
-
-      const { user } = response.data;
+      const { user } = await loginUser(nombre, contraseña);
 
       dispatch(loginSuccess(user));
       Cookies.set("userId", user.id_usuario, { expires: 1 });
@@ -25,7 +21,7 @@ export const useLogin = () => {
       return { success: true, user };
     } catch (err: any) {
       throw new Error(
-        err.response?.data?.error || "Username or password is incorrect"
+        err.response?.data?.error || "Usuario o contraseña incorrectos"
       );
     }
   };
