@@ -1,9 +1,9 @@
 
-import { UserModel } from "../../../db/models/user.model.js";
+import { AuthModel } from "../../../db/models/auth.model.js";
 
 class AuthService {
   async login(nombre, contraseña) {
-    const user = await UserModel.findByCredentials(nombre, contraseña);
+    const user = await AuthModel.findByCredentials(nombre, contraseña);
 
     if (!user) throw new Error("User and password are incorrect");
 
