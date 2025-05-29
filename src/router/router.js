@@ -1,9 +1,13 @@
 import express from "express";
 import authRoutes from "./routes/auth.routes.js";
 import sedesRoutes from "./routes/sedes.routes.js";
-const router = express.Router();
 
-router.use("/api", authRoutes);
-router.use("/api", sedesRoutes);
+const routerApi = (app) => {
+  const router = express.Router();
+  app.use("/api", router);
 
-export default router;
+  router.use("/auth", authRoutes);
+  router.use("/sedes", sedesRoutes);
+};
+
+export default routerApi;
