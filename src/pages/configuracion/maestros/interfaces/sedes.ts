@@ -4,6 +4,6 @@ export interface Sede {
   id_sede: number;
   descripcion: string;
   usuarios: Usuario[];
-  estado: "Activo" | "Inactivo";
+  estado: boolean;
   ubicaciones: string[];
 }
