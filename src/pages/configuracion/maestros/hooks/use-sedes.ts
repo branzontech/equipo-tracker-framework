@@ -1,14 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getSedes } from "@/api/axios/sedes.api";
+import { getSedes, createSede } from "@/api/axios/sedes.api";
 import { useEffect, useState } from "react";
+import { Sede } from "../interfaces/sedes";
 
 export const useSedes = () => {
   const [count, setCount] = useState(0);
+  const [sedes, setSedes] = useState<Sede[]>([]);
+  const [newSede, setNewSede] = useState<Sede>({
+    id_sede: 0,
+    descripcion: "",
+    usuarios: [],
+    estado: "Activo",
+    ubicaciones: [],
+  });
 
   useEffect(() => {
     const fetchSedesCount = async () => {
       try {
         const sedes = await getSedes();
+        setSedes(sedes);
 
         if (Array.isArray(sedes)) {
           setCount(sedes.length);
@@ -24,5 +34,14 @@ export const useSedes = () => {
     fetchSedesCount();
   }, []);
 
-  return { count };
+  const create = async (sede: Sede) => {
+    try {
+      const response = await createSede(sede);
+      return response;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  return { count, sedes, setSedes, create, newSede, setNewSede };
 };
