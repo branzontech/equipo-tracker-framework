@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,48 +9,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle } from "lucide-react";
-import { Sede } from "@/pages/configuracion/maestros/interfaces/sedes";
+import { useSedes } from "../hooks/use-sedes";
 
 type EstadoType = "Activo" | "Inactivo";
 
 const Sedes = () => {
-  const [sedes, setSedes] = useState<Sede[]>([
-    {
-      id: 1,
-      descripcion: "Sede Principal",
-      responsables: "Juan Pérez, María González",
-      estado: "Activo",
-    },
-  ]);
-
-  const [newSede, setNewSede] = useState<{
-    descripcion: string;
-    responsables: string;
-    estado: EstadoType;
-  }>({
-    descripcion: "",
-    responsables: "",
-    estado: "Activo",
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSedes([
-      ...sedes,
-      {
-        id: sedes.length + 1,
-        ...newSede,
-      },
-    ]);
-    setNewSede({
-      descripcion: "",
-      responsables: "",
-      estado: "Activo",
-    });
-  };
+  const { sedes, setSedes, create, newSede, setNewSede } = useSedes();
 
   return (
     <div className="container mx-auto p-6">
@@ -61,38 +32,39 @@ const Sedes = () => {
           <CardTitle className="text-2xl font-bold">Gestión de Sedes</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-4">
+          <form className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <Label htmlFor="descripcion">Descripción</Label>
               <Input
                 id="descripcion"
-                value={newSede.descripcion}
-                onChange={(e) =>
-                  setNewSede({ ...newSede, descripcion: e.target.value })
-                }
+                value={newSede.descripcion || ""}
+                onChange={(e) => {
+                  setNewSede({ ...newSede, descripcion: e.target.value });
+                }}
                 placeholder="Ingrese la descripción"
                 required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="responsables">Responsable(s)</Label>
-              <Input
-                id="responsables"
-                value={newSede.responsables}
-                onChange={(e) =>
-                  setNewSede({ ...newSede, responsables: e.target.value })
-                }
-                placeholder="Ingrese los responsables"
-                required
-              />
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione responsables" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Usuario 1</SelectItem>
+                  <SelectItem value="2">Usuario 2</SelectItem>
+                  <SelectItem value="3">Usuario 3</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
               <Select
-                value={newSede.estado}
-                onValueChange={(value: EstadoType) =>
-                  setNewSede({ ...newSede, estado: value })
-                }
+                value={newSede.estado || ""}
+                onValueChange={(value: EstadoType) => {
+                  setNewSede({ ...newSede, estado: value });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccione el estado" />
@@ -128,10 +100,16 @@ const Sedes = () => {
             </TableHeader>
             <TableBody>
               {sedes.map((sede) => (
-                <TableRow key={sede.id}>
+                <TableRow key={sede.id_sede}>
                   <TableCell>{sede.descripcion}</TableCell>
-                  <TableCell>{sede.responsables}</TableCell>
-                  <TableCell>{sede.estado}</TableCell>
+                  <TableCell>
+                    {sede.usuarios.length > 0
+                      ? sede.usuarios
+                          .map((usuario) => usuario.nombre)
+                          .join(", ")
+                      : "No hay usuarios"}
+                  </TableCell>
+                  <TableCell>{sede.estado ? "Activo" : "Inactivo"}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
