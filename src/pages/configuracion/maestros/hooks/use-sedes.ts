@@ -10,7 +10,7 @@ export const useSedes = () => {
     id_sede: 0,
     descripcion: "",
     usuarios: [],
-    estado: false,
+    estado: null,
     ubicaciones: [],
   });
 

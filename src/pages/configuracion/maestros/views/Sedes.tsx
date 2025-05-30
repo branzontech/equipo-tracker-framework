@@ -62,7 +62,13 @@ const Sedes = () => {
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
               <Select
-                value={newSede.estado === true ? "Activo" : newSede.estado === false ? "Inactivo" : ""}
+                value={
+                  newSede.estado === true
+                    ? "Activo"
+                    : newSede.estado === false
+                    ? "Inactivo"
+                    : ""
+                }
                 onValueChange={(value: EstadoType) => {
                   setNewSede({ ...newSede, estado: value === "Activo" });
                 }}
@@ -112,13 +118,12 @@ const Sedes = () => {
                   </TableCell>
                   <TableCell>
                     <span className="flex items-center">
-
-                    {sede.estado === true ? (
-                      <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                    )}
-                    {sede.estado ? "Activo" : "Inactivo"}
+                      {sede.estado === true ? (
+                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                      ) : (
+                        <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                      )}
+                      {sede.estado ? "Activo" : "Inactivo"}
                     </span>
                   </TableCell>
                 </TableRow>
