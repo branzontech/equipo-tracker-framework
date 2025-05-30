@@ -1,7 +1,12 @@
 import { Router } from "express";
-import getSedes from "../../pages/configuracion/maestros/controller/sedes.controller.js";
+import {
+  getSedes,
+  createSede,
+} from "../../pages/configuracion/maestros/controller/sedes.controller.js";
 const router = Router();
 
-router.get("/get", getSedes);
+router
+  .get("/get", getSedes)
+  .post("/create", createSede);
 
-export default router;     
+export default router;
