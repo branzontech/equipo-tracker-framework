@@ -17,13 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
+import { CheckCircle, PlusCircle, XCircle } from "lucide-react";
 import { useSedes } from "../hooks/use-sedes";
 
 type EstadoType = "Activo" | "Inactivo";
 
 const Sedes = () => {
   const { sedes, setSedes, create, newSede, setNewSede } = useSedes();
+  console.log(sedes);
 
   return (
     <div className="container mx-auto p-6">
@@ -61,9 +62,9 @@ const Sedes = () => {
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
               <Select
-                value={newSede.estado || ""}
+                value={newSede.estado === true ? "Activo" : newSede.estado === false ? "Inactivo" : ""}
                 onValueChange={(value: EstadoType) => {
-                  setNewSede({ ...newSede, estado: value });
+                  setNewSede({ ...newSede, estado: value === "Activo" });
                 }}
               >
                 <SelectTrigger>
@@ -109,7 +110,17 @@ const Sedes = () => {
                           .join(", ")
                       : "No hay usuarios"}
                   </TableCell>
-                  <TableCell>{sede.estado ? "Activo" : "Inactivo"}</TableCell>
+                  <TableCell>
+                    <span className="flex items-center">
+
+                    {sede.estado === true ? (
+                      <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                    )}
+                    {sede.estado ? "Activo" : "Inactivo"}
+                    </span>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
