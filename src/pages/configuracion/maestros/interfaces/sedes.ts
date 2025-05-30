@@ -1,7 +1,9 @@
+import { Usuario } from "../../usuarios/interfaces/usuarios";
 
 export interface Sede {
-  id: number;
+  id_sede: number;
   descripcion: string;
-  responsables: string;
+  usuarios: Usuario[];
   estado: "Activo" | "Inactivo";
+  ubicaciones: string[];
 }
