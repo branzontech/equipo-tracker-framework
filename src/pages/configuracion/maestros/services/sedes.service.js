@@ -5,6 +5,11 @@ class SedesService {
     const sedes = await SedesModel.findAll();
     return sedes;
   }
+
+  async create(sede) {
+    const sedeCreated = await SedesModel.create(sede);
+    return sedeCreated;
+  }
 }
 
 export default new SedesService();
