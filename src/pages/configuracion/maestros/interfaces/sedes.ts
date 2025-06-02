@@ -5,5 +5,4 @@ export interface Sede {
   descripcion: string;
   usuarios: Usuario[];
   estado: boolean;
-  ubicaciones: string[];
 }
