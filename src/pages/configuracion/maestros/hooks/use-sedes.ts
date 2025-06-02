@@ -11,7 +11,6 @@ export const useSedes = () => {
     descripcion: "",
     usuarios: [],
     estado: null,
-    ubicaciones: [],
   });
 
   useEffect(() => {
