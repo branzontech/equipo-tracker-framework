@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOriginsPattern = /^http:\/\/localhost:(8080|5173|5176|5174|3001)$/;
-    const allowedIpPattern = /^http:\/\/192\.168\.1\.4:(8080|5173|5176|5174|3306|3002)$/;
+    const allowedIpPattern = /^http:\/\/192\.168\.1\.21:(8080|5173|5176|5174|3306|3002)$/;
 
     if (allowedOriginsPattern.test(origin) || allowedIpPattern.test(origin) || !origin) {
       callback(null, true);
