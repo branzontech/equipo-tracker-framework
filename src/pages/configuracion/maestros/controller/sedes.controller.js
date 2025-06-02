@@ -18,10 +18,6 @@ export const createSede = async (req, res) => {
   try {
     const sede = req.body;
 
-    if (!sede || !sede.name) {
-      return res.status(400).json({ error: "Invalid data" });
-    }
-
     const sedeCreated = await SedesService.create(sede);
     res.status(201).json({ success: true, sede: sedeCreated });
   } catch (error) {
