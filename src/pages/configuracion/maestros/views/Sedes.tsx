@@ -17,14 +17,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, PlusCircle, XCircle } from "lucide-react";
+import { CheckCircle, PencilIcon, PlusCircle, XCircle } from "lucide-react";
 import { useSedes } from "../hooks/use-sedes";
+import { useUser } from "@/pages/usuarios/hooks/use-user";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@radix-ui/react-popover";
+import { useState } from "react";
 
 type EstadoType = "Activo" | "Inactivo";
 
 const Sedes = () => {
-  const { sedes, setSedes, create, newSede, setNewSede } = useSedes();
-  console.log(sedes);
+  const { sedes, create, newSede, setNewSede } = useSedes();
+  const { users } = useUser();
 
   return (
     <div className="container mx-auto p-6">
@@ -38,6 +46,7 @@ const Sedes = () => {
               <Label htmlFor="descripcion">Descripción</Label>
               <Input
                 id="descripcion"
+                autoComplete="off"
                 value={newSede.descripcion || ""}
                 onChange={(e) => {
                   setNewSede({ ...newSede, descripcion: e.target.value });
@@ -48,16 +57,62 @@ const Sedes = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="responsables">Responsable(s)</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione responsables" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Usuario 1</SelectItem>
-                  <SelectItem value="2">Usuario 2</SelectItem>
-                  <SelectItem value="3">Usuario 3</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger className="w-full px-3 py-2 border rounded text-left text-sm bg-white">
+                  {newSede.usuarios?.length > 0
+                    ? newSede.usuarios.map((u) => u.nombre).join(", ")
+                    : "Seleccione responsables"}
+                </PopoverTrigger>
+
+                <PopoverContent className="w-64 bg-white border rounded shadow">
+                  <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
+                    {users.map((user) => {
+                      const isChecked = newSede.usuarios?.some(
+                        (u) => u.id_usuario === user.id_usuario
+                      );
+
+                      return (
+                        <div
+                          key={user.id_usuario}
+                          className="flex items-center justify-between space-x-2 px-2"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`user-${user.id_usuario}`}
+                              checked={isChecked}
+                              onCheckedChange={(checked) => {
+                                const updatedUsuarios = checked
+                                  ? [...(newSede.usuarios || []), user]
+                                  : (newSede.usuarios || []).filter(
+                                      (u) => u.id_usuario !== user.id_usuario
+                                    );
+                                setNewSede({
+                                  ...newSede,
+                                  usuarios: updatedUsuarios,
+                                });
+                              }}
+                            />
+                            <label
+                              htmlFor={`user-${user.id_usuario}`}
+                              className="text-sm select-none p-1.5"
+                            >
+                              {user.nombre}
+                            </label>
+                          </div>
+
+                          {isChecked && (
+                            <CheckCircle
+                              size={18}
+                              className="text-green-500"
+                              aria-label="Seleccionado"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
@@ -82,10 +137,18 @@ const Sedes = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-end">
-              <Button type="submit" className="w-full">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Agregar Sede
+
+            <div className="flex items-end gap-2">
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={(e: React.FormEvent) => {
+                  e.preventDefault();
+                  create(newSede);
+                }}
+              >
+                {/* <PlusCircle className="mr-2 h-4 w-4" /> */}
+                Registrar
               </Button>
             </div>
           </form>
@@ -103,6 +166,7 @@ const Sedes = () => {
                 <TableHead>Descripción</TableHead>
                 <TableHead>Responsable(s)</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -125,6 +189,28 @@ const Sedes = () => {
                       )}
                       {sede.estado ? "Activo" : "Inactivo"}
                     </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-blue-500 hover:bg-blue-100"
+                      onClick={() => {
+                        console.log("Editar sede:", sede);
+                      }}
+                    >
+                      <PencilIcon className="h-5 w-5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:bg-red-100"
+                      onClick={() => {
+                        console.log("Eliminar sede:", sede);
+                      }}
+                    >
+                      <XCircle className="h-5 w-5" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
