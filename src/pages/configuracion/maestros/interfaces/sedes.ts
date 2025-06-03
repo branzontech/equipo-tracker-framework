@@ -6,3 +6,5 @@ export interface Sede {
   usuarios: Usuario[];
   estado: boolean;
 }
+
+export type EstadoType = "Activo" | "Inactivo";
