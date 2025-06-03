@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getSedes, createSede } from "@/api/axios/sedes.api";
+import { getSedes, createSede, deleteSede } from "@/api/axios/sedes.api";
 import { useEffect, useState } from "react";
 import { Sede } from "../interfaces/sedes";
 
@@ -42,5 +42,28 @@ export const useSedes = () => {
     }
   };
 
-  return { count, sedes, setSedes, create, newSede, setNewSede };
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("¿Está seguro de que desea eliminar esta sede?"))
+      return;
+    try {
+      const response = await deleteSede(id);
+
+      if (response.success) {
+        window.location.reload();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  return {
+    count,
+    sedes,
+    setSedes,
+    create,
+    newSede,
+    setNewSede,
+    handleDelete,
+  };
 };
