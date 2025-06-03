@@ -10,6 +10,11 @@ class SedesService {
     const sedeCreated = await SedesModel.create(sede);
     return sedeCreated;
   }
+
+  async delete(id) {
+    const deletedSede = await SedesModel.delete(id);
+    return deletedSede;
+  }
 }
 
 export default new SedesService();
