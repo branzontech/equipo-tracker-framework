@@ -10,7 +10,7 @@ api.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      console.warn("No autorizado. Redirigiendo a login.");
+      alert("No autorizado. Redirigiendo a login.");
       // Redirige si estás usando React Router
       window.location.href = "/login";
     } else if (status === 500) {
