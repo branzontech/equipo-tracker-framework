@@ -1,7 +1,5 @@
 
 export interface Marca {
-  id: number;
-  descripcion: string;
-  telefono: string;
-  sitioWeb: string;
+  id_marca: number;
+  nombre: string;
 }
