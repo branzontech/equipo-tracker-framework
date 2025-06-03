@@ -7,6 +7,11 @@ export const getUbicaciones = async () => {
 };
 
 export const registerUbicacion = async (ubicacion: Ubicacion) => {
-    const response = await api.post("/ubicaciones/create", ubicacion);
-    return response.data;
+  const response = await api.post("/ubicaciones/create", ubicacion);
+  return response.data;
+};
+
+export const deleteUbicacion = async (id: number) => {
+  const response = await api.delete(`/ubicaciones/delete/${id}`);
+  return response.data;
 };
