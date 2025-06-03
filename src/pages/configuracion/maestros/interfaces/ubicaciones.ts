@@ -1,6 +1,14 @@
+import { Sede } from "./sedes";
+
 export interface Ubicacion {
-  id: number;
+  id_ubicacion: number;
   nombre: string;
-  sede_id: number;
+  sede_id: Sede | number;
+  sedes: Sede | null;
   tipo: string;
+}
+
+export interface UbicacionConEstado extends Ubicacion {
+  estado: string;
+  sede: string;   
 }
