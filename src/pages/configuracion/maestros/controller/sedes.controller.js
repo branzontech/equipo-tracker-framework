@@ -24,3 +24,13 @@ export const createSede = async (req, res) => {
     res.status(401).json({ error: error.message });
   }
 };
+
+export const deleteSede = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedSede = await SedesService.delete(id);
+    res.json({ success: true, deletedSede });
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
