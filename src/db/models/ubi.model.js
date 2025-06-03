@@ -33,4 +33,18 @@ export const UbiModel = {
       throw new Error("Error creating ubicacion: " + error.message);
     }
   },
+
+  delete: async (id) => {
+    const id_ubi = Number(id);
+    try {
+      const deletedUbi = await prisma.ubicaciones.delete({
+        where: {
+          id_ubicacion: id_ubi,
+        },
+      });
+      return deletedUbi;
+    } catch (error) {
+      throw new Error("Error deleting ubicacion: " + error.message);
+    }
+  },
 };
