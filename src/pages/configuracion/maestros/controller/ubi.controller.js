@@ -23,3 +23,13 @@ export const createUbi = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const deleteUbi = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const ubicacionDeleted = await UbiService.delete(id);
+    res.json({ success: true, ubicacion: ubicacionDeleted });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
