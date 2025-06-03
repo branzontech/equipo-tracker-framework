@@ -7,6 +7,7 @@ import Agentes from "@/pages/configuracion/usuarios/Agentes";
 import Responsables from "@/pages/configuracion/usuarios/Responsables";
 import Permisos from "@/pages/configuracion/usuarios/Permisos";
 import Ubicaciones from "@/pages/configuracion/maestros/views/Ubicaciones";
+import Categoria from "@/pages/configuracion/maestros/views/Categoria";
 
 export const configuracionNavigation = [
   { path: "/configuracion/maestros/sedes", element: <Sedes /> },
@@ -14,6 +15,7 @@ export const configuracionNavigation = [
   { path: "/configuracion/maestros/bodegas", element: <Bodegas /> },
   { path: "/configuracion/maestros/marcas", element: <Marcas /> },
   { path: "/configuracion/maestros/perifericos", element: <Perifericos /> },
+  { path: "/configuracion/maestros/categorias", element: <Categoria /> },
   { path: "/configuracion/maestros/perfiles-acceso", element: <PerfilesAcceso /> },
   { path: "/configuracion/usuarios/agentes", element: <Agentes /> },
   { path: "/configuracion/usuarios/responsables", element: <Responsables /> },
