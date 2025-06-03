@@ -4,6 +4,7 @@ import { Ubicacion, UbicacionConEstado } from "../interfaces/ubicaciones";
 import {
   registerUbicacion,
   getUbicaciones,
+  deleteUbicacion,
 } from "../../../../api/axios/ubi.api";
 import { ColumnConfig } from "../interfaces/columns";
 
@@ -30,7 +31,7 @@ export const useUbicaciones = () => {
         const response = await getUbicaciones();
         const ubicacionesPlanas = response.map((ubi: any) => ({
           ...ubi,
-          numeroiD: `UBI-${ubi.id_ubicacion.toString().padStart(3, "0")}`,
+          numeroiD: `UBI${ubi.id_ubicacion.toString().padStart(3, "0")}`,
           sede: ubi.sedes?.descripcion || "Sin Sede",
           estado: ubi.sedes?.estado ? "Activa" : "Inactiva",
         }));
@@ -45,6 +46,9 @@ export const useUbicaciones = () => {
   const handleCreateUbicacion = async (ubicacion: Ubicacion) => {
     try {
       const response = await registerUbicacion(ubicacion);
+      if (response.success) {
+        window.location.reload();
+      }
       return response;
     } catch (error) {
       throw new Error(error.message);
@@ -232,7 +236,23 @@ export const useUbicaciones = () => {
     (value) => value && value !== "todas" && value !== "todos"
   ).length;
 
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("¿Está seguro de que desea eliminar esta ubicación?"))
+      return;
+    try {
+      const response = await deleteUbicacion(id);
+
+      if (response.success) {
+        window.location.reload();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
   return {
+    handleDelete,
     ubicaciones,
     setUbicaciones,
     newUbicacion,
