@@ -10,6 +10,11 @@ class UbiServiceClass {
     const newUbi = await UbiModel.create(ubicacion);
     return newUbi;
   }
+
+  async delete(id) {
+    const deletedUbi = await UbiModel.delete(id);
+    return deletedUbi;
+  }
 }
 
 export const UbiService = new UbiServiceClass();
