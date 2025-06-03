@@ -104,6 +104,7 @@ const Ubicaciones = () => {
     setCurrentPage,
     filters,
     setActiveTab,
+    handleDelete,
   } = useUbicaciones();
   useUbicaciones();
 
@@ -327,11 +328,6 @@ const Ubicaciones = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-
-              <Button variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Descargar CSV
-              </Button>
             </div>
           </div>
 
@@ -470,7 +466,7 @@ const Ubicaciones = () => {
                             size="icon"
                             className="text-red-500 hover:bg-red-100"
                             onClick={() => {
-                              console.log("Eliminar sede:", item);
+                              handleDelete(item.id_ubicacion);
                             }}
                           >
                             <XCircle className="h-5 w-5" />
