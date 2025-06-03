@@ -1,4 +1,4 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,31 +18,94 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDownIcon, PlusCircle } from "lucide-react";
-import { Ubicacion } from "../interfaces/ubicaciones";
-import { SelectIcon } from "@radix-ui/react-select";
+import {
+  ArrowDown,
+  ArrowUp,
+  Download,
+  Filter,
+  GripVertical,
+  PencilIcon,
+  PlusCircle,
+  Search,
+  X,
+  XCircle,
+} from "lucide-react";
 import { useSedes } from "../hooks/use-sedes";
+import { Tabs, TabsContent } from "@radix-ui/react-tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { useUbicaciones } from "../hooks/use-ubicaciones";
+
+const StatusBadge = ({ status }: { status: string }) => {
+  let variant: "default" | "secondary" | "destructive" | "outline" = "default";
+  let className = "";
+
+  switch (status.toLowerCase()) {
+    case "activa":
+      variant = "default";
+      className = "bg-[#bff036] text-[#01242c] hover:bg-[#a5d81c]";
+      break;
+    case "inactivoa":
+      variant = "outline";
+      className = "bg-gray-100 text-gray-500 border-gray-200";
+      break;
+    default:
+      variant = "outline";
+  }
+
+  return (
+    <Badge variant={variant} className={className}>
+      {status}
+    </Badge>
+  );
+};
 
 const Ubicaciones = () => {
   const { sedes } = useSedes();
-  const [bodegas, setBodegas] = useState<Ubicacion[]>([
-    {
-      id: 1,
-      nombre: "Bodega Principal",
-      sede_id: 1,
-      tipo: "Bodega Principal",
-    },
-  ]);
-
-  const [newBodega, setNewBodega] = useState<{
-    nombre: string;
-    tipo: string;
-    sede_id: string;
-  }>({
-    nombre: "",
-    tipo: "",
-    sede_id: "",
-  });
+  const {
+    newUbicacion,
+    setNewUbicacion,
+    handleCreateUbicacion,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleFilterChange,
+    resetFilters,
+    filteredData,
+    totalPages,
+    paginatedData,
+    handleSort,
+    sortedColumns,
+    uniqueTipos,
+    uniqueEstados,
+    uniqueSedes,
+    activeFiltersCount,
+    searchTerm,
+    setSearchTerm,
+    sortField,
+    sortDirection,
+    currentPage,
+    setCurrentPage,
+    filters,
+    setActiveTab,
+  } = useUbicaciones();
+  useUbicaciones();
 
   return (
     <div className="container mx-auto p-6">
@@ -57,9 +120,9 @@ const Ubicaciones = () => {
             <div className="space-y-2">
               <Label htmlFor="descripcion">Nombre</Label>
               <Input
-                value={newBodega.nombre}
+                value={newUbicacion.nombre}
                 onChange={(e) =>
-                  setNewBodega({ ...newBodega, nombre: e.target.value })
+                  setNewUbicacion({ ...newUbicacion, nombre: e.target.value })
                 }
                 placeholder="Ingrese el nombre"
                 required
@@ -68,43 +131,44 @@ const Ubicaciones = () => {
             <div className="space-y-2">
               <Label htmlFor="responsables">Tipo</Label>
               <Select
-                value={newBodega.tipo}
+                value={newUbicacion.tipo}
                 onValueChange={(value) =>
-                  setNewBodega({ ...newBodega, tipo: value })
+                  setNewUbicacion({ ...newUbicacion, tipo: value })
                 }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccione el tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Bodega Principal">
-                    Bodega Principal
+                  <SelectItem value="Administrativa">Administrativa</SelectItem>
+                  <SelectItem value="Ubicacion Secundaria">
+                    Ubicacion Secundaria
                   </SelectItem>
-                  <SelectItem value="Bodega Secundaria">
-                    Bodega Secundaria
+                  <SelectItem value="Ubicacion Terciaria">
+                    Ubicacion Terciaria
                   </SelectItem>
-                  <SelectItem value="Bodega Terciaria">
-                    Bodega Terciaria
-                  </SelectItem>
-                  <SelectItem value="Bodega Cuarta">Bodega Cuarta</SelectItem>
-                  <SelectItem value="Bodega Quinta">Bodega Quinta</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sedes">Sedes</Label>
               <Select
-                value={newBodega.sede_id}
+                value={
+                  newUbicacion.sede_id ? newUbicacion.sede_id.toString() : ""
+                }
                 onValueChange={(value) =>
-                  setNewBodega({ ...newBodega, sede_id: value })
+                  setNewUbicacion({ ...newUbicacion, sede_id: Number(value) })
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Seleccione el tipo" />
+                  <SelectValue placeholder="Seleccione la sede" />
                 </SelectTrigger>
                 <SelectContent>
                   {sedes.map((sede) => (
-                    <SelectItem key={sede.id_sede} value={sede.descripcion}>
+                    <SelectItem
+                      key={sede.id_sede}
+                      value={sede.id_sede.toString()}
+                    >
                       {sede.descripcion}
                     </SelectItem>
                   ))}
@@ -113,40 +177,375 @@ const Ubicaciones = () => {
             </div>
 
             <div className="flex items-end">
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={(e: React.FormEvent) => {
+                  e.preventDefault();
+                  handleCreateUbicacion(newUbicacion);
+                }}
+              >
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Agregar Bodega
+                Registrar
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Ubicaciones</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Descripción</TableHead>
-                <TableHead>Sede</TableHead>
-                <TableHead>Tipo</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bodegas.map((bodega) => (
-                <TableRow key={bodega.id}>
-                  <TableCell>{bodega.nombre}</TableCell>
-                  <TableCell>{bodega.sede_id}</TableCell>
-                  <TableCell>{bodega.tipo}</TableCell>
+      <Tabs
+        defaultValue="ubicaciones"
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-[#040d50]">
+            Listado de Ubicaciones
+          </h1>
+        </div>
+
+        <TabsContent value="ubicaciones" className="mt-0">
+          <div className="flex justify-between mb-4">
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar ubicación..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className={
+                      activeFiltersCount > 0 ? "relative bg-slate-100" : ""
+                    }
+                  >
+                    <Filter className="h-4 w-4" />
+                    {activeFiltersCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                        {activeFiltersCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  side="right"
+                  className="w-full max-w-md sm:max-w-lg"
+                >
+                  <SheetHeader>
+                    <SheetTitle className="text-xl font-semibold mb-2">
+                      Filtros Avanzados
+                    </SheetTitle>
+                  </SheetHeader>
+
+                  <div className="mt-6 space-y-6">
+                    <div className="grid grid-cols-1 gap-y-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Tipo</label>
+                        <Select
+                          value={filters.tipo}
+                          onValueChange={(value) =>
+                            handleFilterChange("tipo", value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccionar tipo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todas">Todas</SelectItem>
+                            {uniqueTipos.map((tipo) => (
+                              <SelectItem key={tipo} value={tipo}>
+                                {tipo}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Estado Sede
+                        </label>
+                        <Select
+                          value={filters.estado}
+                          onValueChange={(value) =>
+                            handleFilterChange("estado", value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccionar estado" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todos">Todos</SelectItem>
+                            {uniqueEstados.map((estado) => (
+                              <SelectItem key={estado} value={estado}>
+                                {estado}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Sede</label>
+                        <Select
+                          value={filters.sede}
+                          onValueChange={(value) =>
+                            handleFilterChange("sede", value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccionar sede" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todas">Todas</SelectItem>
+                            {uniqueSedes.map((sede) => (
+                              <SelectItem key={sede} value={sede}>
+                                {sede}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t flex justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={resetFilters}
+                        className="mr-2"
+                      >
+                        Limpiar filtros
+                      </Button>
+                      <Button>Aplicar filtros</Button>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              <Button variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                Descargar CSV
+              </Button>
+            </div>
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {Object.entries(filters).map(([key, value]) => {
+                if (!value || value === "todas" || value === "todos")
+                  return null;
+
+                const label = {
+                  nombre: "Nombre",
+                  tipo: "Tipo",
+                  estado: "Estado",
+                  sede: "Sede",
+                }[key];
+
+                return (
+                  <Badge
+                    key={key}
+                    variant="outline"
+                    className="px-3 py-1 bg-slate-100 gap-2"
+                  >
+                    <span className="font-medium">{label}:</span>
+                    <span>{value}</span>
+                    <button
+                      className="ml-1 hover:text-destructive"
+                      onClick={() =>
+                        handleFilterChange(key as keyof typeof filters, "")
+                      }
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+
+              {activeFiltersCount > 1 && (
+                <button
+                  className="text-xs text-muted-foreground underline hover:text-destructive"
+                  onClick={resetFilters}
+                >
+                  Limpiar todos
+                </button>
+              )}
+            </div>
+          )}
+
+          <div className="border rounded-lg shadow-sm overflow-hidden">
+            <Table>
+              <TableHeader className="bg-slate-100">
+                <TableRow>
+                  {sortedColumns.map(
+                    (column) =>
+                      column.isVisible && (
+                        <TableHead
+                          key={column.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, column.id)}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={(e) => handleDragOver(e, column.id)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, column.id)}
+                          className="cursor-grab transition-all duration-200 hover:bg-slate-200 font-semibold"
+                        >
+                          <div className="flex items-center gap-2 select-none">
+                            <GripVertical className="h-4 w-4 text-muted-foreground" />
+                            <div
+                              className="flex items-center gap-2"
+                              onClick={() => handleSort(column.key)}
+                            >
+                              {column.label}
+                              {sortField === column.key &&
+                                (sortDirection === "asc" ? (
+                                  <ArrowUp className="inline h-4 w-4" />
+                                ) : (
+                                  <ArrowDown className="inline h-4 w-4" />
+                                ))}
+                            </div>
+                          </div>
+                        </TableHead>
+                      )
+                  )}
+                  <TableHead className="font-semibold">Acciones</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredData.length > 0 ? (
+                  paginatedData.map((item) => (
+                    <TableRow
+                      key={item.id_ubicacion}
+                      className="hover:bg-slate-50"
+                    >
+                      {sortedColumns.map(
+                        (column) =>
+                          column.isVisible && (
+                            <TableCell
+                              key={`${item.id_ubicacion}-${column.id}`}
+                              className="py-3"
+                            >
+                              {column.id === "estado" ? (
+                                <StatusBadge
+                                  status={
+                                    item[
+                                      column.key as keyof typeof item
+                                    ] as string
+                                  }
+                                />
+                              ) : typeof item[
+                                  column.key as keyof typeof item
+                                ] === "object" &&
+                                item[column.key as keyof typeof item] !==
+                                  null ? (
+                                // Render a property of the object, e.g., 'descripcion' if it's a Sede object
+                                (item[column.key as keyof typeof item] as any)
+                                  .descripcion ?? ""
+                              ) : (
+                                item[column.key as keyof typeof item]
+                              )}
+                            </TableCell>
+                          )
+                      )}
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-blue-500 hover:bg-blue-100"
+                            onClick={() => {
+                              console.log("Editar sede:", item);
+                            }}
+                          >
+                            <PencilIcon className="h-5 w-5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-500 hover:bg-red-100"
+                            onClick={() => {
+                              console.log("Eliminar sede:", item);
+                            }}
+                          >
+                            <XCircle className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={
+                        sortedColumns.filter((col) => col.isVisible).length + 1
+                      }
+                      className="h-24 text-center"
+                    >
+                      No se encontraron resultados.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="mt-6 flex justify-between items-center">
+            <div className="text-sm text-gray-500">
+              Mostrando {paginatedData.length} de {filteredData.length}{" "}
+              registros
+            </div>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((page) => Math.max(1, page - 1))
+                    }
+                    className={
+                      currentPage === 1
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+                {[...Array(totalPages)].map((_, index) => (
+                  <PaginationItem key={index + 1}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(index + 1)}
+                      isActive={currentPage === index + 1}
+                      className={
+                        currentPage === index + 1
+                          ? "bg-[#01242c] text-white"
+                          : ""
+                      }
+                    >
+                      {index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((page) => Math.min(totalPages, page + 1))
+                    }
+                    className={
+                      currentPage === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
