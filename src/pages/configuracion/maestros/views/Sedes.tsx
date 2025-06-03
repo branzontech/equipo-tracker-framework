@@ -26,12 +26,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
-import { useState } from "react";
-
-type EstadoType = "Activo" | "Inactivo";
+import { EstadoType } from "../interfaces/sedes";
 
 const Sedes = () => {
-  const { sedes, create, newSede, setNewSede } = useSedes();
+  const { sedes, create, newSede, setNewSede, handleDelete } = useSedes();
   const { users } = useUser();
 
   return (
@@ -206,7 +204,7 @@ const Sedes = () => {
                       size="icon"
                       className="text-red-500 hover:bg-red-100"
                       onClick={() => {
-                        console.log("Eliminar sede:", sede);
+                        handleDelete(sede.id_sede);
                       }}
                     >
                       <XCircle className="h-5 w-5" />
