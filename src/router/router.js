@@ -3,6 +3,8 @@ import authRoutes from "./routes/auth.routes.js";
 import sedesRoutes from "./routes/sedes.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import ubiRoutes from "./routes/ubi.routes.js";
+import marcasRoutes from "./routes/marcas.routes.js";
+import categoriaRoutes from "./routes/categoria.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -12,7 +14,8 @@ const routerApi = (app) => {
   router.use("/sedes", sedesRoutes);
   router.use("/users", userRoutes);
   router.use("/ubicaciones", ubiRoutes);
-
+  router.use("/marcas", marcasRoutes);
+  router.use("/categorias", categoriaRoutes);
 };
 
 export default routerApi;
