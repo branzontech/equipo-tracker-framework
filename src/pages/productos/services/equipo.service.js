@@ -10,4 +10,7 @@ export const equipoService = {
   async findById(nro_serie) {
     return await equipoModel.findById(nro_serie);
   },
+  async delete_(id) {
+    return await equipoModel.delete_(id);
+  },
 };
