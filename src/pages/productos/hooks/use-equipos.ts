@@ -62,7 +62,7 @@ export const useEquipos = () => {
       numero_factura: "",
       proveedor: "",
     },
-    informacionAdministrativa: {
+    administrativa: {
       codigo_inventario: "",
       centro_coste: "",
       autorizado_por: "",
