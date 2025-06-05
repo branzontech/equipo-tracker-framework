@@ -477,7 +477,7 @@ const Ubicaciones = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-blue-500 hover:bg-blue-100"
+                            className="slate-100"
                             onClick={() => {
                               console.log("Editar sede:", item);
                             }}
@@ -487,7 +487,7 @@ const Ubicaciones = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-red-500 hover:bg-red-100"
+                            className="slate-100"
                             onClick={() => {
                               handleDelete(item.id_sucursal);
                             }}
