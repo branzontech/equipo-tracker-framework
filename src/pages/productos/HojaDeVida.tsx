@@ -43,64 +43,7 @@ import {
 } from "recharts";
 import { useEquipos } from "./hooks/use-equipos";
 import { getEquiposByNroSerie } from "@/api/axios/equipo.api";
-
-// Datos de ejemplo
-const equipoInfo = {
-  id: "EQ001",
-  numeroSerie: "SN123456",
-  descripcion: "Laptop Dell XPS 15",
-  marca: "Dell",
-  modelo: "XPS 15 9520",
-  estado: "Activo",
-  fechaIngreso: "2023-01-15",
-  tipoActivo: "Equipo de Cómputo",
-  garantia: "2025-01-15",
-  proveedor: "Dell Colombia",
-  valor: 5000000,
-  ubicacionActual: {
-    sede: "Sede Principal",
-    area: "Desarrollo",
-    responsable: "Juan Pérez",
-  },
-  // Información técnica adicional
-  especificaciones: {
-    procesador: "Intel Core i7-12700H",
-    memoriaRam: "32GB DDR5",
-    almacenamiento: "1TB SSD NVMe",
-    tarjetaGrafica: "NVIDIA GeForce RTX 3050Ti",
-    pantalla: '15.6" OLED 3.5K (3456 x 2160)',
-    sistemaOperativo: "Windows 11 Pro",
-    bateria: "86Whr",
-    puertos: "2x Thunderbolt 4, 1x USB-C, 1x SD card, 1x audio jack",
-  },
-  adquisicion: {
-    ordenCompra: "OC-2023-001",
-    fechaCompra: "2022-12-20",
-    precioCompra: 5000000,
-    formaPago: "Transferencia bancaria",
-    plazoPago: "Contado",
-    numeroFactura: "F-2023-0456",
-  },
-  informacionAdministrativa: {
-    codigoInventario: "INV-COMP-001",
-    centroCoste: "TI-DEV",
-    autorizadoPor: "Carlos Gómez",
-    fechaActivacion: "2023-01-16",
-    estadoContable: "Activo fijo",
-    valorDepreciado: 4500000,
-    vidaUtilRestante: "4 años y 2 meses",
-  },
-  seguridad: {
-    nivelAcceso: "Confidencial",
-    softwareSeguridad: "Bitdefender Endpoint Security",
-    cifradoDisco: "BitLocker activado",
-    politicasAplicadas: [
-      "Bloqueo automático",
-      "Actualizaciones obligatorias",
-      "VPN corporativa",
-    ],
-  },
-};
+import { useGlobal } from "@/hooks/use-global";
 
 const historialEventos = [
   {
@@ -194,6 +137,7 @@ const HojaDeVida = () => {
   const { nroSeries } = useParams();
   const [activeTab, setActiveTab] = useState("informacion");
   const { navigate, getInfoEquipo, newEquipo } = useEquipos();
+  const { formatFecha, formatPrecio } = useGlobal();
 
   useEffect(() => {
     getInfoEquipo(nroSeries);
@@ -288,7 +232,7 @@ const HojaDeVida = () => {
             </div>
             <p className="text-xs text-muted-foreground">
               {newEquipo.sucursales?.sedes?.nombre ?? "Sin sede"} -{" "}
-              {equipoInfo.proveedor}
+              {/* {newEquipo.proveedor} */} Miguel Primera
             </p>
           </CardContent>
         </Card>
@@ -336,45 +280,43 @@ const HojaDeVida = () => {
                     <div className="space-y-2 bg-slate-50 p-4 rounded-md">
                       <p>
                         <span className="font-medium text-slate-700">ID:</span>{" "}
-                        {equipoInfo.id}
+                        {`SQ${newEquipo.id_equipo.toString().padStart(3, "0")}`}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Número de Serie:
                         </span>{" "}
-                        {equipoInfo.numeroSerie}
+                        {newEquipo.nro_serie}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Descripción:
                         </span>{" "}
-                        {equipoInfo.descripcion}
+                        {newEquipo.nombre_equipo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Marca:
                         </span>{" "}
-                        {equipoInfo.marca}
+                        {newEquipo.marcas?.nombre}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Modelo:
                         </span>{" "}
-                        {equipoInfo.modelo}
+                        {newEquipo.modelo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Tipo de Activo:
                         </span>{" "}
-                        {equipoInfo.tipoActivo}
+                        {newEquipo.tipo_activo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Fecha Ingreso:
                         </span>{" "}
-                        {format(new Date(equipoInfo.fechaIngreso), "PPP", {
-                          locale: es,
-                        })}
+                        {formatFecha(newEquipo.fecha_registro)}
                       </p>
                     </div>
                   </div>
@@ -389,49 +331,49 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Procesador:
                         </span>{" "}
-                        {equipoInfo.especificaciones.procesador}
+                        {newEquipo.especificaciones?.[0]?.procesador}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Memoria RAM:
                         </span>{" "}
-                        {equipoInfo.especificaciones.memoriaRam}
+                        {newEquipo.especificaciones?.[0]?.memoria_ram}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Almacenamiento:
                         </span>{" "}
-                        {equipoInfo.especificaciones.almacenamiento}
+                        {newEquipo.especificaciones?.[0]?.almacenamiento}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Tarjeta Gráfica:
                         </span>{" "}
-                        {equipoInfo.especificaciones.tarjetaGrafica}
+                        {newEquipo.especificaciones?.[0]?.tarjeta_grafica}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Pantalla:
                         </span>{" "}
-                        {equipoInfo.especificaciones.pantalla}
+                        {newEquipo.especificaciones?.[0]?.pantalla}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Sistema Operativo:
                         </span>{" "}
-                        {equipoInfo.especificaciones.sistemaOperativo}
+                        {newEquipo.especificaciones?.[0]?.sistema_operativo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Batería:
                         </span>{" "}
-                        {equipoInfo.especificaciones.bateria}
+                        {newEquipo.especificaciones?.[0]?.bateria}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Puertos:
                         </span>{" "}
-                        {equipoInfo.especificaciones.puertos}
+                        {newEquipo.especificaciones?.[0]?.puertos}
                       </p>
                     </div>
                   </div>
@@ -446,25 +388,26 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Nivel de Acceso:
                         </span>{" "}
-                        {equipoInfo.seguridad.nivelAcceso}
+                        {newEquipo.seguridad?.[0]?.nivel_acceso}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Software de Seguridad:
                         </span>{" "}
-                        {equipoInfo.seguridad.softwareSeguridad}
+                        {newEquipo.seguridad?.[0]?.software_seguridad}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Cifrado de Disco:
                         </span>{" "}
-                        {equipoInfo.seguridad.cifradoDisco}
+                        {newEquipo.seguridad?.[0]?.cifrado_disco}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Políticas Aplicadas:
                         </span>{" "}
-                        {equipoInfo.seguridad.politicasAplicadas.join(", ")}
+                        {newEquipo.seguridad?.[0]?.politicas_aplicadas}{" "}
+                        {/* .join(", ") */}
                       </p>
                     </div>
                   </div>
@@ -481,55 +424,50 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Orden de Compra:
                         </span>{" "}
-                        {equipoInfo.adquisicion.ordenCompra}
+                        {newEquipo.adquisicion?.[0]?.orden_compra}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Fecha de Compra:
                         </span>{" "}
-                        {format(
-                          new Date(equipoInfo.adquisicion.fechaCompra),
-                          "PPP",
-                          { locale: es }
-                        )}
+                        {formatFecha(newEquipo.adquisicion?.[0]?.fecha_compra)}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Precio de Compra:
                         </span>{" "}
-                        ${equipoInfo.adquisicion.precioCompra.toLocaleString()}
+                        ${formatPrecio(newEquipo.adquisicion?.[0]?.precio_compra)}{" "}
+                        {/* .toLocaleString() */}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Forma de Pago:
                         </span>{" "}
-                        {equipoInfo.adquisicion.formaPago}
+                        {newEquipo.adquisicion?.[0]?.forma_pago}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Plazo de Pago:
                         </span>{" "}
-                        {equipoInfo.adquisicion.plazoPago}
+                        {newEquipo.adquisicion?.[0]?.plazo_pago}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Número de Factura:
                         </span>{" "}
-                        {equipoInfo.adquisicion.numeroFactura}
+                        {newEquipo.adquisicion?.[0]?.numero_factura}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Proveedor:
                         </span>{" "}
-                        {equipoInfo.proveedor}
+                        {newEquipo.adquisicion?.[0]?.proveedor}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Garantía hasta:
                         </span>{" "}
-                        {format(new Date(equipoInfo.garantia), "PPP", {
-                          locale: es,
-                        })}
+                        {formatFecha(newEquipo.garantia_fecha_fin)}
                       </p>
                     </div>
                   </div>
@@ -544,50 +482,46 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Código de Inventario:
                         </span>{" "}
-                        {equipoInfo.informacionAdministrativa.codigoInventario}
+                        {newEquipo.administrativa?.[0]?.codigo_inventario}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Centro de Coste:
                         </span>{" "}
-                        {equipoInfo.informacionAdministrativa.centroCoste}
+                        {newEquipo.administrativa?.[0]?.centro_coste}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Autorizado Por:
                         </span>{" "}
-                        {equipoInfo.informacionAdministrativa.autorizadoPor}
+                        {newEquipo.administrativa?.[0]?.autorizado_por}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Fecha de Activación:
-                        </span>{" "}
-                        {format(
-                          new Date(
-                            equipoInfo.informacionAdministrativa.fechaActivacion
-                          ),
-                          "PPP",
-                          { locale: es }
+                        </span>
+                        {formatFecha(
+                          newEquipo.administrativa?.[0]?.fecha_activacion
                         )}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Estado Contable:
                         </span>{" "}
-                        {equipoInfo.informacionAdministrativa.estadoContable}
+                        {newEquipo.administrativa?.[0]?.estado_contable}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Valor Actual:
                         </span>{" "}
                         $
-                        {equipoInfo.informacionAdministrativa.valorDepreciado.toLocaleString()}
+                        {formatPrecio(newEquipo.administrativa?.[0]?.valor_depreciado)}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Vida Útil Restante:
                         </span>{" "}
-                        {equipoInfo.informacionAdministrativa.vidaUtilRestante}
+                        {newEquipo.administrativa?.[0]?.vida_util_restante}
                       </p>
                     </div>
                   </div>
@@ -601,25 +535,25 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Sede:
                         </span>{" "}
-                        {equipoInfo.ubicacionActual.sede}
+                        {newEquipo.sucursales.sedes?.nombre}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Área:
                         </span>{" "}
-                        {equipoInfo.ubicacionActual.area}
+                        {newEquipo.sucursales.tipo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Responsable:
                         </span>{" "}
-                        {equipoInfo.ubicacionActual.responsable}
+                        {/* {newEquipo.ubicacionActual.responsable} */}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Estado:
                         </span>{" "}
-                        {equipoInfo.estado}
+                        {newEquipo.estado_actual}
                       </p>
                     </div>
                   </div>
