@@ -30,3 +30,13 @@ export const getEquiposByNroSerie = async (nroSerie: string) => {
     throw error;
   }
 };
+
+export const deleteEquipo = async (id: number) => {
+  try {
+    const response = await api.delete(`/equipos/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting equipo:", error);
+    throw error;
+  }
+};
