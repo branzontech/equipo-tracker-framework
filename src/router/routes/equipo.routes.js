@@ -1,10 +1,11 @@
 import express from "express";
-import { create, findAll } from "../../pages/productos/controller/equipo.controller.js";
+import { create, findAll, findAllById } from "../../pages/productos/controller/equipo.controller.js";
 
 const router = express.Router();
 
 router
     .post("/create", create)
-    .get("/get", findAll);
+    .get("/get", findAll)
+    .get("/:nro_serie", findAllById)
 
 export default router;
