@@ -51,7 +51,7 @@ export interface Equipo {
   };
 
   // Información administrativa
-  informacionAdministrativa?: {
+  administrativa?: {
     codigo_inventario: string;
     centro_coste: string;
     autorizado_por: string;
