@@ -5,7 +5,7 @@ export const SedesModel = {
     const sedes = await prisma.sedes.findMany({
       select: {
         id_sede: true,
-        descripcion: true,
+        nombre: true,
         estado: true,
         usuarios: {
           select: {
@@ -22,7 +22,7 @@ export const SedesModel = {
     // 1. Crear la sede
     const sedeCreated = await prisma.sedes.create({
       data: {
-        descripcion: sede.descripcion,
+        nombre: sede.nombre,
         estado: sede.estado,
       },
     });
