@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
 import {
   Eye,
   Pencil,
@@ -16,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -43,11 +41,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -63,127 +56,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import ListaPerifericos from "@/pages/configuracion/maestros/perifericos/ListaPerifericos";
-
-const sampleData = [
-  {
-    id: 1,
-    numeroSerie: "SN001",
-    descripcion: "Laptop Dell XPS 13",
-    marca: "Dell",
-    estado: "Activo",
-    ubicacion: "TI",
-    responsable: "Juan Pérez",
-    sede: "Sede Central",
-    bodega: "Bodega Principal",
-  },
-  {
-    id: 2,
-    numeroSerie: "SN002",
-    descripcion: "Monitor LG 27'",
-    marca: "LG",
-    estado: "Activo",
-    ubicacion: "Desarrollo",
-    responsable: "María García",
-    sede: "Sede Norte",
-    bodega: "Bodega Equipos",
-  },
-  {
-    id: 3,
-    numeroSerie: "SN003",
-    descripcion: "Impresora HP LaserJet",
-    marca: "HP",
-    estado: "Mantenimiento",
-    ubicacion: "Administración",
-    responsable: "Pedro López",
-    sede: "Sede Sur",
-    bodega: "Bodega Impresoras",
-  },
-  {
-    id: 4,
-    numeroSerie: "SN004",
-    descripcion: "MacBook Pro M1",
-    marca: "Apple",
-    estado: "Activo",
-    ubicacion: "Diseño",
-    responsable: "Ana Martínez",
-    sede: "Sede Central",
-    bodega: "Bodega Portátiles",
-  },
-  {
-    id: 5,
-    numeroSerie: "SN005",
-    descripcion: "Proyector Epson",
-    marca: "Epson",
-    estado: "Inactivo",
-    ubicacion: "Sala Reuniones",
-    responsable: "Carlos Sánchez",
-    sede: "Sede Este",
-    bodega: "Bodega Audiovisuales",
-  },
-  {
-    id: 6,
-    numeroSerie: "SN006",
-    descripcion: "Router Cisco",
-    marca: "Cisco",
-    estado: "Activo",
-    ubicacion: "Redes",
-    responsable: "Luis Ramírez",
-    sede: "Sede Central",
-    bodega: "Bodega Redes",
-  },
-  {
-    id: 7,
-    numeroSerie: "SN007",
-    descripcion: "Scanner Brother",
-    marca: "Brother",
-    estado: "Activo",
-    ubicacion: "Recepción",
-    responsable: "Diana Torres",
-    sede: "Sede Norte",
-    bodega: "Bodega Principal",
-  },
-  {
-    id: 8,
-    numeroSerie: "SN008",
-    descripcion: "UPS APC",
-    marca: "APC",
-    estado: "Activo",
-    ubicacion: "Servidor",
-    responsable: "Roberto Flores",
-    sede: "Sede Central",
-    bodega: "Bodega Servidores",
-  },
-  {
-    id: 9,
-    numeroSerie: "SN009",
-    descripcion: "Tablet Samsung",
-    marca: "Samsung",
-    estado: "Reparación",
-    ubicacion: "Ventas",
-    responsable: "Patricia Ruiz",
-    sede: "Sede Oeste",
-    bodega: "Bodega Móviles",
-  },
-  {
-    id: 10,
-    numeroSerie: "SN010",
-    descripcion: "Desktop HP",
-    marca: "HP",
-    estado: "Activo",
-    ubicacion: "Contabilidad",
-    responsable: "Miguel Ángel",
-    sede: "Sede Central",
-    bodega: "Bodega Principal",
-  },
-];
-
-type ColumnConfig = {
-  id: string;
-  label: string;
-  key: string;
-  isVisible: boolean;
-  order: number;
-};
+import { useEquipos } from "./hooks/use-equipos";
 
 const StatusBadge = ({ status }: { status: string }) => {
   let variant: "default" | "secondary" | "destructive" | "outline" = "default";
@@ -218,254 +91,39 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 const ListaInventario = () => {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("inventario");
-
-  const [filters, setFilters] = useState({
-    marca: "",
-    estado: "",
-    sede: "",
-    bodega: "",
-    fechaDesde: "",
-    fechaHasta: "",
-    responsable: "",
-  });
-
-  const [columns, setColumns] = useState<ColumnConfig[]>([
-    {
-      id: "numeroSerie",
-      label: "N° Serie",
-      key: "numeroSerie",
-      isVisible: true,
-      order: 0,
-    },
-    {
-      id: "descripcion",
-      label: "Descripción",
-      key: "descripcion",
-      isVisible: true,
-      order: 1,
-    },
-    { id: "marca", label: "Marca", key: "marca", isVisible: true, order: 2 },
-    { id: "sede", label: "Sede", key: "sede", isVisible: true, order: 3 },
-    { id: "bodega", label: "Bodega", key: "bodega", isVisible: true, order: 4 },
-    { id: "estado", label: "Estado", key: "estado", isVisible: true, order: 5 },
-    {
-      id: "ubicacion",
-      label: "Ubicación",
-      key: "ubicacion",
-      isVisible: true,
-      order: 6,
-    },
-    {
-      id: "responsable",
-      label: "Responsable",
-      key: "responsable",
-      isVisible: true,
-      order: 7,
-    },
-  ]);
-
-  const handleDragStart = (e: React.DragEvent, columnId: string) => {
-    setDraggedColumn(columnId);
-    const draggedElement = e.currentTarget as HTMLElement;
-    draggedElement.classList.add("opacity-50", "cursor-grabbing");
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    const draggedElement = e.currentTarget as HTMLElement;
-    draggedElement.classList.remove("opacity-50", "cursor-grabbing");
-    setDraggedColumn(null);
-  };
-
-  const handleDragOver = (e: React.DragEvent, targetColumnId: string) => {
-    e.preventDefault();
-    if (!draggedColumn || draggedColumn === targetColumnId) return;
-
-    const targetElement = e.currentTarget as HTMLElement;
-    targetElement.classList.add(
-      "bg-muted",
-      "transition-colors",
-      "duration-200"
-    );
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    const targetElement = e.currentTarget as HTMLElement;
-    targetElement.classList.remove(
-      "bg-muted",
-      "transition-colors",
-      "duration-200"
-    );
-  };
-
-  const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
-    e.preventDefault();
-    if (!draggedColumn || draggedColumn === targetColumnId) return;
-
-    const targetElement = e.currentTarget as HTMLElement;
-    targetElement.classList.remove(
-      "bg-muted",
-      "transition-colors",
-      "duration-200"
-    );
-
-    setColumns((prevColumns) => {
-      const draggedColumnOrder =
-        prevColumns.find((col) => col.id === draggedColumn)?.order || 0;
-      const targetColumnOrder =
-        prevColumns.find((col) => col.id === targetColumnId)?.order || 0;
-
-      return prevColumns.map((column) => {
-        if (column.id === draggedColumn) {
-          return { ...column, order: targetColumnOrder };
-        }
-        if (column.id === targetColumnId) {
-          return { ...column, order: draggedColumnOrder };
-        }
-        return column;
-      });
-    });
-  };
-
-  const toggleColumnVisibility = (columnId: string, isChecked: boolean) => {
-    setColumns((prevColumns) =>
-      prevColumns.map((column) =>
-        column.id === columnId ? { ...column, isVisible: isChecked } : column
-      )
-    );
-  };
-
-  const applyFilters = (data: typeof sampleData) => {
-    return data.filter((item) => {
-      const matchesSearch = Object.values(item).some(
-        (value) =>
-          value &&
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      if (!matchesSearch) return false;
-
-      if (
-        filters.marca &&
-        filters.marca !== "todas" &&
-        item.marca.toLowerCase() !== filters.marca.toLowerCase()
-      )
-        return false;
-      if (
-        filters.estado &&
-        filters.estado !== "todos" &&
-        item.estado.toLowerCase() !== filters.estado.toLowerCase()
-      )
-        return false;
-      if (
-        filters.sede &&
-        filters.sede !== "todas" &&
-        item.sede.toLowerCase() !== filters.sede.toLowerCase()
-      )
-        return false;
-      if (
-        filters.bodega &&
-        filters.bodega !== "todas" &&
-        item.bodega.toLowerCase() !== filters.bodega.toLowerCase()
-      )
-        return false;
-      if (
-        filters.responsable &&
-        !item.responsable
-          .toLowerCase()
-          .includes(filters.responsable.toLowerCase())
-      )
-        return false;
-
-      return true;
-    });
-  };
-
-  const handleFilterChange = (field: keyof typeof filters, value: string) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
-    setCurrentPage(1);
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      marca: "",
-      estado: "",
-      sede: "",
-      bodega: "",
-      fechaDesde: "",
-      fechaHasta: "",
-      responsable: "",
-    });
-    setCurrentPage(1);
-  };
-
-  const filteredData = applyFilters(sampleData);
-
-  const sortedData = [...filteredData].sort((a: any, b: any) => {
-    if (!sortField) return 0;
-    if (sortDirection === "asc") {
-      return a[sortField] > b[sortField] ? 1 : -1;
-    }
-    return a[sortField] < b[sortField] ? 1 : -1;
-  });
-
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const handleDownload = () => {
-    const csvContent = [
-      Object.keys(sampleData[0]).join(","),
-      ...filteredData.map((item) => Object.values(item).join(",")),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.setAttribute("hidden", "");
-    a.setAttribute("href", url);
-    a.setAttribute("download", "inventario.csv");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
-
-  const handleNuevoProducto = () => {
-    navigate("/productos/ingreso");
-  };
-
-  const uniqueMarcas = Array.from(
-    new Set(sampleData.map((item) => item.marca))
-  );
-  const uniqueEstados = Array.from(
-    new Set(sampleData.map((item) => item.estado))
-  );
-  const uniqueSedes = Array.from(new Set(sampleData.map((item) => item.sede)));
-  const uniqueBodegas = Array.from(
-    new Set(sampleData.map((item) => item.bodega))
-  );
-
-  const activeFiltersCount = Object.values(filters).filter(
-    (value) => value && value !== "todas" && value !== "todos"
-  ).length;
+  const {
+    setActiveTab,
+    searchTerm,
+    setSearchTerm,
+    handleSort,
+    paginatedData,
+    totalPages,
+    handleDownload,
+    uniqueMarcas,
+    uniqueEstados,
+    uniqueSucursales,
+    activeFiltersCount,
+    sortedColumns,
+    handleDragEnd,
+    handleDragStart,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    sortField,
+    sortDirection,
+    filteredData,
+    navigate,
+    currentPage,
+    setCurrentPage,
+    columns,
+    activeTab,
+    handleNuevoProducto,
+    filters,
+    handleFilterChange,
+    resetFilters,
+    toggleColumnVisibility,
+    uniqueCategorias,
+  } = useEquipos();
 
   return (
     <div className="p-8">
@@ -537,9 +195,9 @@ const ListaInventario = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Marca</label>
                         <Select
-                          value={filters.marca}
+                          value={filters.marcas}
                           onValueChange={(value) =>
-                            handleFilterChange("marca", value)
+                            handleFilterChange("marcas", value)
                           }
                         >
                           <SelectTrigger className="w-full">
@@ -547,9 +205,37 @@ const ListaInventario = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="todas">Todas</SelectItem>
-                            {uniqueMarcas.map((marca) => (
-                              <SelectItem key={marca} value={marca}>
-                                {marca}
+                            {uniqueMarcas.map((marcas, index) => (
+                              <SelectItem
+                                key={`${marcas}-${index}`}
+                                value={marcas}
+                              >
+                                {marcas}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                       <div className="space-y-2">
+                        <label className="text-sm font-medium">Categorias</label>
+                        <Select
+                          value={filters.categorias}
+                          onValueChange={(value) =>
+                            handleFilterChange("categorias", value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccionar una categoria" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todas">Todas</SelectItem>
+                            {uniqueCategorias.map((categorias, index) => (
+                              <SelectItem
+                                key={`${categorias}-${index}`}
+                                value={categorias}
+                              >
+                                {categorias}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -569,8 +255,11 @@ const ListaInventario = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="todos">Todos</SelectItem>
-                            {uniqueEstados.map((estado) => (
-                              <SelectItem key={estado} value={estado}>
+                            {uniqueEstados.map((estado, index) => (
+                              <SelectItem
+                                key={`${estado}-${index}`}
+                                value={estado}
+                              >
                                 {estado}
                               </SelectItem>
                             ))}
@@ -579,50 +268,28 @@ const ListaInventario = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Sede</label>
+                        <label className="text-sm font-medium">Sucursales</label>
                         <Select
-                          value={filters.sede}
+                          value={filters.sucursales}
                           onValueChange={(value) =>
-                            handleFilterChange("sede", value)
+                            handleFilterChange("sucursales", value)
                           }
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Seleccionar sede" />
+                            <SelectValue placeholder="Seleccionar sucursal" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="todas">Todas</SelectItem>
-                            {uniqueSedes.map((sede) => (
-                              <SelectItem key={sede} value={sede}>
-                                {sede}
+                            {uniqueSucursales.map((sucursal) => (
+                              <SelectItem key={sucursal} value={sucursal}>
+                                {sucursal}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Bodega</label>
-                        <Select
-                          value={filters.bodega}
-                          onValueChange={(value) =>
-                            handleFilterChange("bodega", value)
-                          }
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Seleccionar bodega" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="todas">Todas</SelectItem>
-                            {uniqueBodegas.map((bodega) => (
-                              <SelectItem key={bodega} value={bodega}>
-                                {bodega}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
+                      {/* <div className="space-y-2">
                         <label className="text-sm font-medium">
                           Responsable
                         </label>
@@ -633,7 +300,7 @@ const ListaInventario = () => {
                             handleFilterChange("responsable", e.target.value)
                           }
                         />
-                      </div>
+                      </div> */}
                     </div>
 
                     <div className="pt-4 border-t flex justify-end">
@@ -698,13 +365,9 @@ const ListaInventario = () => {
                   return null;
 
                 const label = {
-                  marca: "Marca",
+                  marcas: "Marca",
                   estado: "Estado",
                   sede: "Sede",
-                  bodega: "Bodega",
-                  fechaDesde: "Desde",
-                  fechaHasta: "Hasta",
-                  responsable: "Responsable",
                 }[key];
 
                 return (
@@ -779,15 +442,18 @@ const ListaInventario = () => {
               <TableBody>
                 {filteredData.length > 0 ? (
                   paginatedData.map((item) => (
-                    <TableRow key={item.id} className="hover:bg-slate-50">
+                    <TableRow
+                      key={item.id_equipo}
+                      className="hover:bg-slate-50"
+                    >
                       {sortedColumns.map(
                         (column) =>
                           column.isVisible && (
                             <TableCell
-                              key={`${item.id}-${column.id}`}
+                              key={`${item.id_equipo}-${column.id}`}
                               className="py-3"
                             >
-                              {column.id === "estado" ? (
+                              {column.id === "estadoActual" ? (
                                 <StatusBadge
                                   status={
                                     item[
@@ -795,6 +461,13 @@ const ListaInventario = () => {
                                     ] as string
                                   }
                                 />
+                              ) : typeof item[
+                                  column.key as keyof typeof item
+                                ] === "object" &&
+                                item[column.key as keyof typeof item] !==
+                                  null ? (
+                                (item[column.key as keyof typeof item] as any)
+                                  .nombre ?? ""
                               ) : (
                                 item[column.key as keyof typeof item]
                               )}
@@ -807,7 +480,7 @@ const ListaInventario = () => {
                             variant="ghost"
                             size="icon"
                             className="hover:bg-slate-100"
-                            onClick={() => navigate(`/hojas-vida/`)}
+                            onClick={() => navigate(`/hojas-vida/${item.nro_serie}`)}
                           >
                             <Eye className="h-4 w-4 text-[#01242c]" />
                           </Button>
