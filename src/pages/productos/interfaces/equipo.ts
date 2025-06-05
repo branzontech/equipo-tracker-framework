@@ -8,10 +8,13 @@ export interface Equipo {
   nro_serie: string;
   modelo: string;
   marca_id: Marca | number;
+  marcas: Marca | null;
   categoria_id: Categoria | number;
+  categorias: Categoria | null;
   tipo_activo: string;
   fecha_registro: string;
   sucursal_id: Sucursal | number;
+  sucursales: Sucursal | null;
   garantia_fecha_fin: string;
   estado_actual: string;
   observaciones?: string;
