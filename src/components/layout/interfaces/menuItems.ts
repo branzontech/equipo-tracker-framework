@@ -104,7 +104,7 @@ export const menuItems = [
         path: "/configuracion/maestros",
         submenu: [
           { title: "Sedes", icon: Building2, path: "/configuracion/maestros/sedes" },
-          { title: "Ubicaciones", icon: Building2, path: "/configuracion/maestros/ubicaciones" },
+          { title: "Sucursales", icon: Building2, path: "/configuracion/maestros/sucursales" },
           { title: "Bodegas", icon: Box, path: "/configuracion/maestros/bodegas" },
           { title: "Marcas", icon: Tag, path: "/configuracion/maestros/marcas" },
           { title: "Periféricos", icon: Cable, path: "/configuracion/maestros/perifericos" },
