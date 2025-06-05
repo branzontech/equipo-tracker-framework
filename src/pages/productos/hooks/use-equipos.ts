@@ -1,10 +1,16 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Equipo } from "../interfaces/equipo";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createEquipo } from "@/api/axios/equipo.api";
+import {
+  createEquipo,
+  getEquipos,
+  getEquiposByNroSerie,
+} from "@/api/axios/equipo.api";
+import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns";
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
@@ -14,8 +20,18 @@ export const useEquipos = () => {
     nro_serie: "",
     modelo: "",
     marca_id: 0,
+    marcas: null,
     categoria_id: 0,
+    categorias: null,
     sucursal_id: 0,
+    sucursales: {
+      id_sucursal: 0,
+      nombre: "",
+      sede_id: 0,
+      sedes: null,
+      tipo: "",
+      estado: null,
+    },
     estado_actual: "",
     fecha_registro: new Date().toISOString().split("T")[0],
     tipo_activo: "",
@@ -57,6 +73,226 @@ export const useEquipos = () => {
     },
   });
   const navigate = useNavigate();
+  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("inventario");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getEquipos();
+        const equipos = response.map((equipo: any) => ({
+          ...equipo,
+          sucursales: equipo.sucursales?.nombre || "Sin Sucursal",
+          sedes: equipo.sucursales?.sedes?.nombre || "Sin Sede",
+          tipo: equipo.sucursales?.tipo || "Sin Tipo",
+          marcas: equipo.marcas?.nombre || "Sin Marca",
+          categorias: equipo.categorias?.nombre || "Sin Categoria",
+          estadoActual: equipo.estado_actual ? "Activo" : "Inactivo",
+        }));
+        setEquipo(equipos);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const [filters, setFilters] = useState({
+    marcas: "",
+    categorias: "",
+    estado: "",
+    sucursales: "",
+    sedes: "",
+  });
+
+  const [columns, setColumns] = useState<ColumnConfig[]>([
+    {
+      id: "nro_serie",
+      label: "N° Serie",
+      key: "nro_serie",
+      isVisible: true,
+      order: 0,
+    },
+    {
+      id: "nombre_equipo",
+      label: "Nombre del Equipo",
+      key: "nombre_equipo",
+      isVisible: true,
+      order: 1,
+    },
+    { id: "marcas", label: "Marca", key: "marcas", isVisible: true, order: 2 },
+    {
+      id: "categorias",
+      label: "Categoria",
+      key: "categorias",
+      isVisible: true,
+      order: 3,
+    },
+    { id: "sedes", label: "Sede", key: "sedes", isVisible: true, order: 5 },
+    {
+      id: "estado_actual",
+      label: "Estado",
+      key: "estado_actual",
+      isVisible: true,
+      order: 4,
+    },
+    {
+      id: "sucursales",
+      label: "Sucursal",
+      key: "sucursales",
+      isVisible: true,
+      order: 6,
+    },
+    {
+      id: "tipo",
+      label: "Tipo de Sucursal",
+      key: "tipo",
+      isVisible: true,
+      order: 6,
+    },
+  ]);
+
+  const handleDragStart = (e: React.DragEvent, columnId: string) => {
+    setDraggedColumn(columnId);
+    const draggedElement = e.currentTarget as HTMLElement;
+    draggedElement.classList.add("opacity-50", "cursor-grabbing");
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const draggedElement = e.currentTarget as HTMLElement;
+    draggedElement.classList.remove("opacity-50", "cursor-grabbing");
+    setDraggedColumn(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
+    if (!draggedColumn || draggedColumn === targetColumnId) return;
+
+    const targetElement = e.currentTarget as HTMLElement;
+    targetElement.classList.add(
+      "bg-muted",
+      "transition-colors",
+      "duration-200"
+    );
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    const targetElement = e.currentTarget as HTMLElement;
+    targetElement.classList.remove(
+      "bg-muted",
+      "transition-colors",
+      "duration-200"
+    );
+  };
+
+  const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
+    if (!draggedColumn || draggedColumn === targetColumnId) return;
+
+    const targetElement = e.currentTarget as HTMLElement;
+    targetElement.classList.remove(
+      "bg-muted",
+      "transition-colors",
+      "duration-200"
+    );
+
+    setColumns((prevColumns) => {
+      const draggedColumnOrder =
+        prevColumns.find((col) => col.id === draggedColumn)?.order || 0;
+      const targetColumnOrder =
+        prevColumns.find((col) => col.id === targetColumnId)?.order || 0;
+
+      return prevColumns.map((column) => {
+        if (column.id === draggedColumn) {
+          return { ...column, order: targetColumnOrder };
+        }
+        if (column.id === targetColumnId) {
+          return { ...column, order: draggedColumnOrder };
+        }
+        return column;
+      });
+    });
+  };
+
+  const toggleColumnVisibility = (columnId: string, isChecked: boolean) => {
+    setColumns((prevColumns) =>
+      prevColumns.map((column) =>
+        column.id === columnId ? { ...column, isVisible: isChecked } : column
+      )
+    );
+  };
+
+  const applyFilters = (data: typeof equipo) => {
+    return data.filter((item) => {
+      const matchesSearch = Object.values(item).some(
+        (value) =>
+          value &&
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      if (!matchesSearch) return false;
+
+      if (
+        filters.marcas &&
+        filters.marcas !== "todas" &&
+        item.marcas.toString() !== filters.marcas
+      )
+        return false;
+
+      if (
+        filters.categorias &&
+        filters.categorias !== "todas" &&
+        item.categorias.toString() !== filters.categorias
+      )
+        return false;
+      if (
+        filters.estado &&
+        filters.estado !== "todos" &&
+        item.estado_actual.toLowerCase() !== filters.estado.toLowerCase()
+      )
+        return false;
+
+      if (
+        filters.sucursales &&
+        filters.sucursales !== "todas" &&
+        item.sucursales.toString() !== filters.sucursales
+      )
+        return false;
+
+      return true;
+    });
+  };
+
+  const handleFilterChange = (field: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+    setCurrentPage(1);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      marcas: "",
+      categorias: "",
+      estado: "",
+      sucursales: "",
+      sedes: "",
+    });
+    setCurrentPage(1);
+  };
+
+  const filteredData = applyFilters(equipo);
+
+  const sortedData = [...filteredData].sort((a: any, b: any) => {
+    if (!sortField) return 0;
+    if (sortDirection === "asc") {
+      return a[sortField] > b[sortField] ? 1 : -1;
+    }
+    return a[sortField] < b[sortField] ? 1 : -1;
+  });
 
   const formSchema = z.object({
     // Información Básica
@@ -149,6 +385,10 @@ export const useEquipos = () => {
     navigate("/productos/lista");
   };
 
+  const handleNuevoProducto = () => {
+    navigate("/productos/ingreso");
+  };
+
   const handleSubmit = async (data: Equipo) => {
     const dataSend = {
       ...data,
@@ -159,7 +399,7 @@ export const useEquipos = () => {
     if (response.success) {
       alert("Equipo creado exitosamente");
       window.location.reload();
-      // navigate("/productos/lista");
+      navigate("/productos/lista");
     } else {
       throw new Error("Error al crear el equipo");
     }
@@ -170,7 +410,63 @@ export const useEquipos = () => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
+
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const handleDownload = () => {
+    const csvContent = [
+      Object.keys(equipo[0]).join(","),
+      ...filteredData.map((item) => Object.values(item).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "inventario.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const uniqueMarcas = Array.from(new Set(equipo.map((item) => item.marcas)));
+
+  const uniqueCategorias = Array.from(
+    new Set(equipo.map((item) => item.categorias))
+  );
+
+  const uniqueEstados = Array.from(
+    new Set(equipo.map((item) => item.estado_actual))
+  );
+
+  const uniqueSucursales = Array.from(
+    new Set(equipo.map((item) => item.sucursales))
+  );
+
+  const activeFiltersCount = Object.values(filters).filter(
+    (value) => value && value !== "todas" && value !== "todos"
+  ).length;
+
+  const getInfoEquipo = async (nroSeries: string) => {
+    const response = await getEquiposByNroSerie(nroSeries);
+    setNewEquipo(response);
+  };
+
   return {
+    getInfoEquipo,
     equipo,
     setEquipo,
     newEquipo,
@@ -178,6 +474,37 @@ export const useEquipos = () => {
     handleVolver,
     form,
     handleSubmit,
-    formatNumber
+    formatNumber,
+    handleNuevoProducto,
+    activeTab,
+    setActiveTab,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    toggleColumnVisibility,
+    handleFilterChange,
+    resetFilters,
+    sortedColumns,
+    totalPages,
+    paginatedData,
+    handleSort,
+    handleDownload,
+    uniqueMarcas,
+    uniqueEstados,
+    uniqueSucursales,
+    activeFiltersCount,
+    searchTerm,
+    setSearchTerm,
+    sortField,
+    sortDirection,
+    filteredData,
+    navigate,
+    currentPage,
+    setCurrentPage,
+    columns,
+    uniqueCategorias,
+    filters,
   };
 };
