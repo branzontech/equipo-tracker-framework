@@ -102,7 +102,37 @@ export const equipoModel = {
         marcas: true,
         categorias: true,
         sucursales: true,
+        sucursales: {
+          include: {
+            sedes: true,
+          },
+        },
       },
     });
+  },
+  async findById(nro_serie) {
+    const equipo = await prisma.equipos.findUnique({
+      where: { nro_serie },
+      include: {
+        marcas: true,
+        categorias: true,
+        sucursales: true,
+        sucursales: {
+          include: {
+            sedes: true,
+          },
+        },
+        especificaciones: true,
+        seguridad: true,
+        adquisicion: true,
+        administrativa: true,
+      },
+    });
+
+    if (!equipo) {
+      throw new Error("No se encontró el equipo.");
+    }
+
+    return equipo;
   },
 };
