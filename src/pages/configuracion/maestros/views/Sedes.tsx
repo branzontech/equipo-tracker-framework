@@ -41,13 +41,13 @@ const Sedes = () => {
         <CardContent>
           <form className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="descripcion">Descripción</Label>
+              <Label htmlFor="nombre">Descripción</Label>
               <Input
-                id="descripcion"
+                id="nombre"
                 autoComplete="off"
-                value={newSede.descripcion || ""}
+                value={newSede.nombre || ""}
                 onChange={(e) => {
-                  setNewSede({ ...newSede, descripcion: e.target.value });
+                  setNewSede({ ...newSede, nombre: e.target.value });
                 }}
                 placeholder="Ingrese la descripción"
                 required
@@ -170,7 +170,7 @@ const Sedes = () => {
             <TableBody>
               {sedes.map((sede) => (
                 <TableRow key={sede.id_sede}>
-                  <TableCell>{sede.descripcion}</TableCell>
+                  <TableCell>{sede.nombre}</TableCell>
                   <TableCell>
                     {sede.usuarios.length > 0
                       ? sede.usuarios
