@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
@@ -55,287 +55,294 @@ import {
   tonerData,
 } from "@/pages/dashboard/interfaces/dashboardItem";
 import { useGlobal } from "@/hooks/use-global";
+import { set } from "date-fns";
 
 export default function Dashboard() {
-  const { sedesCount } = useGlobal();
+  const { sedesConEquiposCount, equiposCount } = useGlobal();
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("general");
 
-  const [dashboardItems, setDashboardItems] = useState<DashboardItem[]>([
-    {
-      id: "total-equipos",
-      order: 0,
-      title: "Total Equipos",
-      size: "small",
-      tab: "general",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <Package className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Total Equipos</span>
-          </div>
-          <div className="text-2xl font-bold mt-2">415</div>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            Activos en inventario
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "mantenimientos",
-      order: 1,
-      title: "Mantenimientos Vencidos",
-      size: "small",
-      tab: "general",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <Wrench className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Mantenimientos Vencidos</span>
-          </div>
-          <div className="text-2xl font-bold mt-2 text-red-500">12</div>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            Requieren atención inmediata
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "toner",
-      order: 2,
-      title: "Tóner Disponible",
-      size: "small",
-      tab: "general",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <Printer className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Tóner Disponible</span>
-          </div>
-          <div className="text-2xl font-bold mt-2">85%</div>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            Stock saludable
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "sedes",
-      order: 3,
-      title: "Sedes Activas",
-      size: "small",
-      tab: "general",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <Building2 className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Sedes Activas</span>
-          </div>
-          <div className="text-2xl font-bold mt-2">{sedesCount}</div>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            Con equipos asignados
-          </p>
-        </div>
-      ),
-    },
+  const [dashboardItems, setDashboardItems] = useState<DashboardItem[]>([]);
 
-    {
-      id: "rendimiento-promedio",
-      order: 4,
-      title: "Rendimiento Promedio",
-      size: "small",
-      tab: "rendimiento",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <Gauge className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Rendimiento Promedio</span>
-          </div>
-          <div className="text-2xl font-bold mt-2 text-blue-500">88%</div>
-          <div className="mt-2">
-            <Progress value={88} className="h-2" />
-          </div>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            Todos los equipos
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "tiempo-respuesta",
-      order: 5,
-      title: "Tiempo de Respuesta",
-      size: "small",
-      tab: "rendimiento",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <TrendingDown className="h-4 w-4 flex-shrink-0 text-green-500" />
-            <span className="truncate">Tiempo de Respuesta</span>
-          </div>
-          <div className="text-2xl font-bold mt-2">
-            3.2 <span className="text-sm font-normal">hrs</span>
-          </div>
-          <p className="text-xs text-green-500 mt-1 truncate">
-            ↓ 12% vs mes anterior
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "incidentes-mes",
-      order: 6,
-      title: "Incidentes del Mes",
-      size: "small",
-      tab: "rendimiento",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <ActivitySquare className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Incidentes del Mes</span>
-          </div>
-          <div className="text-2xl font-bold mt-2">38</div>
-          <p className="text-xs text-red-500 mt-1 truncate">
-            ↑ 5% vs mes anterior
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "satisfaccion",
-      order: 7,
-      title: "Satisfacción Usuario",
-      size: "small",
-      tab: "rendimiento",
-      component: (
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <TrendingUp className="h-4 w-4 flex-shrink-0 text-green-500" />
-            <span className="truncate">Satisfacción Usuario</span>
-          </div>
-          <div className="text-2xl font-bold mt-2 text-green-500">92%</div>
-          <div className="mt-2">
-            <Progress value={92} className="h-2 bg-muted" />
-          </div>
-          <p className="text-xs text-green-500 mt-1 truncate">
-            ↑ 3% vs mes anterior
-          </p>
-        </div>
-      ),
-    },
+  useEffect(() => {
+    if (equiposCount !== undefined && sedesConEquiposCount !== undefined) {
+      setDashboardItems([
+        {
+          id: "total-equipos",
+          order: 0,
+          title: "Total Equipos",
+          size: "small",
+          tab: "general",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <Package className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Total Equipos</span>
+              </div>
+              <div className="text-2xl font-bold mt-2">{equiposCount}</div>
+              <p className="text-xs text-muted-foreground mt-1 truncate">
+                Activos en inventario
+              </p>
+            </div>
+          ),
+        },
+        {
+          id: "mantenimientos",
+          order: 1,
+          title: "Mantenimientos Vencidos",
+          size: "small",
+          tab: "general",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <Wrench className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Mantenimientos Vencidos</span>
+              </div>
+              <div className="text-2xl font-bold mt-2 text-red-500">12</div>
+              <p className="text-xs text-muted-foreground mt-1 truncate">
+                Requieren atención inmediata
+              </p>
+            </div>
+          ),
+        },
+        {
+          id: "toner",
+          order: 2,
+          title: "Tóner Disponible",
+          size: "small",
+          tab: "general",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <Printer className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Tóner Disponible</span>
+              </div>
+              <div className="text-2xl font-bold mt-2">85%</div>
+              <p className="text-xs text-muted-foreground mt-1 truncate">
+                Stock saludable
+              </p>
+            </div>
+          ),
+        },
+        {
+          id: "sedes",
+          order: 3,
+          title: "Sedes Activas",
+          size: "small",
+          tab: "general",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <Building2 className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Sedes Activas</span>
+              </div>
+              <div className="text-2xl font-bold mt-2">{sedesConEquiposCount}</div>
+              <p className="text-xs text-muted-foreground mt-1 truncate">
+                Con equipos asignados
+              </p>
+            </div>
+          ),
+        },
 
-    {
-      id: "distribucion-equipos",
-      order: 8,
-      title: "Distribución de Equipos por Tipo",
-      size: "large",
-      tab: "general",
-      chartType: "bar",
-      data: equiposData,
-      component: <></>,
-    },
-    {
-      id: "estado-mantenimientos",
-      order: 9,
-      title: "Estado de Mantenimientos",
-      size: "large",
-      tab: "general",
-      chartType: "pie",
-      data: mantenimientosData,
-      component: <></>,
-    },
-    {
-      id: "estado-toner",
-      order: 10,
-      title: "Estado de Tóner",
-      size: "large",
-      tab: "general",
-      chartType: "pie",
-      data: tonerData,
-      component: <></>,
-    },
-    {
-      id: "equipos-sede",
-      order: 11,
-      title: "Equipos por Sede",
-      size: "large",
-      tab: "general",
-      chartType: "bar",
-      data: sedesData,
-      component: <></>,
-    },
+        {
+          id: "rendimiento-promedio",
+          order: 4,
+          title: "Rendimiento Promedio",
+          size: "small",
+          tab: "rendimiento",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <Gauge className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Rendimiento Promedio</span>
+              </div>
+              <div className="text-2xl font-bold mt-2 text-blue-500">88%</div>
+              <div className="mt-2">
+                <Progress value={88} className="h-2" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 truncate">
+                Todos los equipos
+              </p>
+            </div>
+          ),
+        },
+        {
+          id: "tiempo-respuesta",
+          order: 5,
+          title: "Tiempo de Respuesta",
+          size: "small",
+          tab: "rendimiento",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <TrendingDown className="h-4 w-4 flex-shrink-0 text-green-500" />
+                <span className="truncate">Tiempo de Respuesta</span>
+              </div>
+              <div className="text-2xl font-bold mt-2">
+                3.2 <span className="text-sm font-normal">hrs</span>
+              </div>
+              <p className="text-xs text-green-500 mt-1 truncate">
+                ↓ 12% vs mes anterior
+              </p>
+            </div>
+          ),
+        },
+        {
+          id: "incidentes-mes",
+          order: 6,
+          title: "Incidentes del Mes",
+          size: "small",
+          tab: "rendimiento",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <ActivitySquare className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Incidentes del Mes</span>
+              </div>
+              <div className="text-2xl font-bold mt-2">38</div>
+              <p className="text-xs text-red-500 mt-1 truncate">
+                ↑ 5% vs mes anterior
+              </p>
+            </div>
+          ),
+        },
+        {
+          id: "satisfaccion",
+          order: 7,
+          title: "Satisfacción Usuario",
+          size: "small",
+          tab: "rendimiento",
+          component: (
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm">
+                <TrendingUp className="h-4 w-4 flex-shrink-0 text-green-500" />
+                <span className="truncate">Satisfacción Usuario</span>
+              </div>
+              <div className="text-2xl font-bold mt-2 text-green-500">92%</div>
+              <div className="mt-2">
+                <Progress value={92} className="h-2 bg-muted" />
+              </div>
+              <p className="text-xs text-green-500 mt-1 truncate">
+                ↑ 3% vs mes anterior
+              </p>
+            </div>
+          ),
+        },
 
-    {
-      id: "rendimiento-toner",
-      order: 12,
-      title: "Rendimiento de Tóner",
-      size: "large",
-      tab: "rendimiento",
-      chartType: "line",
-      data: rendimientoTonerData,
-      component: <></>,
-    },
-    {
-      id: "incidentes-por-mes",
-      order: 13,
-      title: "Incidentes por Mes",
-      size: "large",
-      tab: "rendimiento",
-      chartType: "area",
-      data: incidentesData,
-      component: <></>,
-    },
-    {
-      id: "solicitudes-tipo",
-      order: 14,
-      title: "Solicitudes por Tipo",
-      size: "large",
-      tab: "rendimiento",
-      chartType: "pie",
-      data: solicitudesData,
-      component: <></>,
-    },
-    {
-      id: "rendimiento-equipos",
-      order: 15,
-      title: "Rendimiento por Equipo",
-      size: "large",
-      tab: "rendimiento",
-      chartType: "bar",
-      data: rendimientoEquiposData.map((item) => ({
-        name: item.nombre,
-        cantidad: item.rendimiento,
-      })),
-      component: <></>,
-    },
+        {
+          id: "distribucion-equipos",
+          order: 8,
+          title: "Distribución de Equipos por Tipo",
+          size: "large",
+          tab: "general",
+          chartType: "bar",
+          data: equiposData,
+          component: <></>,
+        },
+        {
+          id: "estado-mantenimientos",
+          order: 9,
+          title: "Estado de Mantenimientos",
+          size: "large",
+          tab: "general",
+          chartType: "pie",
+          data: mantenimientosData,
+          component: <></>,
+        },
+        {
+          id: "estado-toner",
+          order: 10,
+          title: "Estado de Tóner",
+          size: "large",
+          tab: "general",
+          chartType: "pie",
+          data: tonerData,
+          component: <></>,
+        },
+        {
+          id: "equipos-sede",
+          order: 11,
+          title: "Equipos por Sede",
+          size: "large",
+          tab: "general",
+          chartType: "bar",
+          data: sedesData,
+          component: <></>,
+        },
 
-    {
-      id: "servicios-activos",
-      order: 16,
-      title: "Servicios Activos",
-      size: "large",
-      tab: "servicios",
-      chartType: "bar",
-      data: serviciosActivosData.map((item) => ({
-        name: item.name,
-        cantidad: item.valor,
-      })),
-      component: <></>,
-    },
-    {
-      id: "tiempo-respuesta-chart",
-      order: 17,
-      title: "Evolución Tiempo de Respuesta",
-      size: "large",
-      tab: "servicios",
-      chartType: "line",
-      data: tiempoRespuestaData.map((item) => ({
-        name: item.name,
-        cantidad: item.tiempo,
-      })),
-      component: <></>,
-    },
-  ]);
+        {
+          id: "rendimiento-toner",
+          order: 12,
+          title: "Rendimiento de Tóner",
+          size: "large",
+          tab: "rendimiento",
+          chartType: "line",
+          data: rendimientoTonerData,
+          component: <></>,
+        },
+        {
+          id: "incidentes-por-mes",
+          order: 13,
+          title: "Incidentes por Mes",
+          size: "large",
+          tab: "rendimiento",
+          chartType: "area",
+          data: incidentesData,
+          component: <></>,
+        },
+        {
+          id: "solicitudes-tipo",
+          order: 14,
+          title: "Solicitudes por Tipo",
+          size: "large",
+          tab: "rendimiento",
+          chartType: "pie",
+          data: solicitudesData,
+          component: <></>,
+        },
+        {
+          id: "rendimiento-equipos",
+          order: 15,
+          title: "Rendimiento por Equipo",
+          size: "large",
+          tab: "rendimiento",
+          chartType: "bar",
+          data: rendimientoEquiposData.map((item) => ({
+            name: item.nombre,
+            cantidad: item.rendimiento,
+          })),
+          component: <></>,
+        },
+
+        {
+          id: "servicios-activos",
+          order: 16,
+          title: "Servicios Activos",
+          size: "large",
+          tab: "servicios",
+          chartType: "bar",
+          data: serviciosActivosData.map((item) => ({
+            name: item.name,
+            cantidad: item.valor,
+          })),
+          component: <></>,
+        },
+        {
+          id: "tiempo-respuesta-chart",
+          order: 17,
+          title: "Evolución Tiempo de Respuesta",
+          size: "large",
+          tab: "servicios",
+          chartType: "line",
+          data: tiempoRespuestaData.map((item) => ({
+            name: item.name,
+            cantidad: item.tiempo,
+          })),
+          component: <></>,
+        },
+      ]);
+    }
+  }, [sedesConEquiposCount, equiposCount]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     setDraggedItem(itemId);
