@@ -15,5 +15,5 @@ export const productosNavigation = [
   { path: "/productos/actas", element: <Actas /> },
   { path: "/productos/devoluciones", element: <Devoluciones /> },
   { path: "/baja-equipos", element: <BajaEquipos /> },
-  { path: "/hojas-vida", element: <HojaDeVida /> },
+  { path: "/hojas-vida/:nroSeries", element: <HojaDeVida /> },
 ];
