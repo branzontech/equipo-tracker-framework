@@ -8,7 +8,7 @@ export const useSedes = () => {
   const [sedes, setSedes] = useState<Sede[]>([]);
   const [newSede, setNewSede] = useState<Sede>({
     id_sede: 0,
-    descripcion: "",
+    nombre: "",
     usuarios: [],
     estado: null,
   });
