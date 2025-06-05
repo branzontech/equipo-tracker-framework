@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createEquipo,
+  deleteEquipo,
   getEquipos,
   getEquiposByNroSerie,
 } from "@/api/axios/equipo.api";
@@ -14,6 +15,7 @@ import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns"
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
+  const [count, setCountEquipo] = useState<number>(0);
   const [newEquipo, setNewEquipo] = useState<Equipo>({
     id_equipo: 0,
     nombre_equipo: "",
@@ -80,6 +82,7 @@ export const useEquipos = () => {
   const itemsPerPage = 5;
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("inventario");
+  const [sedesConEquiposCount, setSedesConEquiposCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,6 +98,15 @@ export const useEquipos = () => {
           estadoActual: equipo.estado_actual ? "Activo" : "Inactivo",
         }));
         setEquipo(equipos);
+        setCountEquipo(equipos.length);
+
+        const sedesConEquipos = new Set(
+          response
+            .filter((equipo: any) => equipo.sucursales?.sedes?.id_sede)
+            .map((equipo: any) => equipo.sucursales?.sedes?.id_sede)
+        );
+
+        setSedesConEquiposCount(sedesConEquipos.size);
       } catch (error) {
         console.log(error);
       }
@@ -465,7 +477,18 @@ export const useEquipos = () => {
     setNewEquipo(response);
   };
 
+  const deleteEquipoById = async (id: number) => {
+    if (!window.confirm("¿Está seguro de que desea eliminar este equipo?"))
+      return;
+    const response = await deleteEquipo(id);
+    if (response.success) {
+      alert("Equipo eliminado exitosamente");
+      window.location.reload();
+    }
+  };
+
   return {
+    deleteEquipoById,
     getInfoEquipo,
     equipo,
     setEquipo,
@@ -506,5 +529,7 @@ export const useEquipos = () => {
     columns,
     uniqueCategorias,
     filters,
+    count,
+    sedesConEquiposCount,
   };
 };
