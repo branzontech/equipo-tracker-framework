@@ -50,3 +50,9 @@ export const findAllById = async (req, res) => {
   const equipo = await equipoService.findById(nro_serie);
   res.status(200).json(equipo);
 };
+
+export const delete_ = async (req, res) => {
+  const { id } = req.params;
+  const equipo = await equipoService.delete_(id);
+  res.status(200).json({ success: true, data: equipo });
+};
