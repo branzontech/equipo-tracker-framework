@@ -6,12 +6,12 @@ import PerfilesAcceso from "@/pages/configuracion/maestros/views/PerfilesAcceso"
 import Agentes from "@/pages/configuracion/usuarios/Agentes";
 import Responsables from "@/pages/configuracion/usuarios/Responsables";
 import Permisos from "@/pages/configuracion/usuarios/Permisos";
-import Ubicaciones from "@/pages/configuracion/maestros/views/Ubicaciones";
+import Ubicaciones from "@/pages/configuracion/maestros/views/Sucursales";
 import Categoria from "@/pages/configuracion/maestros/views/Categoria";
 
 export const configuracionNavigation = [
   { path: "/configuracion/maestros/sedes", element: <Sedes /> },
-  { path: "/configuracion/maestros/ubicaciones", element: <Ubicaciones /> },
+  { path: "/configuracion/maestros/sucursales", element: <Ubicaciones /> },
   { path: "/configuracion/maestros/bodegas", element: <Bodegas /> },
   { path: "/configuracion/maestros/marcas", element: <Marcas /> },
   { path: "/configuracion/maestros/perifericos", element: <Perifericos /> },
