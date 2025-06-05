@@ -135,4 +135,17 @@ export const equipoModel = {
 
     return equipo;
   },
+  async delete_(id) {
+    const equipo_id = Number(id);
+    await prisma.especificaciones.deleteMany({ where: { equipo_id: equipo_id } });
+    await prisma.seguridad.deleteMany({ where: { equipo_id: equipo_id } });
+    await prisma.adquisicion.deleteMany({ where: { equipo_id: equipo_id } });
+    await prisma.administrativa.deleteMany({ where: { equipo_id: equipo_id } });
+
+    const delete_E = await prisma.equipos.delete({
+      where: { id_equipo: equipo_id },
+    });
+
+    return delete_E;
+  },
 };
