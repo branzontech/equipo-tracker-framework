@@ -7,4 +7,7 @@ export const equipoService = {
   async findAll() {
     return await equipoModel.findAll();
   },
+  async findById(nro_serie) {
+    return await equipoModel.findById(nro_serie);
+  },
 };
