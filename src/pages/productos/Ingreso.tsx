@@ -1142,7 +1142,7 @@ const IngresoProducto = () => {
                 </CardContent>
               </Card>
 
-              {/* Información de informacionAdministrativa  */}
+              {/* Información de administrativa  */}
               <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
@@ -1153,7 +1153,7 @@ const IngresoProducto = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.codigo_inventario"
+                      name="administrativa.codigo_inventario"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Código de Inventario</FormLabel>
@@ -1170,7 +1170,7 @@ const IngresoProducto = () => {
 
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.centro_coste"
+                      name="administrativa.centro_coste"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Centro de Coste</FormLabel>
@@ -1184,7 +1184,7 @@ const IngresoProducto = () => {
 
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.autorizado_por"
+                      name="administrativa.autorizado_por"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Autorizado por</FormLabel>
@@ -1198,7 +1198,7 @@ const IngresoProducto = () => {
 
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.fecha_activacion"
+                      name="administrativa.fecha_activacion"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Fecha de Activación</FormLabel>
@@ -1248,7 +1248,7 @@ const IngresoProducto = () => {
 
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.estado_contable"
+                      name="administrativa.estado_contable"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Estado de Contabilidad</FormLabel>
@@ -1283,7 +1283,7 @@ const IngresoProducto = () => {
 
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.valor_depreciado"
+                      name="administrativa.valor_depreciado"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Valor Depreciado</FormLabel>
@@ -1305,7 +1305,7 @@ const IngresoProducto = () => {
 
                     <FormField
                       control={form.control}
-                      name="informacionAdministrativa.vida_util_restante"
+                      name="administrativa.vida_util_restante"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Vida Útil Restante</FormLabel>
