@@ -54,10 +54,10 @@ import {
   tiempoRespuestaData,
   tonerData,
 } from "@/pages/dashboard/interfaces/dashboardItem";
-import { useCounts } from "@/hooks/use-counts";
+import { useGlobal } from "@/hooks/use-global";
 
 export default function Dashboard() {
-  const { sedesCount } = useCounts();
+  const { sedesCount } = useGlobal();
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("general");
 
