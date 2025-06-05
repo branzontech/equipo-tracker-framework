@@ -20,3 +20,13 @@ export const createEquipo = async (equipo: Equipo) => {
     throw error;
   }
 };
+
+export const getEquiposByNroSerie = async (nroSerie: string) => {
+  try {
+    const response = await api.get(`/equipos/${nroSerie}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching equipos by nroSerie:", error);
+    throw error;
+  }
+};
