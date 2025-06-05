@@ -1,9 +1,11 @@
 import { useSedes } from "@/pages/configuracion/maestros/hooks/use-sedes";
+import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
   const { count: userCount } = useUser();
+  const { count: equiposCount, sedesConEquiposCount } = useEquipos();
 
   const formatFecha = (fechaIso?: string) => {
     if (!fechaIso) return "No disponible";
@@ -28,5 +30,5 @@ export const useGlobal = () => {
   // Aquí puedes agregar más hooks para obtener otros counts si es necesario
   // Por ejemplo, si tienes otro hook para obtener un count de "usuarios":
   // const { count: userCount } = useUsers();
-  return { sedesCount, userCount, formatFecha, formatPrecio };
+  return { sedesCount, userCount, equiposCount, sedesConEquiposCount, formatFecha, formatPrecio };
 };
