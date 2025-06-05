@@ -35,7 +35,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Equipo } from "@/pages/mantenimientos/interfaces/equipo";
+import { Equipo } from "@/pages/productos/interfaces/equipo";
 
 
 interface Sede {
