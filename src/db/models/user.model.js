@@ -13,7 +13,7 @@ export const UserModel = {
         sedes: {
           select: {
             id_sede: true,
-            descripcion: true,
+            nombre: true,
           },
         },
       },
