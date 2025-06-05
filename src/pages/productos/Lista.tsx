@@ -11,6 +11,7 @@ import {
   Plus,
   Filter,
   X,
+  Delete,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -123,6 +124,7 @@ const ListaInventario = () => {
     resetFilters,
     toggleColumnVisibility,
     uniqueCategorias,
+    deleteEquipoById
   } = useEquipos();
 
   return (
@@ -490,6 +492,14 @@ const ListaInventario = () => {
                             className="hover:bg-slate-100"
                           >
                             <Pencil className="h-4 w-4 text-[#01242c]" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:bg-slate-100"
+                            onClick={() => deleteEquipoById(item.id_equipo)}
+                          >
+                            <Delete className="h-4 w-4 text-[#01242c]" />
                           </Button>
                         </div>
                       </TableCell>
