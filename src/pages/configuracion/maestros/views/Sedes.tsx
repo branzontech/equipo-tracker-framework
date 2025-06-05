@@ -192,7 +192,7 @@ const Sedes = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-blue-500 hover:bg-blue-100"
+                      className="hover:bg-slate-100"
                       onClick={() => {
                         console.log("Editar sede:", sede);
                       }}
@@ -202,7 +202,7 @@ const Sedes = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-red-500 hover:bg-red-100"
+                      className="hover:bg-slate-100"
                       onClick={() => {
                         handleDelete(sede.id_sede);
                       }}
