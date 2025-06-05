@@ -44,3 +44,9 @@ export const findAll = async (req, res) => {
   const equipos = await equipoService.findAll();
   res.status(200).json(equipos);
 };
+
+export const findAllById = async (req, res) => {
+  const { nro_serie } = req.params;
+  const equipo = await equipoService.findById(nro_serie);
+  res.status(200).json(equipo);
+};
