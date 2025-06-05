@@ -2,7 +2,7 @@ import { Usuario } from "../../usuarios/interfaces/usuarios";
 
 export interface Sede {
   id_sede: number;
-  descripcion: string;
+  nombre: string;
   usuarios: Usuario[];
   estado: boolean;
 }
