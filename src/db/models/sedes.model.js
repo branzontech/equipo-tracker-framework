@@ -49,14 +49,23 @@ export const SedesModel = {
   delete: async (id) => {
     const id_sede = Number(id);
     try {
-      // 1. Delete all ubicaciones associated with the sede
-      await prisma.ubicaciones.deleteMany({
+      // 1. Verificar si hay ubicaciones
+      const sucursales = await prisma.sucursales.findMany({
         where: {
           sede_id: id_sede,
         },
       });
 
-      // 2. Unlink all users from the sede
+      // 2. Si hay sucursales, eliminarlas
+      if (sucursales.length > 0) {
+        await prisma.sucursales.deleteMany({
+          where: {
+            sede_id: id_sede,
+          },
+        });
+      }
+
+      // 3. Unlink all users from the sede
       await prisma.usuarios.updateMany({
         where: {
           sede_id: id_sede,
@@ -66,7 +75,7 @@ export const SedesModel = {
         },
       });
 
-      // 3. Delete the sede
+      // 4. Delete the sede
       const deletedSede = await prisma.sedes.delete({
         where: {
           id_sede: id_sede,
