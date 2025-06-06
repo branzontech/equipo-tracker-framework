@@ -12,6 +12,7 @@ import {
   getEquiposByNroSerie,
 } from "@/api/axios/equipo.api";
 import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns";
+import { toast } from "sonner";
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
@@ -409,8 +410,10 @@ export const useEquipos = () => {
 
     const response = await createEquipo(dataSend);
     if (response.success) {
-      alert("Equipo creado exitosamente");
-      window.location.reload();
+      toast.success(response.message || "Equipo creado exitosamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
       navigate("/productos/lista");
     } else {
       throw new Error("Error al crear el equipo");
@@ -482,8 +485,10 @@ export const useEquipos = () => {
       return;
     const response = await deleteEquipo(id);
     if (response.success) {
-      alert("Equipo eliminado exitosamente");
-      window.location.reload();
+      toast.success(response.message || "Equipo eliminado exitosamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
     }
   };
 
