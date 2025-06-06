@@ -7,6 +7,7 @@ import marcasRoutes from "./routes/marcas.routes.js";
 import categoriaRoutes from "./routes/categoria.routes.js";
 import equipoRoutes from "./routes/equipo.routes.js";
 import perifericoRoutes from "./routes/periferico.routes.js";
+import impresoraRoutes from "./routes/impresora.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -20,6 +21,7 @@ const routerApi = (app) => {
   router.use("/categorias", categoriaRoutes);
   router.use("/equipos", equipoRoutes);
   router.use("/perifericos", perifericoRoutes);
+  router.use("/impresoras", impresoraRoutes);
 };
 
 export default routerApi;
