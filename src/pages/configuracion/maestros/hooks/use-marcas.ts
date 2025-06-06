@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Marca } from "../interfaces/marcas";
 import { getAllMarcas, createMarca, deleteMarca } from "@/api/axios/marcas.api";
+import { toast } from "sonner";
 
 export const useMarcas = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -21,11 +22,14 @@ export const useMarcas = () => {
     try {
       const response = await createMarca(marca);
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Marca creada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      console.log(error);
+      toast.error(error.message || "Error al crear la marca");
     }
   };
 
@@ -36,11 +40,14 @@ export const useMarcas = () => {
     try {
       const response = await deleteMarca(id);
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Marca eliminada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      console.log(error);
+      toast.error(error.message || "Error al eliminar la marca");
     }
   };
 
