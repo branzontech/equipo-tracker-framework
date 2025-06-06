@@ -2,6 +2,7 @@
 import { getSedes, createSede, deleteSede } from "@/api/axios/sedes.api";
 import { useEffect, useState } from "react";
 import { Sede } from "../interfaces/sedes";
+import { toast } from "sonner";
 
 export const useSedes = () => {
   const [count, setCount] = useState(0);
@@ -36,9 +37,15 @@ export const useSedes = () => {
   const create = async (sede: Sede) => {
     try {
       const response = await createSede(sede);
-      return response;
+      if (response.success) {
+        toast.success(response.message || "Sede creada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
+      }
+      return { response };
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message || "Error al crear la sede");
     }
   };
 
@@ -49,11 +56,14 @@ export const useSedes = () => {
       const response = await deleteSede(id);
 
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Sede eliminada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message || "Error al eliminar la sede");
     }
   };
 
