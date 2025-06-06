@@ -1,6 +1,6 @@
-import IngresoToner from "@/pages/toners/Ingreso";
-import ExistenciaToners from "@/pages/toners/Existencia";
-import SalidaToners from "@/pages/toners/Salida";
+import IngresoToner from "@/pages/toners/views/Ingreso";
+import ExistenciaToners from "@/pages/toners/views/Existencia";
+import SalidaToners from "@/pages/toners/views/Salida";
 
 export const tonersNavigation = [
   { path: "/toners/ingreso", element: <IngresoToner /> },
