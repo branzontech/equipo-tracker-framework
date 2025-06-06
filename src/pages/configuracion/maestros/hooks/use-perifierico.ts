@@ -6,6 +6,7 @@ import {
   deletePeriferico,
   getPerifericos,
 } from "@/api/axios/periferico.api";
+import { toast } from "sonner";
 
 export const usePeriferico = () => {
   const [perifericos, setPerifericos] = useState<Perifericos[]>([]);
@@ -28,7 +29,7 @@ export const usePeriferico = () => {
         }));
         setPerifericos(perifericos);
       } catch (error) {
-        throw new Error(error.message);
+        toast.error(error.message)
       }
     };
     fetchPerifericos();
@@ -38,11 +39,11 @@ export const usePeriferico = () => {
     try {
       const response = await createPeriferico(periferico);
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Periferico creado exitosamente");
       }
       return response;
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message)
     }
   };
 
@@ -53,11 +54,11 @@ export const usePeriferico = () => {
       const response = await deletePeriferico(id);
 
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Periferico eliminado exitosamente");
       }
       return response;
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message)
     }
   };
   return {
