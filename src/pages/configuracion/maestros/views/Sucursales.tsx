@@ -119,7 +119,7 @@ const Ubicaciones = () => {
         <CardContent>
           <form className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="descripcion">Nombre</Label>
+              <Label htmlFor="nombre">Nombre</Label>
               <Input
                 value={newSucursal.nombre}
                 onChange={(e) =>
