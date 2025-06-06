@@ -5,6 +5,7 @@ import {
   deleteCategoria,
   getAllCategorias,
 } from "@/api/axios/categoria.api";
+import { toast } from "sonner";
 
 export const useCategoria = () => {
   const [categoria, setCategoria] = useState<Categoria[]>([]);
@@ -25,11 +26,14 @@ export const useCategoria = () => {
     try {
       const response = await createCategoria(categoria);
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Categoria creada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      console.log(error);
+      toast.error(error.message || "Error al crear la categoria");
     }
   };
 
@@ -40,11 +44,14 @@ export const useCategoria = () => {
     try {
       const response = await deleteCategoria(id);
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Categoria eliminada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      console.log(error);
+      toast.error(error.message || "Error al eliminar la categoria");
     }
   };
   return {
