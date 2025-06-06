@@ -114,7 +114,7 @@ export const Sidebar = ({
         </button>
       </div>
       <div className="flex-1 overflow-hidden">
-        <nav className="h-full p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent hover:scrollbar-thumb-white/20">
+        <nav className="h-full p-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent hover:scrollbar-thumb-white/20 scrollbar-hide">
           {menuItems.map((item) => (
             <MenuItem key={item.path} item={item} isCollapsed={isCollapsed} />
           ))}
