@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Impresora } from "../interfaces/impresora";
 import { getImpresora, createImpresora } from "@/api/axios/impresora.api";
+import { toast } from "sonner";
 
 export const useImpresora = () => {
   const [impresora, setImpresa] = useState<Impresora[]>([]);
@@ -17,7 +18,7 @@ export const useImpresora = () => {
         const data = await getImpresora();
         setImpresa(data);
       } catch (error) {
-        console.log(error);
+        toast.error(error.message)
       }
     };
 
@@ -28,12 +29,14 @@ export const useImpresora = () => {
     try {
       const response = await createImpresora(impresora);
       if (response.data.success) {
-        alert("Impresora registrada exitosamente");
-        window.location.reload();
+        toast.success(response.data.message || "Impresora creada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message)
     }
   };
 
