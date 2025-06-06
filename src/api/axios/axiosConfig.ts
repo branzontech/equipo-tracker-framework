@@ -4,23 +4,23 @@ const api = axios.create({
   baseURL: "http://192.168.1.9:3003/api",
 });
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const status = error.response?.status;
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     const status = error.response?.status;
 
-    if (status === 401) {
-      alert("No autorizado. Redirigiendo a login.");
-      // Redirige si estás usando React Router
-      window.location.href = "/login";
-    } else if (status === 500) {
-      alert("Error interno del servidor. Intenta más tarde.");
-    } else {
-      console.error("Error desconocido:", error);
-    }
+//     if (status === 401) {
+//       alert("No autorizado. Redirigiendo a login.");
+//       // Redirige si estás usando React Router
+//       window.location.href = "/login";
+//     } else if (status === 500) {
+//       alert("Error interno del servidor. Intenta más tarde.");
+//     } else {
+//       console.error("Error desconocido:", error);
+//     }
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 
 export default api;
