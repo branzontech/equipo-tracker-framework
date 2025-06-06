@@ -7,6 +7,7 @@ import {
   deleteSucursal,
 } from "../../../../api/axios/sucursal.api";
 import { ColumnConfig } from "../interfaces/columns";
+import { toast } from "sonner";
 
 export const useSucursales = () => {
   const [sucursales, setSucursales] = useState<SucursalConEstado[]>([]);
@@ -38,7 +39,7 @@ export const useSucursales = () => {
         }));
         setSucursales(Sucursales);
       } catch (error) {
-        throw new Error(error.message);
+        toast.error(error.message)
       }
     };
     fetchData();
@@ -48,11 +49,14 @@ export const useSucursales = () => {
     try {
       const response = await registerSucursal(sucursal);
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Sucursal creada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message)
     }
   };
 
@@ -244,11 +248,14 @@ export const useSucursales = () => {
       const response = await deleteSucursal(id);
 
       if (response.success) {
-        window.location.reload();
+        toast.success(response.message || "Sucursal eliminada exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
       }
       return response;
     } catch (error) {
-      throw new Error(error.message);
+      toast.error(error.message)
     }
   };
 
