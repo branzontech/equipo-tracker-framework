@@ -9,6 +9,27 @@ export const getAll = async (req, res) => {
   }
 };
 
+export const getById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const marca = await MarcasService.findById(id);
+    res.status(200).json(marca);
+  } catch (error) {
+    res.status(500).json({ error: "Error finding marca by id" });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const marca = req.body;
+    const updatedMarca = await MarcasService.update(id, marca);
+    res.status(200).json({ updatedMarca, success: true });
+  } catch (error) {
+    res.status(500).json({ error: "Error updating marca" });
+  }
+};
+
 export const create = async (req, res) => {
   try {
     const marca = req.body;

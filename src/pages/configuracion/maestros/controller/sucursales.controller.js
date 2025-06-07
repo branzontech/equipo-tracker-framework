@@ -14,6 +14,33 @@ export const getSucursal = async (req, res) => {
   }
 };
 
+export const getSucursalById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sucursal = await SucursalService.findById(id);
+
+    if (!sucursal) {
+      return res.status(404).json({ error: "Sucursal not found" });
+    }
+
+    res.json({ success: true, sucursal });
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
+
+export const updateSucursal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sucursal = req.body;
+
+    const sucursalUpdated = await SucursalService.update(id, sucursal);
+    res.json({ success: true, sucursal: sucursalUpdated });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 export const createSucursal = async (req, res) => {
   try {
     const sucursal = req.body;

@@ -5,6 +5,26 @@ export const findAll = async (req, res) => {
   res.status(200).json(perifericos);
 };
 
+export const findById = async (req, res) => {
+  const { id } = req.params;
+  const periferico = await perifericoService.findById(id);
+  res.status(200).json(periferico);
+};
+
+export const update = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, tipo, estado, equipo_asociado_id } = req.body;
+
+  const periferico = await perifericoService.update(id, {
+    nombre,
+    tipo,
+    estado,
+    equipo_asociado_id,
+  });
+
+  res.status(200).json({ success: true, data: periferico });
+};
+
 export const create = async (req, res) => {
   const { nombre, tipo, estado, equipo_asociado_id } = req.body;
 

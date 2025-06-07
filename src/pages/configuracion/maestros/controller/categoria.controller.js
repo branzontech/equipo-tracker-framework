@@ -9,6 +9,27 @@ export const getAll = async (req, res) => {
   }
 };
 
+export const getById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const categoria = await CategoriaService.findById(id);
+    res.status(200).json(categoria);
+  } catch (error) {
+    res.status(500).json({ error: "Error finding categoria by id" });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const categoria = req.body;
+    const updatedCategoria = await CategoriaService.update(id, categoria);
+    res.status(200).json({ updatedCategoria, success: true });
+  } catch (error) {
+    res.status(500).json({ error: "Error updating categoria" });
+  }
+};
+
 export const create = async (req, res) => {
   try {
     const categoria = req.body;
