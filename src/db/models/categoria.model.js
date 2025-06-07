@@ -11,6 +11,18 @@ export const CategoriaModel = {
     return categorias;
   },
 
+  findById: async (id) => {
+    const id_categoria = Number(id);
+    const categoria = await prisma.categorias.findUnique({
+      where: { id_categoria: id_categoria },
+      select: {
+        id_categoria: true,
+        nombre: true,
+      },
+    });
+    return categoria;
+  },
+
   create: async (categoria) => {
     const categoriaCreated = await prisma.categorias.create({
       data: {
@@ -18,6 +30,21 @@ export const CategoriaModel = {
       },
     });
     return categoriaCreated;
+  },
+
+  update: async (id, categoria) => {
+    const id_categoria = Number(id);
+    try {
+      const updatedCategoria = await prisma.categorias.update({
+        where: { id_categoria },
+        data: {
+          nombre: categoria.nombre,
+        },
+      });
+      return updatedCategoria;
+    } catch (error) {
+      throw new Error("Error updating categoria: " + error.message);
+    }
   },
 
   delete: async (id) => {

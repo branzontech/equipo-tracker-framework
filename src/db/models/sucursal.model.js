@@ -20,6 +20,15 @@ export const sucursalesModel = {
     return Sucursales;
   },
 
+  findById: async (id) => {
+    const id_sucursal = Number(id);
+    const sucursal = await prisma.sucursales.findUnique({
+      where: { id_sucursal: id_sucursal },
+      include: { sedes: true },
+    });
+    return sucursal;
+  },
+
   create: async (id_sucursal) => {
     try {
       const newUbi = await prisma.sucursales.create({
@@ -47,6 +56,24 @@ export const sucursalesModel = {
       return deleted;
     } catch (error) {
       throw new Error("Error deleting sucursal: " + error.message);
+    }
+  },
+
+  update: async (id, sucursal) => {
+    const id_sucursal = Number(id);
+    try {
+      const updated = await prisma.sucursales.update({
+        where: { id_sucursal },
+        data: {
+          nombre: sucursal.nombre,
+          estado: sucursal.estado,
+          sede_id: sucursal.sede_id,
+          tipo: sucursal.tipo,
+        },
+      });
+      return updated;
+    } catch (error) {
+      throw new Error("Error updating sucursal: " + error.message);
     }
   },
 };

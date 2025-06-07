@@ -18,6 +18,15 @@ export const SedesModel = {
     return sedes;
   },
 
+  findById: async (id) => {
+    const id_Sede = Number(id);
+    const sede = await prisma.sedes.findUnique({
+      where: { id_sede: id_Sede },
+      include: { usuarios: true },
+    });
+    return sede;
+  },
+
   create: async (sede) => {
     // 1. Crear la sede
     const sedeCreated = await prisma.sedes.create({
@@ -84,6 +93,61 @@ export const SedesModel = {
       return deletedSede;
     } catch (error) {
       throw new Error("Error deleting sede: " + error.message);
+    }
+  },
+
+  update: async (id, sede) => {
+    const id_sede = Number(id);
+    try {
+      // 1. Actualizar nombre y estado
+      const updatedSede = await prisma.sedes.update({
+        where: { id_sede },
+        data: {
+          nombre: sede.nombre,
+          estado: sede.estado,
+        },
+      });
+
+      // 2. Actualizar usuarios asignados (si se enviaron)
+      if (sede.usuarios) {
+        const newUserIds = sede.usuarios.map((u) => u.id_usuario);
+
+        // 2a. Obtener usuarios actuales de esta sede
+        const currentUsers = await prisma.usuarios.findMany({
+          where: { sede_id: id_sede },
+          select: { id_usuario: true },
+        });
+
+        const currentUserIds = currentUsers.map((u) => u.id_usuario);
+
+        // 2b. Calcular usuarios a desasignar
+        const usersToUnlink = currentUserIds.filter(
+          (id) => !newUserIds.includes(id)
+        );
+
+        // 2c. Calcular usuarios a asignar (por si vinieran de otra sede o sin sede)
+        const usersToLink = newUserIds;
+
+        // 2d. Desasignar usuarios que ya no deben estar en esta sede
+        if (usersToUnlink.length > 0) {
+          await prisma.usuarios.updateMany({
+            where: { id_usuario: { in: usersToUnlink } },
+            data: { sede_id: null },
+          });
+        }
+
+        // 2e. Asignar usuarios seleccionados (aunque ya estén)
+        if (usersToLink.length > 0) {
+          await prisma.usuarios.updateMany({
+            where: { id_usuario: { in: usersToLink } },
+            data: { sede_id: id_sede },
+          });
+        }
+      }
+
+      return updatedSede;
+    } catch (error) {
+      throw new Error("Error updating sede: " + error.message);
     }
   },
 };
