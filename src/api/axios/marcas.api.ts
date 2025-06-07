@@ -6,6 +6,16 @@ export const getAllMarcas = async () => {
   return response.data;
 };
 
+export const getMarcaById = async (id: number) => {
+  const response = await api.get(`/marcas/get/${id}`);
+  return response.data;
+};
+
+export const updateMarca = async (id: number, marca: Marca) => {
+  const response = await api.put(`/marcas/update/${id}`, marca);
+  return response.data;
+};
+
 export const createMarca = async (marca: Marca) => {
   const response = await api.post("/marcas/create", marca);
   return response.data;
