@@ -6,6 +6,11 @@ class SucursalServiceClass {
     return sucursales;
   }
 
+  async findById(id) {
+    const sucursal = await sucursalesModel.findById(id);
+    return sucursal;
+  }
+
   async create(sucursales) {
     const newSucursal = await sucursalesModel.create(sucursales);
     return newSucursal;
@@ -14,6 +19,11 @@ class SucursalServiceClass {
   async delete(id) {
     const deletedSucursal = await sucursalesModel.delete(id);
     return deletedSucursal;
+  }
+
+  async update(id, sucursales) {
+    const updatedSucursal = await sucursalesModel.update(id, sucursales);
+    return updatedSucursal;
   }
 }
 
