@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Marca } from "../interfaces/marcas";
-import { getAllMarcas, createMarca, deleteMarca } from "@/api/axios/marcas.api";
+import { getAllMarcas, createMarca, deleteMarca, getMarcaById, updateMarca } from "@/api/axios/marcas.api";
 import { toast } from "sonner";
 
 export const useMarcas = () => {
@@ -9,6 +9,8 @@ export const useMarcas = () => {
     id_marca: 0,
     nombre: "",
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedMarcaId, setSelectedMarcaId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchMarcas = async () => {
@@ -25,7 +27,7 @@ export const useMarcas = () => {
         toast.success(response.message || "Marca creada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
@@ -43,7 +45,7 @@ export const useMarcas = () => {
         toast.success(response.message || "Marca eliminada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
@@ -51,11 +53,38 @@ export const useMarcas = () => {
     }
   };
 
+  const getById = async (id: number) => {
+    const response = await getMarcaById(id);
+    setNewMarca(response);
+  };
+
+  const update = async (id: number, marca: Marca) => {
+    const response = await updateMarca(id, marca);
+    if (response.success) {
+      toast.success(response.message || "Marca actualizada exitosamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    }
+    return response;
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedMarcaId(id);
+    setShowEditModal(true);
+  };
+
   return {
     marcas,
     newMarca,
     setNewMarca,
     addMarca,
-    handleDelete
+    handleDelete,
+    getById,
+    handleOpenEditModal,
+    selectedMarcaId,
+    setShowEditModal,
+    update,
+    showEditModal,
   };
 };

@@ -4,6 +4,8 @@ import {
   createCategoria,
   deleteCategoria,
   getAllCategorias,
+  getCategoriaById,
+  updateCategoria,
 } from "@/api/axios/categoria.api";
 import { toast } from "sonner";
 
@@ -13,6 +15,8 @@ export const useCategoria = () => {
     id_categoria: 0,
     nombre: "",
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -29,7 +33,7 @@ export const useCategoria = () => {
         toast.success(response.message || "Categoria creada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
@@ -47,18 +51,46 @@ export const useCategoria = () => {
         toast.success(response.message || "Categoria eliminada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
       toast.error(error.message || "Error al eliminar la categoria");
     }
   };
+
+  const getById = async (id: number) => {
+    const response = await getCategoriaById(id);
+    setNewCategoria(response);
+  };
+
+  const update = async (id: number, categoria: Categoria) => {
+    const response = await updateCategoria(id, categoria);
+    if (response.success) {
+      toast.success(response.message || "Categoria actualizada exitosamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    }
+    return response;
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedCategoriaId(id);
+    setShowEditModal(true);
+  };
+
   return {
     categoria,
     newCategoria,
     setNewCategoria,
     addCategoria,
     handleDelete,
+    getById,
+    handleOpenEditModal,
+    selectedCategoriaId,
+    setShowEditModal,
+    update,
+    showEditModal,
   };
 };

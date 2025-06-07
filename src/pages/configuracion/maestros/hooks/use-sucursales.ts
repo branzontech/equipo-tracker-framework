@@ -5,6 +5,8 @@ import {
   registerSucursal,
   getsucursales,
   deleteSucursal,
+  updateSucursal,
+  getSucursalById,
 } from "../../../../api/axios/sucursal.api";
 import { ColumnConfig } from "../interfaces/columns";
 import { toast } from "sonner";
@@ -19,6 +21,8 @@ export const useSucursales = () => {
     estado: null,
     sedes: null,
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedSucursal, setSelectedSucursal] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -39,7 +43,7 @@ export const useSucursales = () => {
         }));
         setSucursales(Sucursales);
       } catch (error) {
-        toast.error(error.message)
+        toast.error(error.message);
       }
     };
     fetchData();
@@ -52,11 +56,11 @@ export const useSucursales = () => {
         toast.success(response.message || "Sucursal creada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
   };
 
@@ -251,15 +255,42 @@ export const useSucursales = () => {
         toast.success(response.message || "Sucursal eliminada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
   };
 
+  const getById = async (id: number) => {
+    const response = await getSucursalById(id);
+    setNewSucursal(response);
+  };
+
+  const update = async (id: number, sucursal: Sucursal) => {
+    const response = await updateSucursal(id, sucursal);
+    if (response.success) {
+      toast.success(response.message || "Sucursal actualizada exitosamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    }
+    return response;
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedSucursal(id);
+    setShowEditModal(true);
+  };
+
   return {
+    getById,
+    handleOpenEditModal,
+    selectedSucursal,
+    setShowEditModal,
+    update,
+    showEditModal,
     handleDelete,
     newSucursal,
     setNewSucursal,

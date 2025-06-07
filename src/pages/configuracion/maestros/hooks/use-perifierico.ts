@@ -4,7 +4,9 @@ import { Perifericos } from "../interfaces/periferico";
 import {
   createPeriferico,
   deletePeriferico,
+  getPerifericoById,
   getPerifericos,
+  updatePeriferico,
 } from "@/api/axios/periferico.api";
 import { toast } from "sonner";
 
@@ -18,6 +20,8 @@ export const usePeriferico = () => {
     equipo_asociado_id: 0,
     equipos: null,
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedPerifericoId, setSelectedPerifericoId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchPerifericos = async () => {
@@ -61,6 +65,32 @@ export const usePeriferico = () => {
       toast.error(error.message)
     }
   };
+
+  const getById = async (id: number) => {
+    const response = await getPerifericoById(id);
+    setNewPeriferico(response);
+  };
+
+  const update = async (id: number, periferico: Perifericos) => {
+    try {
+      const response = await updatePeriferico(id, periferico);
+      if (response.success) {
+        toast.success(response.message || "Periferico actualizado exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message)
+    }
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedPerifericoId(id);
+    setShowEditModal(true);
+  };
+
   return {
     handleCreatePeriferico,
     handleDeletePeriferico,
@@ -68,5 +98,11 @@ export const usePeriferico = () => {
     setPerifericos,
     newPeriferico,
     setNewPeriferico,
+    getById,
+    update,
+    showEditModal,
+    handleOpenEditModal,
+    setShowEditModal,
+    selectedPerifericoId,
   };
 };

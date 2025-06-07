@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getSedes, createSede, deleteSede } from "@/api/axios/sedes.api";
+import {
+  getSedes,
+  createSede,
+  deleteSede,
+  getSedeById,
+  updateSede,
+} from "@/api/axios/sedes.api";
 import { useEffect, useState } from "react";
 import { Sede } from "../interfaces/sedes";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export const useSedes = () => {
+  const navigate = useNavigate();
   const [count, setCount] = useState(0);
   const [sedes, setSedes] = useState<Sede[]>([]);
   const [newSede, setNewSede] = useState<Sede>({
@@ -13,6 +21,8 @@ export const useSedes = () => {
     usuarios: [],
     estado: null,
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedSedeId, setSelectedSedeId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchSedesCount = async () => {
@@ -41,7 +51,7 @@ export const useSedes = () => {
         toast.success(response.message || "Sede creada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return { response };
     } catch (error) {
@@ -59,12 +69,37 @@ export const useSedes = () => {
         toast.success(response.message || "Sede eliminada exitosamente");
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 4500);
       }
       return response;
     } catch (error) {
       toast.error(error.message || "Error al eliminar la sede");
     }
+  };
+
+  const handleEdit = async (id: number) => {
+    navigate(`/configuracion/maestros/update-sede/${id}`);
+  };
+
+  const getById = async (id: number) => {
+    const response = await getSedeById(id);
+    setNewSede(response);
+  };
+
+  const update = async (id: number, sede: Sede) => {
+    const response = await updateSede(id, sede);
+    if (response.success) {
+      toast.success(response.message || "Sede actualizada exitosamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    }
+    return response;
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedSedeId(id);
+    setShowEditModal(true);
   };
 
   return {
@@ -75,5 +110,12 @@ export const useSedes = () => {
     newSede,
     setNewSede,
     handleDelete,
+    handleEdit,
+    getById,
+    update,
+    showEditModal,
+    handleOpenEditModal,
+    selectedSedeId,
+    setShowEditModal,
   };
 };
