@@ -11,6 +11,26 @@ export const getPerifericos = async () => {
   }
 };
 
+export const getPerifericoById = async (id: number) => {
+  try {
+    const response = await api.get(`/perifericos/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching periferico by id:", error);
+    throw error;
+  }
+};
+
+export const updatePeriferico = async (id: number, periferico: Perifericos) => {
+  try {
+    const response = await api.put(`/perifericos/${id}`, periferico);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating periferico:", error);
+    throw error;
+  }
+};
+
 export const createPeriferico = async (periferico: Perifericos) => {
   try {
     const response = await api.post("/perifericos/create", periferico);
