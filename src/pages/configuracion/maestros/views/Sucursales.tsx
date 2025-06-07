@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/pagination";
 import { useSucursales } from "../hooks/use-sucursales";
 import { EstadoType } from "../interfaces/sedes";
+import UpdateSucursal from "./UpdateSucursal";
 
 const StatusBadge = ({ status }: { status: string }) => {
   let variant: "default" | "secondary" | "destructive" | "outline" = "default";
@@ -106,6 +107,10 @@ const Ubicaciones = () => {
     filters,
     setActiveTab,
     handleDelete,
+    setShowEditModal,
+    showEditModal,
+    selectedSucursal,
+    handleOpenEditModal,
   } = useSucursales();
 
   return (
@@ -130,7 +135,7 @@ const Ubicaciones = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="responsables">Tipo</Label>
+              <Label>Tipo</Label>
               <Select
                 value={newSucursal.tipo}
                 onValueChange={(value) =>
@@ -142,15 +147,14 @@ const Ubicaciones = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Administrativa">Administrativa</SelectItem>
-                  <SelectItem value="Departamento">
-                    Departamento
-                  </SelectItem>
+                  <SelectItem value="Departamento">Departamento</SelectItem>
                   <SelectItem value="Ubicacion Terciaria">
                     Ubicacion Terciaria
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="sedes">Sedes</Label>
               <Select
@@ -188,7 +192,10 @@ const Ubicaciones = () => {
                     : ""
                 }
                 onValueChange={(value: EstadoType) => {
-                  setNewSucursal({ ...newSucursal, estado: value === "Activo" });
+                  setNewSucursal({
+                    ...newSucursal,
+                    estado: value === "Activo",
+                  });
                 }}
               >
                 <SelectTrigger>
@@ -293,9 +300,7 @@ const Ubicaciones = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          Estado
-                        </label>
+                        <label className="text-sm font-medium">Estado</label>
                         <Select
                           value={filters.estado}
                           onValueChange={(value) =>
@@ -479,7 +484,7 @@ const Ubicaciones = () => {
                             size="icon"
                             className="slate-100"
                             onClick={() => {
-                              console.log("Editar sede:", item);
+                              handleOpenEditModal(item.id_sucursal);
                             }}
                           >
                             <PencilIcon className="h-5 w-5" />
@@ -565,6 +570,12 @@ const Ubicaciones = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <UpdateSucursal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        id={selectedSucursal}
+      />
     </div>
   );
 };

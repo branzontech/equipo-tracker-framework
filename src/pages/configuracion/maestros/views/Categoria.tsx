@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, Globe, Phone, PencilIcon, XCircle } from "lucide-react";
 import { useCategoria } from "../hooks/use-categoria";
+import UpdateCategoria from "./UpdateCategoria";
 
 const Categoria = () => {
   const {
@@ -21,6 +22,10 @@ const Categoria = () => {
     setNewCategoria,
     addCategoria,
     handleDelete,
+    setShowEditModal,
+    showEditModal,
+    handleOpenEditModal,
+    selectedCategoriaId,
   } = useCategoria();
 
   return (
@@ -41,7 +46,7 @@ const Categoria = () => {
                 onChange={(e) =>
                   setNewCategoria({ ...newCategoria, nombre: e.target.value })
                 }
-                placeholder="Nombre de la marca"
+                placeholder="Nombre de la categoria"
                 required
                 autoComplete="off"
               />
@@ -65,12 +70,13 @@ const Categoria = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Marcas</CardTitle>
+          <CardTitle>Lista de Categorias</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>N° Id</TableHead>
                 <TableHead>Nombre</TableHead>
                 {/* <TableHead>Teléfono</TableHead>
                 <TableHead>Sitio Web</TableHead> */}
@@ -80,14 +86,19 @@ const Categoria = () => {
             <TableBody>
               {categoria.map((categoria) => (
                 <TableRow key={categoria.id_categoria}>
+                  <TableCell>
+                    {`CAT-${categoria.id_categoria
+                      .toString()
+                      .padStart(3, "0")}`}
+                  </TableCell>
                   <TableCell>{categoria.nombre}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-blue-500 hover:bg-blue-100"
+                      className="hover:bg-slate-100"
                       onClick={() => {
-                        console.log("Editar sede:", categoria);
+                        handleOpenEditModal(categoria.id_categoria);
                       }}
                     >
                       <PencilIcon className="h-5 w-5" />
@@ -95,7 +106,7 @@ const Categoria = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-red-500 hover:bg-red-100"
+                      className="hover:bg-slate-100"
                       onClick={() => {
                         handleDelete(categoria.id_categoria);
                       }}
@@ -109,6 +120,12 @@ const Categoria = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <UpdateCategoria
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        id={selectedCategoriaId}
+      />
     </div>
   );
 };

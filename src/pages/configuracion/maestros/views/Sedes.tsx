@@ -27,10 +27,24 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { EstadoType } from "../interfaces/sedes";
+import UpdateSede from "./UpdateSede";
+import { set } from "date-fns";
 
 const Sedes = () => {
-  const { sedes, create, newSede, setNewSede, handleDelete } = useSedes();
+  const {
+    sedes,
+    create,
+    newSede,
+    setNewSede,
+    handleDelete,
+    setShowEditModal,
+    showEditModal,
+    handleOpenEditModal,
+    selectedSedeId,
+  } = useSedes();
   const { users } = useUser();
+
+  const usuariosDisponibles = users.filter((user) => user.sede_id === null);
 
   return (
     <>
@@ -45,7 +59,7 @@ const Sedes = () => {
             <form
               className="grid gap-4 md:grid-cols-4"
               onSubmit={(e) => {
-                e.preventDefault(); // Lo usas aquí para evitar recargar, pero puedes hacer validaciones personalizadas si quieres.
+                e.preventDefault();
                 create(newSede);
               }}
             >
@@ -73,9 +87,8 @@ const Sedes = () => {
 
                   <PopoverContent className="w-64 bg-white border rounded shadow">
                     <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
-                      {users
-                        .filter((user) => user.sede_id === null)
-                        .map((user) => {
+                      {usuariosDisponibles.length > 0 ? (
+                        usuariosDisponibles.map((user) => {
                           const isChecked = newSede.usuarios?.some(
                             (u) => u.id_usuario === user.id_usuario
                           );
@@ -120,7 +133,12 @@ const Sedes = () => {
                               )}
                             </div>
                           );
-                        })}
+                        })
+                      ) : (
+                        <div className="text-sm p-2 text-center text-muted-foreground px-2">
+                          No hay usuarios disponibles
+                        </div>
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -201,7 +219,7 @@ const Sedes = () => {
                         size="icon"
                         className="hover:bg-slate-100"
                         onClick={() => {
-                          console.log("Editar sede:", sede);
+                          handleOpenEditModal(sede.id_sede);
                         }}
                       >
                         <PencilIcon className="h-5 w-5" />
@@ -224,6 +242,12 @@ const Sedes = () => {
           </CardContent>
         </Card>
       </div>
+
+      <UpdateSede
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        id={selectedSedeId}
+      />
     </>
   );
 };

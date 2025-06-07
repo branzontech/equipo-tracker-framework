@@ -13,18 +13,20 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, Globe, Phone, PencilIcon, XCircle } from "lucide-react";
 import { useMarcas } from "../hooks/use-marcas";
+import UpdateMarca from "./UpdateMarca";
 
 const Marcas = () => {
-  // const [marcas, setMarcas] = useState<Marca[]>([
-  //   {
-  //     id: 1,
-  //     descripcion: "HP",
-  //     telefono: "123-456-7890",
-  //     sitioWeb: "https://www.hp.com",
-  //   },
-  // ]);
-
-  const { marcas, newMarca, setNewMarca, addMarca, handleDelete } = useMarcas();
+  const {
+    marcas,
+    newMarca,
+    setNewMarca,
+    addMarca,
+    handleDelete,
+    setShowEditModal,
+    showEditModal,
+    handleOpenEditModal,
+    selectedMarcaId,
+  } = useMarcas();
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -106,6 +108,7 @@ const Marcas = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>N° Id</TableHead>
                 <TableHead>Nombre</TableHead>
                 {/* <TableHead>Teléfono</TableHead>
                 <TableHead>Sitio Web</TableHead> */}
@@ -115,14 +118,17 @@ const Marcas = () => {
             <TableBody>
               {marcas.map((marca) => (
                 <TableRow key={marca.id_marca}>
+                  <TableCell>
+                    {`MAR-${marca.id_marca.toString().padStart(3, "0")}`}
+                  </TableCell>
                   <TableCell>{marca.nombre}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-blue-500 hover:bg-blue-100"
+                      className="hover:bg-slate-100"
                       onClick={() => {
-                        console.log("Editar sede:", marca);
+                        handleOpenEditModal(marca.id_marca);
                       }}
                     >
                       <PencilIcon className="h-5 w-5" />
@@ -130,7 +136,7 @@ const Marcas = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-red-500 hover:bg-red-100"
+                      className="hover:bg-slate-100"
                       onClick={() => {
                         handleDelete(marca.id_marca);
                       }}
@@ -144,6 +150,12 @@ const Marcas = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <UpdateMarca
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        id={selectedMarcaId}
+      />
     </div>
   );
 };

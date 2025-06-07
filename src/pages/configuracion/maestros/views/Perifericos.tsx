@@ -18,12 +18,11 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, CheckCircle, XCircle, PencilIcon } from "lucide-react";
-import {
-  listTypes,
-} from "@/pages/configuracion/maestros/interfaces/periferico";
+import { listTypes } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { EstadoType } from "../interfaces/sedes";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
+import UpdatePeriferico from "./UpdatePeriferico";
 
 const Perifericos = () => {
   const {
@@ -31,8 +30,13 @@ const Perifericos = () => {
     newPeriferico,
     setNewPeriferico,
     handleCreatePeriferico,
-    handleDeletePeriferico
+    handleDeletePeriferico,
+    showEditModal,
+    setShowEditModal,
+    selectedPerifericoId,
+    handleOpenEditModal,
   } = usePeriferico();
+
   const { equipo } = useEquipos();
 
   return (
@@ -164,8 +168,8 @@ const Perifericos = () => {
               <TableRow>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Tipo</TableHead>
-                <TableHead>Estado</TableHead>
                 <TableHead>Equipo Asociado</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -174,6 +178,9 @@ const Perifericos = () => {
                 <TableRow key={periferico.id_periferico}>
                   <TableCell>{periferico.nombre}</TableCell>
                   <TableCell>{periferico.tipo}</TableCell>
+                  <TableCell>
+                    {periferico.equipos?.nombre_equipo ?? "No asignado"}
+                  </TableCell>
                   <TableCell>
                     <span className="flex items-center">
                       {periferico.estado === "Activo" ? (
@@ -184,16 +191,13 @@ const Perifericos = () => {
                       {periferico.estado}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {periferico.equipos?.nombre_equipo ?? "No asignado"}
-                  </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
                       size="icon"
                       className="hover:bg-slate-100"
                       onClick={() => {
-                        console.log("Editar periferico:", periferico);
+                        handleOpenEditModal(periferico.id_periferico);
                       }}
                     >
                       <PencilIcon className="h-5 w-5" />
@@ -215,6 +219,12 @@ const Perifericos = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <UpdatePeriferico
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        id={selectedPerifericoId}
+      />
     </div>
   );
 };
