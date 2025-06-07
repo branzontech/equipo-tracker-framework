@@ -25,17 +25,17 @@ root.render(
         // This allows redux-persist to restore the auth state (e.g., the logged-in user)
         <PersistGate loading={null} persistor={persistor}>
           <App />
-          <Toaster richColors position="top-right" />
+          {/* <Toaster richColors position="top-right" /> */}
         </PersistGate>
       ) : (
         // If the user is NOT logged in, skip redux-persist to avoid hydration errors
         // The App will render normally without loading persisted auth state
         <>
-          // If the user is NOT logged in, skip redux-persist to avoid hydration
+          {/* // If the user is NOT logged in, skip redux-persist to avoid hydration
           errors // The App will render normally without loading persisted auth
-          state
+          state */}
           <App />
-          <Toaster richColors position="top-right" />
+          {/* <Toaster richColors position="top-right" /> */}
         </>
       )
     }
