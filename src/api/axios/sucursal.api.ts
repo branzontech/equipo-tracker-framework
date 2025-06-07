@@ -6,6 +6,16 @@ export const getsucursales = async () => {
   return response.data.sucursales;
 };
 
+export const getSucursalById = async (id: number) => {
+  const response = await api.get(`/sucursales/get/${id}`);
+  return response.data.sucursal;
+};
+
+export const updateSucursal = async (id: number, sucursal: Sucursal) => {
+  const response = await api.put(`/sucursales/update/${id}`, sucursal);
+  return response.data;
+};
+
 export const registerSucursal = async (sucursal: Sucursal) => {
   const response = await api.post("/sucursales/create", sucursal);
   return response.data;
