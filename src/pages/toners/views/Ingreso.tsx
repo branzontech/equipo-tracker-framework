@@ -1,6 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,41 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 import ImpresoraForm from "./ImpresoraForm";
-
-const formSchema = z.object({
-  referencia: z.string().min(1, "La referencia es requerida"),
-  modeloImpresora: z.string().min(1, "El modelo de impresora es requerido"),
-  color: z.string().min(1, "El color es requerido"),
-  stockDisponible: z.number().min(0, "El stock no puede ser negativo"),
-  alertaStockMinimo: z
-    .number()
-    .min(1, "La alerta de stock mínimo debe ser mayor a 0"),
-  areas: z.string().min(1, "Debe seleccionar al menos un área"),
-  sede: z.string().min(1, "La sede es requerida"),
-  cantidad: z.number().min(1, "La cantidad debe ser mayor a 0"),
-});
+import { useImpresora } from "../hooks/use-impresora";
+import { useToners } from "../hooks/use-toners";
+import { Label } from "@/components/ui/label";
 
 export default function IngresoToner() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      referencia: "",
-      modeloImpresora: "",
-      color: "",
-      stockDisponible: 0,
-      alertaStockMinimo: 1,
-      areas: "",
-      sede: "",
-      cantidad: 1,
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast.success("Toner registrado exitosamente");
-  }
+  const { create, newToner, setNewToner } = useToners();
+  const { impresora } = useImpresora();
 
   return (
     <>
@@ -64,184 +34,123 @@ export default function IngresoToner() {
             <CardTitle>Ingreso de Toner</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="referencia"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Referencia</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ej: TN-760" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+            <form
+              onSubmit={(e: React.FormEvent) => {
+                e.preventDefault();
+                create(newToner);
+              }}
+              className="space-y-6"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="modelo">Modelo</Label>
+                  <Input
+                    id="nombre"
+                    autoComplete="off"
+                    value={newToner.modelo || ""}
+                    onChange={(e) => {
+                      setNewToner({ ...newToner, modelo: e.target.value });
+                    }}
+                    placeholder="Ej: TN-760"
                   />
+                </div>
 
-                  <FormField
-                    control={form.control}
-                    name="modeloImpresora"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Modelo de Impresora</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Ej: Brother DCP-L2540DW"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="color"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Color</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
+                <div className="space-y-2">
+                  <Label htmlFor="modeloImpresora">Modelo de Impresora</Label>
+                  <Select
+                    value={newToner.impresoras[0]?.toString() || ""}
+                    onValueChange={(value) =>
+                      setNewToner({
+                        ...newToner,
+                        impresoras: [parseInt(value)],
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione un modelo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {impresora.map((impresora) => (
+                        <SelectItem
+                          key={impresora.id_impresora}
+                          value={impresora.id_impresora.toString()}
                         >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un color" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="negro">Negro</SelectItem>
-                            <SelectItem value="cyan">Cyan</SelectItem>
-                            <SelectItem value="magenta">Magenta</SelectItem>
-                            <SelectItem value="amarillo">Amarillo</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          {impresora.modelo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <FormField
-                    control={form.control}
-                    name="stockDisponible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Stock Disponible</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(e.target.valueAsNumber)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="space-y-2">
+                  <Label htmlFor="color">Color</Label>
+                  <Select
+                    value={newToner.color || ""}
+                    onValueChange={(value) =>
+                      setNewToner({ ...newToner, color: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione un color" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="negro">Negro</SelectItem>
+                      <SelectItem value="cyan">Cyan</SelectItem>
+                      <SelectItem value="magenta">Magenta</SelectItem>
+                      <SelectItem value="amarillo">Amarillo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <FormField
-                    control={form.control}
-                    name="alertaStockMinimo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Alerta de Stock Mínimo</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(e.target.valueAsNumber)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* <FormField
-      control={form.control}
-      name="areas"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Áreas</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccione las áreas" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="contabilidad">Contabilidad</SelectItem>
-              <SelectItem value="rrhh">Recursos Humanos</SelectItem>
-              <SelectItem value="sistemas">Sistemas</SelectItem>
-              <SelectItem value="ventas">Ventas</SelectItem>
-              <SelectItem value="gerencia">Gerencia</SelectItem>
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )}
-    /> */}
-
-                  {/* <FormField
-      control={form.control}
-      name="sede"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Sede</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccione una sede" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="sede-norte">Sede Norte</SelectItem>
-              <SelectItem value="sede-sur">Sede Sur</SelectItem>
-              <SelectItem value="sede-centro">Sede Centro</SelectItem>
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )}
-    /> */}
-
-                  <FormField
-                    control={form.control}
-                    name="cantidad"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cantidad</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(e.target.valueAsNumber)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                <div className="space-y-2">
+                  <Label htmlFor="stockDisponible">Stock Disponible</Label>
+                  <Input
+                    type="number"
+                    value={newToner.stock_actual || 0}
+                    onChange={(e) =>
+                      setNewToner({
+                        ...newToner,
+                        stock_actual: Number(e.target.value),
+                      })
+                    }
                   />
                 </div>
 
-                <div className="flex justify-end">
-                  <Button type="submit">Registrar Toner</Button>
+                <div className="space-y-2">
+                  <Label htmlFor="stock_minimo_alerta">
+                    Alerta de Stock Mínimo
+                  </Label>
+                  <Input
+                    type="number"
+                    value={newToner.stock_minimo_alerta || 0}
+                    onChange={(e) =>
+                      setNewToner({
+                        ...newToner,
+                        stock_minimo_alerta: Number(e.target.value),
+                      })
+                    }
+                  />
                 </div>
-              </form>
-            </Form>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cantidad">Cantidad</Label>
+                  <Input
+                    type="number"
+                    value={newToner.cantidad || 0}
+                    onChange={(e) =>
+                      setNewToner({
+                        ...newToner,
+                        cantidad: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit">Registrar Toner</Button>
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>
