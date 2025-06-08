@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Marca } from "../interfaces/marcas";
-import { getAllMarcas, createMarca, deleteMarca, getMarcaById, updateMarca } from "@/api/axios/marcas.api";
+import {
+  getAllMarcas,
+  createMarca,
+  deleteMarca,
+  getMarcaById,
+  updateMarca,
+} from "@/api/axios/marcas.api";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export const useMarcas = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -21,6 +28,11 @@ export const useMarcas = () => {
   }, []);
 
   const addMarca = async (marca: Marca) => {
+    if (!marca.nombre) {
+      toast.error("Debe ingresar un nombre");
+      return;
+    }
+
     try {
       const response = await createMarca(marca);
       if (response.success) {
@@ -36,21 +48,23 @@ export const useMarcas = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("¿Estás seguro de eliminar esta marca?")) {
-      return;
-    }
-    try {
-      const response = await deleteMarca(id);
-      if (response.success) {
-        toast.success(response.message || "Marca eliminada exitosamente");
-        setTimeout(() => {
-          window.location.reload();
-        }, 4500);
-      }
-      return response;
-    } catch (error) {
-      toast.error(error.message || "Error al eliminar la marca");
-    }
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar esta marca?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteMarca(id);
+          if (res.success) {
+            toast.success(res.message || "Marca eliminada correctamente");
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message || "No se pudo eliminar la marca");
+          }
+        } catch (error) {
+          toast.error(error.message || "Error al eliminar la marca");
+        }
+      },
+    });
   };
 
   const getById = async (id: number) => {
