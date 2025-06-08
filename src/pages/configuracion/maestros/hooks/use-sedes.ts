@@ -10,6 +10,12 @@ import { useEffect, useState } from "react";
 import { Sede } from "../interfaces/sedes";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css"; // Importa estilos por defecto
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const useSedes = () => {
   const navigate = useNavigate();
@@ -45,6 +51,22 @@ export const useSedes = () => {
   }, []);
 
   const create = async (sede: Sede) => {
+
+    if (!sede.nombre) {
+      toast.error("Debe ingresar un nombre");
+      return;
+    }
+
+    if (!sede.usuarios || sede.usuarios.length === 0) {
+      toast.error("Debe seleccionar al menos un usuario");
+      return;
+    }
+
+    if (sede.estado === undefined || sede.estado === null) {
+      toast.error("Debe seleccionar un estado");
+      return;
+    }
+
     try {
       const response = await createSede(sede);
       if (response.success) {
@@ -59,22 +81,24 @@ export const useSedes = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("¿Está seguro de que desea eliminar esta sede?"))
-      return;
-    try {
-      const response = await deleteSede(id);
-
-      if (response.success) {
-        toast.success(response.message || "Sede eliminada exitosamente");
-        setTimeout(() => {
-          window.location.reload();
-        }, 4500);
-      }
-      return response;
-    } catch (error) {
-      toast.error(error.message || "Error al eliminar la sede");
-    }
+  const handleDelete = (id: number) => {
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar esta sede?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteSede(id);
+          if (res.success) {
+            toast.success(res.message || "Sede eliminada correctamente");
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message || "No se pudo eliminar la sede");
+          }
+        } catch (error: any) {
+          toast.error(error.message || "Error al eliminar la sede");
+        }
+      },
+    });
   };
 
   const handleEdit = async (id: number) => {
