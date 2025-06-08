@@ -5,4 +5,5 @@ export interface Impresora {
   nombre: string;
   modelo: string;
   sucursal_id: Sucursal | number;
+  sucursales: Sucursal;
 }
