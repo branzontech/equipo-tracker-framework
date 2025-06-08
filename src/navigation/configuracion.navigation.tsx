@@ -12,13 +12,27 @@ import UpdateSede from "@/pages/configuracion/maestros/views/UpdateSede";
 
 export const configuracionNavigation = [
   { path: "/configuracion/maestros/sedes", element: <Sedes /> },
-  { path: "/configuracion/maestros/update-sede/:id", element: <UpdateSede /> },
+  {
+    path: "/configuracion/maestros/update-sede/:id",
+    element: (
+      <UpdateSede
+        open={false}
+        onOpenChange={function (open: boolean): void {
+          throw new Error("Function not implemented.");
+        }}
+        id={0}
+      />
+    ),
+  },
   { path: "/configuracion/maestros/sucursales", element: <Ubicaciones /> },
   { path: "/configuracion/maestros/bodegas", element: <Bodegas /> },
   { path: "/configuracion/maestros/marcas", element: <Marcas /> },
   { path: "/configuracion/maestros/perifericos", element: <Perifericos /> },
   { path: "/configuracion/maestros/categorias", element: <Categoria /> },
-  { path: "/configuracion/maestros/perfiles-acceso", element: <PerfilesAcceso /> },
+  {
+    path: "/configuracion/maestros/perfiles-acceso",
+    element: <PerfilesAcceso />,
+  },
   { path: "/configuracion/usuarios/agentes", element: <Agentes /> },
   { path: "/configuracion/usuarios/responsables", element: <Responsables /> },
   { path: "/configuracion/nivel-acceso", element: <Permisos /> },
