@@ -8,6 +8,7 @@ import {
   updateCategoria,
 } from "@/api/axios/categoria.api";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export const useCategoria = () => {
   const [categoria, setCategoria] = useState<Categoria[]>([]);
@@ -16,7 +17,9 @@ export const useCategoria = () => {
     nombre: "",
   });
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(null);
+  const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -27,6 +30,11 @@ export const useCategoria = () => {
   }, []);
 
   const addCategoria = async (categoria: Categoria) => {
+    if (!categoria.nombre) {
+      toast.error("Debe ingresar un nombre");
+      return;
+    }
+
     try {
       const response = await createCategoria(categoria);
       if (response.success) {
@@ -42,21 +50,23 @@ export const useCategoria = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("¿Estás seguro de eliminar esta categoria?")) {
-      return;
-    }
-    try {
-      const response = await deleteCategoria(id);
-      if (response.success) {
-        toast.success(response.message || "Categoria eliminada exitosamente");
-        setTimeout(() => {
-          window.location.reload();
-        }, 4500);
-      }
-      return response;
-    } catch (error) {
-      toast.error(error.message || "Error al eliminar la categoria");
-    }
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar esta categoria?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteCategoria(id);
+          if (res.success) {
+            toast.success(res.message || "Categoria eliminada correctamente");
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message || "No se pudo eliminar la categoria");
+          }
+        } catch (error) {
+          toast.error(error.message || "Error al eliminar la categoria");
+        }
+      },
+    });
   };
 
   const getById = async (id: number) => {
