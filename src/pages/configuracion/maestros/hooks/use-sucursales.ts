@@ -10,6 +10,7 @@ import {
 } from "../../../../api/axios/sucursal.api";
 import { ColumnConfig } from "../interfaces/columns";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export const useSucursales = () => {
   const [sucursales, setSucursales] = useState<SucursalConEstado[]>([]);
@@ -50,6 +51,26 @@ export const useSucursales = () => {
   }, []);
 
   const handleCreateSucursales = async (sucursal: Sucursal) => {
+    if (!sucursal.nombre) {
+      toast.error("Debe ingresar un nombre");
+      return;
+    }
+
+    if (!sucursal.tipo) {
+      toast.error("Debe seleccionar un tipo");
+      return;
+    }
+
+    if (!sucursal.sede_id) {
+      toast.error("Debe seleccionar una sede");
+      return;
+    }
+
+    if (sucursal.estado === undefined || sucursal.estado === null) {
+      toast.error("Debe seleccionar un estado");
+      return;
+    }
+
     try {
       const response = await registerSucursal(sucursal);
       if (response.success) {
@@ -246,21 +267,23 @@ export const useSucursales = () => {
   ).length;
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("¿Está seguro de que desea eliminar esta sucursal?"))
-      return;
-    try {
-      const response = await deleteSucursal(id);
-
-      if (response.success) {
-        toast.success(response.message || "Sucursal eliminada exitosamente");
-        setTimeout(() => {
-          window.location.reload();
-        }, 4500);
-      }
-      return response;
-    } catch (error) {
-      toast.error(error.message);
-    }
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar esta sucursal?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteSucursal(id);
+          if (res.success) {
+            toast.success(res.message || "Sucursal eliminada correctamente");
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message || "No se pudo eliminar la sucursal");
+          }
+        } catch (error: any) {
+          toast.error(error.message || "Error al eliminar la sucursal");
+        }
+      },
+    });
   };
 
   const getById = async (id: number) => {
