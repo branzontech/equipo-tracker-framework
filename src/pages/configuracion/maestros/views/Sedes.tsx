@@ -28,7 +28,6 @@ import {
 } from "@radix-ui/react-popover";
 import { EstadoType } from "../interfaces/sedes";
 import UpdateSede from "./UpdateSede";
-import { set } from "date-fns";
 
 const Sedes = () => {
   const {
@@ -73,7 +72,6 @@ const Sedes = () => {
                     setNewSede({ ...newSede, nombre: e.target.value });
                   }}
                   placeholder="Ingrese la descripción"
-                  required
                 />
               </div>
               <div className="space-y-2">
