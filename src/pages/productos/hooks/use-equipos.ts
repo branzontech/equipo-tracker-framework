@@ -31,7 +31,12 @@ export const useEquipos = () => {
       id_sucursal: 0,
       nombre: "",
       sede_id: 0,
-      sedes: null,
+      sedes: {
+        id_sede: 0,
+        nombre: "",
+        usuarios: [],
+        estado: null,
+      },
       tipo: "",
       estado: null,
     },
