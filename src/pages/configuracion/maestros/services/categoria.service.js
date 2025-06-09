@@ -38,11 +38,6 @@ export const CategoriaService = {
   },
 
   delete: async (id) => {
-    try {
-      const deletedCategoria = await CategoriaModel.delete(id);
-      return deletedCategoria;
-    } catch (error) {
-      throw new Error("Error deleting categoria: " + error.message);
-    }
+    return await CategoriaModel.delete(id);
   },
 };
