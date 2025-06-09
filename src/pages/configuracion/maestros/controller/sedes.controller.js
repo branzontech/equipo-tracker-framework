@@ -47,7 +47,7 @@ export const deleteSede = async (req, res) => {
     const deletedSede = await SedesService.delete(id);
     res.json({ success: true, deletedSede });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(401).json({ message: error.message });
   }
 };
 
