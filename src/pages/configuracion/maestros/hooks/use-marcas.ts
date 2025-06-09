@@ -61,7 +61,7 @@ export const useMarcas = () => {
             toast.error(res.message || "No se pudo eliminar la marca");
           }
         } catch (error) {
-          toast.error(error.message || "Error al eliminar la marca");
+          toast.info(error.message);
         }
       },
     });
