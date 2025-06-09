@@ -6,6 +6,9 @@ import {
   AlertTriangle,
   Download,
   SlidersHorizontal,
+  PencilIcon,
+  TrashIcon,
+  XCircle,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -193,6 +196,12 @@ const ExistenciaToners = () => {
                   <TableCell>
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <PencilIcon className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <XCircle className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
