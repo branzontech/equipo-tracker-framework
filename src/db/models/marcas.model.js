@@ -34,15 +34,31 @@ export const MarcasModel = {
 
   delete: async (id) => {
     const id_marca = Number(id);
+
     try {
+      // Verificar si hay equipos que usan esta marca
+      const equiposRelacionados = await prisma.equipos.findFirst({
+        where: {
+          marca_id: id_marca,
+        },
+      });
+
+      if (equiposRelacionados) {
+        throw new Error(
+          "No se puede eliminar la marca porque está asociada a uno o más equipos."
+        );
+      }
+
+      // Eliminar la marca si no está asociada a ningún equipo
       const deletedMarca = await prisma.marcas.delete({
         where: {
           id_marca: id_marca,
         },
       });
+
       return deletedMarca;
     } catch (error) {
-      throw new Error("Error deleting marca: " + error.message);
+      throw new Error(error.message);
     }
   },
 
