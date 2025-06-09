@@ -122,7 +122,7 @@ const Ubicaciones = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4 md:grid-cols-4">
+          <form className="grid gap-4 md:grid-cols-5">
             <div className="space-y-2">
               <Label htmlFor="nombre">Nombre</Label>
               <Input
@@ -313,7 +313,7 @@ const Ubicaciones = () => {
                           <SelectContent>
                             <SelectItem value="todos">Todos</SelectItem>
                             {uniqueEstados.map((estado) => (
-                              <SelectItem key={estado} value={estado}>
+                              <SelectItem key={String(estado)} value={String(estado)}>
                                 {estado}
                               </SelectItem>
                             ))}
