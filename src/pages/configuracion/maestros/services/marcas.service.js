@@ -38,11 +38,6 @@ export const MarcasService = {
   },
 
   delete: async (id) => {
-    try {
-      const deletedMarca = await MarcasModel.delete(id);
-      return deletedMarca;
-    } catch (error) {
-      throw new Error("Error deleting marca: " + error.message);
-    }
+    return await MarcasModel.delete(id);
   },
 };
