@@ -144,11 +144,11 @@ export const menuItems = [
     icon: Wrench,
     path: "/mantenimientos",
   },
-  {
-    title: "Hojas de Vida Equipos",
-    icon: FileText,
-    path: "/hojas-vida",
-  },
+  // {
+  //   title: "Hojas de Vida Equipos",
+  //   icon: FileText,
+  //   path: "/hojas-vida",
+  // },
   {
     title: "Trazabilidad Inventario",
     icon: History,
