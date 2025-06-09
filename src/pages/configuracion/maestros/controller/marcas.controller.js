@@ -46,6 +46,6 @@ export const deleteM = async (req, res) => {
     const deletedMarca = await MarcasService.delete(id);
     res.status(200).json({ deletedMarca, success: true });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting marca" });
+    res.status(400).json({ message: error.message });
   }
 };
