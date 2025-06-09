@@ -94,10 +94,10 @@ export default function IngresoToner() {
                       <SelectValue placeholder="Seleccione un color" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="negro">Negro</SelectItem>
-                      <SelectItem value="cyan">Cyan</SelectItem>
-                      <SelectItem value="magenta">Magenta</SelectItem>
-                      <SelectItem value="amarillo">Amarillo</SelectItem>
+                      <SelectItem value="Negro">Negro</SelectItem>
+                      <SelectItem value="Cyan">Cyan</SelectItem>
+                      <SelectItem value="Magenta">Magenta</SelectItem>
+                      <SelectItem value="Amarillo">Amarillo</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
