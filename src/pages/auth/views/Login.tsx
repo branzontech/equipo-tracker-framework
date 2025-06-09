@@ -1,53 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { User, Lock } from "lucide-react";
 import ParticleEffect from "@/components/ParticleEffect";
-import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useLogin } from "../hooks/use-login";
+import React from "react";
 
 const Login = () => {
-  const [user, setUser] = useState({
-    nombre: "",
-    contraseña: "",
-  });
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { SignIn } = useLogin();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    try {
-      await SignIn(user.nombre, user.contraseña, dispatch, navigate);
-    } catch (err: any) {
-      setError(err.message);
-
-      setTimeout(() => {
-        setError(null);
-      }, 5000);
-    }
-  };
+  const { SignIn, user, setUser, rememberAccount, remember, setRemember } =
+    useLogin();
 
   return (
     <>
-      <div className="fixed top-5 right-5 z-50 ">
-        {error && (
-          <Alert variant="destructive">
-            <AlertTitle className="text-white">
-              Error al iniciar sesión
-            </AlertTitle>
-            <AlertDescription className="text-white">{error}</AlertDescription>
-          </Alert>
-        )}
-      </div>
       <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-gradient-to-tr from-[#01242c] to-[#01242c]/70">
         <ParticleEffect />
 
@@ -64,7 +33,13 @@ const Login = () => {
             <p className="text-white/80">Gestión de tecnología</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={(e: React.FormEvent) => {
+              e.preventDefault();
+              SignIn(user.nombre, user.contraseña, dispatch, navigate, remember);
+            }}
+            className="space-y-6"
+          >
             <div className="space-y-2">
               <Label className="text-white" htmlFor="nombre">
                 Usuario
@@ -109,12 +84,14 @@ const Login = () => {
                 <Checkbox
                   id="remember"
                   className="border-[#bff036]/40 data-[state=checked]:bg-[#bff036] data-[state=checked]:text-[#01242c]"
+                  checked={remember}
+                  onCheckedChange={(checked) => setRemember(checked === true)}
                 />
                 <Label htmlFor="remember" className="text-white">
-                  Recordarme
+                  Recordar sesión o cuenta
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <Checkbox
                   id="rememberPassword"
                   className="border-[#bff036]/40 data-[state=checked]:bg-[#bff036] data-[state=checked]:text-[#01242c]"
@@ -122,7 +99,7 @@ const Login = () => {
                 <Label htmlFor="rememberPassword" className="text-white">
                   Recordar contraseña
                 </Label>
-              </div>
+              </div> */}
             </div>
 
             <Button
