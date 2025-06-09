@@ -48,7 +48,7 @@ const Perifericos = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4 md:grid-cols-3">
+          <form className="grid gap-4 md:grid-cols-5">
             <div className="space-y-2">
               <Label htmlFor="descripcion">Nombre</Label>
               <Input
@@ -64,29 +64,6 @@ const Perifericos = () => {
                 autoComplete="off"
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estado">Estado</Label>
-              <Select
-                value={
-                  newPeriferico.estado === "Activo"
-                    ? "Activo"
-                    : newPeriferico.estado === "Inactivo"
-                    ? "Inactivo"
-                    : ""
-                }
-                onValueChange={(value: EstadoType) =>
-                  setNewPeriferico({ ...newPeriferico, estado: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione el estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Activo">Activo</SelectItem>
-                  <SelectItem value="Inactivo">Inactivo</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="space-y-2">
@@ -137,6 +114,30 @@ const Perifericos = () => {
                       {equipo.nombre_equipo}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="estado">Estado</Label>
+              <Select
+                value={
+                  newPeriferico.estado === "Activo"
+                    ? "Activo"
+                    : newPeriferico.estado === "Inactivo"
+                    ? "Inactivo"
+                    : ""
+                }
+                onValueChange={(value: EstadoType) =>
+                  setNewPeriferico({ ...newPeriferico, estado: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione el estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Activo">Activo</SelectItem>
+                  <SelectItem value="Inactivo">Inactivo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
