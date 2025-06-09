@@ -10,12 +10,8 @@ import { useEffect, useState } from "react";
 import { Sede } from "../interfaces/sedes";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css"; // Importa estilos por defecto
+import "react-confirm-alert/src/react-confirm-alert.css";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 export const useSedes = () => {
   const navigate = useNavigate();
@@ -51,7 +47,6 @@ export const useSedes = () => {
   }, []);
 
   const create = async (sede: Sede) => {
-
     if (!sede.nombre) {
       toast.error("Debe ingresar un nombre");
       return;
@@ -92,10 +87,10 @@ export const useSedes = () => {
             toast.success(res.message || "Sede eliminada correctamente");
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message || "No se pudo eliminar la sede");
+            toast.info(res.message);
           }
-        } catch (error: any) {
-          toast.error(error.message || "Error al eliminar la sede");
+        } catch (error) {
+          toast.info(error.message);
         }
       },
     });
