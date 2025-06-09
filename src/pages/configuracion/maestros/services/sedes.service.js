@@ -17,8 +17,7 @@ class SedesService {
   }
 
   async delete(id) {
-    const deletedSede = await SedesModel.delete(id);
-    return deletedSede;
+    return await SedesModel.delete(id);
   }
   async update(id, sede) {
     const updatedSede = await SedesModel.update(id, sede);
