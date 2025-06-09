@@ -65,7 +65,28 @@ export const SedesModel = {
         },
       });
 
-      // 2. Si hay sucursales, eliminarlas
+      // 2. Verificar vinculaciones en equipos o impresoras para cada sucursal
+      for (const sucursal of sucursales) {
+        const tieneEquipos = await prisma.equipos.findFirst({
+          where: { sucursal_id: sucursal.id_sucursal },
+        });
+        if (tieneEquipos) {
+          throw new Error(
+            `No se puede eliminar porque la sucursal "${sucursal.nombre}" tiene equipos asociados.`
+          );
+        }
+
+        const tieneImpresoras = await prisma.impresoras.findFirst({
+          where: { sucursal_id: sucursal.id_sucursal },
+        });
+        if (tieneImpresoras) {
+          throw new Error(
+            `No se puede eliminar porque la sucursal "${sucursal.nombre}" tiene impresoras asociadas.`
+          );
+        }
+      }
+
+      // 3. Si no hay vinculaciones, eliminar todas las sucursales
       if (sucursales.length > 0) {
         await prisma.sucursales.deleteMany({
           where: {
@@ -74,7 +95,7 @@ export const SedesModel = {
         });
       }
 
-      // 3. Unlink all users from the sede
+      // 4. Unlink all users from the sede
       await prisma.usuarios.updateMany({
         where: {
           sede_id: id_sede,
@@ -84,7 +105,7 @@ export const SedesModel = {
         },
       });
 
-      // 4. Delete the sede
+      // 5. Delete the sede
       const deletedSede = await prisma.sedes.delete({
         where: {
           id_sede: id_sede,
@@ -92,7 +113,7 @@ export const SedesModel = {
       });
       return deletedSede;
     } catch (error) {
-      throw new Error("Error deleting sede: " + error.message);
+      throw new Error(error.message);
     }
   },
 
