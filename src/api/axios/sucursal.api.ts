@@ -22,6 +22,10 @@ export const registerSucursal = async (sucursal: Sucursal) => {
 };
 
 export const deleteSucursal = async (id: number) => {
-  const response = await api.delete(`/sucursales/delete/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(`/sucursales/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
 };
