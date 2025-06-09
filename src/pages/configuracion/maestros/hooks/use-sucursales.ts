@@ -81,7 +81,7 @@ export const useSucursales = () => {
       }
       return response;
     } catch (error) {
-      toast.error(error.message);
+      toast.info(error.message);
     }
   };
 
@@ -277,10 +277,10 @@ export const useSucursales = () => {
             toast.success(res.message || "Sucursal eliminada correctamente");
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message || "No se pudo eliminar la sucursal");
+            toast.error(res.message);
           }
-        } catch (error: any) {
-          toast.error(error.message || "Error al eliminar la sucursal");
+        } catch (error) {
+          toast.info(error.message);
         }
       },
     });
