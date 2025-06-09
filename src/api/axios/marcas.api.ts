@@ -22,6 +22,10 @@ export const createMarca = async (marca: Marca) => {
 };
 
 export const deleteMarca = async (id: number) => {
-  const response = await api.delete(`marcas/delete/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(`marcas/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
 };
