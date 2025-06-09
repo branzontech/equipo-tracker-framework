@@ -67,6 +67,9 @@ export const usePeriferico = () => {
       const response = await createPeriferico(periferico);
       if (response.success) {
         toast.success(response.message || "Periferico creado exitosamente");
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
       }
       return response;
     } catch (error) {
