@@ -17,8 +17,7 @@ class SucursalServiceClass {
   }
 
   async delete(id) {
-    const deletedSucursal = await sucursalesModel.delete(id);
-    return deletedSucursal;
+    return await sucursalesModel.delete(id);
   }
 
   async update(id, sucursales) {
