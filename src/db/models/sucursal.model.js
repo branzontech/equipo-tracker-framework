@@ -48,6 +48,31 @@ export const sucursalesModel = {
   delete: async (id) => {
     const id_sucursal = Number(id);
     try {
+      // verificar si hay equipos asociados a esta sucursal
+      const equiposRelacionados = await prisma.equipos.findMany({
+        where: {
+          sucursal_id: id_sucursal,
+        },
+      });
+
+      if (equiposRelacionados) {
+        throw new Error(
+          "No se puede eliminar la sucursal porque está asociada a uno o más equipos."
+        );
+      }
+
+      // verificar impresoras asociadas a esta sucursal
+      const impresorasRelacionadas = await prisma.impresoras.findMany({
+        where: {
+          sucursal_id: id_sucursal,
+        },
+      });
+
+      if (impresorasRelacionadas) {
+        throw new Error(
+          "No se puede eliminar la sucursal porque está asociada a una o más impresoras."
+        );
+      }
       const deleted = await prisma.sucursales.delete({
         where: {
           id_sucursal: id_sucursal,
@@ -55,7 +80,7 @@ export const sucursalesModel = {
       });
       return deleted;
     } catch (error) {
-      throw new Error("Error deleting sucursal: " + error.message);
+      throw new Error(error.message);
     }
   },
 
