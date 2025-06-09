@@ -232,7 +232,9 @@ const HojaDeVida = () => {
             </div>
             <p className="text-xs text-muted-foreground">
               {newEquipo.sucursales?.sedes?.nombre ?? "Sin sede"} -{" "}
-              {/* {newEquipo.proveedor} */} Miguel Primera
+              {newEquipo.sucursales?.sedes?.usuarios
+                ?.map((usuario) => usuario.nombre)
+                .join(", ") ?? "Sin usuarios"}
             </p>
           </CardContent>
         </Card>
@@ -436,7 +438,10 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Precio de Compra:
                         </span>{" "}
-                        ${formatPrecio(newEquipo.adquisicion?.[0]?.precio_compra)}{" "}
+                        $
+                        {formatPrecio(
+                          newEquipo.adquisicion?.[0]?.precio_compra
+                        )}{" "}
                         {/* .toLocaleString() */}
                       </p>
                       <p>
@@ -515,7 +520,9 @@ const HojaDeVida = () => {
                           Valor Actual:
                         </span>{" "}
                         $
-                        {formatPrecio(newEquipo.administrativa?.[0]?.valor_depreciado)}
+                        {formatPrecio(
+                          newEquipo.administrativa?.[0]?.valor_depreciado
+                        )}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -539,15 +546,17 @@ const HojaDeVida = () => {
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
-                          Área:
+                          Tipo de Sucursal:
                         </span>{" "}
                         {newEquipo.sucursales.tipo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
-                          Responsable:
+                          Responsable(s):
                         </span>{" "}
-                        {/* {newEquipo.ubicacionActual.responsable} */}
+                        {newEquipo.sucursales?.sedes?.usuarios
+                          ?.map((usuario) => usuario.nombre)
+                          .join(", ") ?? "Sin usuarios"}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
