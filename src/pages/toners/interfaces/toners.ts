@@ -1,4 +1,3 @@
-import { Impresora } from "./impresora";
 
 export interface Toner {
   id_toner: number;
