@@ -60,10 +60,10 @@ export const useCategoria = () => {
             toast.success(res.message || "Categoria eliminada correctamente");
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message || "No se pudo eliminar la categoria");
+            toast.info(res.message || "No se pudo eliminar la categoria");
           }
         } catch (error) {
-          toast.error(error.message || "Error al eliminar la categoria");
+          toast.info(error.message);
         }
       },
     });
