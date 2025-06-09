@@ -1,6 +1,12 @@
-
-import { useState } from "react";
-import { Eye, Search, ArrowUp, ArrowDown, AlertTriangle, Download, SlidersHorizontal } from "lucide-react";
+import {
+  Eye,
+  Search,
+  ArrowUp,
+  ArrowDown,
+  AlertTriangle,
+  Download,
+  SlidersHorizontal,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,123 +40,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const sampleData = [
-  {
-    id: 1,
-    referencia: "TN-760",
-    modeloImpresora: "Brother DCP-L2540DW",
-    color: "Negro",
-    stockDisponible: 5,
-    alertaStockMinimo: 2,
-    areas: "Contabilidad",
-    sede: "Sede Norte",
-    cantidad: 10,
-  },
-  {
-    id: 2,
-    referencia: "CF410A",
-    modeloImpresora: "HP LaserJet Pro M452dn",
-    color: "Negro",
-    stockDisponible: 3,
-    alertaStockMinimo: 3,
-    areas: "Recursos Humanos",
-    sede: "Sede Sur",
-    cantidad: 8,
-  },
-  {
-    id: 3,
-    referencia: "CF411A",
-    modeloImpresora: "HP LaserJet Pro M452dn",
-    color: "Cyan",
-    stockDisponible: 4,
-    alertaStockMinimo: 2,
-    areas: "Gerencia",
-    sede: "Sede Centro",
-    cantidad: 6,
-  },
-];
+import useTonerImpresora from "../hooks/use-toner-impresora";
 
 const ExistenciaToners = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedColor, setSelectedColor] = useState<string>("todos");
-  const [selectedSede, setSelectedSede] = useState<string>("todas");
-  const itemsPerPage = 5;
-
-  const [visibleColumns, setVisibleColumns] = useState({
-    referencia: true,
-    modeloImpresora: true,
-    color: true,
-    stockDisponible: true,
-    alertaStockMinimo: true,
-    areas: true,
-    sede: true,
-    cantidad: true,
-  });
-
-  const filteredData = sampleData.filter((item) => {
-    const matchesSearch = Object.values(item).some(
-      (value) =>
-        value &&
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const matchesColor = selectedColor === "todos" ? true : item.color.toLowerCase() === selectedColor.toLowerCase();
-    const matchesSede = selectedSede === "todas" ? true : item.sede.toLowerCase() === selectedSede.toLowerCase();
-    return matchesSearch && matchesColor && matchesSede;
-  });
-
-  const sortedData = [...filteredData].sort((a: any, b: any) => {
-    if (!sortField) return 0;
-    if (sortDirection === "asc") {
-      return a[sortField] > b[sortField] ? 1 : -1;
-    }
-    return a[sortField] < b[sortField] ? 1 : -1;
-  });
-
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const handleDownload = () => {
-    const csvContent = [
-      Object.keys(sampleData[0]).join(","),
-      ...filteredData.map(item => Object.values(item).join(","))
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'toners.csv');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const resetFilters = () => {
-    setSearchTerm("");
-    setSelectedColor("todos");
-    setSelectedSede("todas");
-    setCurrentPage(1);
-  };
+  const {
+    searchTerm,
+    selectedColor,
+    selectedSede,
+    currentPage,
+    handleSort,
+    handleDownload,
+    resetFilters,
+    visibleColumns,
+    totalPages,
+    paginatedData,
+    setSearchTerm,
+    setSelectedColor,
+    setSelectedSede,
+    setCurrentPage,
+    setVisibleColumns,
+    sortField,
+    filteredData,
+    sortDirection,
+  } = useTonerImpresora();
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#040d50] mb-6">Existencia de Toners</h1>
-      
+      <h1 className="text-2xl font-bold text-[#040d50] mb-6">
+        Existencia de Toners
+      </h1>
+
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-[#040d50]" />
@@ -163,7 +82,10 @@ const ExistenciaToners = () => {
         </div>
         <Select value={selectedColor} onValueChange={setSelectedColor}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrar por color" className="text-[#040d50]" />
+            <SelectValue
+              placeholder="Filtrar por color"
+              className="text-[#040d50]"
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos los colores</SelectItem>
@@ -175,7 +97,10 @@ const ExistenciaToners = () => {
         </Select>
         <Select value={selectedSede} onValueChange={setSelectedSede}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrar por sede" className="text-[#040d50]" />
+            <SelectValue
+              placeholder="Filtrar por sede"
+              className="text-[#040d50]"
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todas">Todas las sedes</SelectItem>
@@ -192,14 +117,16 @@ const ExistenciaToners = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel className="text-[#040d50]">Columnas visibles</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#040d50]">
+                Columnas visibles
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {Object.entries(visibleColumns).map(([key, value]) => (
                 <DropdownMenuCheckboxItem
                   key={key}
                   checked={value}
                   onCheckedChange={(checked) =>
-                    setVisibleColumns(prev => ({ ...prev, [key]: checked }))
+                    setVisibleColumns((prev) => ({ ...prev, [key]: checked }))
                   }
                 >
                   {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -221,62 +148,86 @@ const ExistenciaToners = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              {Object.entries(visibleColumns).map(([key, visible]) => 
-                visible && (
-                  <TableHead
-                    key={key}
-                    onClick={() => handleSort(key)}
-                    className="cursor-pointer text-[#040d50] hover:text-[#040d50]/80"
-                  >
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                    {sortField === key && (
-                      sortDirection === "asc" ? 
-                        <ArrowUp className="inline ml-1 h-4 w-4" /> : 
-                        <ArrowDown className="inline ml-1 h-4 w-4" />
-                    )}
-                  </TableHead>
-                )
+              {Object.entries(visibleColumns).map(
+                ([key, visible]) =>
+                  visible && (
+                    <TableHead
+                      key={key}
+                      onClick={() => handleSort(key)}
+                      className="cursor-pointer text-[#040d50] hover:text-[#040d50]/80"
+                    >
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                      {sortField === key &&
+                        (sortDirection === "asc" ? (
+                          <ArrowUp className="inline ml-1 h-4 w-4" />
+                        ) : (
+                          <ArrowDown className="inline ml-1 h-4 w-4" />
+                        ))}
+                    </TableHead>
+                  )
               )}
               <TableHead className="text-[#040d50]">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.map((item) => (
-              <TableRow key={item.id}>
-                {Object.entries(visibleColumns).map(([key, visible]) => 
-                  visible && (
-                    <TableCell key={key}>
-                      {key === 'stockDisponible' ? (
-                        <div className="flex items-center gap-2">
-                          {item[key]}
-                          {item.stockDisponible <= item.alertaStockMinimo && (
-                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            {filteredData.length > 0 ? (
+              paginatedData.map((item) => (
+                <TableRow key={item.id}>
+                  {Object.entries(visibleColumns).map(
+                    ([key, visible]) =>
+                      visible && (
+                        <TableCell key={key}>
+                          {key === "stock" ? (
+                            <div className="flex items-center gap-2">
+                              {item[key]}
+                              {item.stock <= item.alerta && (
+                                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                              )}
+                            </div>
+                          ) : (
+                            item[key]
                           )}
-                        </div>
-                      ) : (
-                        item[key]
-                      )}
-                    </TableCell>
-                  )
-                )}
-                <TableCell>
-                  <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                        </TableCell>
+                      )
+                  )}
+                  <TableCell>
+                    <Button variant="ghost" size="icon">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={
+                    Object.entries(visibleColumns).filter((col) => col[1])
+                      .length + 1
+                  }
+                  className="h-24 text-center"
+                >
+                  No se encontraron resultados.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
 
       <div className="mt-4">
+        <div className="text-sm text-gray-500">
+          Mostrando {paginatedData.length} de {filteredData.length} registros
+        </div>
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(page => Math.max(1, page - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              <PaginationPrevious
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                className={
+                  currentPage === 1
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
               />
             </PaginationItem>
             {[...Array(totalPages)].map((_, index) => (
@@ -291,8 +242,14 @@ const ExistenciaToners = () => {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => setCurrentPage(page => Math.min(totalPages, page + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+                className={
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
               />
             </PaginationItem>
           </PaginationContent>
