@@ -46,6 +46,6 @@ export const deleteC = async (req, res) => {
     const deletedCategoria = await CategoriaService.delete(id);
     res.status(200).json({ deletedCategoria, success: true });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting categoria" });
+    res.status(400).json({ message: error.message });
   }
 };
