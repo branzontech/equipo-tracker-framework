@@ -57,6 +57,6 @@ export const deleteSucursal = async (req, res) => {
     const sucursalDeleted = await SucursalService.delete(id);
     res.json({ success: true, sucursal: sucursalDeleted });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
