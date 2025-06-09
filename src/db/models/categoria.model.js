@@ -50,6 +50,18 @@ export const CategoriaModel = {
   delete: async (id) => {
     const id_categoria = Number(id);
     try {
+      // verificar si hay equipos asociados a esta categoria
+      const equiposRelacionados = await prisma.equipos.findMany({
+        where: {
+          categoria_id: id_categoria,
+        },
+      });
+
+      if (equiposRelacionados) {
+        throw new Error(
+          "No se puede eliminar la categoria porque está asociada a uno o más equipos."
+        );
+      }
       const deletedCategoria = await prisma.categorias.delete({
         where: {
           id_categoria: id_categoria,
@@ -57,7 +69,7 @@ export const CategoriaModel = {
       });
       return deletedCategoria;
     } catch (error) {
-      throw new Error("Error deleting categoria: " + error.message);
+      throw new Error(error.message);
     }
   },
 };
