@@ -105,6 +105,11 @@ export const equipoModel = {
         sucursales: {
           include: {
             sedes: true,
+            sedes: {
+              include: {
+                usuarios: true,
+              },
+            },
           },
         },
       },
@@ -120,6 +125,11 @@ export const equipoModel = {
         sucursales: {
           include: {
             sedes: true,
+            sedes: {
+              include: {
+                usuarios: true,
+              },
+            },
           },
         },
         especificaciones: true,
