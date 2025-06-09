@@ -22,6 +22,10 @@ export const createCategoria = async (categoria: Categoria) => {
 };
 
 export const deleteCategoria = async (id: number) => {
+  try {
   const response = await api.delete(`categorias/delete/${id}`);
   return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
 };
