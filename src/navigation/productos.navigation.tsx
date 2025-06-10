@@ -1,11 +1,11 @@
-import IngresoProducto from "@/pages/productos/Ingreso";
-import ListaInventario from "@/pages/productos/Lista";
-import Salidas from "@/pages/productos/Salidas";
+import IngresoProducto from "@/pages/productos/views/Ingreso";
+import ListaInventario from "@/pages/productos/views/Lista";
+import Salidas from "@/pages/productos/views/Salidas";
 import Traslados from "@/pages/productos/salidas/Traslados";
-import Actas from "@/pages/productos/Actas";
-import BajaEquipos from "@/pages/productos/BajaEquipos";
-import Devoluciones from "@/pages/productos/Devoluciones";
-import HojaDeVida from "@/pages/productos/HojaDeVida";
+import Actas from "@/pages/productos/views/Actas";
+import BajaEquipos from "@/pages/productos/views/BajaEquipos";
+import Devoluciones from "@/pages/productos/views/Devoluciones";
+import HojaDeVida from "@/pages/productos/views/HojaDeVida";
 
 export const productosNavigation = [
   { path: "/productos/ingreso", element: <IngresoProducto /> },
