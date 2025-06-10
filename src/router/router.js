@@ -10,6 +10,8 @@ import perifericoRoutes from "./routes/periferico.routes.js";
 import impresoraRoutes from "./routes/impresora.routes.js";
 import tonerRoutes from "./routes/toner.routes.js";
 import tonerImpresoraRoutes from "./routes/toner-impresora.routes.js";
+import contratoRoutes from "./routes/contrato.routes.js";
+import prestamoRoutes from "./routes/prestamo.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -26,6 +28,8 @@ const routerApi = (app) => {
   router.use("/impresoras", impresoraRoutes);
   router.use("/toners", tonerRoutes);
   router.use("/toner-impresora", tonerImpresoraRoutes);
+  router.use("/contrato", contratoRoutes);
+  router.use("/prestamos", prestamoRoutes);
 };
 
 export default routerApi;
