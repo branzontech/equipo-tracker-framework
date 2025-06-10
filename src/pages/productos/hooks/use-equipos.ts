@@ -418,7 +418,7 @@ export const useEquipos = () => {
       toast.success(response.message || "Equipo creado exitosamente");
       setTimeout(() => {
         window.location.reload();
-      }, 2500);
+      }, 4500);
       navigate("/productos/lista");
     } else {
       throw new Error("Error al crear el equipo");
@@ -493,7 +493,7 @@ export const useEquipos = () => {
       toast.success(response.message || "Equipo eliminado exitosamente");
       setTimeout(() => {
         window.location.reload();
-      }, 2500);
+      }, 4500);
     }
   };
 
