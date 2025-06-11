@@ -33,6 +33,12 @@ import {
 } from "@/components/ui/select";
 import { useEquipos } from "../hooks/use-equipos";
 import SignatureCanvas from "@/components/SignatureCanvas";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { useUser } from "@/pages/usuarios/hooks/use-user";
+import { useEffect, useState } from "react";
+import { AccesoriosContainer } from "@/components/AccesorioItem";
+import { toast } from "sonner";
+import { Equipo } from "../interfaces/equipo";
 
 const styles = StyleSheet.create({
   page: {
@@ -222,267 +228,415 @@ const ActaEntregaPDF = ({ data }) => {
 };
 
 const Salidas = () => {
-  const { newPrestamo, prestamos, setNewPrestamo } = usePrestamo();
-  const { equipo, newEquipo, getInfoEquipo } = useEquipos();
-
-  const buscarEquipo = async (serial: string) => {
-    try {
-      const equipo = await getInfoEquipo(serial);
-    } catch (error) {
-      console.error("Error al buscar equipo:", error);
-    }
-  };
+  const {
+    newPrestamo,
+    setNewPrestamo,
+    addPrestamo,
+    buscarEquipo,
+    haBuscado,
+    accesorios,
+    equipo,
+    setEquipo,
+  } = usePrestamo();
+  const {
+    newUser,
+    setNewUser,
+    users,
+    selectedEntregaUser,
+    setSelectedEntregaUser,
+    selectedRecibeUser,
+    setSelectedRecibeUser,
+  } = useUser();
+  const methods = useForm();
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-[#01242c] mb-6">
         Salida de Equipos en Condición de Préstamo
       </h1>
 
-      <form className="space-y-8">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="fechaEntrega">Fecha de Entrega</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  {newPrestamo.fecha_salida ? (
-                    format(newPrestamo.fecha_salida, "PPP", {
-                      locale: es,
-                    })
-                  ) : (
-                    <span>Seleccionar fecha</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={newPrestamo.fecha_salida}
-                  onSelect={(date) =>
-                    setNewPrestamo({
-                      ...newPrestamo,
-                      fecha_salida: date as Date,
-                    })
-                  }
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+      <FormProvider {...methods}>
+        <form
+          className="space-y-8"
+          onSubmit={(e: React.FormEvent) => {
+            e.preventDefault();
 
-          <div className="space-y-2">
-            <Label htmlFor="fechaRetorno">Fecha de Retorno</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  {newPrestamo.fecha_retorno ? (
-                    format(newPrestamo.fecha_retorno, "PPP", {
-                      locale: es,
-                    })
-                  ) : (
-                    <span>Seleccionar fecha</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={newPrestamo.fecha_retorno}
-                  onSelect={(date) =>
-                    setNewPrestamo({
-                      ...newPrestamo,
-                      fecha_retorno: date as Date,
-                    })
-                  }
-                  initialFocus
-                  disabled={(date) =>
-                    newPrestamo.fecha_retorno
-                      ? date < newPrestamo.fecha_retorno
-                      : false
-                  }
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+            const firmaFinalEntrega =
+              newUser.firma_entrega || selectedEntregaUser?.firma || "";
+            const firmaFinalRecibe =
+              newUser.firma_recibe || selectedRecibeUser?.firma || "";
 
-          <div className="space-y-2">
-            <Label htmlFor="nombreUsuario">Nombre del Usuario</Label>
-            <Input id="nombreUsuario" placeholder="Nombre completo" />
-          </div>
+            addPrestamo(newPrestamo, firmaFinalEntrega, firmaFinalRecibe);
+          }}
+        >
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="fechaEntrega">Fecha de Entrega</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newPrestamo.fecha_salida ? (
+                      format(newPrestamo.fecha_salida, "PPP", {
+                        locale: es,
+                      })
+                    ) : (
+                      <span>Seleccionar fecha</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={newPrestamo.fecha_salida}
+                    onSelect={(date) =>
+                      setNewPrestamo({
+                        ...newPrestamo,
+                        fecha_salida: date as Date,
+                      })
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="estado">Estado</Label>
-            <Select
-              value={newPrestamo.estado || ""}
-              onValueChange={(value) =>
-                setNewPrestamo({ ...newPrestamo, estado: value })
-              }
-            >
-              <SelectTrigger id="estado">
-                <SelectValue placeholder="Seleccione un estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pendiente">Pendiente</SelectItem>
-                <SelectItem value="entregado">Entregado</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="fechaRetorno">Fecha de Retorno</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newPrestamo.fecha_retorno ? (
+                      format(newPrestamo.fecha_retorno, "PPP", {
+                        locale: es,
+                      })
+                    ) : (
+                      <span>Seleccionar fecha</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={newPrestamo.fecha_retorno}
+                    onSelect={(date) =>
+                      setNewPrestamo({
+                        ...newPrestamo,
+                        fecha_retorno: date as Date,
+                      })
+                    }
+                    initialFocus
+                    disabled={(date) =>
+                      newPrestamo.fecha_retorno
+                        ? date < newPrestamo.fecha_retorno
+                        : false
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <p className="mb-4 text-gray-700">
-            Señor(a) <span className="font-semibold"></span> a continuación se
-            le hace entrega de los siguientes implementos de trabajo:
-          </p>
-
-          <div className="space-y-6">
-            {equipo.map((field, index) => (
-              <div
-                key={field.id_equipo}
-                className="p-4 border rounded-lg bg-white"
+            <div className="space-y-2">
+              <Label htmlFor="nombreUsuario">Nombre del Usuario</Label>
+              <Select
+                value={newUser.nombre}
+                onValueChange={(value) =>
+                  setNewUser({ ...newUser, nombre: value })
+                }
               >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-medium text-[#01242c]">
-                    Equipo {index + 1}
-                  </h3>
-                  {equipo.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Eliminar
-                    </Button>
-                  )}
-                </div>
+                <SelectTrigger id="nombreUsuario">
+                  <SelectValue placeholder="Seleccione un usuario" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id_usuario} value={user.nombre}>
+                      {user.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-                <div className="grid grid-cols-12 gap-4 items-start">
-                  <div className="col-span-12 md:col-span-3 relative">
-                      <Label>Serial</Label>
-                      <Input
-                        placeholder="Ingrese el serial del equipo"
-                        value={field.nro_serie}
-                        onChange={(e) => {
-                          field.nro_serie = e.target.value;
-                        }}
-                      />
+            <div className="space-y-2">
+              <Label htmlFor="estado">Estado</Label>
+              <Select
+                value={newPrestamo.estado || ""}
+                onValueChange={(value) =>
+                  setNewPrestamo({ ...newPrestamo, estado: value })
+                }
+              >
+                <SelectTrigger id="estado">
+                  <SelectValue placeholder="Seleccione un estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Pendiente">Pendiente</SelectItem>
+                  <SelectItem value="Entregado">Entregado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="mb-4 text-gray-700">
+              Señor(a) <span className="font-semibold">{newUser.nombre}</span> a
+              continuación se le hace entrega de los siguientes implementos de
+              trabajo:
+            </p>
+
+            <div className="space-y-6">
+              {equipo.map((field, index) => (
+                <div
+                  key={field.id_equipo}
+                  className="p-4 border rounded-lg bg-white"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-medium text-[#01242c]">
+                      Equipo {index + 1}
+                    </h3>
+                    {equipo.length > 1 && (
                       <Button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0"
-                        onClick={() => buscarEquipo(field.nro_serie)}
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
                       >
-                        <Search className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Eliminar
                       </Button>
-                    </div>
-
-                    <div className="col-span-12 md:col-span-3">
-                      <Label>Marca</Label>
-                      <Input value={field.marcas.nombre || ""} readOnly />
-                    </div>
-
-                    <div className="col-span-12 md:col-span-3">
-                      <Label>Activo Fijo</Label>
-                      <Input value={field.tipo_activo || ""} readOnly />
-                    </div>
-
-                    <div className="col-span-12 md:col-span-3">
-                      <Label>Nombre</Label>
-                      <Input value={field.nombre_equipo || ""} readOnly />
+                    )}
                   </div>
+
+                  <div className="grid grid-cols-12 gap-4 items-start">
+                    <div className="col-span-12 md:col-span-3">
+                      <Label>Serial</Label>
+                      <div className="relative">
+                        <Input
+                          placeholder="Ingrese el serial del equipo"
+                          onChange={(e) => {
+                            field.nro_serie = e.target.value;
+                          }}
+                          className="pr-10 rounded-l-none"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e: React.FormEvent) => {
+                            e.preventDefault();
+                            if (!field.nro_serie.trim()) {
+                              toast.error("Debe ingresar un número de serie");
+                              return;
+                            }
+                            buscarEquipo(field.nro_serie);
+                          }}
+                          className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <Search className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {haBuscado && (
+                      <>
+                        <div className="col-span-12 md:col-span-3">
+                          <Label>Marca</Label>
+                          <Input
+                            value={
+                              typeof field.marcas === "string"
+                                ? field.marcas
+                                : field.marcas?.nombre || ""
+                            }
+                            readOnly
+                          />
+                        </div>
+
+                        <div className="col-span-12 md:col-span-3">
+                          <Label>Tipo de Activo Fijo</Label>
+                          <Input value={field.tipo_activo || ""} readOnly />
+                        </div>
+
+                        <div className="col-span-12 md:col-span-3">
+                          <Label>Nombre</Label>
+                          <Input value={field.nombre_equipo || ""} readOnly />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <AccesoriosContainer
+                    equipoIndex={index}
+                    accesorios={
+                      Array.isArray(accesorios) ? accesorios : [accesorios]
+                    }
+                  />
                 </div>
+              ))}
 
-                {/* <AccesoriosContainer equipoIndex={index} /> */}
-              </div>
-            ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => {
+                  const nuevoEquipo: Equipo = {
+                    id_equipo: Date.now(),
+                    nombre_equipo: "",
+                    nro_serie: "",
+                    modelo: "",
+                    marca_id: 0,
+                    marcas: null,
+                    categoria_id: 0,
+                    categorias: null,
+                    tipo_activo: "",
+                    fecha_registro: "",
+                    sucursal_id: 0,
+                    sucursales: null,
+                    garantia_fecha_fin: "",
+                    estado_actual: "",
+                    perifericos: null,
+                  };
+                  setEquipo([...equipo, nuevoEquipo]);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Agregar equipo
+              </Button>
+            </div>
+          </div>
 
-            <Button type="button" variant="outline" size="sm" className="mt-2">
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar equipo
+          <div className="space-y-2">
+            <Label htmlFor="descripcion">Descripcion del prestamo</Label>
+            <Textarea
+              id="descripcion"
+              placeholder="Ingrese la descripción..."
+              rows={4}
+              value={newPrestamo.descripcion}
+              onChange={(e) => {
+                setNewPrestamo({
+                  ...newPrestamo,
+                  descripcion: e.target.value,
+                });
+              }}
+            />
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-700">
+            El receptor se compromete a utilizar el equipo exclusivamente para
+            propósitos laborales, mantenerlo en óptimas condiciones y reportar
+            de manera inmediata cualquier falla o anomalía que se presente.
+            Asimismo, se compromete a no instalar ningún tipo de software sin la
+            debida autorización, no prestar ni transferir el equipo a terceras
+            personas y devolverlo cuando la empresa lo requiera.
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ResponsibleSearch
+              name="responsableEntrega"
+              label="Responsable de Entrega"
+              onSelect={(person) => {
+                const user = users.find(
+                  (u) => u.id_usuario === Number(person.id)
+                );
+                if (user) {
+                  setSelectedEntregaUser({
+                    ...user,
+                    firma: user.firma || "",
+                  });
+                } else {
+                  setSelectedEntregaUser(null);
+                }
+                setNewPrestamo((prev) => ({
+                  ...prev,
+                  responsable_salida_id: Number(person.id),
+                }));
+              }}
+            />
+
+            <ResponsibleSearch
+              name="responsableRecibe"
+              label="Responsable de Recepción"
+              onSelect={(person) => {
+                const user = users.find(
+                  (u) => u.id_usuario === Number(person.id)
+                );
+                if (user) {
+                  setSelectedRecibeUser({
+                    ...user,
+                    firma: user.firma || "",
+                  });
+                } else {
+                  setSelectedRecibeUser(null);
+                }
+                setNewPrestamo((prev) => ({
+                  ...prev,
+                  responsable_entrada_id: Number(person.id),
+                }));
+              }}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="firmaEntrega">Firma de quien entrega</Label>
+              <SignatureCanvas
+                value={selectedEntregaUser?.firma || ""}
+                onChange={(value: string) => {
+                  newUser.firma_entrega = value;
+                  if (selectedEntregaUser) {
+                    setSelectedEntregaUser({
+                      ...selectedEntregaUser,
+                      firma: value,
+                    });
+                  }
+                }}
+                readOnly={!!selectedEntregaUser?.firma}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="firmaRecibe">Firma de quien recibe</Label>
+              <SignatureCanvas
+                value={selectedRecibeUser?.firma || ""}
+                onChange={(value: string) => {
+                  newUser.firma_recibe = value;
+                  if (selectedRecibeUser) {
+                    setSelectedRecibeUser({
+                      ...selectedRecibeUser,
+                      firma: value,
+                    });
+                  }
+                }}
+                readOnly={!!selectedRecibeUser?.firma}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-4">
+            <Button type="submit" className="w-full">
+              Generar Acta de Entrega
             </Button>
+            {newPrestamo.fecha_salida && (
+              <PDFDownloadLink
+                document={<ActaEntregaPDF data={newPrestamo} />}
+                fileName={`acta-entrega-${format(
+                  new Date(),
+                  "yyyy-MM-dd"
+                )}.pdf`}
+                className="hidden"
+              >
+                {({ blob, url, loading, error }) =>
+                  loading ? "Generando documento..." : "Descargar PDF"
+                }
+              </PDFDownloadLink>
+            )}
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="observaciones">Observaciones</Label>
-          <Textarea
-            id="observaciones"
-            placeholder="Ingrese las observaciones..."
-            rows={4}
-          />
-        </div>
-
-        <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-700">
-          El receptor se compromete a utilizar el equipo exclusivamente para
-          propósitos laborales, mantenerlo en óptimas condiciones y reportar de
-          manera inmediata cualquier falla o anomalía que se presente. Asimismo,
-          se compromete a no instalar ningún tipo de software sin la debida
-          autorización, no prestar ni transferir el equipo a terceras personas y
-          devolverlo cuando la empresa lo requiera.
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* <ResponsibleSearch
-            name="responsableEntrega"
-            label="Responsable de Entrega"
-          />
-
-          <ResponsibleSearch
-            name="responsableRecibe"
-            label="Responsable de Recepción"
-          /> */}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="firmaEntrega">Firma de quien entrega</Label>
-            <SignatureCanvas
-              value={newPrestamo.firma_entrega}
-              onChange={(value: string) => {
-                setNewPrestamo({ ...newPrestamo, firma_entrega: value });
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="firmaRecibe">Firma de quien recibe</Label>
-            <SignatureCanvas
-              value={newPrestamo.firma_recibe}
-              onChange={(value: string) => {
-                setNewPrestamo({ ...newPrestamo, firma_recibe: value });
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end space-x-4">
-          <Button type="submit" className="w-full">
-            Generar Acta de Entrega
-          </Button>
-          {/* {methods.getValues("fechaEntrega") && (
-            <PDFDownloadLink
-              document={<ActaEntregaPDF data={methods.getValues()} />}
-              fileName={`acta-entrega-${format(new Date(), "yyyy-MM-dd")}.pdf`}
-              className="hidden"
-            >
-              {({ blob, url, loading, error }) =>
-                loading ? "Generando documento..." : "Descargar PDF"
-              }
-            </PDFDownloadLink>
-          )} */}
-        </div>
-      </form>
+        </form>
+      </FormProvider>
     </div>
   );
 };
