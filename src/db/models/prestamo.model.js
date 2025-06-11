@@ -6,29 +6,142 @@ export const prestamoModel = {
       select: {
         id_prestamo: true,
         acta_id: true,
+        actas: {
+          select: {
+            tipo: true,
+            fecha: true,
+          },
+        },
         equipo_id: true,
+        equipos: {
+          select: {
+            id_equipo: true,
+            nombre_equipo: true,
+          },
+        },
         responsable_salida_id: true,
+        usuarios_prestamos_responsable_entrada_idTousuarios: {
+          select: {
+            id_usuario: true,
+            nombre: true,
+          },
+        },
         responsable_entrada_id: true,
-        ubicacion_destino_id: true,
+        usuarios_prestamos_responsable_salida_idTousuarios: {
+          select: {
+            id_usuario: true,
+            nombre: true,
+          },
+        },
         fecha_salida: true,
         fecha_retorno: true,
         estado: true,
+        descripcion: true,
       },
     });
+
     return prestamos;
   },
   async create(prestamo) {
-    const data = {
-      acta_id: prestamo.acta_id,
-      equipo_id: prestamo.equipo_id,
-      responsable_salida_id: prestamo.responsable_salida_id,
-      responsable_entrada_id: prestamo.responsable_entrada_id,
-      ubicacion_destino_id: prestamo.ubicacion_destino_id,
-      fecha_salida: new Date(prestamo.fecha_salida),
-      fecha_retorno: new Date(prestamo.fecha_retorno),
-      estado: prestamo.estado,
-    };
+    try {
+      // 1. Crear el acta
+      const nuevaActa = await prisma.actas.create({
+        data: {
+          tipo: "Prestamo",
+          fecha: new Date(),
+        },
+      });
 
-    return await prisma.prestamos.create({ data });
+      // 2. Crear el préstamo y asociar usuarios
+      const nuevoPrestamo = await prisma.prestamos.create({
+        data: {
+          fecha_salida: new Date(prestamo.fecha_salida),
+          fecha_retorno: new Date(prestamo.fecha_retorno),
+          descripcion: prestamo.descripcion,
+          estado: prestamo.estado,
+          actas: { connect: { id_acta: nuevaActa.id_acta } },
+          usuarios_prestamos_responsable_salida_idTousuarios: {
+            connect: { id_usuario: prestamo.responsable_salida_id },
+          },
+          usuarios_prestamos_responsable_entrada_idTousuarios: {
+            connect: { id_usuario: prestamo.responsable_entrada_id },
+          },
+        },
+      });
+
+      // 3. Iterar por equipos del préstamo
+      for (const equipo of prestamo.equipos) {
+        console.log("Periféricos a registrar:", equipo.perifericos);
+
+        // 3.1 Relacionar equipo con acta
+        await prisma.acta_equipos.create({
+          data: {
+            acta_id: nuevaActa.id_acta,
+            equipo_id: equipo.id_equipo,
+          },
+        });
+
+        // 3.2 Crear relación en Prestamo_Equipos
+        const prestamoEquipo = await prisma.prestamo_equipos.create({
+          data: {
+            prestamo_id: nuevoPrestamo.id_prestamo,
+            equipo_id: equipo.id_equipo,
+          },
+        });
+
+        // 3.3 Insertar perifericos relacionados (si hay)
+        if (equipo.perifericos && equipo.perifericos.length > 0) {
+          for (const periferico_id of equipo.perifericos) {
+            try {
+              await prisma.prestamo_perifericos.create({
+                data: {
+                  prestamo_equipo_id: prestamoEquipo.id,
+                  periferico_id,
+                },
+              });
+            } catch (error) {
+              console.error(
+                `❌ Error insertando periférico ${periferico_id}:`,
+                error
+              );
+            }
+          }
+        }
+      }
+
+      return nuevoPrestamo;
+    } catch (error) {
+      console.error("Error al crear el préstamo:", error);
+      return error;
+    }
+  },
+  async saveSign(
+    firma_entrega,
+    firma_salida,
+    responsable_salida_id,
+    responsable_entrada_id
+  ) {
+    try {
+      if (firma_entrega && responsable_salida_id) {
+        const firmaBuffer = Buffer.from(firma_entrega.split(",")[1], "base64");
+
+        await prisma.usuarios.update({
+          where: { id_usuario: responsable_salida_id },
+          data: { firma: firmaBuffer },
+        });
+      }
+
+      if (firma_salida && responsable_entrada_id) {
+        const firmaBuffer = Buffer.from(firma_salida.split(",")[1], "base64");
+
+        await prisma.usuarios.update({
+          where: { id_usuario: responsable_entrada_id },
+          data: { firma: firmaBuffer },
+        });
+      }
+    } catch (error) {
+      console.error("Error al guardar la firma del prestamo:", error);
+      return error;
+    }
   },
 };
