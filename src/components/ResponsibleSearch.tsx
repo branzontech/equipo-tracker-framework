@@ -1,27 +1,26 @@
-
 import { useState, useEffect, useRef } from "react";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { ResponsiblePerson } from "@/components/interfaces/resposiblePerson";
-
-// Mock data - in a real app, this would come from an API
-const mockResponsibles: ResponsiblePerson[] = [
-  { id: "1", name: "Juan Pérez", position: "Coordinador IT", department: "Tecnología" },
-  { id: "2", name: "María Rodríguez", position: "Analista", department: "Contabilidad" },
-  { id: "3", name: "Carlos Gómez", position: "Gerente", department: "Operaciones" },
-  { id: "4", name: "Laura Martínez", position: "Supervisor", department: "Recursos Humanos" },
-  { id: "5", name: "Diego López", position: "Técnico", department: "Soporte" },
-];
+import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
+import { useUser } from "@/pages/usuarios/hooks/use-user";
 
 interface ResponsibleSearchProps {
   name: string;
   label: string;
+  onSelect?: (person: ResponsiblePerson) => void;
 }
 
-const ResponsibleSearch = ({ name, label }: ResponsibleSearchProps) => {
+const ResponsibleSearch = ({ name, label, onSelect }: ResponsibleSearchProps) => {
   const { control, setValue, watch } = useFormContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -29,11 +28,15 @@ const ResponsibleSearch = ({ name, label }: ResponsibleSearchProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const responsibleId = watch(`${name}Id`);
   const responsibleName = watch(`${name}Name`);
+  const { users } = useUser();
 
   // Close the dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
         setShowResults(false);
       }
     }
@@ -43,19 +46,28 @@ const ResponsibleSearch = ({ name, label }: ResponsibleSearchProps) => {
     };
   }, [wrapperRef]);
 
-  // Search for responsibles
+  const mappedUsers: ResponsiblePerson[] = users.map((u) => ({
+    id: u.id_usuario.toString(),
+    name: u.nombre,
+    department: u.sedes?.nombre || "Sin sede",
+    position: u.rol,
+    firma_entrega: u.firma_entrega,
+    firma_recibe: u.firma_recibe
+  }));
+
   const handleSearch = () => {
     if (searchTerm.trim() === "") {
       setResults([]);
       return;
     }
 
-    const filtered = mockResponsibles.filter(person => 
-      person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      person.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      person.position.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = mappedUsers.filter(
+      (person) =>
+        person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.position.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    
+
     setResults(filtered);
     setShowResults(true);
   };
@@ -68,6 +80,10 @@ const ResponsibleSearch = ({ name, label }: ResponsibleSearchProps) => {
     setValue(`${name}Department`, person.department);
     setSearchTerm("");
     setShowResults(false);
+
+    if (onSelect) {
+      onSelect(person);
+    }
   };
 
   // Clear selected responsible
@@ -124,7 +140,7 @@ const ResponsibleSearch = ({ name, label }: ResponsibleSearchProps) => {
                       </Button>
                     </div>
                   </FormControl>
-                  
+
                   {showResults && results.length > 0 && (
                     <div className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg">
                       <ul className="max-h-60 overflow-auto">
