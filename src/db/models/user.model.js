@@ -10,6 +10,7 @@ export const UserModel = {
         rol: true,
         activo: true,
         sede_id: true,
+        firma: true,
         sedes: {
           select: {
             id_sede: true,
@@ -18,6 +19,15 @@ export const UserModel = {
         },
       },
     });
-    return users;
+
+    // Convierte firma a base64 si es Uint8Array
+    const usersWithFirmaBase64 = users.map((user) => ({
+      ...user,
+      firma: user.firma
+        ? `data:image/png;base64,${Buffer.from(user.firma).toString("base64")}`
+        : null,
+    }));
+
+    return usersWithFirmaBase64;
   },
 };
