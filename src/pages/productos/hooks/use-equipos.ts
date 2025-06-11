@@ -79,6 +79,14 @@ export const useEquipos = () => {
       valor_depreciado: 0,
       vida_util_restante: "",
     },
+    perifericos: {
+      id_periferico: 0,
+      nombre: "",
+      estado: "",
+      tipo: "",
+      equipo_asociado_id: 0,
+      equipos: null,
+    },
   });
   const navigate = useNavigate();
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
@@ -418,8 +426,8 @@ export const useEquipos = () => {
       toast.success(response.message || "Equipo creado exitosamente");
       setTimeout(() => {
         window.location.reload();
+        navigate("/productos/lista");
       }, 4500);
-      navigate("/productos/lista");
     } else {
       throw new Error("Error al crear el equipo");
     }
@@ -483,6 +491,7 @@ export const useEquipos = () => {
   const getInfoEquipo = async (nroSeries: string) => {
     const response = await getEquiposByNroSerie(nroSeries);
     setNewEquipo(response);
+    return response;
   };
 
   const deleteEquipoById = async (id: number) => {
