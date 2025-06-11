@@ -11,6 +11,8 @@ export const equipoModel = {
       throw new Error("ID de categoría, marca o sucursal inválido.");
     }
 
+    console.log("data:", data);
+
     return await prisma.equipos.create({
       data: {
         nombre_equipo: data.nombre_equipo,
@@ -70,18 +72,18 @@ export const equipoModel = {
 
         administrativa: {
           create: {
-            codigo_inventario: data.informacionAdministrativa.codigo_inventario,
-            centro_coste: data.informacionAdministrativa.centro_coste,
-            autorizado_por: data.informacionAdministrativa.autorizado_por,
+            codigo_inventario: data.administrativa.codigo_inventario,
+            centro_coste: data.administrativa.centro_coste,
+            autorizado_por: data.administrativa.autorizado_por,
             fecha_activacion: new Date(
-              data.informacionAdministrativa.fecha_activacion
+              data.administrativa.fecha_activacion
             ),
-            estado_contable: data.informacionAdministrativa.estado_contable,
+            estado_contable: data.administrativa.estado_contable,
             valor_depreciado: new Prisma.Decimal(
-              data.informacionAdministrativa.valor_depreciado
+              data.administrativa.valor_depreciado
             ),
             vida_util_restante:
-              data.informacionAdministrativa.vida_util_restante,
+              data.administrativa.vida_util_restante,
           },
         },
       },
@@ -127,7 +129,12 @@ export const equipoModel = {
             sedes: true,
             sedes: {
               include: {
-                usuarios: true,
+                usuarios: {
+                  select: {
+                    id_usuario: true,
+                    nombre: true,
+                  },
+                },
               },
             },
           },
@@ -136,6 +143,7 @@ export const equipoModel = {
         seguridad: true,
         adquisicion: true,
         administrativa: true,
+        perifericos: true,
       },
     });
 
