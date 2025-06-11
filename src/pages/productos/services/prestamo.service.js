@@ -6,7 +6,7 @@ export const PrestamoService = {
       const prestamos = await prestamoModel.findAll();
       return prestamos;
     } catch (error) {
-      throw new Error("Error getting all prestamos: " + error.message);
+      throw new Error(error.message);
     }
   },
 
@@ -39,5 +39,19 @@ export const PrestamoService = {
 
   delete: async (id) => {
     return await prestamoModel.delete(id);
+  },
+  
+  saveSign: async (firma_entrega, firma_salida, responsable_salida_id, responsable_entrada_id) => {
+    try {
+      const updatedPrestamo = await prestamoModel.saveSign(
+        firma_entrega,
+        firma_salida,
+        responsable_salida_id,
+        responsable_entrada_id
+      );
+      return updatedPrestamo;
+    } catch (error) {
+      throw new Error("Error saving sign: " + error.message);
+    }
   },
 };
