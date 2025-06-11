@@ -1,7 +1,8 @@
-
 export interface ResponsiblePerson {
   id: string;
   name: string;
-  position: string;
   department: string;
+  position: string;
+  firma_entrega?: string | null;
+  firma_recibe?: string | null;
 }
