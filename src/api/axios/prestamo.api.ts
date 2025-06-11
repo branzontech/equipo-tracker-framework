@@ -18,3 +18,17 @@ export const getAll = async () => {
     throw new Error(error.response?.data.message);
   }
 };
+
+export const saveSign = async (firma_entrega, firma_salida, responsable_salida_id, responsable_entrada_id) => {
+  try {
+    const response = await api.post("/prestamos/saveSign", {
+      firma_entrega,
+      firma_salida,
+      responsable_salida_id,
+      responsable_entrada_id
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data.message);
+  }
+};
