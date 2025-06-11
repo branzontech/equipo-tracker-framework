@@ -1,5 +1,6 @@
 import { Categoria } from "@/pages/configuracion/maestros/interfaces/categorias";
 import { Marca } from "@/pages/configuracion/maestros/interfaces/marcas";
+import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { Sucursal } from "@/pages/configuracion/maestros/interfaces/sucursales";
 
 export interface Equipo {
@@ -60,4 +61,6 @@ export interface Equipo {
     valor_depreciado: number;
     vida_util_restante: string;
   };
+
+  perifericos: Perifericos | null;
 }
