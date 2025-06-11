@@ -16,7 +16,7 @@ export const create = async (req, res) => {
     especificaciones,
     seguridad,
     adquisicion,
-    informacionAdministrativa,
+    administrativa,
   } = req.body;
 
   const equipo = await equipoService.create({
@@ -34,7 +34,7 @@ export const create = async (req, res) => {
     especificaciones,
     seguridad,
     adquisicion,
-    informacionAdministrativa,
+    administrativa,
   });
 
   res.status(201).json({ success: true, data: equipo });
