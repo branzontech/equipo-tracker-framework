@@ -102,7 +102,6 @@ export const AccesoriosContainer = ({
   }, [accesorios]);
 
   const equipo = form.watch(`equipos.${equipoIndex}`);
-  const equipoBuscado = form.watch(`equipos.${equipoIndex}.buscado`);
 
   if (!equipo?.serial && fields.length === 0) {
     return (
@@ -113,10 +112,10 @@ export const AccesoriosContainer = ({
   }
 
   return (
-    <div className="mt-3 pl-4 border-l-2 border-gray-200">
+    <div className="mt-5 pl-4 border-l-2 border-gray-200">
       <div className="flex justify-between items-center mb-2">
         <FormLabel className="text-sm font-medium">Accesorios</FormLabel>
-        <Button
+        {/* <Button
           type="button"
           variant="outline"
           size="sm"
@@ -125,7 +124,7 @@ export const AccesoriosContainer = ({
         >
           <Plus className="h-3 w-3 mr-1" />
           Añadir
-        </Button>
+        </Button> */}
       </div>
 
       <div className="space-y-2">
