@@ -9,6 +9,7 @@ import {
 } from "@/api/axios/categoria.api";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { icons } from "@/components/interfaces/icons";
 
 export const useCategoria = () => {
   const [categoria, setCategoria] = useState<Categoria[]>([]);
@@ -31,21 +32,27 @@ export const useCategoria = () => {
 
   const addCategoria = async (categoria: Categoria) => {
     if (!categoria.nombre) {
-      toast.error("Debe ingresar un nombre");
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
       return;
     }
 
     try {
       const response = await createCategoria(categoria);
       if (response.success) {
-        toast.success(response.message || "Categoria creada exitosamente");
+        toast.success(response.message || "Categoria creada exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 4500);
       }
       return response;
     } catch (error) {
-      toast.error(error.message || "Error al crear la categoria");
+      toast.error(error.message || "Error al crear la categoria", {
+        icon: icons.error,
+      });
     }
   };
 
@@ -57,13 +64,19 @@ export const useCategoria = () => {
         try {
           const res = await deleteCategoria(id);
           if (res.success) {
-            toast.success(res.message || "Categoria eliminada correctamente");
+            toast.success(res.message || "Categoria eliminada correctamente", {
+              icon: icons.success,
+            });
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.info(res.message || "No se pudo eliminar la categoria");
+            toast.error(res.message || "No se pudo eliminar la categoria", {
+              icon: icons.error,
+            });
           }
         } catch (error) {
-          toast.info(error.message);
+          toast.error(error.message, {
+            icon: icons.error,
+          });
         }
       },
     });
