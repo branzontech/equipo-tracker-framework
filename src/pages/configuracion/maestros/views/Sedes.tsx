@@ -56,14 +56,14 @@ const Sedes = () => {
           </CardHeader>
           <CardContent>
             <form
-              className="grid gap-4 md:grid-cols-4"
+              className="grid gap-4 md:grid-cols-5"
               onSubmit={(e) => {
                 e.preventDefault();
                 create(newSede);
               }}
             >
               <div className="space-y-2">
-                <Label htmlFor="nombre">Descripción</Label>
+                <Label htmlFor="nombre">Nombre</Label>
                 <Input
                   id="nombre"
                   autoComplete="off"
@@ -71,7 +71,19 @@ const Sedes = () => {
                   onChange={(e) => {
                     setNewSede({ ...newSede, nombre: e.target.value });
                   }}
-                  placeholder="Ingrese la descripción"
+                  placeholder="Ingrese el nombre"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="regional">Regional</Label>
+                <Input
+                  id="regional"
+                  autoComplete="off"
+                  value={newSede.regional || ""}
+                  onChange={(e) => {
+                    setNewSede({ ...newSede, regional: e.target.value });
+                  }}
+                  placeholder="Ingrese la regional"
                 />
               </div>
               <div className="space-y-2">
@@ -184,7 +196,8 @@ const Sedes = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Descripción</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Regional</TableHead>
                   <TableHead>Responsable(s)</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
@@ -194,6 +207,7 @@ const Sedes = () => {
                 {sedes.map((sede) => (
                   <TableRow key={sede.id_sede}>
                     <TableCell>{sede.nombre}</TableCell>
+                    <TableCell>{sede.regional}</TableCell>
                     <TableCell>
                       {sede.usuarios.length > 0
                         ? sede.usuarios
