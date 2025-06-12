@@ -6,8 +6,7 @@ export const getEquipos = async () => {
     const response = await api.get("/equipos/get");
     return response.data;
   } catch (error) {
-    console.error("Error fetching equipos:", error);
-    throw error;
+    throw new Error(error.response?.data?.message);
   }
 };
 
@@ -16,8 +15,7 @@ export const createEquipo = async (equipo: Equipo) => {
     const response = await api.post("/equipos/create", equipo);
     return response.data;
   } catch (error) {
-    console.error("Error creating equipo:", error);
-    throw error;
+    throw new Error(error.response?.data?.message);
   }
 };
 
@@ -26,8 +24,7 @@ export const getEquiposByNroSerie = async (nroSerie: string) => {
     const response = await api.get(`/equipos/${nroSerie}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching equipos by nroSerie:", error);
-    throw error;
+    throw new Error(error.response?.data?.message);
   }
 };
 
@@ -36,7 +33,6 @@ export const deleteEquipo = async (id: number) => {
     const response = await api.delete(`/equipos/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error deleting equipo:", error);
-    throw error;
+    throw new Error(error.response?.data?.message);
   }
 };
