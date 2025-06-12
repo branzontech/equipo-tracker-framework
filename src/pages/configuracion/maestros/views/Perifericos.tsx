@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CheckCircle, XCircle, PencilIcon } from "lucide-react";
+import { PlusCircle, CheckCircle, XCircle, PencilIcon, FileX } from "lucide-react";
 import { listTypes } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { EstadoType } from "../interfaces/sedes";
@@ -185,11 +185,25 @@ const Perifericos = () => {
                   <TableCell>
                     <span className="flex items-center">
                       {periferico.estado === "Activo" ? (
-                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                        <>
+                          <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                          <span className="text-green-700">Activo</span>
+                        </>
+                      ) : periferico.estado === "Inactivo por Baja" ? (
+                        <>
+                          <FileX className="mr-2 h-4 w-4 text-orange-500" />
+                          <span className="text-orange-700">
+                            Inactivo por Baja
+                          </span>
+                        </>
+                      ) : periferico.estado === "Inactivo" ? (
+                        <>
+                          <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                          <span className="text-red-700">Inactivo</span>
+                        </>
                       ) : (
-                        <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                        <span>{periferico.estado}</span>
                       )}
-                      {periferico.estado}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
