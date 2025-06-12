@@ -2,45 +2,23 @@ import { useEffect, useState } from "react";
 import { Prestamo } from "../interfaces/prestamo";
 import { create, getAll, saveSign } from "@/api/axios/prestamo.api";
 import { toast } from "sonner";
-import { useEquipos } from "./use-equipos";
-import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
-import { Equipo } from "../interfaces/equipo";
+import { useGlobal } from "@/hooks/use-global";
 
 export const usePrestamo = () => {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
-  const { getInfoEquipo } = useEquipos();
   const [newPrestamo, setNewPrestamo] = useState<Prestamo>({
     id_prestamo: 0,
     acta_id: 0,
+    actas: null,
     responsable_salida_id: 0,
     responsable_entrada_id: 0,
-    fecha_salida: new Date(),
-    fecha_retorno: new Date(),
+    fecha_salida: null,
+    fecha_retorno: null,
     estado: "",
     descripcion: "",
     equipos: [],
   });
-  const [haBuscado, setHaBuscado] = useState(false);
-  const [accesorios, setAccesorios] = useState<Perifericos[]>([]);
-  const [equipo, setEquipo] = useState<Equipo[]>([
-    {
-      id_equipo: Date.now(),
-      nombre_equipo: "",
-      nro_serie: "",
-      modelo: "",
-      marca_id: 0,
-      marcas: null,
-      categoria_id: 0,
-      categorias: null,
-      tipo_activo: "",
-      fecha_registro: "",
-      sucursal_id: 0,
-      sucursales: null,
-      garantia_fecha_fin: "",
-      estado_actual: "",
-      perifericos: null,
-    },
-  ]);
+  const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } = useGlobal();
 
   useEffect(() => {
     const fetchPrestamos = async () => {
@@ -70,8 +48,6 @@ export const usePrestamo = () => {
       return;
     }
 
-    console.log("prestamo:", prestamo);
-
     try {
       await saveSign_(
         firma_entrega,
@@ -92,59 +68,21 @@ export const usePrestamo = () => {
     }
   };
 
-  const saveSign_ = async (
-    firma_entrega: string,
-    firma_salida: string,
-    responsable_salida_id: number,
-    responsable_entrada_id: number
-  ) => {
-    if (!firma_entrega || !firma_salida) {
-      toast.error("Debe ingresar una firma");
-      return;
-    }
-    try {
-      const response = await saveSign(
-        firma_entrega,
-        firma_salida,
-        responsable_salida_id,
-        responsable_entrada_id
-      );
-      return response;
-    } catch (error) {
-      toast.error(error.message || "Error al guardar la firma");
-    }
-  };
-
-  const buscarEquipo = async (serial: string) => {
-    try {
-      const data = await getInfoEquipo(serial);
-
-      if (data && data.id_equipo) {
-        const idEquipo = data.id_equipo;
-        setNewPrestamo((prev) => ({
-          ...prev,
-          equipos: [
-            ...prev.equipos,
-            {
-              id_equipo: idEquipo,
-              perifericos: (data.perifericos || []).map((p) => p.id_periferico),
-            },
-          ],
-        }));
-
-        setEquipo([data]);
-        setHaBuscado(true);
-        setAccesorios(data.perifericos || []);
-      } else {
-        toast.error("No se encontró el equipo.");
-        setHaBuscado(false);
-        setEquipo([]);
-        setAccesorios([]);
-      }
-    } catch (error) {
-      toast.error("No se encontró el equipo.");
-      setHaBuscado(false);
-      setAccesorios([]);
+  const buscarEquipoPrestamo = async (serial: string) => {
+    const data = await buscarEquipo(serial);
+    if (data && data.id_equipo) {
+      setNewPrestamo((prev) => ({
+        ...prev,
+        equipos: [
+          ...prev.equipos,
+          {
+            id_equipo: data.id_equipo,
+            perifericos: Array.isArray(data.perifericos)
+              ? data.perifericos.map((p) => p.id_periferico)
+              : [],
+          },
+        ],
+      }));
     }
   };
 
@@ -153,11 +91,9 @@ export const usePrestamo = () => {
     newPrestamo,
     setNewPrestamo,
     addPrestamo,
-    saveSign_,
-    buscarEquipo,
-    haBuscado,
-    accesorios,
+    buscarEquipo: buscarEquipoPrestamo,
     equipo,
-    setEquipo,
+    accesorios,
+    haBuscado,
   };
 };
