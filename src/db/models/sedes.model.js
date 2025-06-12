@@ -7,6 +7,7 @@ export const SedesModel = {
         id_sede: true,
         nombre: true,
         estado: true,
+        regional: true,
         usuarios: {
           select: {
             id_usuario: true,
@@ -33,6 +34,7 @@ export const SedesModel = {
       data: {
         nombre: sede.nombre,
         estado: sede.estado,
+        regional: sede.regional,
       },
     });
 
@@ -126,6 +128,7 @@ export const SedesModel = {
         data: {
           nombre: sede.nombre,
           estado: sede.estado,
+          regional: sede.regional,
         },
       });
 
