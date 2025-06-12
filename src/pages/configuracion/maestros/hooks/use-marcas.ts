@@ -9,6 +9,7 @@ import {
 } from "@/api/axios/marcas.api";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { icons } from "@/components/interfaces/icons";
 
 export const useMarcas = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -29,21 +30,27 @@ export const useMarcas = () => {
 
   const addMarca = async (marca: Marca) => {
     if (!marca.nombre) {
-      toast.error("Debe ingresar un nombre");
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
       return;
     }
 
     try {
       const response = await createMarca(marca);
       if (response.success) {
-        toast.success(response.message || "Marca creada exitosamente");
+        toast.success(response.message || "Marca creada exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 4500);
       }
       return response;
     } catch (error) {
-      toast.error(error.message || "Error al crear la marca");
+      toast.error(error.message || "Error al crear la marca", {
+        icon: icons.error,
+      });
     }
   };
 
@@ -55,13 +62,19 @@ export const useMarcas = () => {
         try {
           const res = await deleteMarca(id);
           if (res.success) {
-            toast.success(res.message || "Marca eliminada correctamente");
+            toast.success(res.message || "Marca eliminada correctamente", {
+              icon: icons.success,
+            });
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message || "No se pudo eliminar la marca");
+            toast.error(res.message || "No se pudo eliminar la marca", {
+              icon: icons.error,
+            });
           }
         } catch (error) {
-          toast.info(error.message);
+          toast.error(error.message, {
+            icon: icons.error,
+          });
         }
       },
     });
@@ -73,14 +86,22 @@ export const useMarcas = () => {
   };
 
   const update = async (id: number, marca: Marca) => {
-    const response = await updateMarca(id, marca);
-    if (response.success) {
-      toast.success(response.message || "Marca actualizada exitosamente");
-      setTimeout(() => {
-        window.location.reload();
-      }, 4500);
+    try {
+      const response = await updateMarca(id, marca);
+      if (response.success) {
+        toast.success(response.message || "Marca actualizada exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Error al actualizar la marca", {
+        icon: icons.error,
+      });
     }
-    return response;
   };
 
   const handleOpenEditModal = (id: number) => {
