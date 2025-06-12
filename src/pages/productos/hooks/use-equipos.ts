@@ -13,6 +13,9 @@ import {
 } from "@/api/axios/equipo.api";
 import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns";
 import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { da } from "date-fns/locale";
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
@@ -36,6 +39,7 @@ export const useEquipos = () => {
         nombre: "",
         usuarios: [],
         estado: null,
+        regional: "",
       },
       tipo: "",
       estado: null,
@@ -45,6 +49,7 @@ export const useEquipos = () => {
     tipo_activo: "",
     garantia_fecha_fin: "",
     observaciones: "",
+    motivo: "",
     especificaciones: {
       procesador: "",
       memoria_ram: "",
@@ -415,21 +420,174 @@ export const useEquipos = () => {
     navigate("/productos/ingreso");
   };
 
-  const handleSubmit = async (data: Equipo) => {
-    const dataSend = {
-      ...data,
-      fecha_registro: new Date(data.fecha_registro).toISOString(),
-    };
+  const camposRequeridos = [
+    { valor: newEquipo.nombre_equipo, mensaje: "Debe ingresar un nombre" },
+    { valor: newEquipo.nro_serie, mensaje: "Debe ingresar un número de serie" },
+    {
+      valor: newEquipo.tipo_activo,
+      mensaje: "Debe seleccionar un tipo de activo",
+    },
+    { valor: newEquipo.marca_id, mensaje: "Debe seleccionar una marca" },
+    {
+      valor: newEquipo.categoria_id,
+      mensaje: "Debe seleccionar una categoría",
+    },
+    { valor: newEquipo.sucursal_id, mensaje: "Debe seleccionar una sucursal" },
+    { valor: newEquipo.modelo, mensaje: "Debe ingresar un modelo" },
+    {
+      valor: newEquipo.garantia_fecha_fin,
+      mensaje: "Debe ingresar una fecha de garantía",
+    },
 
-    const response = await createEquipo(dataSend);
-    if (response.success) {
-      toast.success(response.message || "Equipo creado exitosamente");
-      setTimeout(() => {
-        window.location.reload();
-        navigate("/productos/lista");
-      }, 4500);
-    } else {
-      throw new Error("Error al crear el equipo");
+    // Especificaciones técnicas
+    {
+      valor: newEquipo.especificaciones.procesador,
+      mensaje: "Debe ingresar un procesador",
+    },
+    {
+      valor: newEquipo.especificaciones.memoria_ram,
+      mensaje: "Debe ingresar una memoria RAM",
+    },
+    {
+      valor: newEquipo.especificaciones.almacenamiento,
+      mensaje: "Debe ingresar un almacenamiento",
+    },
+    {
+      valor: newEquipo.especificaciones.tarjeta_grafica,
+      mensaje: "Debe ingresar una tarjeta gráfica",
+    },
+    {
+      valor: newEquipo.especificaciones.sistema_operativo,
+      mensaje: "Debe ingresar un sistema operativo",
+    },
+    {
+      valor: newEquipo.especificaciones.bateria,
+      mensaje: "Debe ingresar una batería",
+    },
+    {
+      valor: newEquipo.especificaciones.puertos,
+      mensaje: "Debe ingresar los puertos",
+    },
+
+    // Adquisición
+    {
+      valor: newEquipo.adquisicion.fecha_compra,
+      mensaje: "Debe ingresar la fecha de compra",
+    },
+    {
+      valor: newEquipo.adquisicion.proveedor,
+      mensaje: "Debe ingresar el proveedor",
+    },
+    {
+      valor: newEquipo.adquisicion.numero_factura,
+      mensaje: "Debe ingresar el número de factura",
+    },
+    {
+      valor: newEquipo.adquisicion.precio_compra,
+      mensaje: "Debe ingresar el precio de compra",
+    },
+    {
+      valor: newEquipo.adquisicion.forma_pago,
+      mensaje: "Debe ingresar la forma de pago",
+    },
+    {
+      valor: newEquipo.adquisicion.plazo_pago,
+      mensaje: "Debe ingresar el plazo de pago",
+    },
+    {
+      valor: newEquipo.adquisicion.orden_compra,
+      mensaje: "Debe ingresar el número de orden de compra",
+    },
+
+    // Seguridad
+    {
+      valor: newEquipo.seguridad.nivel_acceso,
+      mensaje: "Debe seleccionar un nivel de acceso",
+    },
+    {
+      valor: newEquipo.seguridad.software_seguridad,
+      mensaje: "Debe ingresar un software de seguridad",
+    },
+    {
+      valor: newEquipo.seguridad.cifrado_disco,
+      mensaje: "Debe ingresar un cifrado de disco",
+    },
+    {
+      valor: newEquipo.seguridad.politicas_aplicadas,
+      mensaje: "Debe ingresar las políticas de aplicación",
+    },
+
+    // Información administrativa
+    {
+      valor: newEquipo.administrativa.codigo_inventario,
+      mensaje: "Debe ingresar el código de inventario",
+    },
+    {
+      valor: newEquipo.administrativa.centro_coste,
+      mensaje: "Debe ingresar el centro de coste",
+    },
+    {
+      valor: newEquipo.administrativa.autorizado_por,
+      mensaje: "Debe ingresar el autorizado por",
+    },
+    {
+      valor: newEquipo.administrativa.fecha_activacion,
+      mensaje: "Debe ingresar la fecha de activación",
+    },
+    {
+      valor: newEquipo.administrativa.estado_contable,
+      mensaje: "Debe seleccionar un estado de contabilidad",
+    },
+    {
+      valor: newEquipo.administrativa.valor_depreciado,
+      mensaje: "Debe ingresar un valor depreciado",
+    },
+    {
+      valor: newEquipo.administrativa.vida_util_restante,
+      mensaje: "Debe ingresar la vida útil restante",
+    },
+
+    // Observaciones
+    {
+      valor: newEquipo.observaciones,
+      mensaje: "Debe ingresar las observaciones",
+    },
+  ];
+
+  const handleSubmit = async (data: Equipo) => {
+    for (const campo of camposRequeridos) {
+      if (!campo.valor) {
+        toast.error(campo.mensaje, {
+          icon: icons.error,
+        });
+        return;
+      }
+    }
+
+    try {
+      const dataSend = {
+        ...data,
+        fecha_registro: new Date(data.fecha_registro).toISOString(),
+      };
+
+      const response = await createEquipo(dataSend);
+      if (response.success) {
+        toast.success(response.message || "Equipo creado exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+          navigate("/productos/lista");
+        }, 4500);
+      } else {
+        toast.error(response.message || "Error al crear el equipo", {
+          icon: icons.error,
+        });
+      }
+    } catch (error) {
+      toast.error(error.message || "Error al crear el equipo", {
+        icon: icons.error,
+      });
     }
   };
 
@@ -495,15 +653,29 @@ export const useEquipos = () => {
   };
 
   const deleteEquipoById = async (id: number) => {
-    if (!window.confirm("¿Está seguro de que desea eliminar este equipo?"))
-      return;
-    const response = await deleteEquipo(id);
-    if (response.success) {
-      toast.success(response.message || "Equipo eliminado exitosamente");
-      setTimeout(() => {
-        window.location.reload();
-      }, 4500);
-    }
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar este equipo?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteEquipo(id);
+          if (res.success) {
+            toast.success(res.message || "Equipo eliminado exitosamente", {
+              icon: icons.success,
+            });
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message, {
+              icon: icons.error,
+            });
+          }
+        } catch (error) {
+          toast.error(error.message, {
+            icon: icons.error,
+          });
+        }
+      },
+    });
   };
 
   return {
