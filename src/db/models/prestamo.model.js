@@ -3,40 +3,45 @@ import { prisma } from "../../../prisma/prismaCliente.js";
 export const prestamoModel = {
   async findAll() {
     const prestamos = await prisma.prestamos.findMany({
-      select: {
-        id_prestamo: true,
-        acta_id: true,
+      include: {
         actas: {
           select: {
             tipo: true,
             fecha: true,
           },
         },
-        equipo_id: true,
-        equipos: {
-          select: {
-            id_equipo: true,
-            nombre_equipo: true,
-          },
-        },
-        responsable_salida_id: true,
         usuarios_prestamos_responsable_entrada_idTousuarios: {
           select: {
             id_usuario: true,
             nombre: true,
           },
         },
-        responsable_entrada_id: true,
         usuarios_prestamos_responsable_salida_idTousuarios: {
           select: {
             id_usuario: true,
             nombre: true,
           },
         },
-        fecha_salida: true,
-        fecha_retorno: true,
-        estado: true,
-        descripcion: true,
+        prestamo_equipos: {
+          include: {
+            equipos: {
+              select: {
+                id_equipo: true,
+                nombre_equipo: true,
+              },
+            },
+            prestamo_perifericos: {
+              include: {
+                perifericos: {
+                  select: {
+                    id_periferico: true,
+                    nombre: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -71,7 +76,6 @@ export const prestamoModel = {
 
       // 3. Iterar por equipos del préstamo
       for (const equipo of prestamo.equipos) {
-        console.log("Periféricos a registrar:", equipo.perifericos);
 
         // 3.1 Relacionar equipo con acta
         await prisma.acta_equipos.create({
