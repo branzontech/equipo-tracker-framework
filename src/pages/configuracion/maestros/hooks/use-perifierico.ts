@@ -10,6 +10,7 @@ import {
 } from "@/api/axios/periferico.api";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { icons } from "@/components/interfaces/icons";
 
 export const usePeriferico = () => {
   const [perifericos, setPerifericos] = useState<Perifericos[]>([]);
@@ -44,36 +45,48 @@ export const usePeriferico = () => {
 
   const handleCreatePeriferico = async (periferico: Perifericos) => {
     if (!periferico.nombre) {
-      toast.error("Debe seleccionar un nombre");
-      return;
-    }
-
-    if (periferico.estado === undefined || periferico.estado === null) {
-      toast.error("Debe seleccionar un estado");
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!periferico.tipo) {
-      toast.error("Debe seleccionar un tipo");
+      toast.error("Debe seleccionar un tipo", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!periferico.equipo_asociado_id) {
-      toast.error("Debe seleccionar un equipo");
+      toast.error("Debe seleccionar un equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (periferico.estado === undefined || periferico.estado === null) {
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
       return;
     }
 
     try {
       const response = await createPeriferico(periferico);
       if (response.success) {
-        toast.success(response.message || "Periferico creado exitosamente");
+        toast.success(response.message || "Periferico creado exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 4500);
       }
       return response;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, {
+        icon: icons.error,
+      });
     }
   };
 
@@ -107,7 +120,10 @@ export const usePeriferico = () => {
       const response = await updatePeriferico(id, periferico);
       if (response.success) {
         toast.success(
-          response.message || "Periferico actualizado exitosamente"
+          response.message || "Periferico actualizado exitosamente",
+          {
+            icon: icons.success,
+          }
         );
         setTimeout(() => {
           window.location.reload();
@@ -115,7 +131,9 @@ export const usePeriferico = () => {
       }
       return response;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, {
+        icon: icons.error,
+      });
     }
   };
 
