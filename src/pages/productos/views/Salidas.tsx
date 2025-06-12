@@ -250,7 +250,7 @@ const Salidas = () => {
 
       <FormProvider {...methods}>
         <form
-          className="space-y-8"
+          className="space-y-8 p-6 rounded-lg shadow-md border border-gray-200"
           onSubmit={(e: React.FormEvent) => {
             e.preventDefault();
 
