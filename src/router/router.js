@@ -12,6 +12,7 @@ import tonerRoutes from "./routes/toner.routes.js";
 import tonerImpresoraRoutes from "./routes/toner-impresora.routes.js";
 import contratoRoutes from "./routes/contrato.routes.js";
 import prestamoRoutes from "./routes/prestamo.routes.js";
+import trasladoRoutes from "./routes/traslados.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -30,6 +31,7 @@ const routerApi = (app) => {
   router.use("/toner-impresora", tonerImpresoraRoutes);
   router.use("/contrato", contratoRoutes);
   router.use("/prestamos", prestamoRoutes);
+  router.use("/traslados", trasladoRoutes);
 };
 
 export default routerApi;
