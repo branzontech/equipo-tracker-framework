@@ -1,10 +1,13 @@
+import { Acta } from "./acta";
+
 export interface Prestamo {
   id_prestamo: number;
   acta_id: number;
+  actas: Acta | null;
   responsable_salida_id: number;
   responsable_entrada_id: number;
-  fecha_salida: Date;
-  fecha_retorno: Date;
+  fecha_salida: Date | null;
+  fecha_retorno: Date | null;
   estado: string;
   descripcion: string;
   equipos: {
