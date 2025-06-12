@@ -17,9 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ImpresoraForm from "./ImpresoraForm";
+import { Label } from "@/components/ui/label";
 import { useImpresora } from "../hooks/use-impresora";
 import { useToners } from "../hooks/use-toners";
-import { Label } from "@/components/ui/label";
 
 export default function IngresoToner() {
   const { create, newToner, setNewToner } = useToners();
