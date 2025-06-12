@@ -36,8 +36,14 @@ import { useSucursales } from "../../configuracion/maestros/hooks/use-sucursales
 import { Label } from "@/components/ui/label";
 
 const IngresoProducto = () => {
-  const { handleVolver, form, handleSubmit, formatNumber, setNewEquipo } =
-    useEquipos();
+  const {
+    handleVolver,
+    form,
+    handleSubmit,
+    formatNumber,
+    setNewEquipo,
+    newEquipo,
+  } = useEquipos();
   const { marcas } = useMarcas();
   const { categoria } = useCategoria();
   const { sucursales } = useSucursales();
@@ -62,7 +68,6 @@ const IngresoProducto = () => {
         <Form {...form}>
           <form className="space-y-6">
             <div className="grid gap-6 max-w-full">
-              {/* Información Básica */}
               <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
@@ -71,259 +76,246 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="nombre_equipo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre del Equipo</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nombre del equipo" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="nombre_equipo">Nombre del Equipo</Label>
+                      <Input
+                        placeholder="Nombre del equipo"
+                        value={newEquipo.nombre_equipo}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            nombre_equipo: e.target.value,
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="nro_serie"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número de Serie</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Número de serie" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="nro_serie">Número de Serie</Label>
+                      <Input
+                        placeholder="Número de serie"
+                        value={newEquipo.nro_serie}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            nro_serie: e.target.value,
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="tipo_activo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tipo de Activo</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value?.toString() || ""}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar un tipo de activo" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              <SelectItem value="Equipo de Cómputo">
-                                Equipo de Cómputo
-                              </SelectItem>
-                              <SelectItem value="Impresora">
-                                Impresora
-                              </SelectItem>
-                              <SelectItem value="Escáner">Escáner</SelectItem>
-                              <SelectItem value="Proyector">
-                                Proyector
-                              </SelectItem>
-                              <SelectItem value="Otro">Otro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="tipo_activo">Tipo de Activo</Label>
+                      <Select
+                        value={newEquipo.tipo_activo}
+                        onValueChange={(value) =>
+                          setNewEquipo({ ...newEquipo, tipo_activo: value })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar un tipo de activo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          <SelectItem value="Equipo de Cómputo">
+                            Equipo de Cómputo
+                          </SelectItem>
+                          <SelectItem value="Impresora">Impresora</SelectItem>
+                          <SelectItem value="Escáner">Escáner</SelectItem>
+                          <SelectItem value="Proyector">Proyector</SelectItem>
+                          <SelectItem value="Otro">Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                    <FormField
-                      control={form.control}
-                      name="marca_id"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Marca/Fabricante</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar marca" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {marcas.map((marca) => (
-                                <SelectItem
-                                  key={marca.id_marca}
-                                  value={marca.id_marca.toString()}
-                                >
-                                  {marca.nombre}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="categoria_id"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Categoría del Equipo</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar categoría" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              {categoria.map((categoria) => (
-                                <SelectItem
-                                  key={categoria.id_categoria}
-                                  value={categoria.id_categoria.toString()}
-                                >
-                                  {categoria.nombre}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="sucursal_id"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Sucursal del Equipo</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar una sucursal" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              {sucursales.map((sucursal) => (
-                                <SelectItem
-                                  key={sucursal.id_sucursal}
-                                  value={sucursal.id_sucursal.toString()}
-                                >
-                                  {sucursal.nombre}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="modelo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Modelo</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Modelo del equipo" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="estado_actual"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Estado Actual</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar estado" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              <SelectItem value="Activo">Activo</SelectItem>
-                              <SelectItem value="En Mantenimiento">
-                                En Mantenimiento
-                              </SelectItem>
-                              <SelectItem value="En Reparación">
-                                En Reparación
-                              </SelectItem>
-                              <SelectItem value="Fuera de Servicio">
-                                Fuera de Servicio
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="garantia_fecha_fin"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Garantía Fin</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "P")
-                                  ) : (
-                                    <span>Seleccionar fecha</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
+                    <div className="space-y-2">
+                      <Label htmlFor="marca_id">Marca/Fabricante</Label>
+                      <Select
+                        value={
+                          newEquipo.marca_id
+                            ? newEquipo.marca_id.toString()
+                            : ""
+                        }
+                        onValueChange={(value) =>
+                          setNewEquipo({
+                            ...newEquipo,
+                            marca_id: Number(value),
+                          })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar marca" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {marcas.map((marca) => (
+                            <SelectItem
+                              key={marca.id_marca}
+                              value={marca.id_marca.toString()}
                             >
-                              <Calendar
-                                mode="single"
-                                selected={
-                                  field.value
-                                    ? new Date(field.value)
-                                    : undefined
-                                }
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                              {marca.nombre}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="categoria_id">Categoría del Equipo</Label>
+                      <Select
+                        value={
+                          newEquipo.categoria_id
+                            ? newEquipo.categoria_id.toString()
+                            : ""
+                        }
+                        onValueChange={(value) =>
+                          setNewEquipo({
+                            ...newEquipo,
+                            categoria_id: Number(value),
+                          })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar categoría" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          {categoria.map((categoria) => (
+                            <SelectItem
+                              key={categoria.id_categoria}
+                              value={categoria.id_categoria.toString()}
+                            >
+                              {categoria.nombre}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="sucursal_id">Sucursal del Equipo</Label>
+                      <Select
+                        value={
+                          newEquipo.sucursal_id
+                            ? newEquipo.sucursal_id.toString()
+                            : ""
+                        }
+                        onValueChange={(value) =>
+                          setNewEquipo({
+                            ...newEquipo,
+                            sucursal_id: Number(value),
+                          })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar una sucursal" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {sucursales.map((sucursal) => (
+                            <SelectItem
+                              key={sucursal.id_sucursal}
+                              value={sucursal.id_sucursal.toString()}
+                            >
+                              {sucursal.nombre}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="modelo">Modelo</Label>
+                      <Input
+                        placeholder="Modelo del equipo"
+                        value={newEquipo.modelo}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            modelo: e.target.value,
+                          });
+                        }}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="estado_actual">Estado Actual</Label>
+                      <Select
+                        value={newEquipo.estado_actual}
+                        onValueChange={(value) =>
+                          setNewEquipo({ ...newEquipo, estado_actual: value })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar estado" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          <SelectItem value="Activo">Activo</SelectItem>
+                          <SelectItem value="En Mantenimiento">
+                            En Mantenimiento
+                          </SelectItem>
+                          <SelectItem value="En Reparación">
+                            En Reparación
+                          </SelectItem>
+                          <SelectItem value="Fuera de Servicio">
+                            Fuera de Servicio
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <FormLabel>Garantía Fin</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal"
+                              )}
+                            >
+                              {newEquipo.garantia_fecha_fin ? (
+                                format(newEquipo.garantia_fecha_fin, "P")
+                              ) : (
+                                <span>Seleccionar fecha</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              newEquipo.garantia_fecha_fin
+                                ? new Date(newEquipo.garantia_fecha_fin)
+                                : undefined
+                            }
+                            onSelect={(date) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                garantia_fecha_fin: date
+                                  ? date.toISOString()
+                                  : "",
+                              })
+                            }
+                            disabled={(date) =>
+                              date < new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
 
                     {/* <FormField
                       control={form.control}
@@ -371,67 +363,80 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.procesador"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Procesador</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ej: Intel Core i5 11th Gen"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.procesador">
+                        Procesador
+                      </Label>
+                      <Input
+                        placeholder="Ej: Intel Core i5 11th Gen"
+                        value={newEquipo.especificaciones.procesador}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              procesador: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.memoria_ram"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Memoria RAM</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ej: 16 GB" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.memoria_ram">
+                        Memoria RAM
+                      </Label>
+                      <Input
+                        placeholder="Ej: 16 GB"
+                        value={newEquipo.especificaciones.memoria_ram}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              memoria_ram: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.almacenamiento">
+                        Almacenamiento
+                      </Label>
+                      <Input
+                        placeholder="Ej: 512 GB"
+                        value={newEquipo.especificaciones.almacenamiento}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              almacenamiento: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.almacenamiento"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Almacenamiento</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ej: 512 GB" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.tarjeta_grafica"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tarjeta Gráfica</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ej: SSD, HDD, NVMe"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.tarjeta_grafica">
+                        Tarjeta Gráfica
+                      </Label>
+                      <Input
+                        placeholder="Ej: SSD, HDD, NVMe"
+                        value={newEquipo.especificaciones.tarjeta_grafica}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              tarjeta_grafica: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
                     {/* <FormField
                       control={form.control}
@@ -473,66 +478,77 @@ const IngresoProducto = () => {
                       />
                     )} */}
 
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.pantalla"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pantalla</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ej: 15.6 pulgadas Full HD"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.sistema_operativo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Sistema Operativo</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ej: Windows 10" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.pantalla">
+                        Pantalla
+                      </Label>
+                      <Input
+                        placeholder="Ej: 15.6 pulgadas Full HD"
+                        value={newEquipo.especificaciones.pantalla}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              pantalla: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.bateria"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Batería</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ej: 120 Wh" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.sistema_operativo">
+                        Sistema Operativo
+                      </Label>
+                      <Input
+                        placeholder="Ej: Windows 10"
+                        value={newEquipo.especificaciones.sistema_operativo}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              sistema_operativo: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="especificaciones.puertos"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Puertos</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ej: USB 3.0, HDMI, VGA"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.bateria">Batería</Label>
+                      <Input
+                        placeholder="Ej: 120 Wh"
+                        value={newEquipo.especificaciones.bateria}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              bateria: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="especificaciones.puertos">Puertos</Label>
+                      <Input
+                        placeholder="Ej: USB 3.0, HDMI, VGA"
+                        value={newEquipo.especificaciones.puertos}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            especificaciones: {
+                              ...newEquipo.especificaciones,
+                              puertos: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -546,162 +562,181 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.fecha_compra"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Fecha de Compra</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "P")
-                                  ) : (
-                                    <span>Seleccionar fecha</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.fecha_compra">
+                        Fecha de Compra
+                      </Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal"
+                              )}
                             >
-                              <Calendar
-                                mode="single"
-                                selected={
-                                  field.value
-                                    ? new Date(field.value)
-                                    : undefined
-                                }
-                                onSelect={field.onChange}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.proveedor"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Proveedor</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Nombre del proveedor"
-                              {...field}
-                            />
+                              {newEquipo.adquisicion.fecha_compra ? (
+                                format(newEquipo.adquisicion.fecha_compra, "P")
+                              ) : (
+                                <span>Seleccionar fecha</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              newEquipo.adquisicion.fecha_compra
+                                ? new Date(newEquipo.adquisicion.fecha_compra)
+                                : undefined
+                            }
+                            onSelect={(date) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                adquisicion: {
+                                  ...newEquipo.adquisicion,
+                                  fecha_compra: date ? date.toISOString() : "",
+                                },
+                              })
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.numero_factura"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número de Factura</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Número de factura" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.proveedor">Proveedor</Label>
+                      <Input
+                        placeholder="Nombre del proveedor"
+                        value={newEquipo.adquisicion.proveedor}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            adquisicion: {
+                              ...newEquipo.adquisicion,
+                              proveedor: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.precio_compra"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Precio de Adquisición</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Precio de Adquisición"
-                              type="number"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.numero_factura">
+                        Número de Factura
+                      </Label>
+                      <Input
+                        placeholder="Número de factura"
+                        value={newEquipo.adquisicion.numero_factura}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            adquisicion: {
+                              ...newEquipo.adquisicion,
+                              numero_factura: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.forma_pago"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Forma de Pago</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar forma de pago" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              <SelectItem value="Efectivo">Efectivo</SelectItem>
-                              <SelectItem value="Tarjeta de Crédito">
-                                Tarjeta de Crédito
-                              </SelectItem>
-                              <SelectItem value="Transferencia Bancaria">
-                                Transferencia Bancaria
-                              </SelectItem>
-                              <SelectItem value="Cheque">Cheque</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.precio_compra">
+                        Precio de Adquisición
+                      </Label>
+                      <Input
+                        placeholder="Precio de Adquisición"
+                        type="text"
+                        value={formatNumber(
+                          newEquipo.adquisicion.precio_compra
+                        )}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/\./g, "");
+                          setNewEquipo({
+                            ...newEquipo,
+                            adquisicion: {
+                              ...newEquipo.adquisicion,
+                              precio_compra: Number(raw),
+                            },
+                          });
+                        }}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.plazo_pago"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Plazo de Pago</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Plazo de Pago" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.forma_pago">
+                        Forma de Pago
+                      </Label>
+                      <Select
+                        value={newEquipo.adquisicion.forma_pago}
+                        onValueChange={(value) =>
+                          setNewEquipo({
+                            ...newEquipo,
+                            adquisicion: {
+                              ...newEquipo.adquisicion,
+                              forma_pago: value,
+                            },
+                          })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar forma de pago" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          <SelectItem value="Efectivo">Efectivo</SelectItem>
+                          <SelectItem value="Tarjeta de Crédito">
+                            Tarjeta de Crédito
+                          </SelectItem>
+                          <SelectItem value="Transferencia Bancaria">
+                            Transferencia Bancaria
+                          </SelectItem>
+                          <SelectItem value="Cheque">Cheque</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="adquisicion.orden_compra"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Orden de Compra</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Número de orden de compra"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.plazo_pago">
+                        Plazo de Pago
+                      </Label>
+                      <Input
+                        placeholder="Plazo de Pago"
+                        value={newEquipo.adquisicion.plazo_pago}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            adquisicion: {
+                              ...newEquipo.adquisicion,
+                              plazo_pago: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="adquisicion.orden_compra">
+                        Orden de Compra
+                      </Label>
+                      <Input
+                        placeholder="Número de orden de compra"
+                        value={newEquipo.adquisicion.orden_compra}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            adquisicion: {
+                              ...newEquipo.adquisicion,
+                              orden_compra: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1055,89 +1090,105 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="seguridad.nivel_acceso"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nivel de Acceso</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar nivel" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              <SelectItem value="Confidencial">
-                                Confidencial
-                              </SelectItem>
-                              <SelectItem value="Acceso Completo">
-                                Acceso Completo
-                              </SelectItem>
-                              <SelectItem value="Acceso Medio">
-                                Acceso Medio
-                              </SelectItem>
-                              <SelectItem value="Acceso Mínimo">
-                                Acceso Mínimo
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="seguridad.software_seguridad"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Software de Seguridad</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Software de Seguridad"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="seguridad.cifrado_disco"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Cifrado Disco</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Cifrado Disco" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="seguridad.politicas_aplicadas"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Políticas de Aplicación</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Políticas de Aplicación"
-                              className="min-h-[100px] "
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="seguridad.nivel_acceso">
+                        Nivel de Acceso
+                      </Label>
+                      <Select
+                        value={newEquipo.seguridad.nivel_acceso}
+                        onValueChange={(value) =>
+                          setNewEquipo({
+                            ...newEquipo,
+                            seguridad: {
+                              ...newEquipo.seguridad,
+                              nivel_acceso: value,
+                            },
+                          })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar nivel" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          <SelectItem value="Confidencial">
+                            Confidencial
+                          </SelectItem>
+                          <SelectItem value="Acceso Completo">
+                            Acceso Completo
+                          </SelectItem>
+                          <SelectItem value="Acceso Medio">
+                            Acceso Medio
+                          </SelectItem>
+                          <SelectItem value="Acceso Mínimo">
+                            Acceso Mínimo
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="seguridad.software_seguridad">
+                        Software de Seguridad
+                      </Label>
+                      <Input
+                        placeholder="Software de Seguridad"
+                        value={newEquipo.seguridad.software_seguridad}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            seguridad: {
+                              ...newEquipo.seguridad,
+                              software_seguridad: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="seguridad.cifrado_disco">
+                        Cifrado Disco
+                      </Label>
+                      <Input
+                        placeholder="Cifrado Disco"
+                        value={newEquipo.seguridad.cifrado_disco}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            seguridad: {
+                              ...newEquipo.seguridad,
+                              cifrado_disco: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="seguridad.politicas_aplicadas">
+                        Políticas de Aplicación
+                      </Label>
+                      <Textarea
+                        placeholder="Políticas de Aplicación"
+                        className="min-h-[100px]"
+                        value={
+                          Array.isArray(newEquipo.seguridad.politicas_aplicadas)
+                            ? newEquipo.seguridad.politicas_aplicadas.join(", ")
+                            : ""
+                        }
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            seguridad: {
+                              ...newEquipo.seguridad,
+                              politicas_aplicadas: e.target.value
+                                .split(",")
+                                .map((item) => item.trim())
+                                .filter((item) => item.length > 0),
+                            },
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1151,174 +1202,188 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="administrativa.codigo_inventario"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Código de Inventario</FormLabel>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.codigo_inventario">
+                        Código de Inventario
+                      </Label>
+                      <Input
+                        placeholder="Código de Inventario"
+                        value={newEquipo.administrativa.codigo_inventario}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            administrativa: {
+                              ...newEquipo.administrativa,
+                              codigo_inventario: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.centro_coste">
+                        Centro de Coste
+                      </Label>
+                      <Input
+                        placeholder="Centro de Coste"
+                        value={newEquipo.administrativa.centro_coste}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            administrativa: {
+                              ...newEquipo.administrativa,
+                              centro_coste: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.autorizado_por">
+                        Autorizado por
+                      </Label>
+                      <Input
+                        placeholder="Autorizado por"
+                        value={newEquipo.administrativa.autorizado_por}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            administrativa: {
+                              ...newEquipo.administrativa,
+                              autorizado_por: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.fecha_activacion">
+                        Fecha de Activación
+                      </Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <Input
-                              placeholder="Código de Inventario"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="administrativa.centro_coste"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Centro de Coste</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Centro de Coste" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="administrativa.autorizado_por"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Autorizado por</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Autorizado por" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="administrativa.fecha_activacion"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Fecha de Activación</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "P")
-                                  ) : (
-                                    <span>Seleccionar fecha</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal"
+                              )}
                             >
-                              <Calendar
-                                mode="single"
-                                selected={
-                                  field.value
-                                    ? new Date(field.value)
-                                    : undefined
-                                }
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="administrativa.estado_contable"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Estado de Contabilidad</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar estado" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              <SelectItem value="Activo fijo">
-                                Activo fijo
-                              </SelectItem>
-                              <SelectItem value="En Mantenimiento">
-                                En Mantenimiento
-                              </SelectItem>
-                              <SelectItem value="En Reparación">
-                                En Reparación
-                              </SelectItem>
-                              <SelectItem value="Fuera de Servicio">
-                                Fuera de Servicio
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="administrativa.valor_depreciado"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Valor Depreciado</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Valor Depreciado"
-                              type="text"
-                              value={formatNumber(field.value)}
-                              onChange={(e) => {
-                                const raw = e.target.value.replace(/\./g, "");
-                                field.onChange(Number(raw));
-                              }}
-                            />
+                              {newEquipo.administrativa.fecha_activacion ? (
+                                format(
+                                  newEquipo.administrativa.fecha_activacion,
+                                  "P"
+                                )
+                              ) : (
+                                <span>Seleccionar fecha</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="administrativa.vida_util_restante"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Vida Útil Restante</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Vida Útil Restante"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              newEquipo.administrativa.fecha_activacion
+                                ? new Date(
+                                    newEquipo.administrativa.fecha_activacion
+                                  )
+                                : undefined
+                            }
+                            onSelect={(date) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                administrativa: {
+                                  ...newEquipo.administrativa,
+                                  fecha_activacion: date
+                                    ? date.toISOString()
+                                    : "",
+                                },
+                              })
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.estado_contable">
+                        Estado de Contabilidad
+                      </Label>
+                      <Select
+                        value={newEquipo.administrativa.estado_contable}
+                        onValueChange={(value) =>
+                          setNewEquipo({
+                            ...newEquipo,
+                            administrativa: {
+                              ...newEquipo.administrativa,
+                              estado_contable: value,
+                            },
+                          })
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar estado" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          <SelectItem value="Activo fijo">
+                            Activo fijo
+                          </SelectItem>
+                          <SelectItem value="En Mantenimiento">
+                            En Mantenimiento
+                          </SelectItem>
+                          <SelectItem value="En Reparación">
+                            En Reparación
+                          </SelectItem>
+                          <SelectItem value="Fuera de Servicio">
+                            Fuera de Servicio
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.valor_depreciado">
+                        Valor Depreciado
+                      </Label>
+                      <Input
+                        placeholder="Valor Depreciado"
+                        type="text"
+                        value={formatNumber(
+                          newEquipo.administrativa.valor_depreciado
+                        )}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/\./g, "");
+                          setNewEquipo({
+                            ...newEquipo,
+                            administrativa: {
+                              ...newEquipo.administrativa,
+                              valor_depreciado: Number(raw),
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="administrativa.vida_util_restante">
+                        Vida Útil Restante
+                      </Label>
+                      <Input
+                        placeholder="Vida Útil Restante"
+                        value={newEquipo.administrativa.vida_util_restante}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            administrativa: {
+                              ...newEquipo.administrativa,
+                              vida_util_restante: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1332,23 +1397,20 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="observaciones"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Observaciones</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Observaciones adicionales"
-                              className="min-h-[100px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="observaciones">Observaciones</Label>
+                      <Textarea
+                        placeholder="Observaciones adicionales"
+                        className="min-h-[100px]"
+                        value={newEquipo.observaciones}
+                        onChange={(e) => {
+                          setNewEquipo({
+                            ...newEquipo,
+                            observaciones: e.target.value,
+                          });
+                        }}
+                      />
+                    </div>
 
                     {/* <FormField
                       control={form.control}
