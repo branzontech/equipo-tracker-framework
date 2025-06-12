@@ -6,14 +6,24 @@ import { Plus, Search, Trash2 } from "lucide-react";
 import { AccesoriosContainer } from "./AccesorioItem";
 import { useGlobal } from "@/hooks/use-global";
 import { Equipo } from "@/pages/productos/interfaces/equipo";
+import { useState } from "react";
+import { Textarea } from "./ui/textarea";
+import { on } from "events";
 
 interface SearchEquipoProps {
   onEquipoEncontrado?: (equipo: Equipo) => void;
+  onMotivoChange?: (id_equipo: number, motivo: string) => void;
+  esBaja?: boolean;
 }
 
-export const SearchEquipo = ({ onEquipoEncontrado }: SearchEquipoProps) => {
+export const SearchEquipo = ({
+  onEquipoEncontrado,
+  onMotivoChange,
+  esBaja = false,
+}: SearchEquipoProps) => {
   const { haBuscado, accesorios, equipo, setEquipo, buscarEquipo } =
     useGlobal();
+  const [motivos, setMotivos] = useState<string[]>([]);
 
   return (
     <div className="space-y-6">
@@ -29,7 +39,9 @@ export const SearchEquipo = ({ onEquipoEncontrado }: SearchEquipoProps) => {
                 className="mt-2"
                 onClick={() => {
                   const nuevosEquipos = equipo.filter((_, i) => i !== index);
+                  const nuevosMotivos = motivos.filter((_, i) => i !== index);
                   setEquipo(nuevosEquipos);
+                  setMotivos(nuevosMotivos);
                 }}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -60,8 +72,22 @@ export const SearchEquipo = ({ onEquipoEncontrado }: SearchEquipoProps) => {
                     }
 
                     const data = await buscarEquipo(field.nro_serie);
+
                     if (data && onEquipoEncontrado) {
-                      onEquipoEncontrado(data); // ✅ Aquí notificas al padre
+                      if (esBaja) {
+                        const motivo = motivos[index] || "";
+                        // if (!motivo.trim()) {
+                        //   toast.error("Debe ingresar el motivo de la baja");
+                        //   return;
+                        // }
+                        onEquipoEncontrado({
+                          ...data,
+                          id_equipo: data.id_equipo,
+                          motivo,
+                        });
+                      } else {
+                        onEquipoEncontrado(data);
+                      }
                     }
                   }}
                   className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 hover:text-gray-700"
@@ -94,14 +120,36 @@ export const SearchEquipo = ({ onEquipoEncontrado }: SearchEquipoProps) => {
                   <Label>Nombre</Label>
                   <Input value={field.nombre_equipo || ""} readOnly />
                 </div>
+
+                {esBaja && (
+                  <div className="col-span-12 mt-4">
+                    <Label>Motivo de la baja</Label>
+                    <Textarea
+                      placeholder="Escribe el motivo"
+                      value={motivos[index] || ""}
+                      onChange={(e) => {
+                        const nuevos = [...motivos];
+                        nuevos[index] = e.target.value;
+                        setMotivos(nuevos);
+
+                        // 👉 Notificar al padre
+                        if (onMotivoChange) {
+                          onMotivoChange(field.id_equipo, e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>
 
-          <AccesoriosContainer
-            equipoIndex={index}
-            accesorios={Array.isArray(accesorios) ? accesorios : [accesorios]}
-          />
+          {!esBaja && (
+            <AccesoriosContainer
+              equipoIndex={index}
+              accesorios={Array.isArray(accesorios) ? accesorios : [accesorios]}
+            />
+          )}
         </div>
       ))}
 
@@ -127,8 +175,10 @@ export const SearchEquipo = ({ onEquipoEncontrado }: SearchEquipoProps) => {
             garantia_fecha_fin: "",
             estado_actual: "",
             perifericos: null,
+            motivo: "",
           };
           setEquipo([...equipo, nuevoEquipo]);
+          setMotivos([...motivos, ""]);
         }}
       >
         <Plus className="h-4 w-4 mr-2" />
