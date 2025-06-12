@@ -35,6 +35,7 @@ export const useGlobal = () => {
       garantia_fecha_fin: "",
       estado_actual: "",
       perifericos: null,
+      motivo: "",
     },
   ]);
 
@@ -57,26 +58,44 @@ export const useGlobal = () => {
       maximumFractionDigits: 0,
     });
   };
-
   const buscarEquipo = async (serial: string): Promise<Equipo | null> => {
     try {
       const data = await getInfoEquipo(serial);
+
       if (data && data.id_equipo) {
-        setEquipo([data]);
+        setEquipo((prevEquipos) => {
+          // Busca el índice del equipo que tenga ese serial
+          const index = prevEquipos.findIndex((e) => e.nro_serie === serial);
+
+          if (index !== -1) {
+            const equipoAnterior = prevEquipos[index];
+            // Mantén los datos ya escritos (como el motivo) y actualiza el resto
+            const actualizado = {
+              ...equipoAnterior,
+              ...data, // sobrescribe con lo que vino del backend
+              motivo: equipoAnterior.motivo, // mantiene el motivo si lo tenía
+            };
+
+            const nuevos = [...prevEquipos];
+            nuevos[index] = actualizado;
+            return nuevos;
+          }
+
+          // Si no lo encontró, lo agrega al final
+          return [...prevEquipos, data];
+        });
+
         setHaBuscado(true);
         setAccesorios(data.perifericos || []);
         return data;
       } else {
         toast.error("No se encontró el equipo.");
         setHaBuscado(false);
-        setEquipo([]);
-        setAccesorios([]);
         return null;
       }
     } catch (error) {
       toast.error("No se encontró el equipo.");
       setHaBuscado(false);
-      setAccesorios([]);
       return null;
     }
   };
