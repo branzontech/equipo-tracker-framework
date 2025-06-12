@@ -69,6 +69,20 @@ const UpdateSede = ({ open, onOpenChange, id }: UpdateProps) => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="regional">Regional</Label>
+                  <Input
+                    id="regional"
+                    value={newSede.regional}
+                    onChange={(e) =>
+                      setNewSede({ ...newSede, regional: e.target.value })
+                    }
+                    autoComplete="off"
+                    placeholder="Ingrese la regional"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="responsables">Responsable(s)</Label>
                   <Popover>
                     <PopoverTrigger className="w-full px-3 py-2 border rounded text-left text-sm bg-white">
