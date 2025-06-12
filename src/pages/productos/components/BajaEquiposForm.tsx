@@ -1,9 +1,15 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, FileX, Plus, Upload, Download } from "lucide-react";
+import {
+  CalendarIcon,
+  FileX,
+  Plus,
+  Upload,
+  Download,
+  Search,
+} from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,247 +42,279 @@ import {
 } from "@/components/ui/sheet";
 import { EquipoForm } from "./EquipoForm";
 import { EquiposTable } from "./EquiposTable";
-
-const equipoSchema = z.object({
-  serial: z.string().min(1, "El serial es requerido"),
-  activoFijo: z.string().min(1, "El número de activo fijo es requerido"),
-  motivo: z.string().min(1, "El motivo de la baja es requerido"),
-  descripcionEstado: z.string().min(1, "La descripción del estado es requerida"),
-});
-
-const formSchema = z.object({
-  fecha: z.date({
-    required_error: "La fecha es requerida",
-  }),
-  equipos: z.array(equipoSchema).min(1, "Debe agregar al menos un equipo"),
-  observaciones: z.string().optional(),
-  autorizadoPor: z.string().min(1, "El nombre de quien autoriza es requerido"),
-  autorizadoPorFirma: z.string().min(1, "La firma de autorización es requerida"),
-  solicitadoPor: z.string().min(1, "El nombre de quien solicita es requerido"),
-  solicitadoPorFirma: z.string().min(1, "La firma de solicitud es requerida"),
-});
-
-// Define a type based on the zod schema for better type checking
-type EquipoType = z.infer<typeof equipoSchema>;
+import { useUser } from "@/pages/usuarios/hooks/use-user";
+import ResponsibleSearch from "@/components/ResponsibleSearch";
+import { Label } from "@/components/ui/label";
+import { useBaja } from "../hooks/use-baja";
+import { es } from "date-fns/locale";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SearchEquipo } from "@/components/SearchEquipo";
 
 export function BajaEquiposForm() {
-  const { toast } = useToast();
-  const [equipos, setEquipos] = useState([{ id: Date.now().toString() }]);
+  // const agregarEquipo = (nuevoEquipo: EquipoType) => {
+  //   const equipoId = { id: Date.now().toString() };
+  //   setEquipos([...equipos, equipoId]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      observaciones: "",
-      equipos: [{ serial: "", activoFijo: "", motivo: "", descripcionEstado: "" }],
-    },
-  });
-  
-  const agregarEquipo = (nuevoEquipo: EquipoType) => {
-    const equipoId = { id: Date.now().toString() };
-    setEquipos([...equipos, equipoId]);
-    
-    const currentEquipos = form.getValues().equipos || [];
-    form.setValue("equipos", [
-      ...currentEquipos, 
-      nuevoEquipo
-    ]);
-    
-    toast({
-      title: "Equipo agregado",
-      description: `Se ha agregado el equipo con serial ${nuevoEquipo.serial}`,
-    });
-  };
-  
-  const eliminarEquipo = (index: number) => {
-    if (equipos.length === 1) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Debe tener al menos un equipo en la baja.",
-      });
-      return;
-    }
-    
-    const nuevosEquipos = [...equipos];
-    nuevosEquipos.splice(index, 1);
-    setEquipos(nuevosEquipos);
-    
-    const currentEquipos = form.getValues().equipos || [];
-    const updatedEquipos = [...currentEquipos];
-    updatedEquipos.splice(index, 1);
-    form.setValue("equipos", updatedEquipos);
+  //   const currentEquipos = form.getValues().equipos || [];
+  //   form.setValue("equipos", [...currentEquipos, nuevoEquipo]);
 
-    toast({
-      title: "Equipo eliminado",
-      description: "Se ha eliminado el equipo de la lista.",
-    });
-  };
+  //   toast({
+  //     title: "Equipo agregado",
+  //     description: `Se ha agregado el equipo con serial ${nuevoEquipo.serial}`,
+  //   });
+  // };
+
+  // const eliminarEquipo = (index: number) => {
+  //   if (equipos.length === 1) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Error",
+  //       description: "Debe tener al menos un equipo en la baja.",
+  //     });
+  //     return;
+  //   }
+
+  //   const nuevosEquipos = [...equipos];
+  //   nuevosEquipos.splice(index, 1);
+  //   setEquipos(nuevosEquipos);
+
+  //   const currentEquipos = form.getValues().equipos || [];
+  //   const updatedEquipos = [...currentEquipos];
+  //   updatedEquipos.splice(index, 1);
+  //   form.setValue("equipos", updatedEquipos);
+
+  //   toast({
+  //     title: "Equipo eliminado",
+  //     description: "Se ha eliminado el equipo de la lista.",
+  //   });
+  // };
 
   // Function to reset the form and start a new equipment withdrawal
-  const nuevaBajaEquipo = () => {
-    form.reset({
-      observaciones: "",
-      equipos: [{ serial: "", activoFijo: "", motivo: "", descripcionEstado: "" }],
-    });
-    setEquipos([{ id: Date.now().toString() }]);
-    
-    toast({
-      title: "Nueva baja de equipos",
-      description: "Se ha iniciado un nuevo formulario de baja de equipos.",
-    });
-  };
+  // const nuevaBajaEquipo = () => {
+  //   form.reset({
+  //     observaciones: "",
+  //     equipos: [
+  //       { serial: "", activoFijo: "", motivo: "", descripcionEstado: "" },
+  //     ],
+  //   });
+  //   setEquipos([{ id: Date.now().toString() }]);
+
+  //   toast({
+  //     title: "Nueva baja de equipos",
+  //     description: "Se ha iniciado un nuevo formulario de baja de equipos.",
+  //   });
+  // };
 
   // Function to handle bulk import from CSV or Excel
-  const handleBulkImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // This would be implemented with a CSV/Excel parsing library
-    // For demo purposes, we'll just simulate adding multiple items
-    const mockData: EquipoType[] = [
-      {
-        serial: "SER1001",
-        activoFijo: "AF2001",
-        motivo: "Obsolescencia",
-        descripcionEstado: "Equipo con 5 años de uso, lento para tareas actuales",
-      },
-      {
-        serial: "SER1002",
-        activoFijo: "AF2002",
-        motivo: "Daño irreparable",
-        descripcionEstado: "Placa madre dañada, costo de reparación superior al 70% del valor",
-      },
-      {
-        serial: "SER1003",
-        activoFijo: "AF2003",
-        motivo: "Actualización tecnológica",
-        descripcionEstado: "Se reemplaza por equipos nuevos según política de renovación",
-      },
-    ];
-    
-    const currentEquipos = form.getValues().equipos || [];
-    const newEquipos = [...currentEquipos, ...mockData];
-    
-    form.setValue("equipos", newEquipos);
-    
-    // Update equipos state
-    const newEquiposState = [
-      ...equipos,
-      ...mockData.map(() => ({ id: Date.now().toString() + Math.random() }))
-    ];
-    setEquipos(newEquiposState);
-    
-    toast({
-      title: "Importación completada",
-      description: `Se han agregado ${mockData.length} equipos a la lista.`,
-    });
-  };
+  // const handleBulkImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   // This would be implemented with a CSV/Excel parsing library
+  //   // For demo purposes, we'll just simulate adding multiple items
+  //   const mockData: EquipoType[] = [
+  //     {
+  //       serial: "SER1001",
+  //       activoFijo: "AF2001",
+  //       motivo: "Obsolescencia",
+  //       descripcionEstado:
+  //         "Equipo con 5 años de uso, lento para tareas actuales",
+  //     },
+  //     {
+  //       serial: "SER1002",
+  //       activoFijo: "AF2002",
+  //       motivo: "Daño irreparable",
+  //       descripcionEstado:
+  //         "Placa madre dañada, costo de reparación superior al 70% del valor",
+  //     },
+  //     {
+  //       serial: "SER1003",
+  //       activoFijo: "AF2003",
+  //       motivo: "Actualización tecnológica",
+  //       descripcionEstado:
+  //         "Se reemplaza por equipos nuevos según política de renovación",
+  //     },
+  //   ];
+
+  //   const currentEquipos = form.getValues().equipos || [];
+  //   const newEquipos = [...currentEquipos, ...mockData];
+
+  //   form.setValue("equipos", newEquipos);
+
+  //   // Update equipos state
+  //   const newEquiposState = [
+  //     ...equipos,
+  //     ...mockData.map(() => ({ id: Date.now().toString() + Math.random() })),
+  //   ];
+  //   setEquipos(newEquiposState);
+
+  //   toast({
+  //     title: "Importación completada",
+  //     description: `Se han agregado ${mockData.length} equipos a la lista.`,
+  //   });
+  // };
 
   // Function to export template
-  const exportTemplate = () => {
-    // In a real application, this would generate and download a CSV/Excel template
-    toast({
-      title: "Plantilla descargada",
-      description: "La plantilla para importación ha sido descargada.",
-    });
-  };
+  // const exportTemplate = () => {
+  //   // In a real application, this would generate and download a CSV/Excel template
+  //   toast({
+  //     title: "Plantilla descargada",
+  //     description: "La plantilla para importación ha sido descargada.",
+  //   });
+  // };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      // Aquí iría la lógica para procesar la baja del equipo
-      console.log(values);
-      
-      toast({
-        title: "Baja de equipos registrada",
-        description: `Se ha registrado la baja de ${values.equipos.length} equipo(s) exitosamente.`,
-      });
-      
-      form.reset();
-      setEquipos([{ id: Date.now().toString() }]);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al registrar la baja del equipo.",
-      });
-    }
-  }
+  const {
+    newUser,
+    users,
+    selectedEntregaUser,
+    setSelectedEntregaUser,
+    selectedRecibeUser,
+    setSelectedRecibeUser,
+  } = useUser();
+
+  const { newBaja, setNewBaja, addBaja } = useBaja();
+  const methods = useForm();
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-[#0B2559]">Baja de Equipos</h1>
-        <Button
+        {/* <Button
           onClick={nuevaBajaEquipo}
           className="bg-[#bff036] hover:bg-[#bff036]/90 text-[#01242c]"
           variant="secondary"
         >
           <FileX className="mr-2 h-4 w-4" />
           Nueva Baja
-        </Button>
+        </Button> */}
       </div>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+      <FormProvider {...methods}>
+        <form
+          className="space-y-8"
+          onSubmit={(e: React.FormEvent) => {
+            e.preventDefault();
+            const firmaFinalEntrega =
+              newUser.firma_entrega || selectedEntregaUser?.firma || "";
+            const firmaFinalRecibe =
+              newUser.firma_recibe || selectedRecibeUser?.firma || "";
+
+            addBaja(newBaja, firmaFinalEntrega, firmaFinalRecibe);
+          }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            {/* Fecha de baja */}
-            <div className="mb-6">
-              <FormField
-                control={form.control}
-                name="fecha"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Fecha</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-64 pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Seleccionar fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="space-y-2">
+                <Label htmlFor="fechaTraslado">Fecha de Traslado</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {newBaja.fecha_baja ? (
+                        format(newBaja.fecha_baja, "PPP", {
+                          locale: es,
+                        })
+                      ) : (
+                        <span>Seleccionar fecha</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        typeof newBaja.fecha_baja === "string"
+                          ? new Date(newBaja.fecha_baja)
+                          : newBaja.fecha_baja
+                      }
+                      onSelect={(date) =>
+                        setNewBaja({
+                          ...newBaja,
+                          fecha_baja: date as Date,
+                        })
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="estado">Estado</Label>
+                <Select
+                  value={newBaja.estado || ""}
+                  onValueChange={(value) =>
+                    setNewBaja({ ...newBaja, estado: value })
+                  }
+                >
+                  <SelectTrigger id="estado">
+                    <SelectValue placeholder="Seleccione un estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Pendiente">Pendiente</SelectItem>
+                    <SelectItem value="En proceso">En proceso</SelectItem>
+                    <SelectItem value="Finalizado">Finalizado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Lista de equipos para dar de baja */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-[#0B2559]">Equipos para dar de baja</h2>
-                <div className="flex space-x-2">
-                  <Button 
+              <h2 className="text-lg font-semibold text-[#0B2559] mb-5">
+                Equipos para dar de baja
+              </h2>
+              {/* <Button
                     type="button"
                     variant="outline"
                     className="flex items-center"
                     onClick={exportTemplate}
                   >
                     <Download className="mr-1 h-4 w-4" /> Plantilla
-                  </Button>
-                  
-                  <Sheet>
+                  </Button> */}
+
+              <SearchEquipo
+                esBaja
+                onEquipoEncontrado={(equipo) => {
+                  setNewBaja((prev) => {
+                    const yaExiste = prev.equipos.some(
+                      (e) => e.id_equipo === equipo.id_equipo
+                    );
+                    if (yaExiste) return prev;
+
+                    return {
+                      ...prev,
+                      equipos: [
+                        ...prev.equipos,
+                        {
+                          id_equipo: equipo.id_equipo,
+                          motivo: "", 
+                        },
+                      ],
+                    };
+                  });
+                }}
+                onMotivoChange={(id_equipo, nuevoMotivo) => {
+                  setNewBaja((prev) => ({
+                    ...prev,
+                    equipos: prev.equipos.map((e) =>
+                      e.id_equipo === id_equipo
+                        ? { ...e, motivo: nuevoMotivo }
+                        : e
+                    ),
+                  }));
+                }}
+              />
+
+              {/* <Sheet>
                     <SheetTrigger asChild>
-                      <Button 
-                        type="button" 
+                      <Button
+                        type="button"
                         variant="secondary"
                         className="flex items-center bg-[#bff036] hover:bg-[#bff036]/90 text-[#01242c]"
                       >
@@ -290,140 +328,138 @@ export function BajaEquiposForm() {
                           Complete los datos del equipo que desea dar de baja.
                         </SheetDescription>
                       </SheetHeader>
-                      <EquipoForm 
+                      <EquipoForm
                         onAddEquipo={agregarEquipo}
                         handleBulkImport={handleBulkImport}
                         exportTemplate={exportTemplate}
                       />
                     </SheetContent>
-                  </Sheet>
-                </div>
-              </div>
-              
+                  </Sheet> */}
+
               {/* Table to display equipos */}
-              <EquiposTable 
-                equipos={form.getValues().equipos} 
-                onDeleteEquipo={eliminarEquipo} 
-              />
+              {/* <EquiposTable
+                equipos={form.getValues().equipos}
+                onDeleteEquipo={eliminarEquipo}
+              /> */}
             </div>
 
-            {/* Observaciones adicionales */}
             <div className="mb-6">
-              <FormField
-                control={form.control}
-                name="observaciones"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Observaciones Adicionales</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Ingrese observaciones adicionales (opcional)"
-                        className="resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Firmas */}
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="autorizadoPor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Autorizado Por</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre de quien autoriza" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              <div className="space-y-2 mb-8">
+                <Label htmlFor="observaciones">Observaciones Adicionales</Label>
+                <Textarea
+                  placeholder="Ingrese observaciones adicionales (opcional)"
+                  className="resize-none"
+                  value={newBaja.observaciones_adicionales}
+                  onChange={(e) => {
+                    setNewBaja({
+                      ...newBaja,
+                      observaciones_adicionales: e.target.value,
+                    });
+                  }}
                 />
-                <div className="mt-2">
-                  <FormField
-                    control={form.control}
-                    name="autorizadoPorFirma"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Firma de quien autoriza</FormLabel>
-                        <FormControl>
-                          <SignatureCanvas 
-                            value={field.value} 
-                            onChange={field.onChange}
-                            label="Firma de autorización"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ResponsibleSearch
+                  name="responsableEntrega"
+                  label="Responsable de Autorización"
+                  onSelect={(person) => {
+                    const user = users.find(
+                      (u) => u.id_usuario === Number(person.id)
+                    );
+                    if (user) {
+                      setSelectedEntregaUser({
+                        ...user,
+                        firma: user.firma || "",
+                      });
+                    } else {
+                      setSelectedEntregaUser(null);
+                    }
+                    setNewBaja((prev) => ({
+                      ...prev,
+                      responsable_autorizacion_id: Number(person.id),
+                    }));
+                  }}
+                />
+
+                <ResponsibleSearch
+                  name="responsableRecibe"
+                  label="Responsable de Solicitud"
+                  onSelect={(person) => {
+                    const user = users.find(
+                      (u) => u.id_usuario === Number(person.id)
+                    );
+                    if (user) {
+                      setSelectedRecibeUser({
+                        ...user,
+                        firma: user.firma || "",
+                      });
+                    } else {
+                      setSelectedRecibeUser(null);
+                    }
+                    setNewBaja((prev) => ({
+                      ...prev,
+                      responsable_solicitud_id: Number(person.id),
+                    }));
+                  }}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                <div className="space-y-2">
+                  <Label htmlFor="firmaEntrega">Firma de quien entrega</Label>
+                  <SignatureCanvas
+                    value={selectedEntregaUser?.firma || ""}
+                    onChange={(value: string) => {
+                      newUser.firma_entrega = value;
+                      if (selectedEntregaUser) {
+                        setSelectedEntregaUser({
+                          ...selectedEntregaUser,
+                          firma: value,
+                        });
+                      }
+                    }}
+                    readOnly={!!selectedEntregaUser?.firma}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="firmaRecibe">Firma de quien recibe</Label>
+                  <SignatureCanvas
+                    value={selectedRecibeUser?.firma || ""}
+                    onChange={(value: string) => {
+                      newUser.firma_recibe = value;
+                      if (selectedRecibeUser) {
+                        setSelectedRecibeUser({
+                          ...selectedRecibeUser,
+                          firma: value,
+                        });
+                      }
+                    }}
+                    readOnly={!!selectedRecibeUser?.firma}
                   />
                 </div>
               </div>
-
-              <div>
-                <FormField
-                  control={form.control}
-                  name="solicitadoPor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Solicitado Por</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre de quien solicita" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="mt-2">
-                  <FormField
-                    control={form.control}
-                    name="solicitadoPorFirma"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Firma de quien solicita</FormLabel>
-                        <FormControl>
-                          <SignatureCanvas 
-                            value={field.value} 
-                            onChange={field.onChange}
-                            label="Firma de solicitud"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
             </div>
-          </div>
 
-          <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                form.reset();
-                setEquipos([{ id: Date.now().toString() }]);
-              }}
-              className="bg-white hover:bg-gray-100"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              type="submit"
-              className="bg-[#bff036] hover:bg-[#bff036]/90 text-[#01242c]"
-              variant="secondary"
-            >
-              Registrar Baja
-            </Button>
+            <div className="flex justify-end space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                // onClick={() => {
+                //   form.reset();
+                //   setEquipos([{ id: Date.now().toString() }]);
+                // }}
+                className="bg-white hover:bg-gray-100 w-full"
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" className=" w-full">
+                Registrar Baja
+              </Button>
+            </div>
           </div>
         </form>
-      </Form>
+      </FormProvider>
     </div>
   );
 }
