@@ -2,7 +2,8 @@ import { equipoModel } from "../../../db/models/equipo.model.js";
 
 export const equipoService = {
   async create(data) {
-    return await equipoModel.create(data);
+    const equipoCreated = await equipoModel.create(data);
+    return equipoCreated;
   },
   async findAll() {
     return await equipoModel.findAll();
