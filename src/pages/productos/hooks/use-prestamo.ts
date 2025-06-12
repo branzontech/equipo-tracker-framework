@@ -3,6 +3,7 @@ import { Prestamo } from "../interfaces/prestamo";
 import { create, getAll, saveSign } from "@/api/axios/prestamo.api";
 import { toast } from "sonner";
 import { useGlobal } from "@/hooks/use-global";
+import { icons } from "@/components/interfaces/icons";
 
 export const usePrestamo = () => {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
@@ -18,7 +19,8 @@ export const usePrestamo = () => {
     descripcion: "",
     equipos: [],
   });
-  const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } = useGlobal();
+  const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } =
+    useGlobal();
 
   useEffect(() => {
     const fetchPrestamos = async () => {
@@ -34,17 +36,51 @@ export const usePrestamo = () => {
     firma_salida: string
   ) => {
     if (!prestamo.fecha_salida) {
-      toast.error("Debe ingresar una fecha de salida");
+      toast.error("Debe ingresar una fecha de salida", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!prestamo.fecha_retorno) {
-      toast.error("Debe ingresar una fecha de retorno");
+      toast.error("Debe ingresar una fecha de retorno", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!prestamo.estado) {
-      toast.error("Debe ingresar un estado");
+      toast.error("Debe ingresar un estado", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!prestamo.equipos.length) {
+      toast.error("Debe agregar al menos un equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!prestamo.descripcion) {
+      toast.error("Debe ingresar una descripcion", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!prestamo.responsable_entrada_id) {
+      toast.error("Debe seleccionar un responsable de salida", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!prestamo.responsable_salida_id) {
+      toast.error("Debe seleccionar un responsable de entrada", {
+        icon: icons.error,
+      });
       return;
     }
 
@@ -57,14 +93,18 @@ export const usePrestamo = () => {
       );
       const response = await create(prestamo);
       if (response.success) {
-        toast.success(response.message || "Prestamo creado exitosamente");
+        toast.success(response.message || "Prestamo creado exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 4500);
       }
       return response;
     } catch (error) {
-      toast.error(error.message || "Error al crear el prestamo");
+      toast.error(error.message || "Error al crear el prestamo", {
+        icon: icons.error,
+      });
     }
   };
 
