@@ -20,6 +20,7 @@ export const useSedes = () => {
   const [newSede, setNewSede] = useState<Sede>({
     id_sede: 0,
     nombre: "",
+    regional: "",
     usuarios: [],
     estado: null,
   });
