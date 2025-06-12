@@ -7,6 +7,7 @@ import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { useState } from "react";
 import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -89,12 +90,16 @@ export const useGlobal = () => {
         setAccesorios(data.perifericos || []);
         return data;
       } else {
-        toast.error("No se encontró el equipo.");
+        toast.error("No se encontró el equipo.", {
+          icon: icons.error,
+        });
         setHaBuscado(false);
         return null;
       }
     } catch (error) {
-      toast.error("No se encontró el equipo.");
+      toast.error("No se encontró el equipo.", {
+        icon: icons.error,
+      });
       setHaBuscado(false);
       return null;
     }
@@ -107,7 +112,23 @@ export const useGlobal = () => {
     responsable_entrada_id: number
   ) => {
     if (!firma_entrega || !firma_salida) {
-      toast.error("Debe ingresar una firma");
+      toast.error("Debe ingresar una firma", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!responsable_salida_id) {
+      toast.error("Debe seleccionar un responsable de salida", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!responsable_entrada_id) {
+      toast.error("Debe seleccionar un responsable de entrada", {
+        icon: icons.error,
+      });
       return;
     }
     try {
@@ -119,7 +140,9 @@ export const useGlobal = () => {
       );
       return response;
     } catch (error) {
-      toast.error(error.message || "Error al guardar la firma");
+      toast.error(error.message || "Error al guardar la firma", {
+        icon: icons.error,
+      });
     }
   };
 
