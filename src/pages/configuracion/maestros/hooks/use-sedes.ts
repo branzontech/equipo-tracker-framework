@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   getSedes,
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { icons } from "@/components/interfaces/icons";
 
 export const useSedes = () => {
   const navigate = useNavigate();
@@ -49,31 +51,41 @@ export const useSedes = () => {
 
   const create = async (sede: Sede) => {
     if (!sede.nombre) {
-      toast.error("Debe ingresar un nombre");
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!sede.usuarios || sede.usuarios.length === 0) {
-      toast.error("Debe seleccionar al menos un usuario");
+      toast.error("Debe seleccionar al menos un usuario", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (sede.estado === undefined || sede.estado === null) {
-      toast.error("Debe seleccionar un estado");
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
       return;
     }
 
     try {
       const response = await createSede(sede);
       if (response.success) {
-        toast.success(response.message || "Sede creada exitosamente");
+        toast.success(response.message || "Sede creada exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 4500);
       }
       return { response };
     } catch (error) {
-      toast.error(error.message || "Error al crear la sede");
+      toast.error(error.message || "Error al crear la sede", {
+        icon: icons.error,
+      });
     }
   };
 
@@ -85,13 +97,19 @@ export const useSedes = () => {
         try {
           const res = await deleteSede(id);
           if (res.success) {
-            toast.success(res.message || "Sede eliminada correctamente");
+            toast.success(res.message || "Sede eliminada correctamente", {
+              icon: icons.success,
+            });
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.info(res.message);
+            toast.error(res.message, {
+              icon: icons.error,
+            });
           }
         } catch (error) {
-          toast.info(error.message);
+          toast.error(error.message, {
+            icon: icons.error,
+          });
         }
       },
     });
@@ -107,14 +125,22 @@ export const useSedes = () => {
   };
 
   const update = async (id: number, sede: Sede) => {
-    const response = await updateSede(id, sede);
-    if (response.success) {
-      toast.success(response.message || "Sede actualizada exitosamente");
-      setTimeout(() => {
-        window.location.reload();
-      }, 4500);
+    try {
+      const response = await updateSede(id, sede);
+      if (response.success) {
+        toast.success(response.message || "Sede actualizada exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Error al actualizar la sede", {
+        icon: icons.error,
+      });
     }
-    return response;
   };
 
   const handleOpenEditModal = (id: number) => {
