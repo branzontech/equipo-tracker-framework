@@ -11,6 +11,7 @@ import {
 import { ColumnConfig } from "../interfaces/columns";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { icons } from "@/components/interfaces/icons";
 
 export const useSucursales = () => {
   const [sucursales, setSucursales] = useState<SucursalConEstado[]>([]);
@@ -52,36 +53,48 @@ export const useSucursales = () => {
 
   const handleCreateSucursales = async (sucursal: Sucursal) => {
     if (!sucursal.nombre) {
-      toast.error("Debe ingresar un nombre");
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!sucursal.tipo) {
-      toast.error("Debe seleccionar un tipo");
+      toast.error("Debe seleccionar un tipo", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (!sucursal.sede_id) {
-      toast.error("Debe seleccionar una sede");
+      toast.error("Debe seleccionar una sede", {
+        icon: icons.error,
+      });
       return;
     }
 
     if (sucursal.estado === undefined || sucursal.estado === null) {
-      toast.error("Debe seleccionar un estado");
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
       return;
     }
 
     try {
       const response = await registerSucursal(sucursal);
       if (response.success) {
-        toast.success(response.message || "Sucursal creada exitosamente");
+        toast.success(response.message || "Sucursal creada exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 4500);
       }
       return response;
     } catch (error) {
-      toast.info(error.message);
+      toast.error(error.message, {
+        icon: icons.error,
+      });
     }
   };
 
@@ -274,13 +287,19 @@ export const useSucursales = () => {
         try {
           const res = await deleteSucursal(id);
           if (res.success) {
-            toast.success(res.message || "Sucursal eliminada correctamente");
+            toast.success(res.message || "Sucursal eliminada correctamente", {
+              icon: icons.success,
+            });
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message);
+            toast.error(res.message, {
+              icon: icons.error,
+            });
           }
         } catch (error) {
-          toast.info(error.message);
+          toast.error(error.message, {
+            icon: icons.error,
+          });
         }
       },
     });
@@ -292,14 +311,22 @@ export const useSucursales = () => {
   };
 
   const update = async (id: number, sucursal: Sucursal) => {
-    const response = await updateSucursal(id, sucursal);
-    if (response.success) {
-      toast.success(response.message || "Sucursal actualizada exitosamente");
-      setTimeout(() => {
-        window.location.reload();
-      }, 4500);
+    try {
+      const response = await updateSucursal(id, sucursal);
+      if (response.success) {
+        toast.success(response.message || "Sucursal actualizada exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Error al actualizar la sucursal", {
+        icon: icons.error,
+      });
     }
-    return response;
   };
 
   const handleOpenEditModal = (id: number) => {
