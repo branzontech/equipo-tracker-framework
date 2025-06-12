@@ -19,6 +19,7 @@ export interface Equipo {
   garantia_fecha_fin: string;
   estado_actual: string;
   observaciones?: string;
+  motivo: string;
 
   // Información Técnica
   especificaciones?: {
