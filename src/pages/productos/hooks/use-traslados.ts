@@ -5,6 +5,7 @@ import { useSedes } from "@/pages/configuracion/maestros/hooks/use-sedes";
 import { useSucursales } from "@/pages/configuracion/maestros/hooks/use-sucursales";
 import { create } from "@/api/axios/traslado.api";
 import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
 
 export const useTraslados = () => {
   const [traslados, setTraslados] = useState<Traslado[]>([]);
@@ -53,24 +54,57 @@ export const useTraslados = () => {
       )
     : [];
 
-  const registerTraslado = async (traslado: Traslado, firma_entrega: string, firma_salida: string) => {
+  const registerTraslado = async (
+    traslado: Traslado,
+    firma_entrega: string,
+    firma_salida: string
+  ) => {
     if (!traslado.fecha_traslado) {
-      toast.error("Debe ingresar una fecha de traslado");
-      return;
-    }
-
-    if (!traslado.motivo) {
-      toast.error("Debe ingresar un motivo");
-      return;
-    }
-
-    if (!traslado.observaciones) {
-      toast.error("Debe ingresar observaciones");
+      toast.error("Debe ingresar una fecha de traslado", {
+        icon: icons.error
+      });
       return;
     }
 
     if (!traslado.sucursal_destino_id) {
-      toast.error("Debe ingresar una sucursal de destino");
+      toast.error("Debe ingresar una sucursal de destino", {
+        icon: icons.error
+      });
+      return;
+    }
+
+    if (!traslado.motivo) {
+      toast.error("Debe ingresar un motivo", {
+        icon: icons.error
+      });
+      return;
+    }
+
+    if (!traslado.equipos.length) {
+      toast.error("Debe agregar al menos un equipo", {
+        icon: icons.error
+      });
+      return;
+    }
+
+    if (!traslado.observaciones) {
+      toast.error("Debe ingresar observaciones", {
+        icon: icons.error
+      });
+      return;
+    }
+
+    if (!traslado.responsable_entrada_id) {
+      toast.error("Debe seleccionar un responsable de entrada", {
+        icon: icons.error
+      });
+      return;
+    }
+
+    if (!traslado.responsable_salida_id) {
+      toast.error("Debe seleccionar un responsable de salida", {
+        icon: icons.error
+      });
       return;
     }
 
