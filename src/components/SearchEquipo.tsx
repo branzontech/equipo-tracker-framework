@@ -52,10 +52,10 @@ export const SearchEquipo = ({
 
           <div className="grid grid-cols-12 gap-4 items-start">
             <div className="col-span-12 md:col-span-3">
-              <Label>Serial</Label>
+              <Label>Serial del equipo</Label>
               <div className="relative">
                 <Input
-                  placeholder="Ingrese el serial del equipo"
+                  placeholder="Ingrese N° serial"
                   onChange={(e) => {
                     field.nro_serie = e.target.value;
                   }}
@@ -76,10 +76,6 @@ export const SearchEquipo = ({
                     if (data && onEquipoEncontrado) {
                       if (esBaja) {
                         const motivo = motivos[index] || "";
-                        // if (!motivo.trim()) {
-                        //   toast.error("Debe ingresar el motivo de la baja");
-                        //   return;
-                        // }
                         onEquipoEncontrado({
                           ...data,
                           id_equipo: data.id_equipo,
