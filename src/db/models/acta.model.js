@@ -81,11 +81,6 @@ export const ActaModel = {
             },
           },
         },
-        acta_equipos: {
-          include: {
-            equipos: true,
-          },
-        },
       },
     });
 

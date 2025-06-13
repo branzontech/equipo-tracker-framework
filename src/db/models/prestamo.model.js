@@ -77,15 +77,7 @@ export const prestamoModel = {
       // 3. Iterar por equipos del préstamo
       for (const equipo of prestamo.equipos) {
 
-        // 3.1 Relacionar equipo con acta
-        // await prisma.acta_equipos.create({
-        //   data: {
-        //     acta_id: nuevaActa.id_acta,
-        //     equipo_id: equipo.id_equipo,
-        //   },
-        // });
-
-        // 3.2 Crear relación en Prestamo_Equipos
+        // 3.1 Crear relación en Prestamo_Equipos
         const prestamoEquipo = await prisma.prestamo_equipos.create({
           data: {
             prestamo_id: nuevoPrestamo.id_prestamo,
@@ -93,7 +85,7 @@ export const prestamoModel = {
           },
         });
 
-        // 3.3 Insertar perifericos relacionados (si hay)
+        // 3.2 Insertar perifericos relacionados (si hay)
         if (equipo.perifericos && equipo.perifericos.length > 0) {
           for (const periferico_id of equipo.perifericos) {
             try {
