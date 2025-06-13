@@ -547,7 +547,7 @@ const Actas = () => {
           <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
           <h3 className="text-lg font-medium">No se encontraron actas</h3>
           <p className="text-gray-500 mt-1">
-            Pruebe con otros filtros de búsqueda
+            No hay actas generadas, por favor crea una nueva.
           </p>
         </div>
       ) : (
