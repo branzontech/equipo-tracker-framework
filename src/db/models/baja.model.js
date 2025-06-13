@@ -45,12 +45,12 @@ export const bajaModel = {
       // Iterar por equipos del baja
       for (const equipo of baja.equipos) {
         // Relacionar equipo con acta
-        await prisma.acta_equipos.create({
-          data: {
-            acta_id: nuevaActa.id_acta,
-            equipo_id: equipo.id_equipo,
-          },
-        });
+        // await prisma.acta_equipos.create({
+        //   data: {
+        //     acta_id: nuevaActa.id_acta,
+        //     equipo_id: equipo.id_equipo,
+        //   },
+        // });
 
         // Crear relación en Bajas_Equipos
         await prisma.bajas_equipos.create({
