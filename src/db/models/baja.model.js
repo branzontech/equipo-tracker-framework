@@ -44,15 +44,6 @@ export const bajaModel = {
 
       // Iterar por equipos del baja
       for (const equipo of baja.equipos) {
-        // Relacionar equipo con acta
-        // await prisma.acta_equipos.create({
-        //   data: {
-        //     acta_id: nuevaActa.id_acta,
-        //     equipo_id: equipo.id_equipo,
-        //   },
-        // });
-
-        // Crear relación en Bajas_Equipos
         await prisma.bajas_equipos.create({
           data: {
             baja_id: bajaCreated.id_baja,
@@ -61,13 +52,14 @@ export const bajaModel = {
           },
         });
 
+        await prisma.equipos.updateMany({
+          where: { id_equipo: equipo.id_equipo },
+          data: { estado_actual: "Inactivo por Baja" },
+        });
+
         await prisma.perifericos.updateMany({
-          where: {
-            equipo_asociado_id: equipo.id_equipo,
-          },
-          data: {
-            estado: "Inactivo por Baja",
-          },
+          where: { equipo_asociado_id: equipo.id_equipo },
+          data: { estado: "Inactivo por Baja" },
         });
       }
 
