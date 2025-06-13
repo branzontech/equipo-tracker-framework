@@ -78,12 +78,12 @@ export const prestamoModel = {
       for (const equipo of prestamo.equipos) {
 
         // 3.1 Relacionar equipo con acta
-        await prisma.acta_equipos.create({
-          data: {
-            acta_id: nuevaActa.id_acta,
-            equipo_id: equipo.id_equipo,
-          },
-        });
+        // await prisma.acta_equipos.create({
+        //   data: {
+        //     acta_id: nuevaActa.id_acta,
+        //     equipo_id: equipo.id_equipo,
+        //   },
+        // });
 
         // 3.2 Crear relación en Prestamo_Equipos
         const prestamoEquipo = await prisma.prestamo_equipos.create({
