@@ -6,6 +6,7 @@ import { useSucursales } from "@/pages/configuracion/maestros/hooks/use-sucursal
 import { create } from "@/api/axios/traslado.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
+import { useNavigate } from "react-router-dom";
 
 export const useTraslados = () => {
   const [traslados, setTraslados] = useState<Traslado[]>([]);
@@ -25,6 +26,7 @@ export const useTraslados = () => {
   const { sedes } = useSedes();
   const { sucursales } = useSucursales();
   const { buscarEquipo, saveSign_ } = useGlobal();
+  const navigate = useNavigate();
 
   const buscarEquipotraslados = async (serial: string) => {
     const data = await buscarEquipo(serial);
@@ -118,14 +120,19 @@ export const useTraslados = () => {
 
       const res = await create(traslado);
       if (res.success) {
-        toast.success(res.message || "Traslado creado exitosamente");
+        toast.success(res.message || "Traslado creado exitosamente", {
+          icon: icons.success,
+        });
         setTimeout(() => {
+          navigate("/productos/actas")
           window.location.reload();
         }, 4500);
       }
       return res;
     } catch (error) {
-      toast.error(error.message || "Error al crear el traslado");
+      toast.error(error.message || "Error al crear el traslado", {
+        icon: icons.error,
+      });
     }
   };
 
