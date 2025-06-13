@@ -4,6 +4,7 @@ import { create, getAll, saveSign } from "@/api/axios/prestamo.api";
 import { toast } from "sonner";
 import { useGlobal } from "@/hooks/use-global";
 import { icons } from "@/components/interfaces/icons";
+import { useNavigate } from "react-router-dom";
 
 export const usePrestamo = () => {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
@@ -21,6 +22,7 @@ export const usePrestamo = () => {
   });
   const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } =
     useGlobal();
+    const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPrestamos = async () => {
@@ -97,6 +99,7 @@ export const usePrestamo = () => {
           icon: icons.success,
         });
         setTimeout(() => {
+          navigate("/productos/actas")
           window.location.reload();
         }, 4500);
       }
