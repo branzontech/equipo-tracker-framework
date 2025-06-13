@@ -407,7 +407,7 @@ export function BajaEquiposForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
                 <div className="space-y-2">
-                  <Label htmlFor="firmaEntrega">Firma de quien entrega</Label>
+                  <Label htmlFor="firmaEntrega">Firma de quien autoriza</Label>
                   <SignatureCanvas
                     value={selectedEntregaUser?.firma || ""}
                     onChange={(value: string) => {
@@ -423,7 +423,7 @@ export function BajaEquiposForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="firmaRecibe">Firma de quien recibe</Label>
+                  <Label htmlFor="firmaRecibe">Firma de quien solicita</Label>
                   <SignatureCanvas
                     value={selectedRecibeUser?.firma || ""}
                     onChange={(value: string) => {
