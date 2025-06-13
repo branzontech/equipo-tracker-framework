@@ -1,6 +1,5 @@
 import { prisma } from "../../../prisma/prismaCliente.js";
 
-
 export const trasladoModel = {
   findAll: async () => {
     const traslados = await prisma.traslados.findMany({
@@ -18,8 +17,6 @@ export const trasladoModel = {
     return traslados;
   },
   create: async (traslado) => {
-
-    console.log(traslado);
 
     try {
       // 1. Crear el acta
@@ -51,12 +48,12 @@ export const trasladoModel = {
       // Iterar por equipos del traslado
       for (const equipo of traslado.equipos) {
         // Relacionar equipo con acta
-        await prisma.acta_equipos.create({
-          data: {
-            acta_id: nuevaActa.id_acta,
-            equipo_id: equipo.id_equipo,
-          },
-        });
+        // await prisma.acta_equipos.create({
+        //   data: {
+        //     acta_id: nuevaActa.id_acta,
+        //     equipo_id: equipo.id_equipo,
+        //   },
+        // });
 
         // Crear relación en Traslado_Equipos
         const trasladoEquipo = await prisma.traslados_equipos.create({
