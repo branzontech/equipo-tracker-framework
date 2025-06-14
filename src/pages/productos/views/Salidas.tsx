@@ -455,6 +455,9 @@ const Salidas = () => {
                   responsable_salida_id: Number(person.id),
                 }));
               }}
+              onClear={() => {
+                setSelectedEntregaUser(null);
+              }}
             />
 
             <ResponsibleSearch
@@ -476,6 +479,9 @@ const Salidas = () => {
                   ...prev,
                   responsable_entrada_id: Number(person.id),
                 }));
+              }}
+              onClear={() => {
+                setSelectedRecibeUser(null);
               }}
             />
           </div>
