@@ -18,9 +18,10 @@ interface ResponsibleSearchProps {
   name: string;
   label: string;
   onSelect?: (person: ResponsiblePerson) => void;
+  onClear?: () => void;
 }
 
-const ResponsibleSearch = ({ name, label, onSelect }: ResponsibleSearchProps) => {
+const ResponsibleSearch = ({ name, label, onSelect, onClear }: ResponsibleSearchProps) => {
   const { control, setValue, watch } = useFormContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -92,6 +93,10 @@ const ResponsibleSearch = ({ name, label, onSelect }: ResponsibleSearchProps) =>
     setValue(`${name}Name`, "");
     setValue(`${name}Position`, "");
     setValue(`${name}Department`, "");
+
+    if (onClear) {
+      onClear();
+    }
   };
 
   return (
