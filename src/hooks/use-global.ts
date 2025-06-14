@@ -60,6 +60,7 @@ export const useGlobal = () => {
       maximumFractionDigits: 0,
     });
   };
+  
   const buscarEquipo = async (serial: string): Promise<Equipo | null> => {
     try {
       const data = await getInfoEquipo(serial);
