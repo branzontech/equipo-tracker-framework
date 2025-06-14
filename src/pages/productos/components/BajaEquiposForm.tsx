@@ -293,7 +293,7 @@ export function BajaEquiposForm() {
                         ...prev.equipos,
                         {
                           id_equipo: equipo.id_equipo,
-                          motivo: "", 
+                          motivo: "",
                         },
                       ],
                     };
@@ -380,6 +380,9 @@ export function BajaEquiposForm() {
                       responsable_autorizacion_id: Number(person.id),
                     }));
                   }}
+                  onClear={() => {
+                    setSelectedEntregaUser(null);
+                  }}
                 />
 
                 <ResponsibleSearch
@@ -401,6 +404,9 @@ export function BajaEquiposForm() {
                       ...prev,
                       responsable_solicitud_id: Number(person.id),
                     }));
+                  }}
+                  onClear={() => {
+                    setSelectedRecibeUser(null);
                   }}
                 />
               </div>
@@ -442,7 +448,7 @@ export function BajaEquiposForm() {
             </div>
 
             <div className="flex justify-end space-x-4">
-              <Button
+              {/* <Button
                 type="button"
                 variant="outline"
                 // onClick={() => {
@@ -452,7 +458,7 @@ export function BajaEquiposForm() {
                 className="bg-white hover:bg-gray-100 w-full"
               >
                 Cancelar
-              </Button>
+              </Button> */}
               <Button type="submit" className=" w-full">
                 Registrar Baja
               </Button>
