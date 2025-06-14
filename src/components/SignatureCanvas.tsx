@@ -15,7 +15,7 @@ const SignatureCanvas = ({
   const [preview, setPreview] = useState<string | null>(value || null);
 
   useEffect(() => {
-    if (value) setPreview(value);
+    setPreview(value || null); 
   }, [value]);
 
   // Clear signature
@@ -76,16 +76,7 @@ const SignatureCanvas = ({
               }}
             />
           </div>
-          <div className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleClear}
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Limpiar
-            </Button>
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-x-2">
               <Button
                 type="button"
@@ -98,14 +89,24 @@ const SignatureCanvas = ({
               </Button>
               <Button
                 type="button"
-                variant="secondary"
+                variant="outline"
                 size="sm"
-                onClick={handleSave}
+                onClick={handleClear}
               >
-                <Save className="h-4 w-4 mr-2" />
-                Guardar
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Limpiar
               </Button>
             </div>
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handleSave}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Guardar
+            </Button>
           </div>
         </div>
       ) : (
