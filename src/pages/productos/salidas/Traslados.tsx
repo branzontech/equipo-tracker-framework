@@ -436,6 +436,9 @@ const Traslados = () => {
                   responsable_salida_id: Number(person.id),
                 }));
               }}
+              onClear={() => {
+                setSelectedEntregaUser(null);
+              }}
             />
 
             <ResponsibleSearch
@@ -457,6 +460,9 @@ const Traslados = () => {
                   ...prev,
                   responsable_entrada_id: Number(person.id),
                 }));
+              }}
+              onClear={() => {
+                setSelectedRecibeUser(null);
               }}
             />
           </div>
