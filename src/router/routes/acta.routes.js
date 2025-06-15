@@ -1,8 +1,11 @@
 import express from "express";
-import { getActas } from "../../pages/productos/controller/acta.controller.js";
+import { getActas, updateStatus } from "../../pages/productos/controller/acta.controller.js";
 
 const router = express.Router();
 
-router.get("/get", getActas);
+router
+    .get("/get", getActas)
+    .post("/updateStatus", updateStatus)
+
 
 export default router;
