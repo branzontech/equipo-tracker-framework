@@ -1,10 +1,5 @@
 import { prisma } from "../../../prisma/prismaCliente.js";
 
-const toBase64 = (firma) => {
-  const bytes = new Uint8Array(Object.values(firma));
-  return `data:image/png;base64,${Buffer.from(bytes).toString("base64")}`;
-};
-
 export const ActaModel = {
   findAll: async () => {
     const actas = await prisma.actas.findMany({
@@ -154,5 +149,33 @@ export const ActaModel = {
     });
 
     return actasWithFirmas;
+  },
+  updateStatus: async (id, newStatus, tipo) => {
+    try {
+      switch (tipo) {
+        case "Prestamo":
+          return await prisma.prestamos.update({
+            where: { id_prestamo: id },
+            data: { estado: newStatus },
+          });
+
+        case "Traslado":
+          return await prisma.traslados.update({
+            where: { id_traslado: id },
+            data: { estado: newStatus },
+          });
+
+        case "Baja":
+          return await prisma.bajas.update({
+            where: { id_baja: id },
+            data: { estado: newStatus },
+          });
+
+        default:
+          throw new Error(`Tipo de acta desconocido: ${tipo}`);
+      }
+    } catch (error) {
+      throw new Error("Error al actualizar el estado del acta: " + error);
+    }
   },
 };
