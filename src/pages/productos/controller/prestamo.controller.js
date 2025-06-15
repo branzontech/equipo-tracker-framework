@@ -21,7 +21,12 @@ export const getPrestamos = async (req, res) => {
 
 export const saveSign = async (req, res) => {
   try {
-    const { firma_entrega, firma_salida, responsable_salida_id, responsable_entrada_id } = req.body;
+    const {
+      firma_entrega,
+      firma_salida,
+      responsable_salida_id,
+      responsable_entrada_id,
+    } = req.body;
     const updatedPrestamo = await PrestamoService.saveSign(
       firma_entrega,
       firma_salida,
@@ -33,4 +38,3 @@ export const saveSign = async (req, res) => {
     res.status(500).json({ error: "Error saving sign" });
   }
 };
-
