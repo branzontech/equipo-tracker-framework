@@ -8,3 +8,13 @@ export const getActas = async (req, res) => {
     res.status(401).json({ error: error.message });
   }
 };
+
+export const updateStatus = async (req, res) => {
+  try {
+    const { id, newStatus, tipo } = req.body;
+    const updatedActa = await actaService.update(id, newStatus, tipo);
+    res.status(200).json({ updatedActa, success: true });
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
