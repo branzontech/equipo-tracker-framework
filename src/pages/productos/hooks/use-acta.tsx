@@ -1,4 +1,4 @@
-import { get } from "@/api/axios/acta.api";
+import { get, updateStatus } from "@/api/axios/acta.api";
 import { useEffect, useState } from "react";
 import { Acta } from "../interfaces/acta";
 import {
@@ -25,6 +25,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
+import { vi } from "date-fns/locale";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import { ActaEntregaPDF } from "../views/ActaEntregaPDF";
 
 export const useActa = () => {
   const [acta, setActa] = useState<Acta[]>([]);
@@ -171,7 +177,7 @@ export const useActa = () => {
       Finalizado: "bg-gray-100 text-gray-800",
       "En proceso": "bg-blue-100 text-blue-800",
       desconocido: "bg-red-100 text-red-800",
-      pendiente_devolucion: "bg-orange-100 text-orange-800",
+      Vigente: "bg-orange-100 text-orange-800",
     };
     return variants[estado] || "bg-gray-100 text-gray-800";
   };
@@ -276,8 +282,8 @@ export const useActa = () => {
           equipos.push({
             serial: equipo.nro_serie,
             nombre: equipo.nombre_equipo,
-            marca: equipo.marcas?.nombre || "-", 
-            activoFijo: equipo.tipo_activo || "-", 
+            marca: equipo.marcas?.nombre || "-",
+            activoFijo: equipo.tipo_activo || "-",
             accesorios: perifericos || "-",
           });
         }
@@ -362,17 +368,17 @@ export const useActa = () => {
 
     if (acta.tipo === "Baja") {
       firmaEntrega =
-        acta.bajas[0].usuarios_bajas_responsable_solicitud_idTousuarios
+        acta.bajas[0].usuarios_bajas_responsable_autorizacion_idTousuarios
           ?.firma || firmaEntrega;
       nombreEntrega =
-        acta.bajas[0].usuarios_bajas_responsable_solicitud_idTousuarios
+        acta.bajas[0].usuarios_bajas_responsable_autorizacion_idTousuarios
           ?.nombre || nombreEntrega;
 
       firmaRecibe =
-        acta.bajas[0].usuarios_bajas_responsable_autorizacion_idTousuarios
+        acta.bajas[0].usuarios_bajas_responsable_solicitud_idTousuarios
           ?.firma || firmaRecibe;
       nombreRecibe =
-        acta.bajas[0].usuarios_bajas_responsable_autorizacion_idTousuarios
+        acta.bajas[0].usuarios_bajas_responsable_solicitud_idTousuarios
           ?.nombre || nombreRecibe;
     }
 
@@ -382,6 +388,83 @@ export const useActa = () => {
       firmaRecibe,
       nombreRecibe,
     };
+  };
+
+  const handleStatusChange = async (acta: Acta, newStatus: string) => {
+    try {
+      let id: number;
+
+      if (acta.tipo === "Prestamo") {
+        id = acta.prestamos[0]?.id_prestamo;
+      } else if (acta.tipo === "Traslado") {
+        id = acta.traslados[0]?.id_traslado;
+      } else if (acta.tipo === "Baja") {
+        id = acta.bajas[0]?.id_baja;
+      }
+
+      if (!id) {
+        toast.error("No se pudo obtener el ID del acta correspondiente");
+        return;
+      }
+
+      const res = await updateStatus(id, newStatus, acta.tipo);
+
+      if (res) {
+        toast.success("Estado actualizado correctamente", {
+          icon: icons.success,
+        });
+
+        setManagementSheetOpen(false);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      } else {
+        toast.error("Error al actualizar el estado", {
+          icon: icons.error,
+        });
+      }
+    } catch (error) {
+      toast.error("Error al actualizar el estado", {
+        icon: icons.error,
+      });
+    }
+  };
+
+  const generarYDescargarPDF = async (data: Acta) => {
+    if (!data || !data.tipo) {
+      toast.error("Debe ingresar un acta válida", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    try {
+      const blob = await pdf(<ActaEntregaPDF data={data} />).toBlob();
+
+      const tipo = data.tipo;
+      let nombre: string;
+
+      switch (tipo) {
+        case "Prestamo":
+          nombre = "Acta de Salida de Equipos en Condición de Préstamo";
+          break;
+        case "Traslado":
+          nombre = "Acta de Traslado de Equipos";
+          break;
+        case "Baja":
+          nombre = "Acta de Baja de Equipos";
+          break;
+        default:
+          nombre = "Acta de Salida de Equipos en Condición de Préstamo";
+          break;
+      }
+      saveAs(blob, nombre + ".pdf");
+    } catch (error) {
+      toast.error("Error al generar el PDF" + error, {
+        icon: icons.error,
+      });
+    }
   };
 
   return {
@@ -421,5 +504,11 @@ export const useActa = () => {
     setSelectedActa,
     getEquiposFromActa,
     getFirmas,
+    currentActa,
+    actasData,
+    managementSheetOpen,
+    setManagementSheetOpen,
+    handleStatusChange,
+    generarYDescargarPDF,
   };
 };
