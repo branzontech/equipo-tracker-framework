@@ -4,6 +4,7 @@ import { loginUser } from "@/api/axios/auth.api";
 import { loginSuccess } from "@/redux/authSlice";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
 
 export const useLogin = () => {
   const [user, setUser] = useState({
@@ -29,12 +30,16 @@ export const useLogin = () => {
   ) => {
     try {
       if (!nombre) {
-        toast.error("Debe ingresar un nombre de usuario");
+        toast.error("Debe ingresar un nombre de usuario", {
+          icon: icons.error
+        });
         return;
       }
 
       if (!contraseña) {
-        toast.error("Debe ingresar una contraseña");
+        toast.error("Debe ingresar una contraseña", {
+          icon: icons.error
+        });
         return;
       }
 
@@ -52,7 +57,9 @@ export const useLogin = () => {
 
       return { success: true, user };
     } catch (error) {
-      toast.info(error.message);
+      toast.error(error.message, {
+        icon: icons.error
+      });
     }
   };
 
