@@ -42,193 +42,6 @@ import { Equipo } from "../interfaces/equipo";
 import { useGlobal } from "@/hooks/use-global";
 import { SearchEquipo } from "@/components/SearchEquipo";
 
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    padding: 30,
-    fontFamily: "Helvetica",
-  },
-  header: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  subheader: {
-    fontSize: 14,
-    marginBottom: 15,
-  },
-  table: {
-    display: "flex",
-    width: "auto",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-  },
-  tableRow: {
-    margin: "auto",
-    flexDirection: "row",
-  },
-  tableCol: {
-    width: "25%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  tableCell: {
-    margin: 5,
-    fontSize: 10,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    marginTop: 15,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  text: {
-    fontSize: 10,
-    marginBottom: 10,
-  },
-  signatures: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 50,
-  },
-  signature: {
-    width: "40%",
-    borderTopWidth: 1,
-    borderColor: "#000",
-    paddingTop: 5,
-    fontSize: 10,
-    textAlign: "center",
-  },
-});
-
-const ActaEntregaPDF = ({ data }) => {
-  const formatAccesorios = (equipos) => {
-    return equipos.map((equipo) => {
-      const accesoriosTexto =
-        equipo.accesorios && equipo.accesorios.length > 0
-          ? equipo.accesorios
-              .map((acc) =>
-                acc.serial ? `${acc.nombre} (S/N: ${acc.serial})` : acc.nombre
-              )
-              .join(", ")
-          : "Ninguno";
-
-      return {
-        ...equipo,
-        accesoriosTexto,
-      };
-    });
-  };
-
-  const equiposConAccesorios = formatAccesorios(data.equipos || []);
-
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.header}>
-          Acta de Salida de Equipos en Condición de Préstamo
-        </Text>
-
-        <Text style={styles.subheader}>
-          Fecha: {data.fechaEntrega ? format(data.fechaEntrega, "PPP") : ""}
-        </Text>
-
-        <Text style={styles.text}>
-          Señor(a) {data.nombreUsuario || ""} a continuación se le hace entrega
-          de los siguientes implementos de trabajo:
-        </Text>
-
-        <View style={styles.table}>
-          <View style={styles.tableRow}>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Serial</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Marca</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Activo Fijo</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>Accesorios</Text>
-            </View>
-          </View>
-
-          {equiposConAccesorios.map((equipo, index) => (
-            <View style={styles.tableRow} key={index}>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{equipo.serial || ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{equipo.marca || ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{equipo.activoFijo || ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {equipo.accesoriosTexto || ""}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {data.observaciones && (
-          <>
-            <Text style={styles.sectionTitle}>Observaciones:</Text>
-            <Text style={styles.text}>{data.observaciones}</Text>
-          </>
-        )}
-
-        <Text style={styles.sectionTitle}>Términos y Condiciones:</Text>
-        <Text style={styles.text}>
-          El receptor se compromete a utilizar el equipo exclusivamente para
-          propósitos laborales, mantenerlo en óptimas condiciones y reportar de
-          manera inmediata cualquier falla o anomalía que se presente. Asimismo,
-          se compromete a no instalar ningún tipo de software sin la debida
-          autorización, no prestar ni transferir el equipo a terceras personas y
-          devolverlo cuando la empresa lo requiera.
-        </Text>
-
-        <View style={styles.signatures}>
-          <View style={styles.signature}>
-            {data.firmaEntrega && (
-              <Image
-                src={data.firmaEntrega}
-                style={{ width: 150, height: 70 }}
-              />
-            )}
-            <Text>{data.responsableEntregaName || ""}</Text>
-            <Text style={{ fontSize: 8 }}>
-              {data.responsableEntregaPosition || ""}
-            </Text>
-            <Text>Entrega</Text>
-          </View>
-          <View style={styles.signature}>
-            {data.firmaRecibe && (
-              <Image
-                src={data.firmaRecibe}
-                style={{ width: 150, height: 70 }}
-              />
-            )}
-            <Text>{data.responsableRecibeName || ""}</Text>
-            <Text style={{ fontSize: 8 }}>
-              {data.responsableRecibePosition || ""}
-            </Text>
-            <Text>Recibe</Text>
-          </View>
-        </View>
-      </Page>
-    </Document>
-  );
-};
-
 const Salidas = () => {
   const { newPrestamo, setNewPrestamo, addPrestamo } = usePrestamo();
   const {
@@ -525,7 +338,7 @@ const Salidas = () => {
             <Button type="submit" className="w-full">
               Generar Acta de Entrega
             </Button>
-            {newPrestamo.fecha_salida && (
+            {/* {newPrestamo.fecha_salida && (
               <PDFDownloadLink
                 document={<ActaEntregaPDF data={newPrestamo} />}
                 fileName={`acta-entrega-${format(
@@ -538,7 +351,7 @@ const Salidas = () => {
                   loading ? "Generando documento..." : "Descargar PDF"
                 }
               </PDFDownloadLink>
-            )}
+            )} */}
           </div>
         </form>
       </FormProvider>
