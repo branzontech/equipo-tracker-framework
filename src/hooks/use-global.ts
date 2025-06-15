@@ -40,16 +40,6 @@ export const useGlobal = () => {
     },
   ]);
 
-  const formatFecha = (fechaIso?: string) => {
-    if (!fechaIso) return "No disponible";
-    return new Date(fechaIso).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      timeZone: "Europe/Madrid",
-    });
-  };
-
   const formatPrecio = (valor?: number | string) => {
     if (!valor) return "No disponible";
     // Convertir a número, por si viene como string
@@ -60,7 +50,7 @@ export const useGlobal = () => {
       maximumFractionDigits: 0,
     });
   };
-  
+
   const buscarEquipo = async (serial: string): Promise<Equipo | null> => {
     try {
       const data = await getInfoEquipo(serial);
@@ -165,4 +155,14 @@ export const useGlobal = () => {
     buscarEquipo,
     saveSign_,
   };
+};
+
+export const formatFecha = (fechaIso?: string | Date) => {
+  if (!fechaIso) return "No disponible";
+  return new Date(fechaIso).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "America/Bogota",
+  });
 };
