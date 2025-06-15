@@ -28,11 +28,24 @@ import {
   LayoutGrid,
   User,
   Calendar,
+  CheckCircle,
+  RotateCw,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
+import { Sheet, SheetDescription } from "@/components/ui/sheet";
 import { VerActaDialog } from "../components/VerActaDialog";
 import { Badge } from "@/components/ui/badge";
 import { useActa } from "../hooks/use-acta";
 import { useGlobal } from "@/hooks/use-global";
+import {
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Separator } from "@radix-ui/react-select";
+import { Label } from "@/components/ui/label";
 
 const Actas = () => {
   const {
@@ -58,27 +71,13 @@ const Actas = () => {
     setDialogOpen,
     dialogOpen,
     selectedActa,
+    currentActa,
+    managementSheetOpen,
+    setManagementSheetOpen,
+    handleStatusChange,
+    generarYDescargarPDF,
   } = useActa();
   const { formatFecha } = useGlobal();
-
-  // const handleStatusChange = (acta: Acta, newStatus: EstadoActa) => {
-  //   const updatedActas = actasData.map((item) =>
-  //     item.id === acta.id ? { ...item, estado: newStatus } : item
-  //   );
-
-  //   setActasData(updatedActas);
-
-  //   toast({
-  //     title: "Estado actualizado",
-  //     description: `El acta ${acta.id} ahora tiene el estado: ${getEstadoLabel(
-  //       newStatus
-  //     )}`,
-  //   });
-
-  //   if (currentActa && currentActa.id === acta.id) {
-  //     setCurrentActa({ ...acta, estado: newStatus });
-  //   }
-  // };
 
   // const handleProcessReturn = (acta: Acta) => {
   //   if (
@@ -296,196 +295,222 @@ const Actas = () => {
     </div>
   );
 
-  // const ActaManagementSheet = () => {
-  //   if (!currentActa) return null;
+  const ActaManagementSheet = () => {
+    if (!currentActa) return null;
 
-  //   return (
-  //     <Sheet open={managementSheetOpen} onOpenChange={setManagementSheetOpen}>
-  //       <SheetContent className="w-full md:max-w-md">
-  //         <SheetHeader>
-  //           <SheetTitle className="flex items-center gap-2">
-  //             {getTipoIcon(currentActa.tipo)}
-  //             Gestionar Acta {currentActa.id}
-  //           </SheetTitle>
-  //         </SheetHeader>
+    const { usuario } = getActaData(currentActa);
+    const estado = getEstadoFromActa(currentActa);
 
-  //         <div className="py-6 space-y-6">
-  //           <div className="space-y-4">
-  //             <div className="flex justify-between items-center">
-  //               <div>
-  //                 <h3 className="font-semibold">Información del Acta</h3>
-  //                 <p className="text-sm text-muted-foreground">
-  //                   Detalles generales
-  //                 </p>
-  //               </div>
-  //               <Badge className={`${getEstadoBadge(currentActa.estado)}`}>
-  //                 {getEstadoLabel(currentActa.estado)}
-  //               </Badge>
-  //             </div>
+    return (
+      <Sheet open={managementSheetOpen} onOpenChange={setManagementSheetOpen}>
+        <SheetContent className="w-full md:max-w-md">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              {getTipoIcon(currentActa.tipo)}
+              Gestionar Acta {currentActa.id_acta}
+            </SheetTitle>
+            <SheetDescription>
+              Aquí puedes revisar y actualizar el estado del acta.
+            </SheetDescription>
+          </SheetHeader>
 
-  //             <div className="grid grid-cols-2 gap-4">
-  //               <div>
-  //                 <p className="text-sm text-gray-500">Tipo</p>
-  //                 <p className="font-medium">
-  //                   {getTipoLabel(currentActa.tipo)}
-  //                 </p>
-  //               </div>
-  //               <div>
-  //                 <p className="text-sm text-gray-500">Fecha</p>
-  //                 <p className="font-medium">
-  //                   {format(currentActa.fecha, "PPP")}
-  //                 </p>
-  //               </div>
-  //               <div>
-  //                 <p className="text-sm text-gray-500">Usuario</p>
-  //                 <p className="font-medium">{currentActa.usuario}</p>
-  //               </div>
+          <div className="py-6 space-y-6">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-semibold">Información del Acta</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Detalles generales
+                  </p>
+                </div>
+                <Badge className={`${getEstadoBadge(estado)}`}>
+                  {getEstadoLabel(estado)}
+                </Badge>
+              </div>
 
-  //               {currentActa.tipo === "prestamo" &&
-  //                 currentActa.fechaDevolucion && (
-  //                   <div>
-  //                     <p className="text-sm text-gray-500">
-  //                       Fecha de devolución
-  //                     </p>
-  //                     <p className="font-medium">
-  //                       {format(currentActa.fechaDevolucion, "PPP")}
-  //                     </p>
-  //                   </div>
-  //                 )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Tipo</p>
+                  <p className="font-medium">
+                    {getTipoLabel(currentActa.tipo)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Fecha</p>
+                  <p className="font-medium">
+                    {formatFecha(
+                      typeof currentActa.fecha === "string"
+                        ? currentActa.fecha
+                        : currentActa.fecha.toISOString()
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Usuario</p>
+                  <p className="font-medium">{usuario}</p>
+                </div>
 
-  //               {currentActa.tipo === "traslado" &&
-  //                 currentActa.regionalDestino && (
-  //                   <div>
-  //                     <p className="text-sm text-gray-500">Destino</p>
-  //                     <p className="font-medium">
-  //                       {currentActa.regionalDestino} -{" "}
-  //                       {currentActa.bodegaDestino}
-  //                     </p>
-  //                   </div>
-  //                 )}
-  //             </div>
-  //           </div>
+                {currentActa.tipo === "Prestamo" &&
+                  currentActa.prestamos[0].fecha_retorno && (
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        Fecha de devolución
+                      </p>
+                      <p className="font-medium">
+                        {formatFecha(currentActa.prestamos[0].fecha_retorno)}
+                      </p>
+                    </div>
+                  )}
 
-  //           <Separator />
+                {currentActa.tipo === "Traslado" &&
+                  currentActa.traslados[0].sucursales.sedes.regional && (
+                    <div>
+                      <p className="text-sm text-gray-500">Destino</p>
+                      <p className="font-medium">
+                        {currentActa.traslados[0].sucursales.sedes.regional} -{" "}
+                        {currentActa.traslados[0].sucursales.nombre}
+                      </p>
+                    </div>
+                  )}
+              </div>
+            </div>
 
-  //           <div className="space-y-4">
-  //             <h3 className="font-semibold">Cambiar estado</h3>
-  //             <div className="flex flex-wrap gap-2">
-  //               {currentActa.estado !== "vigente" && (
-  //                 <Button
-  //                   variant="outline"
-  //                   size="sm"
-  //                   className="flex gap-2"
-  //                   onClick={() => handleStatusChange(currentActa, "vigente")}
-  //                 >
-  //                   <CheckCircle className="h-4 w-4 text-green-500" />
-  //                   Marcar como vigente
-  //                 </Button>
-  //               )}
+            <Separator />
 
-  //               {currentActa.estado !== "finalizada" && (
-  //                 <Button
-  //                   variant="outline"
-  //                   size="sm"
-  //                   className="flex gap-2"
-  //                   onClick={() =>
-  //                     handleStatusChange(currentActa, "finalizada")
-  //                   }
-  //                 >
-  //                   <CheckCircle className="h-4 w-4 text-gray-500" />
-  //                   Marcar como finalizada
-  //                 </Button>
-  //               )}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Cambiar estado</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {estado !== "Vigente" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleStatusChange(currentActa, "Vigente")}
+                  >
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Label className="text-[13px]">Marcar como Vigente</Label>
+                  </Button>
+                )}
 
-  //               {currentActa.estado !== "en_proceso" && (
-  //                 <Button
-  //                   variant="outline"
-  //                   size="sm"
-  //                   className="flex gap-2"
-  //                   onClick={() =>
-  //                     handleStatusChange(currentActa, "en_proceso")
-  //                   }
-  //                 >
-  //                   <RotateCw className="h-4 w-4 text-blue-500" />
-  //                   Marcar en proceso
-  //                 </Button>
-  //               )}
+                {estado !== "Pendiente" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleStatusChange(currentActa, "Pendiente")}
+                  >
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Label className="text-[13px]">Marcar como Pendiente</Label>
+                  </Button>
+                )}
 
-  //               {currentActa.estado !== "cancelada" && (
-  //                 <Button
-  //                   variant="outline"
-  //                   size="sm"
-  //                   className="flex gap-2"
-  //                   onClick={() => handleStatusChange(currentActa, "cancelada")}
-  //                 >
-  //                   <XCircle className="h-4 w-4 text-red-500" />
-  //                   Marcar como cancelada
-  //                 </Button>
-  //               )}
-  //             </div>
-  //           </div>
+                {estado !== "Finalizado" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleStatusChange(currentActa, "Finalizado")
+                    }
+                  >
+                    <CheckCircle className="h-4 w-4 text-gray-500" />
+                    <Label className="text-[13px]">
+                      Marcar como Finalizado
+                    </Label>
+                  </Button>
+                )}
 
-  //           {currentActa.tipo === "prestamo" && (
-  //             <>
-  //               <Separator />
-  //               <div className="space-y-4">
-  //                 <h3 className="font-semibold">
-  //                   Acciones específicas de préstamo
-  //                 </h3>
-  //                 <div className="space-y-2">
-  //                   {currentActa.estado === "vigente" && (
-  //                     <Button
-  //                       className="w-full flex gap-2"
-  //                       onClick={() => handleRequestReturn(currentActa)}
-  //                     >
-  //                       <AlertCircle className="h-4 w-4" />
-  //                       Solicitar devolución
-  //                     </Button>
-  //                   )}
+                {estado !== "En proceso" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleStatusChange(currentActa, "En proceso")
+                    }
+                  >
+                    <RotateCw className="h-4 w-4 text-blue-500" />
+                    <Label className="text-[13px]">Marcar en proceso</Label>
+                  </Button>
+                )}
 
-  //                   {(currentActa.estado === "vigente" ||
-  //                     currentActa.estado === "pendiente_devolucion") && (
-  //                     <Button
-  //                       variant="secondary"
-  //                       className="w-full flex gap-2"
-  //                       onClick={() => handleProcessReturn(currentActa)}
-  //                     >
-  //                       <CheckCircle className="h-4 w-4" />
-  //                       Procesar devolución
-  //                     </Button>
-  //                   )}
-  //                 </div>
-  //               </div>
-  //             </>
-  //           )}
+                {estado !== "Cancelada" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleStatusChange(currentActa, "Cancelada")}
+                  >
+                    <XCircle className="h-4 w-4 text-red-500" />
+                    <Label className="text-[13px]">Marcar como Cancelada</Label>
+                  </Button>
+                )}
+              </div>
+            </div>
 
-  //           {(currentActa.estado === "vigente" ||
-  //             currentActa.estado === "en_proceso") && (
-  //             <>
-  //               <Separator />
-  //               <Button
-  //                 variant="destructive"
-  //                 className="w-full"
-  //                 onClick={() => handleCancelActa(currentActa)}
-  //               >
-  //                 Cancelar acta
-  //               </Button>
-  //             </>
-  //           )}
-  //         </div>
+            {currentActa.tipo === "Prestamo" && estado !== "Vigente" && (
+              <>
+                <Separator />
+                <div className="space-y-4">
+                  <h3 className="font-semibold">
+                    Acciones específicas de préstamo
+                  </h3>
+                  <div className="space-y-2">
+                    {estado === "Pendiente" && (
+                      <Button
+                        className="w-full flex gap-2"
+                        // onClick={() => handleRequestReturn(currentActa)}
+                      >
+                        <AlertCircle className="h-4 w-4" />
+                        Solicitar devolución
+                      </Button>
+                    )}
 
-  //         <SheetFooter className="mt-6">
-  //           <Button
-  //             className="w-full"
-  //             onClick={() => handleVerActa(currentActa)}
-  //           >
-  //             Ver todos los detalles
-  //           </Button>
-  //         </SheetFooter>
-  //       </SheetContent>
-  //     </Sheet>
-  //   );
-  // };
+                    {(estado === "vigente" ||
+                      estado === "pendiente_devolucion") && (
+                      <Button
+                        variant="secondary"
+                        className="w-full flex gap-2"
+                        // onClick={() => handleProcessReturn(currentActa)}
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Procesar devolución
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {estado === "En proceso" && (
+              <>
+                <Separator />
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  // onClick={() => handleCancelActa(currentActa)}
+                >
+                  Cancelar acta
+                </Button>
+              </>
+            )}
+          </div>
+
+          <SheetFooter className="mt-6">
+            <Button
+              className="w-full"
+              onClick={() => handleVerActa(currentActa)}
+            >
+              Ver todos los detalles
+            </Button>
+            {estado === "Pendiente" || estado === "Cancelada" ? null : (
+              <Button
+                className="w-full"
+                onClick={() => generarYDescargarPDF(currentActa)}
+              >
+                Generar PDF
+              </Button>
+            )}
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    );
+  };
 
   return (
     <div className="p-8">
@@ -563,7 +588,7 @@ const Actas = () => {
         onOpenChange={setDialogOpen}
       />
 
-      {/* <ActaManagementSheet /> */}
+      <ActaManagementSheet />
     </div>
   );
 };
