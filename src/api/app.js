@@ -14,7 +14,7 @@ app.use(
       const allowedOriginsPattern =
         /^http:\/\/localhost:(8080|5173|5176|5174|3001)$/;
       const allowedIpPattern =
-        /^http:\/\/192\.168\.1\.9:(8080|5173|5176|5174|3306|3002)$/;
+        /^http:\/\/192\.168\.1\.6:(8080|5173|5176|5174|3306|3002)$/;
 
       if (
         allowedOriginsPattern.test(origin) ||
