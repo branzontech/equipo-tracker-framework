@@ -150,6 +150,59 @@ export const ActaModel = {
 
     return actasWithFirmas;
   },
+  async getInfoEquipo(nro_serie) {
+    const equipo = await prisma.equipos.findUnique({
+      where: { nro_serie },
+      select: { id_equipo: true },
+    });
+
+    if (!equipo) {
+      throw new Error("No se encontró el equipo.");
+    }
+
+    const equipoId = equipo.id_equipo;
+
+    const [prestamoActivo, trasladoActivo, bajaAsociada] = await Promise.all([
+      prisma.prestamo_equipos.findFirst({
+        where: { equipo_id: equipoId },
+        include: {
+          prestamos: {
+            where: {
+              estado: {
+                not: "finalizado",
+              },
+            },
+          },
+        },
+      }),
+      prisma.traslados_equipos.findFirst({
+        where: { equipo_id: equipoId },
+        include: {
+          traslados: {
+            where: {
+              estado: {
+                not: "finalizado",
+              },
+            },
+          },
+        },
+      }),
+      prisma.bajas_equipos.findFirst({
+        where: { equipo_id: equipoId },
+      }),
+    ]);
+
+    const enPrestamo = !!prestamoActivo?.prestamos;
+    const enTraslado = !!trasladoActivo?.traslados;
+    const enBaja = !!bajaAsociada;
+
+    return {
+      disponible: !(enPrestamo || enTraslado || enBaja),
+      enPrestamo,
+      enTraslado,
+      enBaja,
+    };
+  },
   updateStatus: async (id, newStatus, tipo) => {
     try {
       switch (tipo) {

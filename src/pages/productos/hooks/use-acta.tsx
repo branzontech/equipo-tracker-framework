@@ -1,4 +1,4 @@
-import { get, updateStatus } from "@/api/axios/acta.api";
+import { get, getInfoEquipo, updateStatus } from "@/api/axios/acta.api";
 import { useEffect, useState } from "react";
 import { Acta } from "../interfaces/acta";
 import {
@@ -207,6 +207,11 @@ export const useActa = () => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const findEquipoByNroSerie = async (nroSeries: string) => {
+    const response = await getInfoEquipo(nroSeries);
+    return response;
   };
 
   const PaginationControls = () => {
@@ -510,5 +515,6 @@ export const useActa = () => {
     setManagementSheetOpen,
     handleStatusChange,
     generarYDescargarPDF,
+    findEquipoByNroSerie
   };
 };

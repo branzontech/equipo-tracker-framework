@@ -9,6 +9,16 @@ export const getActas = async (req, res) => {
   }
 };
 
+export const getInfoEquipo = async (req, res) => {
+  try {
+    const { nro_serie } = req.params;
+    const infoEquipo = await actaService.getInfoEquipo(nro_serie);
+    res.status(200).json(infoEquipo);
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
+
 export const updateStatus = async (req, res) => {
   try {
     const { id, newStatus, tipo } = req.body;
