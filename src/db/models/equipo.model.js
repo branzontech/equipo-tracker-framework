@@ -11,8 +11,6 @@ export const equipoModel = {
       throw new Error("ID de categoría, marca o sucursal inválido.");
     }
 
-    console.log("data:", data);
-
     return await prisma.equipos.create({
       data: {
         nombre_equipo: data.nombre_equipo,
@@ -54,7 +52,7 @@ export const equipoModel = {
             nivel_acceso: data.seguridad.nivel_acceso,
             software_seguridad: data.seguridad.software_seguridad,
             cifrado_disco: data.seguridad.cifrado_disco,
-            politicas_aplicadas: data.seguridad.politicas_aplicadas,
+            politicas_aplicadas: data.seguridad.politicas_aplicadas.join(", "),
           },
         },
 
@@ -75,15 +73,12 @@ export const equipoModel = {
             codigo_inventario: data.administrativa.codigo_inventario,
             centro_coste: data.administrativa.centro_coste,
             autorizado_por: data.administrativa.autorizado_por,
-            fecha_activacion: new Date(
-              data.administrativa.fecha_activacion
-            ),
+            fecha_activacion: new Date(data.administrativa.fecha_activacion),
             estado_contable: data.administrativa.estado_contable,
             valor_depreciado: new Prisma.Decimal(
               data.administrativa.valor_depreciado
             ),
-            vida_util_restante:
-              data.administrativa.vida_util_restante,
+            vida_util_restante: data.administrativa.vida_util_restante,
           },
         },
       },
@@ -155,7 +150,9 @@ export const equipoModel = {
   },
   async delete_(id) {
     const equipo_id = Number(id);
-    await prisma.especificaciones.deleteMany({ where: { equipo_id: equipo_id } });
+    await prisma.especificaciones.deleteMany({
+      where: { equipo_id: equipo_id },
+    });
     await prisma.seguridad.deleteMany({ where: { equipo_id: equipo_id } });
     await prisma.adquisicion.deleteMany({ where: { equipo_id: equipo_id } });
     await prisma.administrativa.deleteMany({ where: { equipo_id: equipo_id } });
