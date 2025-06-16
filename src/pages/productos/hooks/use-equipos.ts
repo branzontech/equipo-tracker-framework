@@ -179,13 +179,13 @@ export const useEquipos = () => {
       isVisible: true,
       order: 6,
     },
-    {
-      id: "tipo",
-      label: "Tipo de Sucursal",
-      key: "tipo",
-      isVisible: true,
-      order: 6,
-    },
+    // {
+    //   id: "tipo",
+    //   label: "Tipo de Sucursal",
+    //   key: "tipo",
+    //   isVisible: true,
+    //   order: 6,
+    // },
   ]);
 
   const handleDragStart = (e: React.DragEvent, columnId: string) => {
@@ -576,8 +576,8 @@ export const useEquipos = () => {
           icon: icons.success,
         });
         setTimeout(() => {
-          window.location.reload();
           navigate("/productos/lista");
+          window.location.reload();
         }, 4500);
       } else {
         toast.error(response.message || "Error al crear el equipo", {

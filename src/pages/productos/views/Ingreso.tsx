@@ -1445,7 +1445,7 @@ const IngresoProducto = () => {
                   type="submit"
                   onClick={(e: React.FormEvent) => {
                     e.preventDefault();
-                    handleSubmit(form.getValues());
+                    handleSubmit(newEquipo);
                   }}
                 >
                   Guardar Producto
