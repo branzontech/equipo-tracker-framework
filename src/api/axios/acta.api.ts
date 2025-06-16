@@ -5,6 +5,11 @@ export const get = async () => {
   return data;
 };
 
+export const getInfoEquipo = async (nro_serie) => {
+  const { data } = await api.get(`/actas/getEquipo/${nro_serie}`);
+  return data;
+};
+
 export const updateStatus = async (id, newStatus, tipo) => {
   const { data } = await api.post("/actas/updateStatus", {
     id,
