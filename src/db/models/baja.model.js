@@ -54,12 +54,12 @@ export const bajaModel = {
 
         await prisma.equipos.updateMany({
           where: { id_equipo: equipo.id_equipo },
-          data: { estado_actual: "Inactivo por Baja" },
+          data: { estado_actual: "Fuera de servicio" },
         });
 
         await prisma.perifericos.updateMany({
           where: { equipo_asociado_id: equipo.id_equipo },
-          data: { estado: "Inactivo por Baja" },
+          data: { estado: "Fuera de servicio" },
         });
       }
 
