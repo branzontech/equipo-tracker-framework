@@ -8,6 +8,7 @@ import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { useState } from "react";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
+import { useActa } from "@/pages/productos/hooks/use-acta";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -17,6 +18,7 @@ export const useGlobal = () => {
     sedesConEquiposCount,
     getInfoEquipo,
   } = useEquipos();
+  const { findEquipoByNroSerie } = useActa();
   const [haBuscado, setHaBuscado] = useState(false);
   const [accesorios, setAccesorios] = useState<Perifericos[]>([]);
   const [equipo, setEquipo] = useState<Equipo[]>([
@@ -53,6 +55,20 @@ export const useGlobal = () => {
 
   const buscarEquipo = async (serial: string): Promise<Equipo | null> => {
     try {
+      // 1. Consultar disponibilidad ANTES de buscar el equipo completo
+      const disponibilidad = await findEquipoByNroSerie(serial);
+
+      if (!disponibilidad.disponible) {
+        let mensaje = "El equipo no está disponible. ";
+        if (disponibilidad.enPrestamo) mensaje += "Está en préstamo. ";
+        if (disponibilidad.enBaja) mensaje += "Está dado de baja. ";
+        if (disponibilidad.enTraslado) mensaje += "Está en traslado. ";
+
+        toast.error(mensaje, { icon: icons.error });
+        setHaBuscado(false);
+        return null;
+      }
+
       const data = await getInfoEquipo(serial);
 
       if (data && data.id_equipo) {
