@@ -7,6 +7,7 @@ export const ActaPrestamo = ({ data }) => {
   const { getFirmas } = useActa();
   const { firmaEntrega, nombreEntrega, firmaRecibe, nombreRecibe } =
     getFirmas(data);
+
   const formatAccesorios = (equipos) => {
     return equipos.map((equipo) => {
       const perifericos = equipo.prestamo_perifericos || [];
@@ -44,7 +45,7 @@ export const ActaPrestamo = ({ data }) => {
   return (
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>
-        Acta de Salida de Equipos en Condición de Préstamo
+        ACTA DE SALIDA DE EQUIPOS EN CONDICION DE PRESTAMO
       </Text>
 
       <Text style={styles.text}>
@@ -80,7 +81,7 @@ export const ActaPrestamo = ({ data }) => {
         </View>
 
         {equiposConAccesorios.map((equipo, index) => (
-          <View style={styles.tableRow} key={index}>
+          <View style={[styles.tableRow, styles.tableHeader]} key={index}>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>{equipo.serial || ""}</Text>
             </View>
