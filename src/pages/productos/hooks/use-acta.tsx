@@ -257,15 +257,6 @@ export const useActa = () => {
     );
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   const getEquiposFromActa = (acta: Acta) => {
     const equipos: {
       serial?: string;
@@ -412,7 +403,7 @@ export const useActa = () => {
         return;
       }
 
-      const res = await updateStatus(id, newStatus, acta.tipo);
+      const res = await updateStatus(id, newStatus, acta.tipo, acta.bajas[0]?.bajas_equipos);
 
       if (res) {
         toast.success("Estado actualizado correctamente", {
