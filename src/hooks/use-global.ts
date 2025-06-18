@@ -23,6 +23,7 @@ export const useGlobal = () => {
   const [accesorios, setAccesorios] = useState<Perifericos[]>([]);
   const [equipo, setEquipo] = useState<Equipo[]>([
     {
+      sedes: null,
       id_equipo: Date.now(),
       nombre_equipo: "",
       nro_serie: "",
@@ -95,7 +96,29 @@ export const useGlobal = () => {
         });
 
         setHaBuscado(true);
-        setAccesorios(data.perifericos || []);
+        const equipoConPerifericos = {
+          ...data,
+          perifericos: data.perifericos || [],
+        };
+
+        setEquipo((prevEquipos) => {
+          const index = prevEquipos.findIndex((e) => e.nro_serie === serial);
+
+          if (index !== -1) {
+            const actualizado = {
+              ...prevEquipos[index],
+              ...equipoConPerifericos,
+              motivo: prevEquipos[index].motivo,
+            };
+
+            const nuevos = [...prevEquipos];
+            nuevos[index] = actualizado;
+            return nuevos;
+          }
+
+          return [...prevEquipos, equipoConPerifericos];
+        });
+
         return data;
       } else {
         toast.error("No se encontró el equipo.", {
