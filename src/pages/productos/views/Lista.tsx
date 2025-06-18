@@ -58,37 +58,57 @@ import {
 } from "@/components/ui/sheet";
 import ListaPerifericos from "@/pages/configuracion/maestros/perifericos/ListaPerifericos";
 import { useEquipos } from "../hooks/use-equipos";
+import { icons } from "@/components/interfaces/icons";
+
+import { CheckCircle, FileX, Wrench, ShieldAlert } from "lucide-react";
 
 const StatusBadge = ({ status }: { status: string }) => {
-  let variant: "default" | "secondary" | "destructive" | "outline" = "default";
-  let className = "";
+  const normalized = status.toLowerCase();
 
-  switch (status.toLowerCase()) {
+  switch (normalized) {
     case "activo":
-      variant = "default";
-      className = "bg-[#bff036] text-[#01242c] hover:bg-[#a5d81c]";
-      break;
+      return (
+        <div className="flex items-center space-x-1 text-green-700">
+          <CheckCircle className="h-4 w-4 text-green-500" />
+          <span>Activo</span>
+        </div>
+      );
     case "inactivo":
-      variant = "outline";
-      className = "bg-gray-100 text-gray-500 border-gray-200";
-      break;
+      return (
+        <div className="flex items-center space-x-1 text-gray-500">
+          <FileX className="h-4 w-4 text-gray-400" />
+          <span>Inactivo</span>
+        </div>
+      );
+    case "fuera de servicio":
+      return (
+        <div className="flex items-center space-x-1 text-orange-700">
+          <FileX className="mr-2 h-4 w-4 text-orange-500" />
+          <span>Fuera de servicio</span>
+        </div>
+      );
     case "mantenimiento":
-      variant = "secondary";
-      className = "bg-amber-100 text-amber-700 border-amber-200";
-      break;
+      return (
+        <div className="flex items-center space-x-1 text-amber-700">
+          <Wrench className="h-4 w-4 text-amber-500" />
+          <span>Mantenimiento</span>
+        </div>
+      );
     case "reparación":
-      variant = "destructive";
-      className = "bg-red-100 text-red-700 border-red-200";
-      break;
+      return (
+        <div className="flex items-center space-x-1 text-red-700">
+          <ShieldAlert className="h-4 w-4 text-red-500" />
+          <span>Reparación</span>
+        </div>
+      );
     default:
-      variant = "outline";
+      return (
+        <div className="flex items-center space-x-1 text-slate-600">
+          <FileX className="h-4 w-4 text-slate-400" />
+          <span>{status}</span>
+        </div>
+      );
   }
-
-  return (
-    <Badge variant={variant} className={className}>
-      {status}
-    </Badge>
-  );
 };
 
 const ListaInventario = () => {
@@ -459,7 +479,7 @@ const ListaInventario = () => {
                               key={`${item.id_equipo}-${column.id}`}
                               className="py-3"
                             >
-                              {column.id === "estadoActual" ? (
+                              {column.id === "estado_actual" ? (
                                 <StatusBadge
                                   status={
                                     item[
