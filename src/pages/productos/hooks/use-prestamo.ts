@@ -16,13 +16,15 @@ export const usePrestamo = () => {
     responsable_entrada_id: 0,
     fecha_salida: null,
     fecha_retorno: null,
-    estado: "",
+    estado: "Pendiente",
     descripcion: "",
     equipos: [],
   });
+  const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
+
   const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } =
     useGlobal();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPrestamos = async () => {
@@ -99,7 +101,7 @@ export const usePrestamo = () => {
           icon: icons.success,
         });
         setTimeout(() => {
-          navigate("/productos/actas")
+          navigate("/productos/actas");
           window.location.reload();
         }, 4500);
       }
@@ -138,5 +140,7 @@ export const usePrestamo = () => {
     equipo,
     accesorios,
     haBuscado,
+    responsableRecibeInput,
+    setResponsableRecibeInput,
   };
 };
