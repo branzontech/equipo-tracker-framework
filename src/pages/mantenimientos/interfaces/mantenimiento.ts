@@ -1,23 +1,44 @@
-import { LucideIcon } from "lucide-react";
+import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
+import { Equipo } from "@/pages/productos/interfaces/equipo";
 
-export interface MantenimientoItem {
-  id: number;
+export interface Mantenimiento {
+  id_mantenimiento: number;
+  id_equipo: number;
+  equipos: Equipo | null;
+  id_impresora: number;
+  tecnico_id: number;
+  usuarios: Usuario | null;
+  fecha_programada: Date | string;
+  fecha_realizada: Date | string;
   tipo: string;
-  equipo: string;
-  ubicacion: string;
+  prioridad: string;
+  descripcion: string;
+  tiempo_estimado: number;
+  recomendaciones: string;
+  observaciones_adi: string;
   estado: string;
-  hora: string;
-  responsable: string;
-  fecha: Date;
+  progreso: number;
+
+  archivosmantenimiento: {
+    id_archivo: number;
+    mantenimiento_id: number;
+    nombre_archivo: string;
+    tipo_archivo: string;
+    archivos: File[];
+    archivo: {
+      content: string;
+      nombre: string;
+      tipo: string;
+    };
+    fecha_subida: Date;
+  }[];
 }
 
-export interface EstadoInfo {
-  value: string;
+export interface TableColumn {
+  id: string;
   label: string;
-  icon: LucideIcon;
-  color: string;
-}
-
-export interface StatItem extends EstadoInfo {
-  count: number;
+  accessor: string;
+  isVisible: boolean;
+  order: number;
+  className?: string;
 }
