@@ -4,6 +4,7 @@ import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferic
 import { Sucursal } from "@/pages/configuracion/maestros/interfaces/sucursales";
 
 export interface Equipo {
+  sedes: string;
   id_equipo: number;
   nombre_equipo: string;
   nro_serie: string;
@@ -11,7 +12,7 @@ export interface Equipo {
   marca_id: Marca | number;
   marcas: Marca | null;
   categoria_id: Categoria | number;
-  categorias: Categoria | null;
+  categorias: Categoria | string;
   tipo_activo: string;
   fecha_registro: string;
   sucursal_id: Sucursal | number;
