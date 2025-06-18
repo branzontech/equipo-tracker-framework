@@ -21,8 +21,14 @@ export const SearchEquipo = ({
   onMotivoChange,
   esBaja = false,
 }: SearchEquipoProps) => {
-  const { haBuscado, accesorios, equipo, setEquipo, buscarEquipo } =
-    useGlobal();
+  const {
+    haBuscado,
+    accesorios,
+    equipo,
+    setEquipo,
+    buscarEquipo,
+    setHaBuscado,
+  } = useGlobal();
   const [motivos, setMotivos] = useState<string[]>([]);
 
   return (
@@ -93,7 +99,7 @@ export const SearchEquipo = ({
               </div>
             </div>
 
-            {haBuscado && (
+            {field.nombre_equipo && (
               <>
                 <div className="col-span-12 md:col-span-3">
                   <Label>Marca</Label>
@@ -128,7 +134,6 @@ export const SearchEquipo = ({
                         nuevos[index] = e.target.value;
                         setMotivos(nuevos);
 
-                        // 👉 Notificar al padre
                         if (onMotivoChange) {
                           onMotivoChange(field.id_equipo, e.target.value);
                         }
@@ -143,7 +148,7 @@ export const SearchEquipo = ({
           {!esBaja && (
             <AccesoriosContainer
               equipoIndex={index}
-              accesorios={Array.isArray(accesorios) ? accesorios : [accesorios]}
+              accesorios={Array.isArray(field.perifericos) ? field.perifericos : []}
             />
           )}
         </div>
@@ -175,6 +180,7 @@ export const SearchEquipo = ({
           };
           setEquipo([...equipo, nuevoEquipo]);
           setMotivos([...motivos, ""]);
+          setHaBuscado(false);
         }}
       >
         <Plus className="h-4 w-4 mr-2" />
