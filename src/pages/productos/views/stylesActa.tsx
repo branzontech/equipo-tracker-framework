@@ -28,6 +28,10 @@ export const styles = StyleSheet.create({
     margin: "auto",
     flexDirection: "row",
   },
+  tableHeader: {
+    backgroundColor: "#f0f0f0",
+    fontWeight: "bold",
+  },
   tableCol: {
     width: "25%",
     borderStyle: "solid",
