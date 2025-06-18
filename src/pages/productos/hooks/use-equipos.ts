@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Equipo } from "../interfaces/equipo";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -21,6 +21,7 @@ export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
   const [count, setCountEquipo] = useState<number>(0);
   const [newEquipo, setNewEquipo] = useState<Equipo>({
+    sedes: null,
     id_equipo: 0,
     nombre_equipo: "",
     nro_serie: "",
@@ -678,7 +679,40 @@ export const useEquipos = () => {
     });
   };
 
+  const equiposData = useMemo(() => {
+    const conteo: Record<string, number> = {};
+
+    equipo.forEach((item) => {
+      const nombreCategoria =
+        typeof item.categorias === "string"
+          ? item.categorias
+          : item.categorias?.nombre || "Sin categoría";
+      conteo[nombreCategoria] = (conteo[nombreCategoria] || 0) + 1;
+    });
+
+    return Object.entries(conteo).map(([name, cantidad]) => ({
+      name,
+      cantidad,
+    }));
+  }, [equipo]);
+
+  const sedesData = useMemo(() => {
+    const conteo: Record<string, number> = {};
+
+    equipo.forEach((item) => {
+      const nombreSede = item.sedes;
+      conteo[nombreSede] = (conteo[nombreSede] || 0) + 1;
+    });
+
+    return Object.entries(conteo).map(([name, cantidad]) => ({
+      name,
+      cantidad,
+    }));
+  }, [equipo]);
+
   return {
+    sedesData,
+    equiposData,
     deleteEquipoById,
     getInfoEquipo,
     equipo,
