@@ -1,5 +1,17 @@
-import { useState, useRef } from "react";
-import { Calendar, ChevronLeft, Plus, Filter, Search, ListFilter, CheckSquare, Square, GripVertical, X, Search as SearchIcon } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Calendar,
+  ChevronLeft,
+  Plus,
+  Filter,
+  Search,
+  ListFilter,
+  CheckSquare,
+  Square,
+  GripVertical,
+  X,
+  Search as SearchIcon,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,234 +65,37 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-const equiposMock = [
-  { id: 1, nombre: "Laptop Dell XPS", tipo: "Laptop", sede: "Sede 1", area: "Sistemas", estado: "Activo" },
-  { id: 2, nombre: "Impresora HP LaserJet", tipo: "Impresora", sede: "Sede 2", area: "Administración", estado: "Activo" },
-  { id: 3, nombre: "Monitor LG 27'", tipo: "Monitor", sede: "Sede 1", area: "Ventas", estado: "Activo" },
-  { id: 4, nombre: "Desktop Lenovo", tipo: "Desktop", sede: "Sede 3", area: "Recursos Humanos", estado: "Activo" },
-  { id: 5, nombre: "Servidor Dell PowerEdge", tipo: "Servidor", sede: "Sede 1", area: "IT", estado: "Activo" },
-];
-
-const mantenimientosMock = [
-  { id: 1, equipo: "Laptop Dell XPS", tipo: "Preventivo", fechaProgramada: "2023-11-15", responsable: "Juan Pérez", estado: "Pendiente" },
-  { id: 2, equipo: "Impresora HP LaserJet", tipo: "Correctivo", fechaProgramada: "2023-11-18", responsable: "María López", estado: "Programado" },
-  { id: 3, equipo: "Monitor LG 27'", tipo: "Preventivo", fechaProgramada: "2023-11-20", responsable: "Carlos Gómez", estado: "Pendiente" },
-  { id: 4, equipo: "Desktop Lenovo", tipo: "Preventivo", fechaProgramada: "2023-11-22", responsable: "Ana Martínez", estado: "Programado" },
-  { id: 5, equipo: "Servidor Dell PowerEdge", tipo: "Correctivo", fechaProgramada: "2023-11-25", responsable: "Pedro Sánchez", estado: "Pendiente" },
-];
-
-interface FormValues {
-  tipo: string;
-  periodicidad: string;
-  fechaInicio: Date;
-  sede: string;
-  bodega: string;
-  responsable: string;
-  descripcion: string;
-  equipos: number[];
-  tipoRegistro: "individual" | "masivo";
-}
-
-interface TableColumn {
-  id: string;
-  label: string;
-  accessor: string;
-  isVisible: boolean;
-  order: number;
-  className?: string;
-}
+import { useMantenimiento } from "./hooks/use-mantenimiento";
 
 const ProgramacionMantenimiento = () => {
+  const {
+    mantenimientosFiltrados,
+    handleColumnDragStart,
+    handleColumnDragOver,
+    handleColumnDragEnter,
+    handleColumnDragLeave,
+    handleColumnDrop,
+    handleColumnDragEnd,
+    mainTableColumns,
+    resetFilters,
+    handleSearch,
+    searchQuery,
+    setSearchQuery,
+    isSearching,
+    showAdvancedFilters,
+    setShowAdvancedFilters,
+    filtroResponsable,
+    setFiltroResponsable,
+    filtroEstado,
+    setFiltroEstado,
+    filtroFechaDesde,
+    setFiltroFechaDesde,
+    filtroFechaHasta,
+    setFiltroFechaHasta,
+    tipoMantenimiento,
+    setTipoMantenimiento,
+  } = useMantenimiento();
   const navigate = useNavigate();
-  const [tipoMantenimiento, setTipoMantenimiento] = useState<string>("todos");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [filtroSede, setFiltroSede] = useState<string>("all");
-  const [filtroArea, setFiltroArea] = useState<string>("all");
-  const [filtroTipo, setFiltroTipo] = useState<string>("all");
-  const [busqueda, setBusqueda] = useState<string>("");
-  const [selectedEquipos, setSelectedEquipos] = useState<number[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
-  const [mantenimientos, setMantenimientos] = useState([...mantenimientosMock]);
-  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
-  
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filtroResponsable, setFiltroResponsable] = useState<string>("all");
-  const [filtroEstado, setFiltroEstado] = useState<string>("all");
-  const [filtroFechaDesde, setFiltroFechaDesde] = useState<Date | undefined>(undefined);
-  const [filtroFechaHasta, setFiltroFechaHasta] = useState<Date | undefined>(undefined);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const [mainTableColumns, setMainTableColumns] = useState<TableColumn[]>([
-    { id: "grip", label: "", accessor: "", isVisible: true, order: 0, className: "w-[40px]" },
-    { id: "equipo", label: "Equipo", accessor: "equipo", isVisible: true, order: 1 },
-    { id: "tipo", label: "Tipo", accessor: "tipo", isVisible: true, order: 2, className: "hidden sm:table-cell" },
-    { id: "fechaProgramada", label: "Fecha Programada", accessor: "fechaProgramada", isVisible: true, order: 3 },
-    { id: "responsable", label: "Responsable", accessor: "responsable", isVisible: true, order: 4, className: "hidden sm:table-cell" },
-    { id: "estado", label: "Estado", accessor: "estado", isVisible: true, order: 5, className: "hidden sm:table-cell" },
-    { id: "acciones", label: "Acciones", accessor: "", isVisible: true, order: 6 },
-  ]);
-
-  const [equipoTableColumns, setEquipoTableColumns] = useState<TableColumn[]>([
-    { id: "checkbox", label: "", accessor: "", isVisible: true, order: 0, className: "w-[50px]" },
-    { id: "grip", label: "", accessor: "", isVisible: true, order: 1, className: "w-[50px]" },
-    { id: "nombre", label: "Equipo", accessor: "nombre", isVisible: true, order: 2 },
-    { id: "tipo", label: "Tipo", accessor: "tipo", isVisible: true, order: 3, className: "hidden sm:table-cell" },
-    { id: "sede", label: "Sede", accessor: "sede", isVisible: true, order: 4, className: "hidden sm:table-cell" },
-    { id: "area", label: "Área", accessor: "area", isVisible: true, order: 5, className: "hidden sm:table-cell" },
-  ]);
-
-  const form = useForm<FormValues>({
-    defaultValues: {
-      tipo: "preventivo",
-      periodicidad: "mensual",
-      responsable: "",
-      descripcion: "",
-      tipoRegistro: "individual",
-      sede: "",
-      bodega: "",
-      equipos: [],
-    },
-  });
-
-  const equiposFiltrados = equiposMock.filter(equipo => {
-    const cumpleFiltroSede = filtroSede === "all" || equipo.sede === filtroSede;
-    const cumpleFiltroArea = filtroArea === "all" || equipo.area === filtroArea;
-    const cumpleFiltroTipo = filtroTipo === "all" || equipo.tipo === filtroTipo;
-    const cumpleBusqueda = !busqueda || 
-      equipo.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      equipo.tipo.toLowerCase().includes(busqueda.toLowerCase());
-
-    return cumpleFiltroSede && cumpleFiltroArea && cumpleFiltroTipo && cumpleBusqueda;
-  });
-
-  const mantenimientosFiltrados = mantenimientos.filter(mantenimiento => {
-    const cumpleTipo = tipoMantenimiento === "todos" || 
-      mantenimiento.tipo.toLowerCase() === tipoMantenimiento.toLowerCase();
-    
-    const cumpleSearch = !searchQuery || 
-      mantenimiento.equipo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mantenimiento.responsable.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mantenimiento.estado.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mantenimiento.tipo.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const cumpleResponsable = filtroResponsable === "all" || 
-      mantenimiento.responsable === filtroResponsable;
-    
-    const cumpleEstado = filtroEstado === "all" || 
-      mantenimiento.estado === filtroEstado;
-    
-    const fechaProgramada = new Date(mantenimiento.fechaProgramada);
-    const cumpleFechaDesde = !filtroFechaDesde || 
-      fechaProgramada >= filtroFechaDesde;
-    
-    const cumpleFechaHasta = !filtroFechaHasta || 
-      fechaProgramada <= filtroFechaHasta;
-    
-    return cumpleTipo && cumpleSearch && cumpleResponsable && 
-           cumpleEstado && cumpleFechaDesde && cumpleFechaHasta;
-  });
-
-  const resetFilters = () => {
-    setTipoMantenimiento("todos");
-    setSearchQuery("");
-    setFiltroResponsable("all");
-    setFiltroEstado("all");
-    setFiltroFechaDesde(undefined);
-    setFiltroFechaHasta(undefined);
-    setIsSearching(false);
-  };
-
-  const handleSearch = () => {
-    setIsSearching(true);
-    toast.success("Filtros aplicados correctamente");
-  };
-
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedEquipos([]);
-      form.setValue('equipos', []);
-    } else {
-      const allEquiposIds = equiposFiltrados.map(equipo => equipo.id);
-      setSelectedEquipos(allEquiposIds);
-      form.setValue('equipos', allEquiposIds);
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const handleSelectEquipo = (equipoId: number) => {
-    const updatedSelection = selectedEquipos.includes(equipoId)
-      ? selectedEquipos.filter(id => id !== equipoId)
-      : [...selectedEquipos, equipoId];
-    
-    setSelectedEquipos(updatedSelection);
-    form.setValue('equipos', updatedSelection);
-    setSelectAll(updatedSelection.length === equiposFiltrados.length);
-  };
-
-  const onSubmit = (data: FormValues) => {
-    console.log({ ...data, equipos: selectedEquipos });
-    setIsDialogOpen(false);
-    form.reset();
-    setSelectedEquipos([]);
-    setSelectAll(false);
-    toast.success("Mantenimiento programado correctamente");
-  };
-
-  const handleColumnDragStart = (e: React.DragEvent<HTMLTableCellElement>, columnId: string) => {
-    setDraggedColumn(columnId);
-    e.currentTarget.classList.add('opacity-70');
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleColumnDragOver = (e: React.DragEvent<HTMLTableCellElement>) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleColumnDragEnter = (e: React.DragEvent<HTMLTableCellElement>, columnId: string) => {
-    e.preventDefault();
-    if (!draggedColumn || draggedColumn === columnId) return;
-    e.currentTarget.classList.add('bg-slate-100');
-  };
-
-  const handleColumnDragLeave = (e: React.DragEvent<HTMLTableCellElement>) => {
-    e.currentTarget.classList.remove('bg-slate-100');
-  };
-
-  const handleColumnDrop = (e: React.DragEvent<HTMLTableCellElement>, targetColumnId: string, isMainTable: boolean) => {
-    e.preventDefault();
-    if (!draggedColumn || draggedColumn === targetColumnId) return;
-    
-    e.currentTarget.classList.remove('bg-slate-100');
-    
-    const columns = isMainTable ? mainTableColumns : equipoTableColumns;
-    const setColumns = isMainTable ? setMainTableColumns : setEquipoTableColumns;
-    
-    const draggedCol = columns.find(col => col.id === draggedColumn);
-    const targetCol = columns.find(col => col.id === targetColumnId);
-    
-    if (!draggedCol || !targetCol) return;
-    
-    const newColumns = columns.map(col => {
-      if (col.id === draggedColumn) {
-        return { ...col, order: targetCol.order };
-      }
-      if (col.id === targetColumnId) {
-        return { ...col, order: draggedCol.order };
-      }
-      return col;
-    });
-    
-    setColumns(newColumns);
-    toast.success(`Columnas reordenadas: ${draggedCol.label} y ${targetCol.label}`);
-  };
-
-  const handleColumnDragEnd = (e: React.DragEvent<HTMLTableCellElement>) => {
-    e.currentTarget.classList.remove('opacity-70');
-    setDraggedColumn(null);
-  };
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -303,15 +118,18 @@ const ProgramacionMantenimiento = () => {
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <div className="relative flex-1">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Buscar mantenimientos..." 
+              <Input
+                placeholder="Buscar mantenimientos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
-            
-            <Select value={tipoMantenimiento} onValueChange={setTipoMantenimiento}>
+
+            <Select
+              value={tipoMantenimiento}
+              onValueChange={setTipoMantenimiento}
+            >
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Tipo de mantenimiento" />
               </SelectTrigger>
@@ -321,9 +139,9 @@ const ProgramacionMantenimiento = () => {
                 <SelectItem value="correctivo">Correctivo</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Button
-              variant="outline" 
+              variant="outline"
               size="default"
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
               className="w-full sm:w-auto"
@@ -331,9 +149,9 @@ const ProgramacionMantenimiento = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filtros Avanzados
             </Button>
-            
-            <Button 
-              variant="default" 
+
+            <Button
+              variant="default"
               onClick={handleSearch}
               className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
             >
@@ -341,13 +159,19 @@ const ProgramacionMantenimiento = () => {
               Buscar
             </Button>
           </div>
-          
-          <Collapsible open={showAdvancedFilters} onOpenChange={setShowAdvancedFilters}>
+
+          <Collapsible
+            open={showAdvancedFilters}
+            onOpenChange={setShowAdvancedFilters}
+          >
             <CollapsibleContent className="pt-3 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <FormLabel>Responsable</FormLabel>
-                  <Select value={filtroResponsable} onValueChange={setFiltroResponsable}>
+                  <Select
+                    value={filtroResponsable}
+                    onValueChange={setFiltroResponsable}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Filtrar por responsable" />
                     </SelectTrigger>
@@ -357,11 +181,13 @@ const ProgramacionMantenimiento = () => {
                       <SelectItem value="María López">María López</SelectItem>
                       <SelectItem value="Carlos Gómez">Carlos Gómez</SelectItem>
                       <SelectItem value="Ana Martínez">Ana Martínez</SelectItem>
-                      <SelectItem value="Pedro Sánchez">Pedro Sánchez</SelectItem>
+                      <SelectItem value="Pedro Sánchez">
+                        Pedro Sánchez
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <FormLabel>Estado</FormLabel>
                   <Select value={filtroEstado} onValueChange={setFiltroEstado}>
@@ -378,7 +204,7 @@ const ProgramacionMantenimiento = () => {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <FormLabel>Fecha desde</FormLabel>
@@ -389,7 +215,9 @@ const ProgramacionMantenimiento = () => {
                         className="w-full justify-start text-left font-normal"
                       >
                         <Calendar className="mr-2 h-4 w-4" />
-                        {filtroFechaDesde ? format(filtroFechaDesde, "PP", { locale: es }) : "Seleccionar fecha"}
+                        {filtroFechaDesde
+                          ? format(filtroFechaDesde, "PP", { locale: es })
+                          : "Seleccionar fecha"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -403,7 +231,7 @@ const ProgramacionMantenimiento = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-                
+
                 <div>
                   <FormLabel>Fecha hasta</FormLabel>
                   <Popover>
@@ -413,7 +241,9 @@ const ProgramacionMantenimiento = () => {
                         className="w-full justify-start text-left font-normal"
                       >
                         <Calendar className="mr-2 h-4 w-4" />
-                        {filtroFechaHasta ? format(filtroFechaHasta, "PP", { locale: es }) : "Seleccionar fecha"}
+                        {filtroFechaHasta
+                          ? format(filtroFechaHasta, "PP", { locale: es })
+                          : "Seleccionar fecha"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -428,10 +258,10 @@ const ProgramacionMantenimiento = () => {
                   </Popover>
                 </div>
               </div>
-              
+
               <div className="flex justify-end">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={resetFilters}
                   className="flex items-center"
                 >
@@ -441,15 +271,15 @@ const ProgramacionMantenimiento = () => {
               </div>
             </CollapsibleContent>
           </Collapsible>
-          
+
           {isSearching && (
             <div className="flex items-center pt-2">
               <div className="text-sm text-gray-500">
                 {mantenimientosFiltrados.length} resultados encontrados
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={resetFilters}
                 className="ml-auto text-xs"
               >
@@ -460,7 +290,7 @@ const ProgramacionMantenimiento = () => {
           )}
         </div>
       </div>
-
+      {/* 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -839,7 +669,7 @@ const ProgramacionMantenimiento = () => {
             </Form>
           </DialogContent>
         </Dialog>
-      </div>
+      </div> */}
 
       <Card>
         <CardContent className="p-0">
@@ -849,12 +679,14 @@ const ProgramacionMantenimiento = () => {
                 <TableRow>
                   {mainTableColumns
                     .sort((a, b) => a.order - b.order)
-                    .filter(col => col.isVisible)
+                    .filter((col) => col.isVisible)
                     .map((column) => (
-                      <TableHead 
+                      <TableHead
                         key={column.id}
                         className={column.className}
-                        draggable={column.id !== "acciones" && column.id !== "grip"}
+                        draggable={
+                          column.id !== "acciones" && column.id !== "grip"
+                        }
                         columnId={column.id}
                         onDragStart={(e) => handleColumnDragStart(e, column.id)}
                         onDragOver={handleColumnDragOver}
@@ -867,9 +699,10 @@ const ProgramacionMantenimiento = () => {
                           <div></div>
                         ) : (
                           <div className="flex items-center gap-2 text-[#01242c]">
-                            {column.id !== "acciones" && column.id !== "grip" && (
-                              <GripVertical className="h-4 w-4 text-muted-foreground" />
-                            )}
+                            {column.id !== "acciones" &&
+                              column.id !== "grip" && (
+                                <GripVertical className="h-4 w-4 text-muted-foreground" />
+                              )}
                             {column.label}
                           </div>
                         )}
@@ -880,67 +713,137 @@ const ProgramacionMantenimiento = () => {
               <TableBody>
                 {mantenimientosFiltrados.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={mainTableColumns.filter(col => col.isVisible).length} className="text-center py-8 text-muted-foreground">
-                      No hay mantenimientos programados que coincidan con los criterios de búsqueda
+                    <TableCell
+                      colSpan={
+                        mainTableColumns.filter((col) => col.isVisible).length
+                      }
+                      className="text-center py-8 text-muted-foreground"
+                    >
+                      No hay mantenimientos programados que coincidan con los
+                      criterios de búsqueda
                     </TableCell>
                   </TableRow>
                 ) : (
                   mantenimientosFiltrados.map((mantenimiento) => (
-                    <TableRow key={mantenimiento.id}>
+                    <TableRow key={mantenimiento.id_mantenimiento}>
                       {mainTableColumns
                         .sort((a, b) => a.order - b.order)
-                        .filter(col => col.isVisible)
+                        .filter((col) => col.isVisible)
                         .map((column) => {
+                          const key = `${mantenimiento.id_mantenimiento}-${column.id}`;
+
                           if (column.id === "grip") {
                             return (
-                              <TableCell key={`${mantenimiento.id}-${column.id}`} className={column.className}>
+                              <TableCell key={key} className={column.className}>
                                 <GripVertical className="h-4 w-4 text-gray-400" />
                               </TableCell>
                             );
-                          } else if (column.id === "equipo") {
+                          }
+
+                          if (column.id === "equipo_id") {
                             return (
-                              <TableCell key={`${mantenimiento.id}-${column.id}`} className="font-medium">
-                                <div>{mantenimiento.equipo}</div>
+                              <TableCell key={key} className="font-medium">
+                                <div>
+                                  {mantenimiento.equipos?.nombre_equipo || "—"}
+                                </div>
                                 <div className="text-xs text-gray-500 sm:hidden">
-                                  {mantenimiento.tipo} - {mantenimiento.fechaProgramada}
+                                  {mantenimiento.tipo} ·{" "}
+                                  {typeof mantenimiento.fecha_programada ===
+                                  "string"
+                                    ? new Date(
+                                        mantenimiento.fecha_programada
+                                      ).toLocaleDateString("es-CO", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                      })
+                                    : mantenimiento.fecha_programada.toLocaleDateString(
+                                        "es-CO",
+                                        {
+                                          year: "numeric",
+                                          month: "long",
+                                          day: "numeric",
+                                        }
+                                      )}
                                 </div>
                               </TableCell>
                             );
-                          } else if (column.id === "estado") {
+                          }
+
+                          if (column.id === "estado") {
                             return (
-                              <TableCell key={`${mantenimiento.id}-${column.id}`} className={column.className}>
-                                <span className={`px-2 py-1 rounded-full text-xs ${
-                                  mantenimiento.estado === 'Pendiente' 
-                                    ? 'bg-yellow-100 text-yellow-800' 
-                                    : 'bg-blue-100 text-blue-800'
-                                }`}>
+                              <TableCell key={key} className={column.className}>
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs ${
+                                    mantenimiento.estado === "Pendiente"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-blue-100 text-blue-800"
+                                  }`}
+                                >
                                   {mantenimiento.estado}
                                 </span>
                               </TableCell>
                             );
-                          } else if (column.id === "acciones") {
+                          }
+
+                          if (column.id === "acciones") {
                             return (
-                              <TableCell key={`${mantenimiento.id}-${column.id}`}>
+                              <TableCell key={key}>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => {
-                                    toast.info(`Ver detalles de ${mantenimiento.equipo}`);
-                                  }}
+                                  onClick={() =>
+                                    toast.info(
+                                      `Ver detalles de ${
+                                        mantenimiento.equipos?.nombre_equipo ||
+                                        "equipo"
+                                      }`
+                                    )
+                                  }
                                 >
                                   Ver
                                 </Button>
                               </TableCell>
                             );
-                          } else if (column.accessor) {
+                          }
+
+                          if (column.accessor) {
+                            const value =
+                              mantenimiento[
+                                column.accessor as keyof typeof mantenimiento
+                              ];
+
+                            let content: React.ReactNode;
+
+                            if (value === null || value === undefined) {
+                              content = "—";
+                            } else if (typeof value === "object") {
+                              if ("nombre" in value) {
+                                content = (value as any).nombre;
+                              } else if (value instanceof Date) {
+                                content = value.toLocaleDateString("es-CO");
+                              } else {
+                                content = JSON.stringify(value);
+                              }
+                            } else if (
+                              column.accessor === "fecha_programada" &&
+                              typeof value === "string"
+                            ) {
+                              content = new Date(value).toLocaleDateString(
+                                "es-CO"
+                              );
+                            } else {
+                              content = value;
+                            }
+
                             return (
-                              <TableCell key={`${mantenimiento.id}-${column.id}`} className={column.className}>
-                                {mantenimiento[column.accessor as keyof typeof mantenimiento]}
+                              <TableCell key={key} className={column.className}>
+                                {content}
                               </TableCell>
                             );
-                          } else {
-                            return <TableCell key={`${mantenimiento.id}-${column.id}`}></TableCell>;
                           }
+
+                          return <TableCell key={key}></TableCell>;
                         })}
                     </TableRow>
                   ))
