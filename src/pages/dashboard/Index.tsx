@@ -43,22 +43,21 @@ import {
 } from "@/components/ui/table";
 import {
   DashboardItem,
-  equiposData,
   incidentesData,
   mantenimientosData,
   rendimientoEquiposData,
   rendimientoTonerData,
-  sedesData,
   serviciosActivosData,
   solicitudesData,
   tiempoRespuestaData,
   tonerData,
 } from "@/pages/dashboard/interfaces/dashboardItem";
 import { useGlobal } from "@/hooks/use-global";
-import { set } from "date-fns";
+import { useEquipos } from "../productos/hooks/use-equipos";
 
 export default function Dashboard() {
   const { sedesConEquiposCount, equiposCount } = useGlobal();
+  const { equiposData, sedesData } = useEquipos();
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("general");
 
@@ -342,7 +341,7 @@ export default function Dashboard() {
         },
       ]);
     }
-  }, [sedesConEquiposCount, equiposCount]);
+  }, [sedesConEquiposCount, equiposCount, equiposData, sedesData]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     setDraggedItem(itemId);
