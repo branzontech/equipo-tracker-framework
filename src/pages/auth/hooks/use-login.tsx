@@ -5,11 +5,21 @@ import { loginSuccess } from "@/redux/authSlice";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
+import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
 
 export const useLogin = () => {
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<Usuario>({
+    id_usuario: 0,
     nombre: "",
     contraseña: "",
+    email: "",
+    rol: "",
+    sede_id: 0,
+    sedes: null,
+    activo: false,
+    firma_entrega: "",
+    firma_recibe: "",
+    firma: "",
   });
   const [remember, setRemember] = useState(false);
 
@@ -17,40 +27,40 @@ export const useLogin = () => {
     const savedUser = localStorage.getItem("rememberUser");
     const savedPassword = localStorage.getItem("rememberPassword");
     if (savedUser && savedPassword) {
-      setUser({ nombre: savedUser, contraseña: savedPassword });
+      setUser({ ...user, email: savedUser, contraseña: savedPassword });
     }
-  }, []);
+  }, [user]);
 
   const SignIn = async (
-    nombre: string,
+    email: string,
     contraseña: string,
     dispatch: any,
     navigate: any,
     remember
   ) => {
     try {
-      if (!nombre) {
-        toast.error("Debe ingresar un nombre de usuario", {
-          icon: icons.error
+      if (!email) {
+        toast.error("Debe ingresar su correo electronico", {
+          icon: icons.error,
         });
         return;
       }
 
       if (!contraseña) {
         toast.error("Debe ingresar una contraseña", {
-          icon: icons.error
+          icon: icons.error,
         });
         return;
       }
 
-      const { user } = await loginUser(nombre, contraseña);
+      const { user } = await loginUser(email, contraseña);
 
       dispatch(loginSuccess(user));
       Cookies.set("userId", user.id_usuario, { expires: 1 });
       navigate("/dashboard");
 
       if (remember) {
-        rememberAccount(nombre, contraseña);
+        rememberAccount(email, contraseña);
       } else {
         localStorage.removeItem("rememberUser");
       }
@@ -58,15 +68,15 @@ export const useLogin = () => {
       return { success: true, user };
     } catch (error) {
       toast.error(error.message, {
-        icon: icons.error
+        icon: icons.error,
       });
     }
   };
 
-  const rememberAccount = (nombre, contraseña) => {
-    localStorage.setItem("rememberUser", nombre);
+  const rememberAccount = (email, contraseña) => {
+    localStorage.setItem("rememberUser", email);
     localStorage.setItem("rememberPassword", contraseña);
   };
 
-  return { SignIn, user, setUser, rememberAccount, remember, setRemember };
+  return { SignIn, user, setUser, remember, setRemember };
 };
