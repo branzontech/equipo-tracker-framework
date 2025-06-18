@@ -21,8 +21,8 @@ export const getInfoEquipo = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   try {
-    const { id, newStatus, tipo } = req.body;
-    const updatedActa = await actaService.update(id, newStatus, tipo);
+    const { id, newStatus, tipo, acta_equipos } = req.body;
+    const updatedActa = await actaService.update(id, newStatus, tipo, acta_equipos);
     res.status(200).json({ updatedActa, success: true });
   } catch (error) {
     res.status(401).json({ error: error.message });
