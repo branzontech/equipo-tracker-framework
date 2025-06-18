@@ -15,6 +15,7 @@ import prestamoRoutes from "./routes/prestamo.routes.js";
 import trasladoRoutes from "./routes/traslados.routes.js";
 import bajasRoutes from "./routes/baja.routes.js";
 import actaRoutes from "./routes/acta.routes.js";
+import manteRoutes from "./routes/mante.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -36,6 +37,7 @@ const routerApi = (app) => {
   router.use("/traslados", trasladoRoutes);
   router.use("/bajas", bajasRoutes);
   router.use("/actas", actaRoutes);
+  router.use("/mantenimientos", manteRoutes);
 };
 
 export default routerApi;
