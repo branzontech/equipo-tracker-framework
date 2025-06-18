@@ -43,7 +43,13 @@ import { useGlobal } from "@/hooks/use-global";
 import { SearchEquipo } from "@/components/SearchEquipo";
 
 const Salidas = () => {
-  const { newPrestamo, setNewPrestamo, addPrestamo } = usePrestamo();
+  const {
+    newPrestamo,
+    setNewPrestamo,
+    addPrestamo,
+    responsableRecibeInput,
+    setResponsableRecibeInput,
+  } = usePrestamo();
   const {
     newUser,
     setNewUser,
@@ -54,6 +60,17 @@ const Salidas = () => {
     setSelectedRecibeUser,
   } = useUser();
   const methods = useForm();
+
+  const selectedEntregaId = selectedEntregaUser?.id_usuario;
+  const selectedRecibeId = selectedRecibeUser?.id_usuario;
+
+  const entregaUsuarios = users.filter(
+    (u) => u.id_usuario !== selectedRecibeId
+  );
+
+  const recibeUsuarios = users.filter(
+    (u) => u.id_usuario !== selectedEntregaId
+  );
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -161,9 +178,38 @@ const Salidas = () => {
               <Label htmlFor="nombreUsuario">Nombre del Usuario</Label>
               <Select
                 value={newUser.nombre}
-                onValueChange={(value) =>
-                  setNewUser({ ...newUser, nombre: value })
-                }
+                onValueChange={(value) => {
+                  const user = users.find((u) => u.nombre === value);
+                  if (user) {
+                    setNewUser({ ...newUser, nombre: value });
+
+                    // Simular selección
+                    setSelectedRecibeUser({
+                      ...user,
+                      firma: user.firma || "",
+                    });
+
+                    setNewPrestamo((prev) => ({
+                      ...prev,
+                      responsable_entrada_id: user.id_usuario,
+                    }));
+
+                    setResponsableRecibeInput({
+                      id: user.id_usuario.toString(),
+                      name: user.nombre,
+                      position: user.rol,
+                      department: user.sedes?.nombre || "Sin sede",
+                    });
+                  } else {
+                    setNewUser({ ...newUser, nombre: value });
+                    setSelectedRecibeUser(null);
+                    setNewPrestamo((prev) => ({
+                      ...prev,
+                      responsable_entrada_id: null,
+                    }));
+                    setResponsableRecibeInput(null);
+                  }
+                }}
               >
                 <SelectTrigger id="nombreUsuario">
                   <SelectValue placeholder="Seleccione un usuario" />
@@ -191,7 +237,6 @@ const Salidas = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Pendiente">Pendiente</SelectItem>
-                  <SelectItem value="Entregado">Entregado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -251,6 +296,7 @@ const Salidas = () => {
             <ResponsibleSearch
               name="responsableEntrega"
               label="Responsable de Entrega"
+              users={entregaUsuarios}
               onSelect={(person) => {
                 const user = users.find(
                   (u) => u.id_usuario === Number(person.id)
@@ -276,6 +322,8 @@ const Salidas = () => {
             <ResponsibleSearch
               name="responsableRecibe"
               label="Responsable de Recepción"
+              users={recibeUsuarios}
+              value={responsableRecibeInput}
               onSelect={(person) => {
                 const user = users.find(
                   (u) => u.id_usuario === Number(person.id)
@@ -285,8 +333,13 @@ const Salidas = () => {
                     ...user,
                     firma: user.firma || "",
                   });
+                  setResponsableRecibeInput({
+                    id: user.id_usuario.toString(),
+                    label: user.nombre,
+                  }); // 👈 importante
                 } else {
                   setSelectedRecibeUser(null);
+                  setResponsableRecibeInput(null);
                 }
                 setNewPrestamo((prev) => ({
                   ...prev,
@@ -295,6 +348,7 @@ const Salidas = () => {
               }}
               onClear={() => {
                 setSelectedRecibeUser(null);
+                setResponsableRecibeInput(null);
               }}
             />
           </div>
@@ -338,20 +392,6 @@ const Salidas = () => {
             <Button type="submit" className="w-full">
               Generar Acta de Entrega
             </Button>
-            {/* {newPrestamo.fecha_salida && (
-              <PDFDownloadLink
-                document={<ActaEntregaPDF data={newPrestamo} />}
-                fileName={`acta-entrega-${format(
-                  new Date(),
-                  "yyyy-MM-dd"
-                )}.pdf`}
-                className="hidden"
-              >
-                {({ blob, url, loading, error }) =>
-                  loading ? "Generando documento..." : "Descargar PDF"
-                }
-              </PDFDownloadLink>
-            )} */}
           </div>
         </form>
       </FormProvider>
