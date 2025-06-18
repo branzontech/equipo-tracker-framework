@@ -269,7 +269,7 @@ const Actas = () => {
                   })()}
                 </TableCell>
                 <TableCell className="max-w-xs truncate">
-                  {descripcion}
+                  {descripcion === "" ? "Sin descripción" : descripcion}
                 </TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button
