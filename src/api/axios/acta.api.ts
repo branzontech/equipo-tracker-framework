@@ -10,11 +10,12 @@ export const getInfoEquipo = async (nro_serie) => {
   return data;
 };
 
-export const updateStatus = async (id, newStatus, tipo) => {
+export const updateStatus = async (id, newStatus, tipo, acta_equipos) => {
   const { data } = await api.post("/actas/updateStatus", {
     id,
     newStatus,
     tipo,
+    acta_equipos
   });
   return data;
 };
