@@ -39,6 +39,8 @@ const Perifericos = () => {
 
   const { equipo } = useEquipos();
 
+  const equiposDisponible = equipo.filter((equipo) => equipo.estado_actual !== "Fuera de servicio");
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <Card className="mb-6">
@@ -106,7 +108,7 @@ const Perifericos = () => {
                   <SelectValue placeholder="Seleccione el equipo asociado" />
                 </SelectTrigger>
                 <SelectContent>
-                  {equipo.map((equipo) => (
+                  {equiposDisponible.map((equipo) => (
                     <SelectItem
                       key={equipo.id_equipo}
                       value={equipo.id_equipo.toString()}
@@ -189,11 +191,11 @@ const Perifericos = () => {
                           <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
                           <span className="text-green-700">Activo</span>
                         </>
-                      ) : periferico.estado === "Inactivo por Baja" ? (
+                      ) : periferico.estado === "Fuera de servicio" ? (
                         <>
                           <FileX className="mr-2 h-4 w-4 text-orange-500" />
                           <span className="text-orange-700">
-                            Inactivo por Baja
+                            Fuera de servicio
                           </span>
                         </>
                       ) : periferico.estado === "Inactivo" ? (
