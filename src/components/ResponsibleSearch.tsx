@@ -17,11 +17,20 @@ import { useUser } from "@/pages/usuarios/hooks/use-user";
 interface ResponsibleSearchProps {
   name: string;
   label: string;
+  users: Usuario[];
+  value?: ResponsiblePerson;
   onSelect?: (person: ResponsiblePerson) => void;
   onClear?: () => void;
 }
 
-const ResponsibleSearch = ({ name, label, onSelect, onClear }: ResponsibleSearchProps) => {
+const ResponsibleSearch = ({
+  name,
+  label,
+  users,
+  value,
+  onSelect,
+  onClear,
+}: ResponsibleSearchProps) => {
   const { control, setValue, watch } = useFormContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -29,7 +38,18 @@ const ResponsibleSearch = ({ name, label, onSelect, onClear }: ResponsibleSearch
   const wrapperRef = useRef<HTMLDivElement>(null);
   const responsibleId = watch(`${name}Id`);
   const responsibleName = watch(`${name}Name`);
-  const { users } = useUser();
+
+  useEffect(() => {
+    if (value) {
+      // Solo actualizar si aún no se ha seleccionado manualmente un responsable
+      if (!responsibleId) {
+        setValue(`${name}Id`, value.id);
+        setValue(`${name}Name`, value.name);
+        setValue(`${name}Position`, value.position);
+        setValue(`${name}Department`, value.department);
+      }
+    }
+  }, [value, name, setValue, responsibleId]);
 
   // Close the dropdown when clicking outside
   useEffect(() => {
@@ -53,7 +73,7 @@ const ResponsibleSearch = ({ name, label, onSelect, onClear }: ResponsibleSearch
     department: u.sedes?.nombre || "Sin sede",
     position: u.rol,
     firma_entrega: u.firma_entrega,
-    firma_recibe: u.firma_recibe
+    firma_recibe: u.firma_recibe,
   }));
 
   const handleSearch = () => {
