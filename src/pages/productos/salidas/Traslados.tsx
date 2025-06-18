@@ -250,6 +250,17 @@ const Traslados = () => {
   } = useUser();
   const methods = useForm();
 
+  const selectedEntregaId = selectedEntregaUser?.id_usuario;
+  const selectedRecibeId = selectedRecibeUser?.id_usuario;
+
+  const entregaUsuarios = users.filter(
+    (u) => u.id_usuario !== selectedRecibeId
+  );
+
+  const recibeUsuarios = users.filter(
+    (u) => u.id_usuario !== selectedEntregaId
+  );
+
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-[#01242c] mb-6">
@@ -315,7 +326,7 @@ const Traslados = () => {
                   <SelectValue placeholder="Seleccione un regional" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bogota">Bogotá</SelectItem>
+                  <SelectItem value="cartagena">Cartagena</SelectItem>
                   <SelectItem value="medellin">Medellín</SelectItem>
                   <SelectItem value="cali">Cali</SelectItem>
                   <SelectItem value="barranquilla">Barranquilla</SelectItem>
@@ -419,6 +430,7 @@ const Traslados = () => {
             <ResponsibleSearch
               name="responsableEntrega"
               label="Responsable de Entrega"
+              users={entregaUsuarios}
               onSelect={(person) => {
                 const user = users.find(
                   (u) => u.id_usuario === Number(person.id)
@@ -444,6 +456,7 @@ const Traslados = () => {
             <ResponsibleSearch
               name="responsableRecibe"
               label="Responsable de Recepción"
+              users={recibeUsuarios}
               onSelect={(person) => {
                 const user = users.find(
                   (u) => u.id_usuario === Number(person.id)

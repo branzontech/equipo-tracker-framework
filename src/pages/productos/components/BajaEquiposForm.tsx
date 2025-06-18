@@ -174,9 +174,19 @@ export function BajaEquiposForm() {
     selectedRecibeUser,
     setSelectedRecibeUser,
   } = useUser();
-
   const { newBaja, setNewBaja, addBaja } = useBaja();
   const methods = useForm();
+
+  const selectedEntregaId = selectedEntregaUser?.id_usuario;
+  const selectedRecibeId = selectedRecibeUser?.id_usuario;
+
+  const entregaUsuarios = users.filter(
+    (u) => u.id_usuario !== selectedRecibeId
+  );
+
+  const recibeUsuarios = users.filter(
+    (u) => u.id_usuario !== selectedEntregaId
+  );
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -258,8 +268,6 @@ export function BajaEquiposForm() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Pendiente">Pendiente</SelectItem>
-                    <SelectItem value="En proceso">En proceso</SelectItem>
-                    <SelectItem value="Finalizado">Finalizado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -363,6 +371,7 @@ export function BajaEquiposForm() {
                 <ResponsibleSearch
                   name="responsableEntrega"
                   label="Responsable de Autorización"
+                  users={entregaUsuarios}
                   onSelect={(person) => {
                     const user = users.find(
                       (u) => u.id_usuario === Number(person.id)
@@ -388,6 +397,7 @@ export function BajaEquiposForm() {
                 <ResponsibleSearch
                   name="responsableRecibe"
                   label="Responsable de Solicitud"
+                  users={recibeUsuarios}
                   onSelect={(person) => {
                     const user = users.find(
                       (u) => u.id_usuario === Number(person.id)
