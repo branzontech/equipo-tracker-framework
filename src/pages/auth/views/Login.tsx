@@ -12,8 +12,7 @@ import React from "react";
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { SignIn, user, setUser, rememberAccount, remember, setRemember } =
-    useLogin();
+  const { SignIn, user, setUser, remember, setRemember } = useLogin();
 
   return (
     <>
@@ -36,23 +35,30 @@ const Login = () => {
           <form
             onSubmit={(e: React.FormEvent) => {
               e.preventDefault();
-              SignIn(user.nombre, user.contraseña, dispatch, navigate, remember);
+              SignIn(
+                user.email,
+                user.contraseña,
+                dispatch,
+                navigate,
+                remember
+              );
             }}
             className="space-y-6"
           >
             <div className="space-y-2">
-              <Label className="text-white" htmlFor="nombre">
-                Usuario
+              <Label className="text-white" htmlFor="correo">
+                Correo electronico
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#bff036] w-5 h-5" />
                 <Input
-                  id="nombre"
-                  name="nombre"
-                  value={user.nombre}
+                  id="correo"
+                  name="correo"
+                  type="email"
+                  value={user.email}
                   className="pl-10 bg-[#01242c]/30 border-[#bff036]/20 text-white placeholder:text-white/50"
-                  placeholder="Ingrese su usuario"
-                  onChange={(e) => setUser({ ...user, nombre: e.target.value })}
+                  placeholder="Ingrese su correo electronico"
+                  onChange={(e) => setUser({ ...user, email: e.target.value })}
                   autoComplete="off"
                 />
               </div>
