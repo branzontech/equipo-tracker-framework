@@ -2,8 +2,8 @@
 import { AuthModel } from "../../../db/models/auth.model.js";
 
 class AuthService {
-  async login(nombre, contraseña) {
-    const user = await AuthModel.findByCredentials(nombre, contraseña);
+  async login(email, contraseña) {
+    const user = await AuthModel.findByCredentials(email, contraseña);
     delete user.contrase_a;
     return user;
   }

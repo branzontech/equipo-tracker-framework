@@ -1,14 +1,14 @@
 import { prisma } from "../../../prisma/prismaCliente.js";
 
 export const AuthModel = {
-  findByCredentials: async (nombre, contraseña) => {
+  findByCredentials: async (email, contraseña) => {
     try {
       const user = await prisma.usuarios.findFirst({
-        where: { nombre, contrase_a: contraseña },
+        where: { email, contrase_a: contraseña },
       });
 
       if (!user) {
-        throw new Error("Nombre de usuario o contraseña incorrectos");
+        throw new Error("Correo electronico o contraseña incorrectos");
       }
 
       return user;

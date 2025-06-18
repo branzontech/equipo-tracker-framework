@@ -1,8 +1,8 @@
 import api from "./axiosConfig";
 
-export const loginUser = async (nombre: string, contraseña: string) => {
+export const loginUser = async (email: string, contraseña: string) => {
   try {
-    const response = await api.post("/auth/login", { nombre, contraseña });
+    const response = await api.post("/auth/login", { email, contraseña });
     return response.data;
   } catch (error) {
     console.error("Error de login:", error);
