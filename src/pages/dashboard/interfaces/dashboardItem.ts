@@ -1,11 +1,3 @@
-export const equiposData = [
-  { name: 'Laptops', cantidad: 120 },
-  { name: 'Desktops', cantidad: 80 },
-  { name: 'Monitores', cantidad: 150 },
-  { name: 'Impresoras', cantidad: 45 },
-  { name: 'Servidores', cantidad: 20 },
-];
-
 export const mantenimientosData = [
   { name: 'Al día', value: 75, color: '#4ade80' },
   { name: 'Próximos', value: 15, color: '#fbbf24' },
