@@ -188,7 +188,14 @@ export const ActaModel = {
         },
       }),
       prisma.bajas_equipos.findFirst({
-        where: { equipo_id: equipoId },
+        where: {
+          equipo_id: equipoId,
+          bajas: {
+            estado: {
+              not: "Cancelada",
+            },
+          },
+        },
       }),
     ]);
 
@@ -203,7 +210,7 @@ export const ActaModel = {
       enBaja,
     };
   },
-  updateStatus: async (id, newStatus, tipo) => {
+  updateStatus: async (id, newStatus, tipo, acta_equipos) => {
     try {
       switch (tipo) {
         case "Prestamo":
@@ -219,6 +226,27 @@ export const ActaModel = {
           });
 
         case "Baja":
+          if (newStatus === "Cancelada") {
+            // Update status of the equipment
+            for (const acta_equipo of acta_equipos) {
+              const equipo = await prisma.equipos.findUnique({
+                where: { nro_serie: acta_equipo.equipos.nro_serie },
+              });
+              if (equipo) {
+                await prisma.equipos.update({
+                  where: { id_equipo: equipo.id_equipo },
+                  data: { estado_actual: "Activo" },
+                });
+
+                // Update perifericos status
+                await prisma.perifericos.updateMany({
+                  where: { equipo_asociado_id: equipo.id_equipo },
+                  data: { estado: "Activo" },
+                });
+              }
+            }
+          }
+
           return await prisma.bajas.update({
             where: { id_baja: id },
             data: { estado: newStatus },
