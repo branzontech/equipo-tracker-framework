@@ -56,9 +56,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import ListaPerifericos from "@/pages/configuracion/maestros/perifericos/ListaPerifericos";
 import { useEquipos } from "../hooks/use-equipos";
-import { icons } from "@/components/interfaces/icons";
+import Perifericos from "@/pages/configuracion/maestros/views/Perifericos";
 
 import { CheckCircle, FileX, Wrench, ShieldAlert } from "lucide-react";
 
@@ -467,70 +466,77 @@ const ListaInventario = () => {
               </TableHeader>
               <TableBody>
                 {filteredData.length > 0 ? (
-                  paginatedData.map((item) => (
-                    <TableRow
-                      key={item.id_equipo}
-                      className="hover:bg-slate-50"
-                    >
-                      {sortedColumns.map(
-                        (column) =>
-                          column.isVisible && (
-                            <TableCell
-                              key={`${item.id_equipo}-${column.id}`}
-                              className="py-3"
+                  [...paginatedData]
+                    .sort(
+                      (a, b) =>
+                        new Date(b.fecha_registro).getTime() -
+                        new Date(a.fecha_registro).getTime()
+                    )
+                    .map((item) => (
+                      <TableRow
+                        key={item.id_equipo}
+                        className="hover:bg-slate-50"
+                      >
+                        {sortedColumns.map(
+                          (column) =>
+                            column.isVisible && (
+                              <TableCell
+                                key={`${item.id_equipo}-${column.id}`}
+                                className="py-3"
+                              >
+                                {column.id === "estado_actual" ? (
+                                  <StatusBadge
+                                    status={
+                                      item[
+                                        column.key as keyof typeof item
+                                      ] as string
+                                    }
+                                  />
+                                ) : typeof item[
+                                    column.key as keyof typeof item
+                                  ] === "object" &&
+                                  item[column.key as keyof typeof item] !==
+                                    null ? (
+                                  (item[column.key as keyof typeof item] as any)
+                                    .nombre ?? ""
+                                ) : (
+                                  item[column.key as keyof typeof item]
+                                )}
+                              </TableCell>
+                            )
+                        )}
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-slate-100"
+                              onClick={() =>
+                                navigate(`/hojas-vida/${item.nro_serie}`)
+                              }
                             >
-                              {column.id === "estado_actual" ? (
-                                <StatusBadge
-                                  status={
-                                    item[
-                                      column.key as keyof typeof item
-                                    ] as string
-                                  }
-                                />
-                              ) : typeof item[
-                                  column.key as keyof typeof item
-                                ] === "object" &&
-                                item[column.key as keyof typeof item] !==
-                                  null ? (
-                                (item[column.key as keyof typeof item] as any)
-                                  .nombre ?? ""
-                              ) : (
-                                item[column.key as keyof typeof item]
-                              )}
-                            </TableCell>
-                          )
-                      )}
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="hover:bg-slate-100"
-                            onClick={() =>
-                              navigate(`/hojas-vida/${item.nro_serie}`)
-                            }
-                          >
-                            <Eye className="h-4 w-4 text-[#01242c]" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="hover:bg-slate-100"
-                          >
-                            <Pencil className="h-4 w-4 text-[#01242c]" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="hover:bg-slate-100"
-                            onClick={() => deleteEquipoById(item.id_equipo)}
-                          >
-                            <Delete className="h-4 w-4 text-[#01242c]" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                              <Eye className="h-4 w-4 text-[#01242c]" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-slate-100"
+                              onClick={() => navigate(`/productos/edit/${item.nro_serie}`)}
+                            >
+                              <Pencil className="h-4 w-4 text-[#01242c]" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-slate-100"
+                              onClick={() => deleteEquipoById(item.id_equipo)}
+                            >
+                              <Delete className="h-4 w-4 text-[#01242c]" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
                 ) : (
                   <TableRow>
                     <TableCell
@@ -599,7 +605,7 @@ const ListaInventario = () => {
         </TabsContent>
 
         <TabsContent value="perifericos" className="mt-0">
-          <ListaPerifericos />
+          <Perifericos />
         </TabsContent>
       </Tabs>
     </div>
