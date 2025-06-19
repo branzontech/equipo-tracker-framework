@@ -19,6 +19,15 @@ export const createEquipo = async (equipo: Equipo) => {
   }
 };
 
+export const updateEquipo = async (equipo: Equipo) => {
+  try {
+    const response = await api.post("/equipos/update", equipo);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
+};
+
 export const getEquiposByNroSerie = async (nroSerie: string) => {
   try {
     const response = await api.get(`/equipos/${nroSerie}`);
