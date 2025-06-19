@@ -147,17 +147,11 @@ const UpdateSede = ({ open, onOpenChange, id }: UpdateProps) => {
                 <div className="space-y-2">
                   <Label htmlFor="estado">Estado</Label>
                   <Select
-                    value={
-                      newSede.estado === true
-                        ? "Activo"
-                        : newSede.estado === false
-                        ? "Inactivo"
-                        : ""
-                    }
+                    value={newSede.estado}
                     onValueChange={(value) =>
                       setNewSede({
                         ...newSede,
-                        estado: value === "Activo" ? true : false,
+                        estado: value,
                       })
                     }
                     required
