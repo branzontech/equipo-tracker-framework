@@ -41,7 +41,7 @@ export const useActa = () => {
     prestamos: [],
     bajas: [],
     traslados: [],
-    acta_equipos: [],
+    devoluciones: [],
   });
   const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [tipoFiltro, setTipoFiltro] = useState<string>("todos");
@@ -106,6 +106,16 @@ export const useActa = () => {
           descripcion: traslado?.motivo ?? "Sin descripción",
         };
       }
+      case "Devolucion": {
+        const devolucion = acta.devoluciones[0];
+        return {
+          usuario:
+            devolucion?.usuarios_devoluciones_usuario_entrega_idTousuarios
+              ?.nombre ?? "Sin usuario",
+              estado: devolucion?.estado ?? "Sin estado",
+          descripcion: devolucion?.observaciones ?? "Sin descripción",
+        };
+      }
       default:
         return {
           usuario: "Desconocido",
@@ -143,6 +153,8 @@ export const useActa = () => {
         return <Truck className="h-5 w-5 text-green-500" />;
       case "Baja":
         return <FileX className="h-5 w-5 text-red-500" />;
+      case "Devolucion":
+        return <RotateCw className="h-5 w-5 text-yellow-500" />;
       default:
         return <FileText className="h-5 w-5" />;
     }
@@ -158,6 +170,9 @@ export const useActa = () => {
     if (acta.tipo === "Baja" && acta.bajas.length > 0) {
       return acta.bajas[0].estado ?? "desconocido";
     }
+    if (acta.tipo === "Devolucion" && acta.devoluciones.length > 0) {
+      return acta.devoluciones[0].estado ?? "desconocido";
+    }
     return "desconocido";
   };
 
@@ -166,6 +181,7 @@ export const useActa = () => {
       Pendiente: "Pendiente",
       Finalizado: "Finalizado",
       "En proceso": "En proceso",
+      Satisfactoria: "Satisfactoria",
       desconocido: "Desconocido",
     };
     return labels[estado] || estado;
@@ -177,6 +193,7 @@ export const useActa = () => {
       Finalizado: "bg-gray-100 text-gray-800",
       "En proceso": "bg-blue-100 text-blue-800",
       desconocido: "bg-red-100 text-red-800",
+      Satisfactoria: "bg-yellow-100 text-yellow-800",
       Vigente: "bg-orange-100 text-orange-800",
     };
     return variants[estado] || "bg-gray-100 text-gray-800";
@@ -298,7 +315,7 @@ export const useActa = () => {
           equipos.push({
             serial: equipo.nro_serie,
             nombre: equipo.nombre_equipo,
-            marca: equipo.marcas?.nombre,
+            marca: equipo.marcas?.nombre || "-",
             activoFijo: equipo.tipo_activo || "-",
             accesorios: perifericos || "-",
           });
@@ -319,6 +336,48 @@ export const useActa = () => {
           });
         }
       });
+    }
+
+    if (acta.tipo === "Devolucion") {
+      const devolucion = acta.devoluciones[0];
+
+      if (devolucion?.prestamos) {
+        devolucion.prestamos.prestamo_equipos.forEach((item) => {
+          const equipo = item.equipos;
+          const perifericos = item.prestamo_perifericos
+            .map((p) => p.perifericos?.nombre)
+            .filter(Boolean)
+            .join(", ");
+          if (equipo) {
+            equipos.push({
+              serial: equipo.nro_serie,
+              nombre: equipo.nombre_equipo,
+              marca: equipo.marcas?.nombre || "-",
+              activoFijo: equipo.tipo_activo || "-",
+              accesorios: perifericos || "-",
+            });
+          }
+        });
+      }
+
+      if (devolucion?.traslados) {
+        devolucion.traslados.traslados_equipos.forEach((item) => {
+          const equipo = item.equipos;
+          const perifericos = item.traslados_perifericos
+            .map((p) => p.perifericos?.nombre)
+            .filter(Boolean)
+            .join(", ");
+          if (equipo) {
+            equipos.push({
+              serial: equipo.nro_serie,
+              nombre: equipo.nombre_equipo,
+              marca: equipo.marcas?.nombre || "-",
+              activoFijo: equipo.tipo_activo || "-",
+              accesorios: perifericos || "-",
+            });
+          }
+        });
+      }
     }
 
     return equipos;
@@ -378,6 +437,22 @@ export const useActa = () => {
           ?.nombre || nombreRecibe;
     }
 
+    if (acta.tipo === "Devolucion") {
+      firmaEntrega =
+        acta.devoluciones[0].usuarios_devoluciones_usuario_entrega_idTousuarios
+          ?.firma || firmaEntrega;
+      nombreEntrega =
+        acta.devoluciones[0].usuarios_devoluciones_usuario_entrega_idTousuarios
+          ?.nombre || nombreEntrega;
+
+      firmaRecibe =
+        acta.devoluciones[0].usuarios_devoluciones_usuario_recibe_idTousuarios
+          ?.firma || firmaRecibe;
+      nombreRecibe =
+        acta.devoluciones[0].usuarios_devoluciones_usuario_recibe_idTousuarios
+          ?.nombre || nombreRecibe;
+    }
+
     return {
       firmaEntrega,
       nombreEntrega,
@@ -403,7 +478,12 @@ export const useActa = () => {
         return;
       }
 
-      const res = await updateStatus(id, newStatus, acta.tipo, acta.bajas[0]?.bajas_equipos);
+      const res = await updateStatus(
+        id,
+        newStatus,
+        acta.tipo,
+        acta.bajas[0]?.bajas_equipos
+      );
 
       if (res) {
         toast.success("Estado actualizado correctamente", {
@@ -450,6 +530,9 @@ export const useActa = () => {
           break;
         case "Baja":
           nombre = "Acta de Baja de Equipos";
+          break;
+        case "Devolucion":
+          nombre = "Acta de Devolución de Equipos";
           break;
         default:
           nombre = "Acta de Salida de Equipos en Condición de Préstamo";
@@ -506,6 +589,6 @@ export const useActa = () => {
     setManagementSheetOpen,
     handleStatusChange,
     generarYDescargarPDF,
-    findEquipoByNroSerie
+    findEquipoByNroSerie,
   };
 };
