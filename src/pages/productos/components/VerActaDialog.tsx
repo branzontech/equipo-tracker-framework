@@ -23,6 +23,8 @@ import {
   DollarSign,
   Building,
   AlertCircle,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -107,9 +109,7 @@ export function VerActaDialog({
               )}`}
             >
               <span className="flex items-center gap-2">
-                {estado === "Pendiente" && (
-                  <CheckCircle className="h-3.5 w-3.5" />
-                )}
+                {estado === "Pendiente" && <Clock className="h-3.5 w-3.5" />}
                 {estado === "Finalizado" && (
                   <CheckCircle className="h-3.5 w-3.5" />
                 )}
@@ -118,6 +118,10 @@ export function VerActaDialog({
                 )}
                 {estado === "Desconocido" && (
                   <AlertCircle className="h-3.5 w-3.5" />
+                )}
+                {estado === "Cancelada" && <XCircle className="h-3.5 w-3.5" />}
+                {estado === "Satisfactoria" && (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
                 )}
                 {getEstadoLabel(estado)}
               </span>
@@ -230,6 +234,29 @@ export function VerActaDialog({
             </Card>
           )}
 
+          {acta.tipo === "Devolucion" && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold flex items-center gap-2 mb-3">
+                  <ArrowUpFromLine className="h-4 w-4 text-yellow-500" />
+                  Información de Devolución
+                </h3>
+                <div className="space-y-3">
+                  {acta.devoluciones[0].motivo && (
+                    <div>
+                      <span className="text-sm text-gray-500">
+                        Motivo de devolución:
+                      </span>
+                      <p className="font-medium">
+                        {acta.devoluciones[0].motivo}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Tabla de Equipos */}
           <div className="overflow-x-auto rounded-lg border bg-white">
             <table className="min-w-full divide-y divide-gray-200">
@@ -238,7 +265,9 @@ export function VerActaDialog({
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                       <Info className="h-4 w-4" />
-                      Equipos incluidos
+                      {acta.tipo === "Devolucion"
+                        ? "Equipos devueltos"
+                        : "Equipos incluidos"}
                     </h3>
 
                     <div className="overflow-x-auto rounded-lg border bg-white">
@@ -303,17 +332,6 @@ export function VerActaDialog({
               </tbody>
             </table>
           </div>
-
-          {/* Observaciones */}
-          {/* {acta.observaciones && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <h3 className="font-semibold">Observaciones</h3>
-                <p className="text-muted-foreground">{acta.observaciones}</p>
-              </div>
-            </>
-          )} */}
 
           {/* Firmas */}
           {(firmaEntrega || firmaRecibe) && (
