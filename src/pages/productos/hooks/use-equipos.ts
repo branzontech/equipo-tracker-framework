@@ -1,3 +1,4 @@
+import { set } from "date-fns";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import { Equipo } from "../interfaces/equipo";
@@ -10,6 +11,7 @@ import {
   deleteEquipo,
   getEquipos,
   getEquiposByNroSerie,
+  updateEquipo,
 } from "@/api/axios/equipo.api";
 import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns";
 import { toast } from "sonner";
@@ -103,6 +105,7 @@ export const useEquipos = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("inventario");
   const [sedesConEquiposCount, setSedesConEquiposCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -592,6 +595,43 @@ export const useEquipos = () => {
     }
   };
 
+  const update = async (data: Equipo) => {
+    for (const campo of camposRequeridos) {
+      if (!campo.valor) {
+        toast.error(campo.mensaje, {
+          icon: icons.error,
+        });
+        return;
+      }
+    }
+
+    try {
+      const dataSend = {
+        ...data,
+        fecha_registro: new Date(data.fecha_registro).toISOString(),
+      };
+
+      const response = await updateEquipo(dataSend);
+      if (response.success) {
+        toast.success(response.message || "Equipo actualizdo exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          navigate("/productos/lista");
+          window.location.reload();
+        }, 4500);
+      } else {
+        toast.error(response.message || "Error al actualizar el equipo", {
+          icon: icons.error,
+        });
+      }
+    } catch (error) {
+      toast.error(error.message || "Error al actualizar el equipo", {
+        icon: icons.error,
+      });
+    }
+  };
+
   const formatNumber = (value: number | string) => {
     const num = typeof value === "number" ? value.toString() : value;
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -648,8 +688,65 @@ export const useEquipos = () => {
   ).length;
 
   const getInfoEquipo = async (nroSeries: string) => {
+    setIsLoading(true);
     const response = await getEquiposByNroSerie(nroSeries);
-    setNewEquipo(response);
+    const seguridadRaw = response.seguridad?.[0] || {};
+
+    const especificacionesProcesadas = response.especificaciones?.[0] || {
+      id_especificacion: 0,
+      procesador: "",
+      memoria_ram: "",
+      almacenamiento: "",
+      tarjeta_grafica: "",
+      pantalla: "",
+      sistema_operativo: "",
+      bateria: "",
+      puertos: "",
+    };
+
+    const seguridadProcesada = {
+      ...seguridadRaw,
+      politicas_aplicadas:
+        typeof seguridadRaw.politicas_aplicadas === "string"
+          ? seguridadRaw.politicas_aplicadas.split(",").map((p) => p.trim())
+          : [],
+    };
+
+    const adquisicionProcesada = response.adquisicion?.[0] || {
+      id_adquisicion: 0,
+      orden_compra: "",
+      fecha_compra: "",
+      precio_compra: 0,
+      forma_pago: "",
+      plazo_pago: "",
+      numero_factura: "",
+      proveedor: "",
+    };
+
+    const administrativaProcesada = response.administrativa?.[0] || {
+      id_admin: 0,
+      codigo_inventario: "",
+      centro_coste: "",
+      autorizado_por: "",
+      fecha_activacion: "",
+      estado_contable: "",
+      valor_depreciado: 0,
+      vida_util_restante: "",
+    };
+
+    setNewEquipo({
+      ...response,
+      especificaciones: especificacionesProcesadas,
+      seguridad: seguridadProcesada,
+      adquisicion: adquisicionProcesada,
+      administrativa: administrativaProcesada,
+    });
+
+    setNewEquipo({
+      ...response,
+      seguridad: seguridadProcesada,
+    });
+    setIsLoading(false);
     return response;
   };
 
@@ -666,7 +763,7 @@ export const useEquipos = () => {
             });
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message, {
+            toast.error(res.message || "No se pudo eliminar el equipo", {
               icon: icons.error,
             });
           }
@@ -711,6 +808,9 @@ export const useEquipos = () => {
   }, [equipo]);
 
   return {
+    update,
+    isLoading,
+    setIsLoading,
     sedesData,
     equiposData,
     deleteEquipoById,
