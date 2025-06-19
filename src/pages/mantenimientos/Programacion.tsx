@@ -724,129 +724,145 @@ const ProgramacionMantenimiento = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  mantenimientosFiltrados.map((mantenimiento) => (
-                    <TableRow key={mantenimiento.id_mantenimiento}>
-                      {mainTableColumns
-                        .sort((a, b) => a.order - b.order)
-                        .filter((col) => col.isVisible)
-                        .map((column) => {
-                          const key = `${mantenimiento.id_mantenimiento}-${column.id}`;
+                  [...mantenimientosFiltrados]
+                    .sort(
+                      (a, b) =>
+                        new Date(b.fecha_programada).getTime() -
+                        new Date(a.fecha_programada).getTime()
+                    )
+                    .map((mantenimiento) => (
+                      <TableRow key={mantenimiento.id_mantenimiento}>
+                        {mainTableColumns
+                          .sort((a, b) => a.order - b.order)
+                          .filter((col) => col.isVisible)
+                          .map((column) => {
+                            const key = `${mantenimiento.id_mantenimiento}-${column.id}`;
 
-                          if (column.id === "grip") {
-                            return (
-                              <TableCell key={key} className={column.className}>
-                                <GripVertical className="h-4 w-4 text-gray-400" />
-                              </TableCell>
-                            );
-                          }
+                            if (column.id === "grip") {
+                              return (
+                                <TableCell
+                                  key={key}
+                                  className={column.className}
+                                >
+                                  <GripVertical className="h-4 w-4 text-gray-400" />
+                                </TableCell>
+                              );
+                            }
 
-                          if (column.id === "equipo_id") {
-                            return (
-                              <TableCell key={key} className="font-medium">
-                                <div>
-                                  {mantenimiento.equipos?.nombre_equipo || "—"}
-                                </div>
-                                <div className="text-xs text-gray-500 sm:hidden">
-                                  {mantenimiento.tipo} ·{" "}
-                                  {typeof mantenimiento.fecha_programada ===
-                                  "string"
-                                    ? new Date(
-                                        mantenimiento.fecha_programada
-                                      ).toLocaleDateString("es-CO", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                      })
-                                    : mantenimiento.fecha_programada.toLocaleDateString(
-                                        "es-CO",
-                                        {
+                            if (column.id === "equipo_id") {
+                              return (
+                                <TableCell key={key} className="font-medium">
+                                  <div>
+                                    {mantenimiento.equipos?.nombre_equipo ||
+                                      "—"}
+                                  </div>
+                                  <div className="text-xs text-gray-500 sm:hidden">
+                                    {mantenimiento.tipo} ·{" "}
+                                    {typeof mantenimiento.fecha_programada ===
+                                    "string"
+                                      ? new Date(
+                                          mantenimiento.fecha_programada
+                                        ).toLocaleDateString("es-CO", {
                                           year: "numeric",
                                           month: "long",
                                           day: "numeric",
-                                        }
-                                      )}
-                                </div>
-                              </TableCell>
-                            );
-                          }
-
-                          if (column.id === "estado") {
-                            return (
-                              <TableCell key={key} className={column.className}>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs ${
-                                    mantenimiento.estado === "Pendiente"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-blue-100 text-blue-800"
-                                  }`}
-                                >
-                                  {mantenimiento.estado}
-                                </span>
-                              </TableCell>
-                            );
-                          }
-
-                          if (column.id === "acciones") {
-                            return (
-                              <TableCell key={key}>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    toast.info(
-                                      `Ver detalles de ${
-                                        mantenimiento.equipos?.nombre_equipo ||
-                                        "equipo"
-                                      }`
-                                    )
-                                  }
-                                >
-                                  Ver
-                                </Button>
-                              </TableCell>
-                            );
-                          }
-
-                          if (column.accessor) {
-                            const value =
-                              mantenimiento[
-                                column.accessor as keyof typeof mantenimiento
-                              ];
-
-                            let content: React.ReactNode;
-
-                            if (value === null || value === undefined) {
-                              content = "—";
-                            } else if (typeof value === "object") {
-                              if ("nombre" in value) {
-                                content = (value as any).nombre;
-                              } else if (value instanceof Date) {
-                                content = value.toLocaleDateString("es-CO");
-                              } else {
-                                content = JSON.stringify(value);
-                              }
-                            } else if (
-                              column.accessor === "fecha_programada" &&
-                              typeof value === "string"
-                            ) {
-                              content = new Date(value).toLocaleDateString(
-                                "es-CO"
+                                        })
+                                      : mantenimiento.fecha_programada.toLocaleDateString(
+                                          "es-CO",
+                                          {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                          }
+                                        )}
+                                  </div>
+                                </TableCell>
                               );
-                            } else {
-                              content = value;
                             }
 
-                            return (
-                              <TableCell key={key} className={column.className}>
-                                {content}
-                              </TableCell>
-                            );
-                          }
+                            if (column.id === "estado") {
+                              return (
+                                <TableCell
+                                  key={key}
+                                  className={column.className}
+                                >
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs ${
+                                      mantenimiento.estado === "Pendiente"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-blue-100 text-blue-800"
+                                    }`}
+                                  >
+                                    {mantenimiento.estado}
+                                  </span>
+                                </TableCell>
+                              );
+                            }
 
-                          return <TableCell key={key}></TableCell>;
-                        })}
-                    </TableRow>
-                  ))
+                            if (column.id === "acciones") {
+                              return (
+                                <TableCell key={key}>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      toast.info(
+                                        `Ver detalles de ${
+                                          mantenimiento.equipos
+                                            ?.nombre_equipo || "equipo"
+                                        }`
+                                      )
+                                    }
+                                  >
+                                    Ver
+                                  </Button>
+                                </TableCell>
+                              );
+                            }
+
+                            if (column.accessor) {
+                              const value =
+                                mantenimiento[
+                                  column.accessor as keyof typeof mantenimiento
+                                ];
+
+                              let content: React.ReactNode;
+
+                              if (value === null || value === undefined) {
+                                content = "—";
+                              } else if (typeof value === "object") {
+                                if ("nombre" in value) {
+                                  content = (value as any).nombre;
+                                } else if (value instanceof Date) {
+                                  content = value.toLocaleDateString("es-CO");
+                                } else {
+                                  content = JSON.stringify(value);
+                                }
+                              } else if (
+                                column.accessor === "fecha_programada" &&
+                                typeof value === "string"
+                              ) {
+                                content = new Date(value).toLocaleDateString(
+                                  "es-CO"
+                                );
+                              } else {
+                                content = value;
+                              }
+
+                              return (
+                                <TableCell
+                                  key={key}
+                                  className={column.className}
+                                >
+                                  {content}
+                                </TableCell>
+                              );
+                            }
+
+                            return <TableCell key={key}></TableCell>;
+                          })}
+                      </TableRow>
+                    ))
                 )}
               </TableBody>
             </Table>
