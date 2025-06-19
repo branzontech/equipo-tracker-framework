@@ -13,7 +13,7 @@ import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { icons } from "@/components/interfaces/icons";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Check, Clock, AlertCircle, Pause, Play, Rocket } from "lucide-react";
+import { Check, Clock, AlertCircle, Pause, Play, Rocket, AlertTriangle } from "lucide-react";
 
 const listadoChequeo = [
   "Limpieza de hardware",
@@ -92,7 +92,17 @@ export const useMantenimiento = () => {
         if (esHoy && mantenimiento.estado === "Pendiente") {
           updateStatus(mantenimiento.id_mantenimiento, "iniciado");
         }
+
+        const yaPaso = fechaProgramada < hoy;
+        const noFinalizado =
+          mantenimiento.estado !== "Finalizado" &&
+          mantenimiento.estado !== "Completado";
+
+        if (yaPaso && noFinalizado) {
+          updateStatus(mantenimiento.id_mantenimiento, "Atrasado");
+        }
       });
+
       setMantenimientos(mantenimientos);
     };
     fetchMantenimientos();
@@ -483,6 +493,16 @@ export const useMantenimiento = () => {
           >
             <AlertCircle className="h-3 w-3" />
             Pendiente
+          </Badge>
+        );
+      case "Atrasado":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-red-500  text-white px-4 py-1 w-fit min-w-[120px] justify-center items-center flex gap-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            Atrasado
           </Badge>
         );
       default:
