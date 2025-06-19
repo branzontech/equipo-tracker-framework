@@ -24,6 +24,8 @@ import {
   DollarSign,
   Tag,
   Shield,
+  Clock,
+  Repeat,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,78 +46,6 @@ import {
 import { useEquipos } from "../hooks/use-equipos";
 import { getEquiposByNroSerie } from "@/api/axios/equipo.api";
 import { useGlobal } from "@/hooks/use-global";
-
-const historialEventos = [
-  {
-    id: 1,
-    tipo: "ingreso",
-    fecha: "2023-01-15",
-    descripcion: "Ingreso inicial del equipo",
-    responsable: "María González",
-    detalles: {
-      proveedor: "Dell Colombia",
-      factura: "FAC-001",
-      valor: 5000000,
-    },
-  },
-  {
-    id: 2,
-    tipo: "mantenimiento_preventivo",
-    fecha: "2023-04-15",
-    descripcion: "Mantenimiento preventivo trimestral",
-    responsable: "Carlos Rodríguez",
-    detalles: {
-      actividades: [
-        "Limpieza general",
-        "Actualización de software",
-        "Revisión de hardware",
-      ],
-      duracion: "2 horas",
-      resultado: "Satisfactorio",
-    },
-  },
-  {
-    id: 3,
-    tipo: "traslado",
-    fecha: "2023-06-01",
-    descripcion: "Traslado entre áreas",
-    responsable: "Ana Martínez",
-    detalles: {
-      origen: "Área TI",
-      destino: "Desarrollo",
-      motivo: "Reasignación de recursos",
-    },
-  },
-  {
-    id: 4,
-    tipo: "mantenimiento_correctivo",
-    fecha: "2023-08-15",
-    descripcion: "Reemplazo de batería",
-    responsable: "Pedro López",
-    detalles: {
-      problema: "Batería no retiene carga",
-      solucion: "Instalación de batería nueva",
-      repuestos: ["Batería original Dell"],
-      garantia: "1 año",
-    },
-  },
-  {
-    id: 5,
-    tipo: "mantenimiento_preventivo",
-    fecha: "2023-10-15",
-    descripcion: "Mantenimiento preventivo trimestral",
-    responsable: "Carlos Rodríguez",
-    detalles: {
-      actividades: [
-        "Limpieza general",
-        "Actualización de software",
-        "Revisión de hardware",
-      ],
-      duracion: "2 horas",
-      resultado: "Satisfactorio",
-    },
-  },
-];
 
 const estadisticasMantenimiento = [
   { name: "Preventivos", value: 8 },
@@ -143,18 +73,96 @@ const HojaDeVida = () => {
     getInfoEquipo(nroSeries);
   }, []);
 
+  const historialEventos = [];
+
+  // Ingreso (registro del equipo)
+  historialEventos.push({
+    id: `ingreso-${newEquipo.id_equipo}`,
+    tipo: "ingreso",
+    fecha: newEquipo.fecha_registro,
+    descripcion: "Registro inicial del equipo",
+    responsable: newEquipo.sucursales?.sedes?.usuarios?.[0]?.nombre || "-",
+    detalles: {
+      sucursal: newEquipo.sucursales?.nombre || "-",
+      estado: newEquipo.estado_actual,
+      tipo_activo: newEquipo.tipo_activo,
+    },
+  });
+
+  // Mantenimientos
+  newEquipo.trazabilidad.mantenimientos?.forEach((mant) => {
+    historialEventos.push({
+      id: `mant-${mant.id_mantenimiento}`,
+      tipo: `mantenimiento_${mant.tipo?.toLowerCase()}`,
+      fecha: mant.fecha_programada,
+      descripcion: `Mantenimiento ${mant.tipo}`,
+      responsable: mant.usuarios?.nombre || `Técnico ID ${mant.tecnico_id}`,
+      detalles: {
+        descripcion: mant.descripcion || "-",
+        duración: `${mant.tiempo_estimado} hora${
+          mant.tiempo_estimado === 1 ? "" : "s"
+        }`,
+        prioridad: mant.prioridad,
+      },
+    });
+  });
+
+  // Préstamos
+  newEquipo.trazabilidad.prestamo_equipos?.forEach((pe) => {
+    const prestamo = pe.prestamos;
+    if (prestamo) {
+      historialEventos.push({
+        id: `prestamo-${prestamo.id_prestamo}`,
+        tipo: "prestamo",
+        descripcion: "Préstamo Realizado",
+        fecha: prestamo.fecha_salida,
+        responsable:
+          prestamo.usuarios_prestamos_responsable_salida_idTousuarios?.nombre ||
+          `ID ${prestamo.responsable_salida_id}`,
+        detalles: {
+          estado: prestamo.estado || "-",
+          fecha_retorno: formatFecha(prestamo.fecha_retorno),
+          descripcion: prestamo.descripcion || "-",
+        },
+      });
+    }
+  });
+
+  // Traslados
+  newEquipo.trazabilidad.traslados_equipos?.forEach((te) => {
+    const traslado = te.traslados;
+    if (traslado) {
+      historialEventos.push({
+        id: `traslado-${traslado.id_traslado}`,
+        tipo: "traslado",
+        fecha: traslado.fecha_traslado,
+        descripcion: "Traslado Realizado",
+        responsable:
+          traslado.usuarios?.nombre || `ID ${traslado.responsable_salida_id}`,
+        detalles: {
+          destino: traslado.sucursales?.nombre || "-",
+          descripcion: traslado.motivo || "-",
+          sede: traslado.sucursales?.sedes || "-",
+        },
+      });
+    }
+  });
+
   const getIconoEvento = (tipo: string) => {
     switch (tipo) {
       case "ingreso":
         return <Clipboard className="h-6 w-6 text-green-500" />;
+      case "mantenimiento_predictivo":
+        return <Clock className="h-6 w-6 text-yellow-500" />;
       case "mantenimiento_preventivo":
-        return <Wrench className="h-6 w-6 text-blue-500" />;
       case "mantenimiento_correctivo":
-        return <AlertCircle className="h-6 w-6 text-red-500" />;
+        return <Wrench className="h-6 w-6 text-blue-500" />;
       case "traslado":
         return <Truck className="h-6 w-6 text-orange-500" />;
+      case "prestamo":
+        return <Repeat className="h-6 w-6 text-purple-500" />;
       default:
-        return <Info className="h-6 w-6" />;
+        return <Info className="h-6 w-6 text-muted-foreground" />;
     }
   };
 
@@ -172,9 +180,15 @@ const HojaDeVida = () => {
             Preventivo
           </Badge>
         );
+      case "mantenimiento_predictivo":
+        return (
+          <Badge variant="outline" className="bg-yellow-500 text-white">
+            Predictivo
+          </Badge>
+        );
       case "mantenimiento_correctivo":
         return (
-          <Badge variant="outline" className="bg-red-500 text-white">
+          <Badge variant="outline" className="bg-cyan-500 text-white">
             Correctivo
           </Badge>
         );
@@ -182,6 +196,12 @@ const HojaDeVida = () => {
         return (
           <Badge variant="outline" className="bg-orange-500 text-white">
             Traslado
+          </Badge>
+        );
+      case "prestamo":
+        return (
+          <Badge variant="outline" className="bg-purple-500 text-white">
+            Préstamo
           </Badge>
         );
       default:
@@ -438,10 +458,7 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Precio de Compra:
                         </span>{" "}
-                        $
-                        {formatPrecio(
-                          newEquipo.adquisicion?.precio_compra
-                        )}{" "}
+                        ${formatPrecio(newEquipo.adquisicion?.precio_compra)}{" "}
                         {/* .toLocaleString() */}
                       </p>
                       <p>
@@ -590,9 +607,7 @@ const HojaDeVida = () => {
                       <div className="flex items-center gap-2">
                         {getBadgeEvento(evento.tipo)}
                         <span className="text-sm text-muted-foreground">
-                          {format(new Date(evento.fecha), "PPP", {
-                            locale: es,
-                          })}
+                          {formatFecha(evento.fecha)}
                         </span>
                       </div>
                       <h4 className="font-semibold">{evento.descripcion}</h4>
@@ -602,16 +617,40 @@ const HojaDeVida = () => {
                       {evento.detalles && (
                         <div className="bg-muted p-3 rounded-md text-sm">
                           {Object.entries(evento.detalles).map(
-                            ([key, value]) => (
-                              <p key={key} className="capitalize">
-                                <span className="font-medium">
-                                  {key.replace(/_/g, " ")}:
-                                </span>{" "}
-                                {Array.isArray(value)
-                                  ? value.join(", ")
-                                  : value}
-                              </p>
-                            )
+                            ([key, value]) => {
+                              if (key === "prioridad") {
+                                return (
+                                  <p
+                                    key={key}
+                                    className="capitalize flex items-center gap-2"
+                                  >
+                                    <span className="font-medium">
+                                      {key.replace(/_/g, " ")}:
+                                    </span>
+                                    {value === "alta" ? (
+                                      <Badge className="bg-red-500 text-white">
+                                        {(value as string).toUpperCase()}
+                                      </Badge>
+                                    ) : (
+                                      <Badge className="bg-yellow-500 text-white">
+                                        {String(value).toUpperCase()}
+                                      </Badge>
+                                    )}
+                                  </p>
+                                );
+                              }
+
+                              return (
+                                <p key={key} className="capitalize">
+                                  <span className="font-medium">
+                                    {key.replace(/_/g, " ")}:
+                                  </span>{" "}
+                                  {Array.isArray(value)
+                                    ? value.join(", ")
+                                    : String(value)}
+                                </p>
+                              );
+                            }
                           )}
                         </div>
                       )}
