@@ -138,7 +138,13 @@ const EjecucionMantenimiento = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                mantenimientosFiltrados.map((mantenimiento) => (
+                [...mantenimientosFiltrados]
+                .sort(
+                  (a, b) =>
+                    new Date(b.fecha_programada).getTime() -
+                    new Date(a.fecha_programada).getTime()
+                )
+                .map((mantenimiento) => (
                   <TableRow key={mantenimiento.id_mantenimiento}>
                     <TableCell className="font-medium">
                       {mantenimiento.equipos?.nombre_equipo || "—"}
