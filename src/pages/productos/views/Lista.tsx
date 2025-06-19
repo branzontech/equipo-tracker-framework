@@ -12,6 +12,9 @@ import {
   Filter,
   X,
   Delete,
+  ArrowRightLeft,
+  Package,
+  Truck,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -87,20 +90,28 @@ const StatusBadge = ({ status }: { status: string }) => {
           <span>Fuera de servicio</span>
         </div>
       );
-    case "mantenimiento":
+    case "en mantenimiento":
       return (
-        <div className="flex items-center space-x-1 text-amber-700">
-          <Wrench className="h-4 w-4 text-amber-500" />
+        <div className="flex items-center space-x-1 text-red-700">
+          <Wrench className="h-4 w-4 text-red-500" />
           <span>Mantenimiento</span>
         </div>
       );
-    case "reparación":
+    case "en préstamo":
       return (
-        <div className="flex items-center space-x-1 text-red-700">
-          <ShieldAlert className="h-4 w-4 text-red-500" />
-          <span>Reparación</span>
+        <div className="flex items-center space-x-1 text-amber-700">
+          <ArrowRightLeft className="h-4 w-4 text-amber-500" />
+          <span>En prestamo</span>
         </div>
       );
+    case "en traslado":
+      return (
+        <div className="flex items-center space-x-1 text-blue-700">
+          <Truck className="h-4 w-4 text-blue-500" />
+          <span>En traslado</span>
+        </div>
+      );
+
     default:
       return (
         <div className="flex items-center space-x-1 text-slate-600">
