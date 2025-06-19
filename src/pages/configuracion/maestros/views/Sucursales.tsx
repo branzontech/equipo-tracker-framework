@@ -313,7 +313,10 @@ const Ubicaciones = () => {
                           <SelectContent>
                             <SelectItem value="todos">Todos</SelectItem>
                             {uniqueEstados.map((estado) => (
-                              <SelectItem key={String(estado)} value={String(estado)}>
+                              <SelectItem
+                                key={String(estado)}
+                                value={String(estado)}
+                              >
                                 {estado}
                               </SelectItem>
                             ))}
@@ -444,65 +447,67 @@ const Ubicaciones = () => {
               </TableHeader>
               <TableBody>
                 {filteredData.length > 0 ? (
-                  paginatedData.map((item) => (
-                    <TableRow
-                      key={item.id_sucursal}
-                      className="hover:bg-slate-50"
-                    >
-                      {sortedColumns.map(
-                        (column) =>
-                          column.isVisible && (
-                            <TableCell
-                              key={`${item.id_sucursal}-${column.id}`}
-                              className="py-3"
+                  [...paginatedData]
+                    .sort((a, b) => b.id_sucursal - a.id_sucursal)
+                    .map((item) => (
+                      <TableRow
+                        key={item.id_sucursal}
+                        className="hover:bg-slate-50"
+                      >
+                        {sortedColumns.map(
+                          (column) =>
+                            column.isVisible && (
+                              <TableCell
+                                key={`${item.id_sucursal}-${column.id}`}
+                                className="py-3"
+                              >
+                                {column.id === "estado" ? (
+                                  <StatusBadge
+                                    status={
+                                      item[
+                                        column.key as keyof typeof item
+                                      ] as string
+                                    }
+                                  />
+                                ) : typeof item[
+                                    column.key as keyof typeof item
+                                  ] === "object" &&
+                                  item[column.key as keyof typeof item] !==
+                                    null ? (
+                                  (item[column.key as keyof typeof item] as any)
+                                    .descripcion ?? ""
+                                ) : (
+                                  item[column.key as keyof typeof item]
+                                )}
+                              </TableCell>
+                            )
+                        )}
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="slate-100"
+                              onClick={() => {
+                                handleOpenEditModal(item.id_sucursal);
+                              }}
                             >
-                              {column.id === "estado" ? (
-                                <StatusBadge
-                                  status={
-                                    item[
-                                      column.key as keyof typeof item
-                                    ] as string
-                                  }
-                                />
-                              ) : typeof item[
-                                  column.key as keyof typeof item
-                                ] === "object" &&
-                                item[column.key as keyof typeof item] !==
-                                  null ? (
-                                (item[column.key as keyof typeof item] as any)
-                                  .descripcion ?? ""
-                              ) : (
-                                item[column.key as keyof typeof item]
-                              )}
-                            </TableCell>
-                          )
-                      )}
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="slate-100"
-                            onClick={() => {
-                              handleOpenEditModal(item.id_sucursal);
-                            }}
-                          >
-                            <PencilIcon className="h-5 w-5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="slate-100"
-                            onClick={() => {
-                              handleDelete(item.id_sucursal);
-                            }}
-                          >
-                            <XCircle className="h-5 w-5" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                              <PencilIcon className="h-5 w-5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="slate-100"
+                              onClick={() => {
+                                handleDelete(item.id_sucursal);
+                              }}
+                            >
+                              <XCircle className="h-5 w-5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
                 ) : (
                   <TableRow>
                     <TableCell
