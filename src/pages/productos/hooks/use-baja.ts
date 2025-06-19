@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Baja } from "../interfaces/bajas";
 import { createBaja, getAllBajas } from "@/api/axios/baja.api";
 import { toast } from "sonner";
-import { useGlobal } from "@/hooks/use-global";
 import { icons } from "@/components/interfaces/icons";
 import { useNavigate } from "react-router-dom";
+import { useGlobal } from "@/hooks/use-global";
 
 export const useBaja = () => {
   const [bajas, setbajas] = useState<Baja[]>([]);
