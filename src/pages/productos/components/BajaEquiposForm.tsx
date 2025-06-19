@@ -192,14 +192,6 @@ export function BajaEquiposForm() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-[#0B2559]">Baja de Equipos</h1>
-        {/* <Button
-          onClick={nuevaBajaEquipo}
-          className="bg-[#bff036] hover:bg-[#bff036]/90 text-[#01242c]"
-          variant="secondary"
-        >
-          <FileX className="mr-2 h-4 w-4" />
-          Nueva Baja
-        </Button> */}
       </div>
 
       <FormProvider {...methods}>
@@ -258,6 +250,7 @@ export function BajaEquiposForm() {
               <div className="space-y-2">
                 <Label htmlFor="estado">Estado</Label>
                 <Select
+                  disabled
                   value={newBaja.estado || ""}
                   onValueChange={(value) =>
                     setNewBaja({ ...newBaja, estado: value })
@@ -267,7 +260,7 @@ export function BajaEquiposForm() {
                     <SelectValue placeholder="Seleccione un estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pendiente">Pendiente</SelectItem>
+                    <SelectItem value="Vigente">Vigente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -277,14 +270,6 @@ export function BajaEquiposForm() {
               <h2 className="text-lg font-semibold text-[#0B2559] mb-5">
                 Equipos para dar de baja
               </h2>
-              {/* <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center"
-                    onClick={exportTemplate}
-                  >
-                    <Download className="mr-1 h-4 w-4" /> Plantilla
-                  </Button> */}
 
               <SearchEquipo
                 esBaja
