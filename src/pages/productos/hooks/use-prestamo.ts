@@ -16,7 +16,7 @@ export const usePrestamo = () => {
     responsable_entrada_id: 0,
     fecha_salida: null,
     fecha_retorno: null,
-    estado: "Pendiente",
+    estado: "Vigente",
     descripcion: "",
     equipos: [],
   });
@@ -37,7 +37,8 @@ export const usePrestamo = () => {
   const addPrestamo = async (
     prestamo: Prestamo,
     firma_entrega: string,
-    firma_salida: string
+    firma_salida: string,
+    nombreInput: string
   ) => {
     if (!prestamo.fecha_salida) {
       toast.error("Debe ingresar una fecha de salida", {
@@ -53,8 +54,8 @@ export const usePrestamo = () => {
       return;
     }
 
-    if (!prestamo.estado) {
-      toast.error("Debe ingresar un estado", {
+    if (!nombreInput) {
+      toast.error("Debe ingresar un nombre de usuario", {
         icon: icons.error,
       });
       return;
