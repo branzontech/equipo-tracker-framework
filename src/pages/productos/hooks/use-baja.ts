@@ -13,7 +13,7 @@ export const useBaja = () => {
     acta_id: 0,
     fecha_baja: "",
     observaciones_adicionales: "",
-    estado: "Pendiente",
+    estado: "Vigente",
     responsable_autorizacion_id: 0,
     responsable_solicitud_id: 0,
     equipos: [],
