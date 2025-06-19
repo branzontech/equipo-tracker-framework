@@ -52,12 +52,16 @@ const Salidas = () => {
   } = usePrestamo();
   const {
     newUser,
-    setNewUser,
     users,
     selectedEntregaUser,
     setSelectedEntregaUser,
     selectedRecibeUser,
     setSelectedRecibeUser,
+    handleNombreInput,
+    nombreInput,
+    sugerencias,
+    setSugerencias,
+    setNombreUser,
   } = useUser();
   const methods = useForm();
 
@@ -89,7 +93,7 @@ const Salidas = () => {
             const firmaFinalRecibe =
               newUser.firma_recibe || selectedRecibeUser?.firma || "";
 
-            addPrestamo(newPrestamo, firmaFinalEntrega, firmaFinalRecibe);
+            addPrestamo(newPrestamo, firmaFinalEntrega, firmaFinalRecibe, nombreInput);
           }}
         >
           <div className="grid grid-cols-2 gap-6">
@@ -174,59 +178,49 @@ const Salidas = () => {
               </Popover>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="nombreUsuario">Nombre del Usuario</Label>
-              <Select
-                value={newUser.nombre}
-                onValueChange={(value) => {
-                  const user = users.find((u) => u.nombre === value);
-                  if (user) {
-                    setNewUser({ ...newUser, nombre: value });
+            <div className="space-y-2 relative">
+              <Label>Usuario de recepción</Label>
+              <Input
+                type="text"
+                value={nombreInput}
+                placeholder="Ingrese el nombre o cédula"
+                onChange={(e) => handleNombreInput(e.target.value)}
+                autoComplete="off"
+              />
 
-                    // Simular selección
-                    setSelectedRecibeUser({
-                      ...user,
-                      firma: user.firma || "",
-                    });
-
-                    setNewPrestamo((prev) => ({
-                      ...prev,
-                      responsable_entrada_id: user.id_usuario,
-                    }));
-
-                    setResponsableRecibeInput({
-                      id: user.id_usuario.toString(),
-                      name: user.nombre,
-                      position: user.rol,
-                      department: user.sedes?.nombre || "Sin sede",
-                    });
-                  } else {
-                    setNewUser({ ...newUser, nombre: value });
-                    setSelectedRecibeUser(null);
-                    setNewPrestamo((prev) => ({
-                      ...prev,
-                      responsable_entrada_id: null,
-                    }));
-                    setResponsableRecibeInput(null);
-                  }
-                }}
-              >
-                <SelectTrigger id="nombreUsuario">
-                  <SelectValue placeholder="Seleccione un usuario" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users.map((user) => (
-                    <SelectItem key={user.id_usuario} value={user.nombre}>
-                      {user.nombre}
-                    </SelectItem>
+              {Array.isArray(sugerencias) && sugerencias.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border rounded-md shadow-md mt-1 max-h-60 overflow-y-auto text-sm">
+                  {sugerencias.map((usuario) => (
+                    <li
+                      key={usuario.id_usuario}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setNombreUser(usuario.nombre);
+                        setSelectedRecibeUser(usuario);
+                        setResponsableRecibeInput({
+                          id: usuario.id_usuario.toString(),
+                          name: usuario.nombre,
+                          position: usuario.rol,
+                          department: usuario.sedes?.nombre || "Sin sede",
+                        });
+                        setNewPrestamo((prev) => ({
+                          ...prev,
+                          responsable_entrada_id: usuario.id_usuario,
+                        }));
+                        setSugerencias([]);
+                      }}
+                    >
+                      {usuario.nombre}
+                    </li>
                   ))}
-                </SelectContent>
-              </Select>
+                </ul>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
               <Select
+                disabled
                 value={newPrestamo.estado || ""}
                 onValueChange={(value) =>
                   setNewPrestamo({ ...newPrestamo, estado: value })
@@ -236,7 +230,7 @@ const Salidas = () => {
                   <SelectValue placeholder="Seleccione un estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Pendiente">Pendiente</SelectItem>
+                  <SelectItem value="Vigente">Vigente</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -244,7 +238,7 @@ const Salidas = () => {
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="mb-4 text-gray-700">
-              Señor(a) <span className="font-semibold">{newUser.nombre}</span> a
+              Señor(a) <span className="font-semibold">{nombreInput}</span> a
               continuación se le hace entrega de los siguientes implementos de
               trabajo:
             </p>
@@ -336,7 +330,7 @@ const Salidas = () => {
                   setResponsableRecibeInput({
                     id: user.id_usuario.toString(),
                     label: user.nombre,
-                  }); // 👈 importante
+                  });
                 } else {
                   setSelectedRecibeUser(null);
                   setResponsableRecibeInput(null);
