@@ -39,7 +39,6 @@ import { useEffect, useState } from "react";
 import { AccesoriosContainer } from "@/components/AccesorioItem";
 import { toast } from "sonner";
 import { Equipo } from "../interfaces/equipo";
-import { useGlobal } from "@/hooks/use-global";
 import { SearchEquipo } from "@/components/SearchEquipo";
 
 const Salidas = () => {
