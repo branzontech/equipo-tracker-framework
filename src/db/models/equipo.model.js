@@ -285,4 +285,51 @@ export const equipoModel = {
       throw new Error(error.message);
     }
   },
+  async getTrazabilidadByEquipoId(id_equipo) {
+    const equipoId = Number(id_equipo);
+    return await prisma.equipos.findUnique({
+      where: { id_equipo: equipoId },
+      include: {
+        prestamo_equipos: {
+          include: {
+            prestamos: {
+              include: {
+                actas: true,
+                usuarios_prestamos_responsable_salida_idTousuarios: {
+                  select: { nombre: true },
+                },
+              },
+            },
+          },
+        },
+        traslados_equipos: {
+          include: {
+            traslados: {
+              include: {
+                actas: true,
+                sucursales: {
+                  include: {
+                    sedes: {
+                      include: {
+                        usuarios: {
+                          select: { nombre: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        mantenimientos: {
+          include: {
+            usuarios: {
+              select: { nombre: true },
+            },
+          },
+        },
+      },
+    });
+  },
 };
