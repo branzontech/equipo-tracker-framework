@@ -94,11 +94,62 @@ export interface Acta {
     }[];
   }[];
 
-  acta_equipos: {
-    id: number;
-    equipos: {
-      id_equipo: number;
+  devoluciones: {
+    id_devolucion: number;
+    fecha_devolucion: Date | null;
+    motivo: string | null;
+    estado_equipo: string | null;
+    observaciones: string | null;
+    estado: string | null;
+
+    usuarios_devoluciones_usuario_entrega_idTousuarios: {
+      id_usuario: number;
       nombre: string;
+      firma: string;
+    } | null;
+    usuarios_devoluciones_usuario_recibe_idTousuarios: {
+      id_usuario: number;
+      nombre: string;
+      firma: string;
+    } | null;
+
+    prestamos: {
+      id_prestamo: number;
+      prestamo_equipos: {
+        id: number;
+        equipos: Equipo | null;
+        prestamo_perifericos: {
+          id: number;
+          perifericos: {
+            id_periferico: number;
+            nombre: string;
+          } | null;
+        }[];
+      }[];
+    } | null;
+
+    traslados: {
+      id_traslado: number;
+      traslados_equipos: {
+        id: number;
+        equipos: Equipo | null;
+        traslados_perifericos: {
+          id: number;
+          perifericos: {
+            id_periferico: number;
+            nombre: string;
+          } | null;
+        }[];
+      }[];
+      sucursales: {
+        id_sucursal: number;
+        nombre: string;
+        sedes: {
+          id_sede: number;
+          nombre: string;
+          regional: string | null;
+        } | null;
+      } | null;
     } | null;
   }[];
 }
