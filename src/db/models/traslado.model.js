@@ -17,7 +17,6 @@ export const trasladoModel = {
     return traslados;
   },
   create: async (traslado) => {
-
     try {
       // 1. Crear el acta
       const nuevaActa = await prisma.actas.create({
@@ -41,19 +40,32 @@ export const trasladoModel = {
           usuarios_traslados_responsable_salida_idTousuarios: {
             connect: { id_usuario: traslado.responsable_salida_id },
           },
-          sucursales: { connect: { id_sucursal: traslado.sucursal_destino_id } },
+          sucursales: {
+            connect: { id_sucursal: traslado.sucursal_destino_id },
+          },
         },
       });
 
       // Iterar por equipos del traslado
       for (const equipo of traslado.equipos) {
-
         // Crear relación en Traslado_Equipos
         const trasladoEquipo = await prisma.traslados_equipos.create({
           data: {
             traslado_id: trasladoCreated.id_traslado,
             equipo_id: equipo.id_equipo,
           },
+        });
+
+        await prisma.equipos.update({
+          where: { id_equipo: equipo.id_equipo },
+          data: {
+            estado_actual: "En Traslado",
+          },
+        });
+
+        await prisma.perifericos.updateMany({
+          where: { equipo_asociado_id: equipo.id_equipo },
+          data: { estado: "En Traslado" },
         });
 
         // Insertar perifericos relacionados (si hay)
