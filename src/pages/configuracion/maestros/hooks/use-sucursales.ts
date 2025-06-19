@@ -41,7 +41,7 @@ export const useSucursales = () => {
           ...sucu,
           numeroiD: `SUCUR${sucu.id_sucursal.toString().padStart(3, "0")}`,
           sede: sucu.sedes?.nombre || "Sin Sede",
-          estado: sucu.estado ? "Activa" : "Inactiva",
+          estado: sucu.estado,
         }));
         setSucursales(Sucursales);
       } catch (error) {
