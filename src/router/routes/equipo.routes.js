@@ -1,5 +1,5 @@
 import express from "express";
-import { create, findAll, findAllById, delete_, update } from "../../pages/productos/controller/equipo.controller.js";
+import { create, findAll, findAllById, delete_, update, getTrazabilidadByEquipoId } from "../../pages/productos/controller/equipo.controller.js";
 
 const router = express.Router();
 
@@ -8,6 +8,7 @@ router
     .post("/update", update)
     .get("/get", findAll)
     .get("/:nro_serie", findAllById)
-    .delete("/:id", delete_);
+    .delete("/:id", delete_)
+    .get("/trazabilidad/:id_equipo", getTrazabilidadByEquipoId);
 
 export default router;
