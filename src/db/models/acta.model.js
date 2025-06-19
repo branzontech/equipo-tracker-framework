@@ -235,7 +235,7 @@ export const ActaModel = {
 
     const equipoId = equipo.id_equipo;
 
-    const [prestamoActivo, trasladoActivo, bajaAsociada] = await Promise.all([
+    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] = await Promise.all([
       prisma.prestamo_equipos.findFirst({
         where: { equipo_id: equipoId },
         include: {
@@ -270,17 +270,27 @@ export const ActaModel = {
           },
         },
       }),
+      prisma.mantenimientos.findFirst({
+        where: {
+          equipo_id: equipoId,
+          estado: {
+            not: "Finalizado",
+          },
+        },
+      }),
     ]);
 
     const enPrestamo = !!prestamoActivo?.prestamos;
     const enTraslado = !!trasladoActivo?.traslados;
     const enBaja = !!bajaAsociada;
+    const enMantenimiento = !!mantenimientos;
 
     return {
-      disponible: !(enPrestamo || enTraslado || enBaja),
+      disponible: !(enPrestamo || enTraslado || enBaja || enMantenimiento),
       enPrestamo,
       enTraslado,
       enBaja,
+      enMantenimiento,
     };
   },
   updateStatus: async (id, newStatus, tipo, acta_equipos) => {
