@@ -2,6 +2,8 @@ import { Categoria } from "@/pages/configuracion/maestros/interfaces/categorias"
 import { Marca } from "@/pages/configuracion/maestros/interfaces/marcas";
 import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { Sucursal } from "@/pages/configuracion/maestros/interfaces/sucursales";
+import { Prestamo } from "./prestamo";
+import { Traslado } from "./traslados";
 
 export interface Equipo {
   sedes: string;
@@ -21,6 +23,14 @@ export interface Equipo {
   estado_actual: string;
   observaciones?: string;
   motivo: string;
+
+  // PRESTAMO O TRASLADOS
+  prestamo_equipos?: {
+    prestamos: Prestamo;
+  }[];
+  traslado_equipos?: {
+    traslados: Traslado;
+  }[];
 
   // Información Técnica
   especificaciones?: {
