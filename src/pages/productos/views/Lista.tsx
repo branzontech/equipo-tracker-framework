@@ -51,6 +51,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -141,6 +142,7 @@ const ListaInventario = () => {
     filters,
     handleFilterChange,
     resetFilters,
+    aplicarFiltros,
     toggleColumnVisibility,
     uniqueCategorias,
     deleteEquipoById,
@@ -228,10 +230,20 @@ const ListaInventario = () => {
                             <SelectItem value="todas">Todas</SelectItem>
                             {uniqueMarcas.map((marcas, index) => (
                               <SelectItem
-                                key={`${marcas}-${index}`}
-                                value={marcas}
+                                key={`${
+                                  typeof marcas === "object" && marcas !== null
+                                    ? marcas.id_marca
+                                    : marcas
+                                }-${index}`}
+                                value={
+                                  typeof marcas === "object" && marcas !== null
+                                    ? String(marcas.id_marca)
+                                    : String(marcas)
+                                }
                               >
-                                {marcas}
+                                {typeof marcas === "object" && marcas !== null
+                                  ? marcas.nombre
+                                  : String(marcas)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -255,10 +267,23 @@ const ListaInventario = () => {
                             <SelectItem value="todas">Todas</SelectItem>
                             {uniqueCategorias.map((categorias, index) => (
                               <SelectItem
-                                key={`${categorias}-${index}`}
-                                value={categorias}
+                                key={`${
+                                  typeof categorias === "object" &&
+                                  categorias !== null
+                                    ? categorias.id_categoria
+                                    : categorias
+                                }-${index}`}
+                                value={
+                                  typeof categorias === "object" &&
+                                  categorias !== null
+                                    ? String(categorias.id_categoria)
+                                    : String(categorias)
+                                }
                               >
-                                {categorias}
+                                {typeof categorias === "object" &&
+                                categorias !== null
+                                  ? categorias.nombre
+                                  : String(categorias)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -305,27 +330,30 @@ const ListaInventario = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="todas">Todas</SelectItem>
-                            {uniqueSucursales.map((sucursal) => (
-                              <SelectItem key={sucursal} value={sucursal}>
-                                {sucursal}
+                            {uniqueSucursales.map((sucursal, index) => (
+                              <SelectItem
+                                key={`${
+                                  typeof sucursal === "object" &&
+                                  sucursal !== null
+                                    ? sucursal.id_sucursal
+                                    : sucursal
+                                }-${index}`}
+                                value={
+                                  typeof sucursal === "object" &&
+                                  sucursal !== null
+                                    ? String(sucursal.id_sucursal)
+                                    : String(sucursal)
+                                }
+                              >
+                                {typeof sucursal === "object" &&
+                                sucursal !== null
+                                  ? sucursal.nombre
+                                  : String(sucursal)}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
-
-                      {/* <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          Responsable
-                        </label>
-                        <Input
-                          placeholder="Buscar por responsable"
-                          value={filters.responsable}
-                          onChange={(e) =>
-                            handleFilterChange("responsable", e.target.value)
-                          }
-                        />
-                      </div> */}
                     </div>
 
                     <div className="pt-4 border-t flex justify-end">
@@ -336,7 +364,18 @@ const ListaInventario = () => {
                       >
                         Limpiar filtros
                       </Button>
-                      <Button>Aplicar filtros</Button>
+                      <Button
+                        variant="outline"
+                        onClick={aplicarFiltros}
+                        className="mr-2"
+                      >
+                        Aplicar filtros
+                      </Button>
+
+                      {/* Botón oculto con SheetClose */}
+                      <SheetClose asChild>
+                        <button id="close-sheet-btn" className="hidden" />
+                      </SheetClose>
                     </div>
                   </div>
                 </SheetContent>
@@ -521,7 +560,9 @@ const ListaInventario = () => {
                               variant="ghost"
                               size="icon"
                               className="hover:bg-slate-100"
-                              onClick={() => navigate(`/productos/edit/${item.nro_serie}`)}
+                              onClick={() =>
+                                navigate(`/productos/edit/${item.nro_serie}`)
+                              }
                             >
                               <Pencil className="h-4 w-4 text-[#01242c]" />
                             </Button>
