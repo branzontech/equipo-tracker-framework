@@ -6,6 +6,7 @@ import Actas from "@/pages/productos/views/Actas";
 import BajaEquipos from "@/pages/productos/views/BajaEquipos";
 import Devoluciones from "@/pages/productos/views/Devoluciones";
 import HojaDeVida from "@/pages/productos/views/HojaDeVida";
+import EditEquipo from "@/pages/productos/views/EditEquipo";
 
 export const productosNavigation = [
   { path: "/productos/ingreso", element: <IngresoProducto /> },
@@ -16,4 +17,5 @@ export const productosNavigation = [
   { path: "/productos/devoluciones", element: <Devoluciones /> },
   { path: "/baja-equipos", element: <BajaEquipos /> },
   { path: "/hojas-vida/:nroSeries", element: <HojaDeVida /> },
+  { path: "/productos/edit/:nroSeries", element: <EditEquipo /> },
 ];
