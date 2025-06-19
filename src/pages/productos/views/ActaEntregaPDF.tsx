@@ -2,6 +2,7 @@ import { Document, Page, Text } from "@react-pdf/renderer";
 import { ActaPrestamo } from "./ActaPrestamo";
 import { ActaTraslado } from "./ActaTraslado";
 import { ActaBaja } from "./ActaBaja";
+import { ActaDevolucion } from "./ActaDevolucion";
 
 export const ActaEntregaPDF = ({ data }) => {
   if (!data?.tipo) {
@@ -33,6 +34,14 @@ export const ActaEntregaPDF = ({ data }) => {
     return (
       <Document>
         <ActaBaja data={data} />
+      </Document>
+    );
+  }
+
+  if (data.tipo === "Devolucion") {
+    return (
+      <Document>
+        <ActaDevolucion data={data} />
       </Document>
     );
   }
