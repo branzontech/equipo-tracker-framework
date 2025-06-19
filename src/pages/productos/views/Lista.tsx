@@ -12,9 +12,6 @@ import {
   Filter,
   X,
   Delete,
-  ArrowRightLeft,
-  Package,
-  Truck,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -62,65 +59,7 @@ import {
 } from "@/components/ui/sheet";
 import { useEquipos } from "../hooks/use-equipos";
 import Perifericos from "@/pages/configuracion/maestros/views/Perifericos";
-
-import { CheckCircle, FileX, Wrench, ShieldAlert } from "lucide-react";
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const normalized = status.toLowerCase();
-
-  switch (normalized) {
-    case "activo":
-      return (
-        <div className="flex items-center space-x-1 text-green-700">
-          <CheckCircle className="h-4 w-4 text-green-500" />
-          <span>Activo</span>
-        </div>
-      );
-    case "inactivo":
-      return (
-        <div className="flex items-center space-x-1 text-gray-500">
-          <FileX className="h-4 w-4 text-gray-400" />
-          <span>Inactivo</span>
-        </div>
-      );
-    case "fuera de servicio":
-      return (
-        <div className="flex items-center space-x-1 text-orange-700">
-          <FileX className="mr-2 h-4 w-4 text-orange-500" />
-          <span>Fuera de servicio</span>
-        </div>
-      );
-    case "en mantenimiento":
-      return (
-        <div className="flex items-center space-x-1 text-red-700">
-          <Wrench className="h-4 w-4 text-red-500" />
-          <span>Mantenimiento</span>
-        </div>
-      );
-    case "en préstamo":
-      return (
-        <div className="flex items-center space-x-1 text-amber-700">
-          <ArrowRightLeft className="h-4 w-4 text-amber-500" />
-          <span>En prestamo</span>
-        </div>
-      );
-    case "en traslado":
-      return (
-        <div className="flex items-center space-x-1 text-blue-700">
-          <Truck className="h-4 w-4 text-blue-500" />
-          <span>En traslado</span>
-        </div>
-      );
-
-    default:
-      return (
-        <div className="flex items-center space-x-1 text-slate-600">
-          <FileX className="h-4 w-4 text-slate-400" />
-          <span>{status}</span>
-        </div>
-      );
-  }
-};
+import { useGlobal } from "@/hooks/use-global";
 
 const ListaInventario = () => {
   const {
@@ -158,6 +97,7 @@ const ListaInventario = () => {
     uniqueCategorias,
     deleteEquipoById,
   } = useEquipos();
+  const { StatusBadge } = useGlobal();
 
   return (
     <div className="p-8">
