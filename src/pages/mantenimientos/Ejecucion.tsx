@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/table";
 import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
 import { useSucursales } from "../configuracion/maestros/hooks/use-sucursales";
-import { useGlobal } from "@/hooks/use-global";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
+import { useGlobal } from "@/hooks/use-global";
 
 const EjecucionMantenimiento = () => {
   const navigate = useNavigate();
