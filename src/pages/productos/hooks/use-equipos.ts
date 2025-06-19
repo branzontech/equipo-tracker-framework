@@ -11,13 +11,13 @@ import {
   deleteEquipo,
   getEquipos,
   getEquiposByNroSerie,
+  getTrazabilidadByEquipoId,
   updateEquipo,
 } from "@/api/axios/equipo.api";
 import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { da } from "date-fns/locale";
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
@@ -94,6 +94,11 @@ export const useEquipos = () => {
       tipo: "",
       equipo_asociado_id: 0,
       equipos: null,
+    },
+    trazabilidad: {
+      prestamo_equipos: [],
+      traslados_equipos: [],
+      mantenimientos: [],
     },
   });
   const navigate = useNavigate();
@@ -706,6 +711,7 @@ export const useEquipos = () => {
   const getInfoEquipo = async (nroSeries: string) => {
     setIsLoading(true);
     const response = await getEquiposByNroSerie(nroSeries);
+    const trazabilidad = await getTrazabilidadByEquipoId(response.id_equipo);
     const seguridadRaw = response.seguridad?.[0] || {};
 
     const especificacionesProcesadas = response.especificaciones?.[0] || {
@@ -756,6 +762,7 @@ export const useEquipos = () => {
       seguridad: seguridadProcesada,
       adquisicion: adquisicionProcesada,
       administrativa: administrativaProcesada,
+      trazabilidad,
     });
     setIsLoading(false);
     return response;
