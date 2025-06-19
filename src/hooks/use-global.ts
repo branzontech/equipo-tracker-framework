@@ -45,7 +45,6 @@ export const useGlobal = () => {
 
   const formatPrecio = (valor?: number | string) => {
     if (!valor) return "No disponible";
-    // Convertir a número, por si viene como string
     const numero = typeof valor === "string" ? Number(valor) : valor;
     if (isNaN(numero)) return "No disponible";
     return numero.toLocaleString("es-ES", {
