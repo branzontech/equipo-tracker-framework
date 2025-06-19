@@ -27,9 +27,9 @@ import {
 } from "lucide-react";
 import { listTypes } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { usePeriferico } from "../hooks/use-perifierico";
-import { EstadoType } from "../interfaces/sedes";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 import UpdatePeriferico from "./UpdatePeriferico";
+import { useGlobal } from "@/hooks/use-global";
 
 const Perifericos = () => {
   const {
@@ -43,7 +43,7 @@ const Perifericos = () => {
     selectedPerifericoId,
     handleOpenEditModal,
   } = usePeriferico();
-
+  const { StatusBadge } = useGlobal();
   const { equipo } = useEquipos();
 
   const equiposDisponible = equipo.filter(
@@ -132,14 +132,8 @@ const Perifericos = () => {
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
               <Select
-                value={
-                  newPeriferico.estado === "Activo"
-                    ? "Activo"
-                    : newPeriferico.estado === "Inactivo"
-                    ? "Inactivo"
-                    : ""
-                }
-                onValueChange={(value: EstadoType) =>
+                value={newPeriferico.estado || ""}
+                onValueChange={(value) =>
                   setNewPeriferico({ ...newPeriferico, estado: value })
                 }
               >
@@ -197,31 +191,7 @@ const Perifericos = () => {
                     </TableCell>
                     <TableCell>
                       <span className="flex items-center">
-                        {periferico.estado === "Activo" ? (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                            <span className="text-green-700">Activo</span>
-                          </>
-                        ) : periferico.estado === "Fuera de servicio" ? (
-                          <>
-                            <FileX className="mr-2 h-4 w-4 text-gray-700" />
-                            <span className="text-gray-700">
-                              Fuera de servicio
-                            </span>
-                          </>
-                        ) : periferico.estado === "En Préstamo" ? (
-                          <>
-                            <ArrowRightLeft className="mr-2 h-4 w-4 text-amber-500" />
-                            <span className="text-amber-700">En Préstamo</span>
-                          </>
-                        ) : periferico.estado === "Inactivo" ? (
-                          <>
-                            <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                            <span className="text-red-700">Inactivo</span>
-                          </>
-                        ) : (
-                          <span>{periferico.estado}</span>
-                        )}
+                        <StatusBadge status={periferico.estado} />
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
