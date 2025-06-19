@@ -5,6 +5,10 @@ class UserService {
     const users = await UserModel.findAll();
     return users;
   }
+  async findByName(name) {
+    const user = await UserModel.findByName(name);
+    return user;
+  }
 }
 
 export default new UserService();
