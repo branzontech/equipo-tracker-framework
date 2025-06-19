@@ -204,7 +204,9 @@ const Sedes = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sedes.map((sede) => (
+                {[...sedes]
+                .sort((a, b) => b.id_sede - a.id_sede)
+                .map((sede) => (
                   <TableRow key={sede.id_sede}>
                     <TableCell>{sede.nombre}</TableCell>
                     <TableCell>{sede.regional}</TableCell>
