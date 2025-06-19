@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getUsers } from "@/api/axios/user.api";
-import { Firma, Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
+import { getUserByName, getUsers } from "@/api/axios/user.api";
+import {
+  Firma,
+  Usuario,
+} from "@/pages/configuracion/usuarios/interfaces/usuarios";
 import { useEffect, useState } from "react";
 
 export const useUser = () => {
@@ -19,11 +22,14 @@ export const useUser = () => {
     firma: "",
   });
   const [count, setCount] = useState(0);
-  const [selectedEntregaUser, setSelectedEntregaUser] =
-    useState<Firma | null>(null);
+  const [selectedEntregaUser, setSelectedEntregaUser] = useState<Firma | null>(
+    null
+  );
   const [selectedRecibeUser, setSelectedRecibeUser] = useState<Firma | null>(
     null
   );
+  const [nombreInput, setNombreUser] = useState("");
+  const [sugerencias, setSugerencias] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -38,7 +44,27 @@ export const useUser = () => {
     fetchUsers();
   }, []);
 
+  const handleNombreInput = async (name: string) => {
+    setNombreUser(name);
+
+    if (name.length >= 3) {
+      try {
+        const res = await getUserByName(name);
+        setSugerencias(res);
+      } catch (err) {
+        console.error("Error buscando usuarios:", err);
+      }
+    } else {
+      setSugerencias([]);
+    }
+  };
+
   return {
+    setNombreUser,
+    handleNombreInput,
+    nombreInput,
+    sugerencias,
+    setSugerencias,
     users,
     count,
     setUsers,
