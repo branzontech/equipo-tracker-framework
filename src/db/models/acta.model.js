@@ -76,6 +76,58 @@ export const ActaModel = {
             },
           },
         },
+        devoluciones: {
+          include: {
+            actas: true,
+            prestamos: {
+              include: {
+                prestamo_equipos: {
+                  include: {
+                    equipos: {
+                      include: {
+                        marcas: true,
+                      },
+                    },
+                    prestamo_perifericos: {
+                      include: {
+                        perifericos: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            traslados: {
+              include: {
+                traslados_equipos: {
+                  include: {
+                    equipos: {
+                      include: {
+                        marcas: true,
+                      },
+                    },
+                    traslados_perifericos: {
+                      include: {
+                        perifericos: true,
+                      },
+                    },
+                  },
+                },
+                sucursales: {
+                  include: {
+                    sedes: true,
+                  },
+                },
+              },
+            },
+            usuarios_devoluciones_usuario_entrega_idTousuarios: {
+              select: { nombre: true, firma: true },
+            },
+            usuarios_devoluciones_usuario_recibe_idTousuarios: {
+              select: { nombre: true, firma: true },
+            },
+          },
+        },
       },
     });
 
@@ -140,11 +192,32 @@ export const ActaModel = {
         };
       });
 
+      // --- Devoluciones
+      const devoluciones = Object.values(acta.devoluciones || {}).map(
+        (devolucion) => {
+          const entrega =
+            devolucion.usuarios_devoluciones_usuario_entrega_idTousuarios;
+          const recibe =
+            devolucion.usuarios_devoluciones_usuario_recibe_idTousuarios;
+
+          return {
+            ...devolucion,
+            usuarios_devoluciones_usuario_entrega_idTousuarios: entrega
+              ? { ...entrega, firma: toBase64(entrega.firma) }
+              : null,
+            usuarios_devoluciones_usuario_recibe_idTousuarios: recibe
+              ? { ...recibe, firma: toBase64(recibe.firma) }
+              : null,
+          };
+        }
+      );
+
       return {
         ...acta,
         prestamos,
         traslados,
         bajas,
+        devoluciones,
       };
     });
 
