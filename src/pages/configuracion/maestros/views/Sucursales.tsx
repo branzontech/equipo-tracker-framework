@@ -49,32 +49,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useSucursales } from "../hooks/use-sucursales";
-import { EstadoType } from "../interfaces/sedes";
 import UpdateSucursal from "./UpdateSucursal";
-
-const StatusBadge = ({ status }: { status: string }) => {
-  let variant: "default" | "secondary" | "destructive" | "outline" = "default";
-  let className = "";
-
-  switch (status.toLowerCase()) {
-    case "activa":
-      variant = "default";
-      className = "bg-[#bff036] text-[#01242c] hover:bg-[#a5d81c]";
-      break;
-    case "inactivoa":
-      variant = "outline";
-      className = "bg-gray-100 text-gray-500 border-gray-200";
-      break;
-    default:
-      variant = "outline";
-  }
-
-  return (
-    <Badge variant={variant} className={className}>
-      {status}
-    </Badge>
-  );
-};
+import { useGlobal } from "@/hooks/use-global";
 
 const Ubicaciones = () => {
   const { sedes } = useSedes();
@@ -112,6 +88,7 @@ const Ubicaciones = () => {
     selectedSucursal,
     handleOpenEditModal,
   } = useSucursales();
+  const { StatusBadge } = useGlobal();
 
   return (
     <div className="container mx-auto p-6">
@@ -184,17 +161,11 @@ const Ubicaciones = () => {
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
               <Select
-                value={
-                  newSucursal.estado === true
-                    ? "Activo"
-                    : newSucursal.estado === false
-                    ? "Inactivo"
-                    : ""
-                }
-                onValueChange={(value: EstadoType) => {
+                value={newSucursal.estado || ""}
+                onValueChange={(value) => {
                   setNewSucursal({
                     ...newSucursal,
-                    estado: value === "Activo",
+                    estado: value,
                   });
                 }}
               >
