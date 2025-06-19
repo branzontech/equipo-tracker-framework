@@ -4,10 +4,10 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Plus, Search, Trash2 } from "lucide-react";
 import { AccesoriosContainer } from "./AccesorioItem";
-import { useGlobal } from "@/hooks/use-global";
 import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
+import { useGlobal } from "@/hooks/use-global";
 
 interface SearchEquipoProps {
   onEquipoEncontrado?: (equipo: Equipo) => void;
