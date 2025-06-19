@@ -147,73 +147,79 @@ const Actas = () => {
 
   const GridView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {currentActas.map((acta) => {
-        const { usuario, descripcion } = getActaData(acta);
+      {[...currentActas]
+        .sort(
+          (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+        )
+        .map((acta) => {
+          const { usuario, descripcion } = getActaData(acta);
 
-        return (
-          <Card
-            key={acta.id_acta}
-            className="hover:shadow-lg transition-shadow"
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {getTipoIcon(acta.tipo)}
-                {acta.tipo}
-              </CardTitle>
-              <CardDescription className="flex items-center gap-2">
-                <Calendar className="h-3 w-3" />
-                {formatFecha(
-                  typeof acta.fecha === "string"
-                    ? acta.fecha
-                    : acta.fecha.toISOString()
-                )}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span>{usuario}</span>
+          return (
+            <Card
+              key={acta.id_acta}
+              className="hover:shadow-lg transition-shadow"
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {getTipoIcon(acta.tipo)}
+                  {acta.tipo}
+                </CardTitle>
+                <CardDescription className="flex items-center gap-2">
+                  <Calendar className="h-3 w-3" />
+                  {formatFecha(
+                    typeof acta.fecha === "string"
+                      ? acta.fecha
+                      : acta.fecha.toISOString()
+                  )}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-gray-500" />
+                    <span>{usuario}</span>
+                  </div>
+                  <div>
+                    <Badge
+                      className={`capitalize ${getEstadoBadge(
+                        getEstadoFromActa(acta)
+                      )}`}
+                    >
+                      {getEstadoLabel(getEstadoFromActa(acta))}
+                    </Badge>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-xs uppercase tracking-wider text-gray-500">
+                      Tipo:
+                    </span>{" "}
+                    <span className="capitalize">
+                      {getTipoLabel(acta.tipo)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {descripcion}
+                  </p>
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleVerActa(acta)}
+                    >
+                      Ver Acta
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="flex-1"
+                      onClick={() => handleManageActa(acta)}
+                    >
+                      Gestionar
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <Badge
-                    className={`capitalize ${getEstadoBadge(
-                      getEstadoFromActa(acta)
-                    )}`}
-                  >
-                    {getEstadoLabel(getEstadoFromActa(acta))}
-                  </Badge>
-                </div>
-                <div>
-                  <span className="font-semibold text-xs uppercase tracking-wider text-gray-500">
-                    Tipo:
-                  </span>{" "}
-                  <span className="capitalize">{getTipoLabel(acta.tipo)}</span>
-                </div>
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {descripcion}
-                </p>
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => handleVerActa(acta)}
-                  >
-                    Ver Acta
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    className="flex-1"
-                    onClick={() => handleManageActa(acta)}
-                  >
-                    Gestionar
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+              </CardContent>
+            </Card>
+          );
+        })}
     </div>
   );
 
@@ -232,64 +238,71 @@ const Actas = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentActas.map((acta) => {
-            const { usuario, descripcion } = getActaData(acta);
+          {[...currentActas]
+            .sort(
+              (a, b) =>
+                new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+            )
+            .map((acta) => {
+              const { usuario, descripcion } = getActaData(acta);
 
-            const estado = getEstadoFromActa(acta);
+              const estado = getEstadoFromActa(acta);
 
-            return (
-              <TableRow key={acta.id_acta}>
-                <TableCell className="font-medium">{`ACT${acta.id_acta
-                  .toString()
-                  .padStart(3, "0")}`}</TableCell>
-                <TableCell>
-                  {formatFecha(
-                    typeof acta.fecha === "string"
-                      ? acta.fecha
-                      : acta.fecha.toISOString()
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {getTipoIcon(acta.tipo)}
-                    <span className="capitalize">
-                      {getTipoLabel(acta.tipo)}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>{usuario}</TableCell>
-                <TableCell>
-                  {(() => {
-                    const estado = getEstadoFromActa(acta);
-                    return (
-                      <Badge className={`capitalize ${getEstadoBadge(estado)}`}>
-                        {getEstadoLabel(estado)}
-                      </Badge>
-                    );
-                  })()}
-                </TableCell>
-                <TableCell className="max-w-xs truncate">
-                  {descripcion === "" ? "Sin descripción" : descripcion}
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleVerActa(acta)}
-                  >
-                    Ver
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleManageActa(acta)}
-                  >
-                    Gestionar
-                  </Button>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+              return (
+                <TableRow key={acta.id_acta}>
+                  <TableCell className="font-medium">{`ACT${acta.id_acta
+                    .toString()
+                    .padStart(3, "0")}`}</TableCell>
+                  <TableCell>
+                    {formatFecha(
+                      typeof acta.fecha === "string"
+                        ? acta.fecha
+                        : acta.fecha.toISOString()
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {getTipoIcon(acta.tipo)}
+                      <span className="capitalize">
+                        {getTipoLabel(acta.tipo)}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{usuario}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const estado = getEstadoFromActa(acta);
+                      return (
+                        <Badge
+                          className={`capitalize ${getEstadoBadge(estado)}`}
+                        >
+                          {getEstadoLabel(estado)}
+                        </Badge>
+                      );
+                    })()}
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {descripcion === "" ? "Sin descripción" : descripcion}
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleVerActa(acta)}
+                    >
+                      Ver
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleManageActa(acta)}
+                    >
+                      Gestionar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
         </TableBody>
       </Table>
     </div>
@@ -379,7 +392,7 @@ const Actas = () => {
 
             <div className="space-y-4">
               <h3 className="font-semibold">Cambiar estado</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2">
                 {estado !== "Vigente" && (
                   <Button
                     variant="outline"
@@ -388,17 +401,6 @@ const Actas = () => {
                   >
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     <Label className="text-[13px]">Marcar como Vigente</Label>
-                  </Button>
-                )}
-
-                {estado !== "Pendiente" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleStatusChange(currentActa, "Pendiente")}
-                  >
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <Label className="text-[13px]">Marcar como Pendiente</Label>
                   </Button>
                 )}
 
@@ -426,7 +428,9 @@ const Actas = () => {
                     }
                   >
                     <RotateCw className="h-4 w-4 text-blue-500" />
-                    <Label className="text-[13px]">Marcar en proceso</Label>
+                    <Label className="text-[13px]">
+                      Marcar como En Proceso
+                    </Label>
                   </Button>
                 )}
 
@@ -537,7 +541,7 @@ const Actas = () => {
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="flex-1 min-w-[200px]">
           <Input
-            placeholder="Buscar por ID, usuario o descripción..."
+            placeholder="Buscar usuario o descripción..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
           />
@@ -560,9 +564,10 @@ const Actas = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos los estados</SelectItem>
-            <SelectItem value="Pendiente">Pendiente</SelectItem>
             <SelectItem value="En proceso">En proceso</SelectItem>
+            <SelectItem value="Vigente">Vigente</SelectItem>
             <SelectItem value="Finalizado">Finalizada</SelectItem>
+            <SelectItem value="Cancelada">Cancelada</SelectItem>
           </SelectContent>
         </Select>
       </div>
