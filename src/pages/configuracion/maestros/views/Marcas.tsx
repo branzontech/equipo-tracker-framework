@@ -116,7 +116,9 @@ const Marcas = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {marcas.map((marca) => (
+              {[...marcas]
+                .sort((a, b) => b.id_marca - a.id_marca)
+                .map((marca) => (
                 <TableRow key={marca.id_marca}>
                   <TableCell>
                     {`MAR-${marca.id_marca.toString().padStart(3, "0")}`}
