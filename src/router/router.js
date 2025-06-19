@@ -16,6 +16,7 @@ import trasladoRoutes from "./routes/traslados.routes.js";
 import bajasRoutes from "./routes/baja.routes.js";
 import actaRoutes from "./routes/acta.routes.js";
 import manteRoutes from "./routes/mante.routes.js";
+import devolucionRoutes from "./routes/devolucion.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -38,6 +39,7 @@ const routerApi = (app) => {
   router.use("/bajas", bajasRoutes);
   router.use("/actas", actaRoutes);
   router.use("/mantenimientos", manteRoutes);
+  router.use("/devoluciones", devolucionRoutes);
 };
 
 export default routerApi;
