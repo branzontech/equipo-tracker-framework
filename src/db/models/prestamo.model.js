@@ -76,13 +76,25 @@ export const prestamoModel = {
 
       // 3. Iterar por equipos del préstamo
       for (const equipo of prestamo.equipos) {
-
         // 3.1 Crear relación en Prestamo_Equipos
         const prestamoEquipo = await prisma.prestamo_equipos.create({
           data: {
             prestamo_id: nuevoPrestamo.id_prestamo,
             equipo_id: equipo.id_equipo,
           },
+        });
+
+        // 3.1.1 Actualizar el estado del equipo a "En préstamo"
+        await prisma.equipos.update({
+          where: { id_equipo: equipo.id_equipo },
+          data: {
+            estado_actual: "En Préstamo",
+          },
+        });
+
+        await prisma.perifericos.updateMany({
+          where: { equipo_asociado_id: equipo.id_equipo },
+          data: { estado: "En Préstamo" },
         });
 
         // 3.2 Insertar perifericos relacionados (si hay)
