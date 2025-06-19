@@ -26,8 +26,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
-import { EstadoType } from "../interfaces/sedes";
 import UpdateSede from "./UpdateSede";
+import { useGlobal } from "@/hooks/use-global";
 
 const Sedes = () => {
   const {
@@ -42,6 +42,7 @@ const Sedes = () => {
     selectedSedeId,
   } = useSedes();
   const { users } = useUser();
+  const { StatusBadge } = useGlobal();
 
   const usuariosDisponibles = users.filter((user) => user.sede_id === null);
 
@@ -156,15 +157,9 @@ const Sedes = () => {
               <div className="space-y-2">
                 <Label htmlFor="estado">Estado</Label>
                 <Select
-                  value={
-                    newSede.estado === true
-                      ? "Activo"
-                      : newSede.estado === false
-                      ? "Inactivo"
-                      : ""
-                  }
-                  onValueChange={(value: EstadoType) => {
-                    setNewSede({ ...newSede, estado: value === "Activo" });
+                  value={newSede.estado || ""}
+                  onValueChange={(value) => {
+                    setNewSede({ ...newSede, estado: value });
                   }}
                   required
                 >
@@ -205,52 +200,47 @@ const Sedes = () => {
               </TableHeader>
               <TableBody>
                 {[...sedes]
-                .sort((a, b) => b.id_sede - a.id_sede)
-                .map((sede) => (
-                  <TableRow key={sede.id_sede}>
-                    <TableCell>{sede.nombre}</TableCell>
-                    <TableCell>{sede.regional}</TableCell>
-                    <TableCell>
-                      {sede.usuarios.length > 0
-                        ? sede.usuarios
-                            .map((usuario) => usuario.nombre)
-                            .join(", ")
-                        : "No hay usuarios"}
-                    </TableCell>
-                    <TableCell>
-                      <span className="flex items-center">
-                        {sede.estado === true ? (
-                          <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                        )}
-                        {sede.estado ? "Activo" : "Inactivo"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="hover:bg-slate-100"
-                        onClick={() => {
-                          handleOpenEditModal(sede.id_sede);
-                        }}
-                      >
-                        <PencilIcon className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="hover:bg-slate-100"
-                        onClick={() => {
-                          handleDelete(sede.id_sede);
-                        }}
-                      >
-                        <XCircle className="h-5 w-5" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                  .sort((a, b) => b.id_sede - a.id_sede)
+                  .map((sede) => (
+                    <TableRow key={sede.id_sede}>
+                      <TableCell>{sede.nombre}</TableCell>
+                      <TableCell>{sede.regional}</TableCell>
+                      <TableCell>
+                        {sede.usuarios.length > 0
+                          ? sede.usuarios
+                              .map((usuario) => usuario.nombre)
+                              .join(", ")
+                          : "No hay usuarios"}
+                      </TableCell>
+                      <TableCell>
+                        <span className="flex items-center">
+                          <StatusBadge status={sede.estado} />
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-slate-100"
+                          onClick={() => {
+                            handleOpenEditModal(sede.id_sede);
+                          }}
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-slate-100"
+                          onClick={() => {
+                            handleDelete(sede.id_sede);
+                          }}
+                        >
+                          <XCircle className="h-5 w-5" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </CardContent>
