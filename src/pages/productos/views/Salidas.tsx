@@ -183,7 +183,7 @@ const Salidas = () => {
               <Input
                 type="text"
                 value={nombreInput}
-                placeholder="Ingrese el nombre o cédula"
+                placeholder="Ingrese el nombre del usuario"
                 onChange={(e) => handleNombreInput(e.target.value)}
                 autoComplete="off"
               />
