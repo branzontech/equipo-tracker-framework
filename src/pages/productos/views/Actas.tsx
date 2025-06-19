@@ -38,7 +38,6 @@ import { Sheet, SheetDescription } from "@/components/ui/sheet";
 import { VerActaDialog } from "../components/VerActaDialog";
 import { Badge } from "@/components/ui/badge";
 import { useActa } from "../hooks/use-acta";
-import { useGlobal } from "@/hooks/use-global";
 import {
   SheetContent,
   SheetFooter,
@@ -47,6 +46,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@radix-ui/react-select";
 import { Label } from "@/components/ui/label";
+import { useGlobal } from "@/hooks/use-global";
 
 const Actas = () => {
   const {
