@@ -44,6 +44,52 @@ export const create = async (req, res) => {
   }
 };
 
+export const update = async (req, res) => {
+  try {
+    const {
+      id,
+      nombre_equipo,
+      nro_serie,
+      modelo,
+      marca_id,
+      categoria_id,
+      sucursal_id,
+      estado_actual,
+      fecha_registro,
+      tipo_activo,
+      garantia_fecha_fin,
+      observaciones,
+      especificaciones,
+      seguridad,
+      adquisicion,
+      administrativa,
+    } = req.body;
+
+    const equipo = await equipoService.update({
+      id,
+      nombre_equipo,
+      nro_serie,
+      modelo,
+      marca_id,
+      categoria_id,
+      sucursal_id,
+      estado_actual,
+      fecha_registro,
+      tipo_activo,
+      garantia_fecha_fin,
+      observaciones,
+      especificaciones,
+      seguridad,
+      adquisicion,
+      administrativa,
+    });
+
+    res.status(200).json({ success: true, data: equipo });
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
+
 export const findAll = async (req, res) => {
   try {
     const equipos = await equipoService.findAll();
@@ -66,9 +112,12 @@ export const findAllById = async (req, res) => {
 export const delete_ = async (req, res) => {
   try {
     const { id } = req.params;
-    const equipo = await equipoService.delete_(id);
+    const equipo = await equipoService.delete(id);
     res.status(200).json({ success: true, data: equipo });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "No se pudo deshabilitar el equipo. Intenta nuevamente.",
+    });
   }
 };
