@@ -6,7 +6,7 @@ export interface Sucursal {
   sede_id: Sede | number;
   sedes: Sede | null;
   tipo: string;
-  estado: boolean;
+  estado: string;
 }
 
 export interface SucursalConEstado extends Sucursal {
