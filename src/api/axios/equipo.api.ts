@@ -45,3 +45,12 @@ export const deleteEquipo = async (id: number) => {
     throw new Error(error.response?.data?.message);
   }
 };
+
+export const getTrazabilidadByEquipoId = async (id: number) => {
+  try {
+    const response = await api.get(`/equipos/trazabilidad/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
+};
