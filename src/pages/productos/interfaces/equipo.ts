@@ -4,6 +4,7 @@ import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferic
 import { Sucursal } from "@/pages/configuracion/maestros/interfaces/sucursales";
 import { Prestamo } from "./prestamo";
 import { Traslado } from "./traslados";
+import { Mantenimiento } from "@/pages/mantenimientos/interfaces/mantenimiento";
 
 export interface Equipo {
   sedes: string;
@@ -24,13 +25,16 @@ export interface Equipo {
   observaciones?: string;
   motivo: string;
 
-  // PRESTAMO O TRASLADOS
-  prestamo_equipos?: {
-    prestamos: Prestamo;
-  }[];
-  traslado_equipos?: {
-    traslados: Traslado;
-  }[];
+  // PRESTAMO O TRASLADOS O MANTENIMIENTOS
+  trazabilidad?: {
+    prestamo_equipos?: {
+      prestamos: Prestamo;
+    }[];
+    traslados_equipos?: {
+      traslados: Traslado;
+    }[];
+    mantenimientos?: Mantenimiento[];
+  };
 
   // Información Técnica
   especificaciones?: {
