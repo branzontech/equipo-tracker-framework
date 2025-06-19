@@ -18,4 +18,7 @@ export const equipoService = {
   async delete(id) {
     return await equipoModel.delete_(id);
   },
+  async getTrazabilidadByEquipoId(id_equipo) {
+    return await equipoModel.getTrazabilidadByEquipoId(id_equipo);
+  },
 };
