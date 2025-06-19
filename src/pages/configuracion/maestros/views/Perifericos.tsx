@@ -177,7 +177,9 @@ const Perifericos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {perifericos.map((periferico) => (
+              {[...perifericos]
+              .sort((a, b) => b.id_periferico - a.id_periferico)
+              .map((periferico) => (
                 <TableRow key={periferico.id_periferico}>
                   <TableCell>{periferico.nombre}</TableCell>
                   <TableCell>{periferico.tipo}</TableCell>
