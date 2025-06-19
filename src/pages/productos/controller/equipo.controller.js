@@ -47,7 +47,7 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const {
-      id,
+      id_equipo,
       nombre_equipo,
       nro_serie,
       modelo,
@@ -66,7 +66,7 @@ export const update = async (req, res) => {
     } = req.body;
 
     const equipo = await equipoService.update({
-      id,
+      id_equipo,
       nombre_equipo,
       nro_serie,
       modelo,
