@@ -84,7 +84,9 @@ const Categoria = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categoria.map((categoria) => (
+              {[...categoria]
+              .sort((a, b) => b.id_categoria - a.id_categoria)
+              .map((categoria) => (
                 <TableRow key={categoria.id_categoria}>
                   <TableCell>
                     {`CAT-${categoria.id_categoria
