@@ -151,6 +151,27 @@ export const manteModel = {
         progreso: data.progreso,
       },
     });
+
+    // ✅ Actualizar estado del equipo
+    if (data.id_equipo && data.id_equipo > 0) {
+      await prisma.equipos.update({
+        where: { id_equipo: data.id_equipo },
+        data: { estado_actual: "En mantenimiento" },
+      });
+
+      await prisma.perifericos.updateMany({
+        where: { equipo_asociado_id: data.id_equipo },
+        data: { estado: "En mantenimiento" },
+      });
+    }
+
+    // ✅ Actualizar estado de la impresora
+    if (data.id_impresora && data.id_impresora > 0) {
+      await prisma.impresoras.update({
+        where: { id_impresora: data.id_impresora },
+        data: { estado_actual: "En mantenimiento" },
+      });
+    }
     return mante;
   },
   async updateStatus(id, status) {
