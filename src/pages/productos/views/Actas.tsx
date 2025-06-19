@@ -32,6 +32,7 @@ import {
   RotateCw,
   XCircle,
   AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { Sheet, SheetDescription } from "@/components/ui/sheet";
 import { VerActaDialog } from "../components/VerActaDialog";
@@ -393,56 +394,82 @@ const Actas = () => {
             <div className="space-y-4">
               <h3 className="font-semibold">Cambiar estado</h3>
               <div className="grid grid-cols-1 gap-2">
-                {estado !== "Vigente" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleStatusChange(currentActa, "Vigente")}
-                  >
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <Label className="text-[13px]">Marcar como Vigente</Label>
-                  </Button>
-                )}
-
-                {estado !== "Finalizado" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleStatusChange(currentActa, "Finalizado")
-                    }
-                  >
-                    <CheckCircle className="h-4 w-4 text-gray-500" />
-                    <Label className="text-[13px]">
-                      Marcar como Finalizado
-                    </Label>
-                  </Button>
-                )}
-
-                {estado !== "En proceso" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleStatusChange(currentActa, "En proceso")
-                    }
-                  >
-                    <RotateCw className="h-4 w-4 text-blue-500" />
-                    <Label className="text-[13px]">
-                      Marcar como En Proceso
-                    </Label>
-                  </Button>
-                )}
-
-                {estado !== "Cancelada" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleStatusChange(currentActa, "Cancelada")}
-                  >
-                    <XCircle className="h-4 w-4 text-red-500" />
-                    <Label className="text-[13px]">Marcar como Cancelada</Label>
-                  </Button>
+                {currentActa.tipo === "Devolucion" ? (
+                  <>
+                    {estado !== "Cancelada" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleStatusChange(currentActa, "Cancelada")
+                        }
+                      >
+                        <XCircle className="h-4 w-4 text-red-500" />
+                        <Label className="text-[13px]">
+                          Marcar como Cancelada
+                        </Label>
+                      </Button>
+                    )}
+                    {estado !== "Satisfactoria" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleStatusChange(currentActa, "Satisfactoria")
+                        }
+                      >
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        <Label className="text-[13px]">
+                          Marcar como Satisfactoria
+                        </Label>
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {estado !== "Vigente" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleStatusChange(currentActa, "Vigente")
+                        }
+                      >
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Label className="text-[13px]">
+                          Marcar como Vigente
+                        </Label>
+                      </Button>
+                    )}
+                    {estado !== "Finalizado" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleStatusChange(currentActa, "Finalizado")
+                        }
+                      >
+                        <CheckCircle className="h-4 w-4 text-gray-500" />
+                        <Label className="text-[13px]">
+                          Marcar como Finalizado
+                        </Label>
+                      </Button>
+                    )}
+                    {estado !== "En proceso" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleStatusChange(currentActa, "En proceso")
+                        }
+                      >
+                        <RotateCw className="h-4 w-4 text-blue-500" />
+                        <Label className="text-[13px]">
+                          Marcar como En Proceso
+                        </Label>
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
