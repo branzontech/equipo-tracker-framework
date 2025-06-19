@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Prestamo } from "../interfaces/prestamo";
 import { create, getAll, saveSign } from "@/api/axios/prestamo.api";
 import { toast } from "sonner";
-import { useGlobal } from "@/hooks/use-global";
 import { icons } from "@/components/interfaces/icons";
 import { useNavigate } from "react-router-dom";
+import { useGlobal } from "@/hooks/use-global";
 
 export const usePrestamo = () => {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
@@ -19,6 +19,10 @@ export const usePrestamo = () => {
     estado: "Vigente",
     descripcion: "",
     equipos: [],
+    usuarios_prestamos_responsable_salida_idTousuarios: {
+      id_usuario: 0,
+      nombre: "",
+    },
   });
   const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
 
