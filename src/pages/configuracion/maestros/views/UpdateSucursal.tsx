@@ -121,17 +121,11 @@ const UpdateSucursal = ({ open, onOpenChange, id }: UpdateProps) => {
                 <div className="space-y-2">
                   <Label htmlFor="estado">Estado</Label>
                   <Select
-                    value={
-                      newSucursal.estado === true
-                        ? "Activo"
-                        : newSucursal.estado === false
-                        ? "Inactivo"
-                        : ""
-                    }
+                    value={newSucursal.estado}
                     onValueChange={(value) =>
                       setNewSucursal({
                         ...newSucursal,
-                        estado: value === "Activo" ? true : false,
+                        estado: value
                       })
                     }
                     required
