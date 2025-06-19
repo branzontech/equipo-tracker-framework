@@ -192,6 +192,22 @@ export const useEquipos = () => {
     // },
   ]);
 
+  const aplicarFiltros = () => {
+    const hayFiltros = Object.values(filters).some(
+      (valor) => valor !== "todas" && valor !== "todos" && valor !== ""
+    );
+
+    if (!hayFiltros) {
+      toast.error("Debe seleccionar al menos un filtro", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    // Simular clic al botón oculto que tiene SheetClose
+    document.getElementById("close-sheet-btn")?.click();
+  };
+
   const handleDragStart = (e: React.DragEvent, columnId: string) => {
     setDraggedColumn(columnId);
     const draggedElement = e.currentTarget as HTMLElement;
@@ -741,11 +757,6 @@ export const useEquipos = () => {
       adquisicion: adquisicionProcesada,
       administrativa: administrativaProcesada,
     });
-
-    setNewEquipo({
-      ...response,
-      seguridad: seguridadProcesada,
-    });
     setIsLoading(false);
     return response;
   };
@@ -808,6 +819,7 @@ export const useEquipos = () => {
   }, [equipo]);
 
   return {
+    aplicarFiltros,
     update,
     isLoading,
     setIsLoading,
