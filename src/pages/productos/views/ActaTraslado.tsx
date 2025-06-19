@@ -75,7 +75,7 @@ export const ActaTraslado = ({ data }) => {
         </View>
 
         {equiposConAccesorios.map((equipo, index) => (
-          <View style={styles.tableRow} key={index}>
+          <View style={[styles.tableRow, styles.tableHeader]} key={index}>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>{equipo.serial}</Text>
             </View>
