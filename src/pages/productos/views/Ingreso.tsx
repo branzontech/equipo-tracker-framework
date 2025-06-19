@@ -284,7 +284,7 @@ const IngresoProducto = () => {
                               )}
                             >
                               {newEquipo.garantia_fecha_fin ? (
-                                format(newEquipo.garantia_fecha_fin, "P")
+                                format(newEquipo.garantia_fecha_fin, "PP")
                               ) : (
                                 <span>Seleccionar fecha</span>
                               )}
