@@ -8,7 +8,6 @@ import { useGlobal } from "@/hooks/use-global";
 import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
-import { on } from "events";
 
 interface SearchEquipoProps {
   onEquipoEncontrado?: (equipo: Equipo) => void;
@@ -102,19 +101,12 @@ export const SearchEquipo = ({
             {field.nombre_equipo && (
               <>
                 <div className="col-span-12 md:col-span-3">
-                  <Label>Marca</Label>
-                  <Input
-                    value={
-                      typeof field.marcas === "string"
-                        ? field.marcas
-                        : field.marcas?.nombre || ""
-                    }
-                    readOnly
-                  />
+                  <Label>N° Serie</Label>
+                  <Input value={field.nro_serie || ""} readOnly />
                 </div>
 
                 <div className="col-span-12 md:col-span-3">
-                  <Label>Tipo de Activo Fijo</Label>
+                  <Label>Tipo de Activo</Label>
                   <Input value={field.tipo_activo || ""} readOnly />
                 </div>
 
@@ -148,7 +140,9 @@ export const SearchEquipo = ({
           {!esBaja && (
             <AccesoriosContainer
               equipoIndex={index}
-              accesorios={Array.isArray(field.perifericos) ? field.perifericos : []}
+              accesorios={
+                Array.isArray(field.perifericos) ? field.perifericos : []
+              }
             />
           )}
         </div>
@@ -161,6 +155,7 @@ export const SearchEquipo = ({
         className="mt-2"
         onClick={() => {
           const nuevoEquipo: Equipo = {
+            sedes: null,
             id_equipo: Date.now(),
             nombre_equipo: "",
             nro_serie: "",
