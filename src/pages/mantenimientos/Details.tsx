@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
-import { useGlobal } from "@/hooks/use-global";
 import {
   Calendar,
   User,
@@ -38,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useGlobal } from "@/hooks/use-global";
 
 const Labels = ({ icon: Icon, text }: { icon: any; text: string }) => (
   <h3 className="flex items-center gap-2 font-semibold text-lg text-gray-800">
