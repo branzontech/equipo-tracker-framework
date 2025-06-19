@@ -121,3 +121,13 @@ export const delete_ = async (req, res) => {
     });
   }
 };
+
+export const getTrazabilidadByEquipoId = async (req, res) => {
+  try {
+    const { id_equipo } = req.params;
+    const trazabilidad = await equipoService.getTrazabilidadByEquipoId(id_equipo);
+    res.status(200).json(trazabilidad);
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
