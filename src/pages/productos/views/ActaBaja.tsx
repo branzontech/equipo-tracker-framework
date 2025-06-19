@@ -49,7 +49,7 @@ export const ActaBaja = ({ data }) => {
         </View>
 
         {equipos.map((equipo, i) => (
-          <View style={styles.tableRow} key={i}>
+          <View style={[styles.tableRow, styles.tableHeader]} key={i}>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>{equipo.serial}</Text>
             </View>
