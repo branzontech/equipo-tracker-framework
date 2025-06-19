@@ -52,8 +52,8 @@ import {
   tiempoRespuestaData,
   tonerData,
 } from "@/pages/dashboard/interfaces/dashboardItem";
-import { useGlobal } from "@/hooks/use-global";
 import { useEquipos } from "../productos/hooks/use-equipos";
+import { useGlobal } from "@/hooks/use-global";
 
 export default function Dashboard() {
   const { sedesConEquiposCount, equiposCount } = useGlobal();
