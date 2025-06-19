@@ -17,7 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CheckCircle, XCircle, PencilIcon, FileX } from "lucide-react";
+import {
+  PlusCircle,
+  CheckCircle,
+  XCircle,
+  PencilIcon,
+  FileX,
+  ArrowRightLeft,
+} from "lucide-react";
 import { listTypes } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { EstadoType } from "../interfaces/sedes";
@@ -39,7 +46,9 @@ const Perifericos = () => {
 
   const { equipo } = useEquipos();
 
-  const equiposDisponible = equipo.filter((equipo) => equipo.estado_actual !== "Fuera de servicio");
+  const equiposDisponible = equipo.filter(
+    (equipo) => equipo.estado_actual !== "Fuera de servicio"
+  );
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -178,62 +187,67 @@ const Perifericos = () => {
             </TableHeader>
             <TableBody>
               {[...perifericos]
-              .sort((a, b) => b.id_periferico - a.id_periferico)
-              .map((periferico) => (
-                <TableRow key={periferico.id_periferico}>
-                  <TableCell>{periferico.nombre}</TableCell>
-                  <TableCell>{periferico.tipo}</TableCell>
-                  <TableCell>
-                    {periferico.equipos?.nombre_equipo ?? "No asignado"}
-                  </TableCell>
-                  <TableCell>
-                    <span className="flex items-center">
-                      {periferico.estado === "Activo" ? (
-                        <>
-                          <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                          <span className="text-green-700">Activo</span>
-                        </>
-                      ) : periferico.estado === "Fuera de servicio" ? (
-                        <>
-                          <FileX className="mr-2 h-4 w-4 text-orange-500" />
-                          <span className="text-orange-700">
-                            Fuera de servicio
-                          </span>
-                        </>
-                      ) : periferico.estado === "Inactivo" ? (
-                        <>
-                          <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                          <span className="text-red-700">Inactivo</span>
-                        </>
-                      ) : (
-                        <span>{periferico.estado}</span>
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-slate-100"
-                      onClick={() => {
-                        handleOpenEditModal(periferico.id_periferico);
-                      }}
-                    >
-                      <PencilIcon className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-slate-100"
-                      onClick={() => {
-                        handleDeletePeriferico(periferico.id_periferico);
-                      }}
-                    >
-                      <XCircle className="h-5 w-5" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+                .sort((a, b) => b.id_periferico - a.id_periferico)
+                .map((periferico) => (
+                  <TableRow key={periferico.id_periferico}>
+                    <TableCell>{periferico.nombre}</TableCell>
+                    <TableCell>{periferico.tipo}</TableCell>
+                    <TableCell>
+                      {periferico.equipos?.nombre_equipo ?? "No asignado"}
+                    </TableCell>
+                    <TableCell>
+                      <span className="flex items-center">
+                        {periferico.estado === "Activo" ? (
+                          <>
+                            <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                            <span className="text-green-700">Activo</span>
+                          </>
+                        ) : periferico.estado === "Fuera de servicio" ? (
+                          <>
+                            <FileX className="mr-2 h-4 w-4 text-gray-700" />
+                            <span className="text-gray-700">
+                              Fuera de servicio
+                            </span>
+                          </>
+                        ) : periferico.estado === "En Préstamo" ? (
+                          <>
+                            <ArrowRightLeft className="mr-2 h-4 w-4 text-amber-500" />
+                            <span className="text-amber-700">En Préstamo</span>
+                          </>
+                        ) : periferico.estado === "Inactivo" ? (
+                          <>
+                            <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                            <span className="text-red-700">Inactivo</span>
+                          </>
+                        ) : (
+                          <span>{periferico.estado}</span>
+                        )}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-slate-100"
+                        onClick={() => {
+                          handleOpenEditModal(periferico.id_periferico);
+                        }}
+                      >
+                        <PencilIcon className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-slate-100"
+                        onClick={() => {
+                          handleDeletePeriferico(periferico.id_periferico);
+                        }}
+                      >
+                        <XCircle className="h-5 w-5" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </CardContent>
