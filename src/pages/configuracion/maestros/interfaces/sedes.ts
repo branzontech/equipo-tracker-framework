@@ -5,7 +5,5 @@ export interface Sede {
   nombre: string;
   regional: string;
   usuarios: Usuario[];
-  estado: boolean;
+  estado: string;
 }
-
-export type EstadoType = "Activo" | "Inactivo";
