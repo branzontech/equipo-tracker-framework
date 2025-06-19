@@ -292,7 +292,7 @@ const HojaDeVida = () => {
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
-                          Descripción:
+                          Nombre:
                         </span>{" "}
                         {newEquipo.nombre_equipo}
                       </p>
