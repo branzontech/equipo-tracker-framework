@@ -333,49 +333,49 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Procesador:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.procesador}
+                        {newEquipo.especificaciones?.procesador}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Memoria RAM:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.memoria_ram}
+                        {newEquipo.especificaciones?.memoria_ram}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Almacenamiento:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.almacenamiento}
+                        {newEquipo.especificaciones?.almacenamiento}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Tarjeta Gráfica:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.tarjeta_grafica}
+                        {newEquipo.especificaciones?.tarjeta_grafica}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Pantalla:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.pantalla}
+                        {newEquipo.especificaciones?.pantalla}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Sistema Operativo:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.sistema_operativo}
+                        {newEquipo.especificaciones?.sistema_operativo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Batería:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.bateria}
+                        {newEquipo.especificaciones?.bateria}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Puertos:
                         </span>{" "}
-                        {newEquipo.especificaciones?.[0]?.puertos}
+                        {newEquipo.especificaciones?.puertos}
                       </p>
                     </div>
                   </div>
@@ -390,25 +390,25 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Nivel de Acceso:
                         </span>{" "}
-                        {newEquipo.seguridad?.[0]?.nivel_acceso}
+                        {newEquipo.seguridad?.nivel_acceso}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Software de Seguridad:
                         </span>{" "}
-                        {newEquipo.seguridad?.[0]?.software_seguridad}
+                        {newEquipo.seguridad?.software_seguridad}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Cifrado de Disco:
                         </span>{" "}
-                        {newEquipo.seguridad?.[0]?.cifrado_disco}
+                        {newEquipo.seguridad?.cifrado_disco}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Políticas Aplicadas:
                         </span>{" "}
-                        {newEquipo.seguridad?.[0]?.politicas_aplicadas}{" "}
+                        {newEquipo.seguridad?.politicas_aplicadas}{" "}
                         {/* .join(", ") */}
                       </p>
                     </div>
@@ -426,13 +426,13 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Orden de Compra:
                         </span>{" "}
-                        {newEquipo.adquisicion?.[0]?.orden_compra}
+                        {newEquipo.adquisicion?.orden_compra}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Fecha de Compra:
                         </span>{" "}
-                        {formatFecha(newEquipo.adquisicion?.[0]?.fecha_compra)}
+                        {formatFecha(newEquipo.adquisicion?.fecha_compra)}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -440,7 +440,7 @@ const HojaDeVida = () => {
                         </span>{" "}
                         $
                         {formatPrecio(
-                          newEquipo.adquisicion?.[0]?.precio_compra
+                          newEquipo.adquisicion?.precio_compra
                         )}{" "}
                         {/* .toLocaleString() */}
                       </p>
@@ -448,25 +448,25 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Forma de Pago:
                         </span>{" "}
-                        {newEquipo.adquisicion?.[0]?.forma_pago}
+                        {newEquipo.adquisicion?.forma_pago}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Plazo de Pago:
                         </span>{" "}
-                        {newEquipo.adquisicion?.[0]?.plazo_pago}
+                        {newEquipo.adquisicion?.plazo_pago}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Número de Factura:
                         </span>{" "}
-                        {newEquipo.adquisicion?.[0]?.numero_factura}
+                        {newEquipo.adquisicion?.numero_factura}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Proveedor:
                         </span>{" "}
-                        {newEquipo.adquisicion?.[0]?.proveedor}
+                        {newEquipo.adquisicion?.proveedor}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -487,33 +487,33 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Código de Inventario:
                         </span>{" "}
-                        {newEquipo.administrativa?.[0]?.codigo_inventario}
+                        {newEquipo.administrativa?.codigo_inventario}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Centro de Coste:
                         </span>{" "}
-                        {newEquipo.administrativa?.[0]?.centro_coste}
+                        {newEquipo.administrativa?.centro_coste}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Autorizado Por:
                         </span>{" "}
-                        {newEquipo.administrativa?.[0]?.autorizado_por}
+                        {newEquipo.administrativa?.autorizado_por}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Fecha de Activación:
                         </span>
                         {formatFecha(
-                          newEquipo.administrativa?.[0]?.fecha_activacion
+                          newEquipo.administrativa?.fecha_activacion
                         )}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Estado Contable:
                         </span>{" "}
-                        {newEquipo.administrativa?.[0]?.estado_contable}
+                        {newEquipo.administrativa?.estado_contable}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -521,14 +521,14 @@ const HojaDeVida = () => {
                         </span>{" "}
                         $
                         {formatPrecio(
-                          newEquipo.administrativa?.[0]?.valor_depreciado
+                          newEquipo.administrativa?.valor_depreciado
                         )}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Vida Útil Restante:
                         </span>{" "}
-                        {newEquipo.administrativa?.[0]?.vida_util_restante}
+                        {newEquipo.administrativa?.vida_util_restante}
                       </p>
                     </div>
                   </div>
