@@ -84,7 +84,7 @@ const EditEquipo = () => {
                 Volver
               </Button>
               <h1 className="text-2xl font-bold text-[#040d50]">
-                Actualización del Equipo: {nroSeries}
+                Actualización del Equipo: {newEquipo.nombre_equipo || "Cargando..."}
               </h1>
             </div>
 
@@ -375,7 +375,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: Intel Core i5 11th Gen"
-                            value={newEquipo.especificaciones?.[0]?.procesador}
+                            value={newEquipo.especificaciones?.procesador || ""}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -394,7 +394,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 16 GB"
-                            value={newEquipo.especificaciones?.[0]?.memoria_ram}
+                            value={newEquipo.especificaciones?.memoria_ram}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -413,7 +413,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Ej: 512 GB"
                             value={
-                              newEquipo.especificaciones?.[0]?.almacenamiento
+                              newEquipo.especificaciones?.almacenamiento
                             }
                             onChange={(e) => {
                               setNewEquipo({
@@ -434,7 +434,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Ej: SSD, HDD, NVMe"
                             value={
-                              newEquipo.especificaciones?.[0]?.tarjeta_grafica
+                              newEquipo.especificaciones?.tarjeta_grafica
                             }
                             onChange={(e) => {
                               setNewEquipo({
@@ -454,7 +454,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 15.6 pulgadas Full HD"
-                            value={newEquipo.especificaciones?.[0]?.pantalla}
+                            value={newEquipo.especificaciones?.pantalla}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -474,7 +474,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Ej: Windows 10"
                             value={
-                              newEquipo.especificaciones?.[0]?.sistema_operativo
+                              newEquipo.especificaciones?.sistema_operativo
                             }
                             onChange={(e) => {
                               setNewEquipo({
@@ -494,7 +494,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 120 Wh"
-                            value={newEquipo.especificaciones?.[0]?.bateria}
+                            value={newEquipo.especificaciones?.bateria}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -513,7 +513,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: USB 3.0, HDMI, VGA"
-                            value={newEquipo.especificaciones?.[0]?.puertos}
+                            value={newEquipo.especificaciones?.puertos}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -551,9 +551,9 @@ const EditEquipo = () => {
                                     "w-full pl-3 text-left font-normal"
                                   )}
                                 >
-                                  {newEquipo.adquisicion?.[0]?.fecha_compra ? (
+                                  {newEquipo.adquisicion?.fecha_compra ? (
                                     format(
-                                      newEquipo.adquisicion?.[0]?.fecha_compra,
+                                      newEquipo.adquisicion?.fecha_compra,
                                       "PP"
                                     )
                                   ) : (
@@ -570,7 +570,7 @@ const EditEquipo = () => {
                               <Calendar
                                 mode="single"
                                 selected={
-                                  newEquipo.adquisicion?.[0]?.fecha_compra
+                                  newEquipo.adquisicion?.fecha_compra
                                     ? new Date(
                                         newEquipo.adquisicion.fecha_compra
                                       )
@@ -599,7 +599,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Nombre del proveedor"
-                            value={newEquipo.adquisicion?.[0]?.proveedor}
+                            value={newEquipo.adquisicion?.proveedor}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -618,7 +618,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Número de factura"
-                            value={newEquipo.adquisicion?.[0]?.numero_factura}
+                            value={newEquipo.adquisicion?.numero_factura}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -638,7 +638,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Precio de Adquisición"
                             type="text"
-                            value={newEquipo.adquisicion?.[0]?.precio_compra}
+                            value={newEquipo.adquisicion?.precio_compra}
                             onChange={(e) => {
                               const raw = e.target.value.replace(/\./g, "");
                               setNewEquipo({
@@ -657,7 +657,7 @@ const EditEquipo = () => {
                             Forma de Pago
                           </Label>
                           <Select
-                            value={newEquipo.adquisicion?.[0]?.forma_pago}
+                            value={newEquipo.adquisicion?.forma_pago}
                             onValueChange={(value) =>
                               setNewEquipo({
                                 ...newEquipo,
@@ -692,7 +692,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Plazo de Pago"
-                            value={newEquipo.adquisicion?.[0]?.plazo_pago}
+                            value={newEquipo.adquisicion?.plazo_pago}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -711,7 +711,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Número de orden de compra"
-                            value={newEquipo.adquisicion?.[0]?.orden_compra}
+                            value={newEquipo.adquisicion?.orden_compra}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -855,7 +855,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Código de Inventario"
                             value={
-                              newEquipo.administrativa?.[0]?.codigo_inventario
+                              newEquipo.administrativa?.codigo_inventario
                             }
                             onChange={(e) => {
                               setNewEquipo({
@@ -874,7 +874,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Centro de Coste"
-                            value={newEquipo.administrativa?.[0]?.centro_coste}
+                            value={newEquipo.administrativa?.centro_coste}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -893,7 +893,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Autorizado por"
                             value={
-                              newEquipo.administrativa?.[0]?.autorizado_por
+                              newEquipo.administrativa?.autorizado_por
                             }
                             onChange={(e) => {
                               setNewEquipo({
@@ -919,10 +919,10 @@ const EditEquipo = () => {
                                     "w-full pl-3 text-left font-normal"
                                   )}
                                 >
-                                  {newEquipo.administrativa?.[0]
+                                  {newEquipo.administrativa
                                     ?.fecha_activacion ? (
                                     format(
-                                      newEquipo.administrativa?.[0]
+                                      newEquipo.administrativa
                                         ?.fecha_activacion,
                                       "PP"
                                     )
@@ -940,10 +940,10 @@ const EditEquipo = () => {
                               <Calendar
                                 mode="single"
                                 selected={
-                                  newEquipo.administrativa?.[0]
+                                  newEquipo.administrativa
                                     ?.fecha_activacion
                                     ? new Date(
-                                        newEquipo.administrativa?.[0]?.fecha_activacion
+                                        newEquipo.administrativa?.fecha_activacion
                                       )
                                     : undefined
                                 }
@@ -969,7 +969,7 @@ const EditEquipo = () => {
                           </Label>
                           <Select
                             value={
-                              newEquipo.administrativa?.[0]?.estado_contable
+                              newEquipo.administrativa?.estado_contable
                             }
                             onValueChange={(value) =>
                               setNewEquipo({
@@ -1010,7 +1010,7 @@ const EditEquipo = () => {
                             placeholder="Valor Depreciado"
                             type="text"
                             value={
-                              newEquipo.administrativa?.[0]?.valor_depreciado
+                              newEquipo.administrativa?.valor_depreciado
                             }
                             onChange={(e) => {
                               const raw = e.target.value.replace(/\./g, "");
@@ -1031,7 +1031,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Vida Útil Restante"
                             value={
-                              newEquipo.administrativa?.[0]?.vida_util_restante
+                              newEquipo.administrativa?.vida_util_restante
                             }
                             onChange={(e) => {
                               setNewEquipo({
