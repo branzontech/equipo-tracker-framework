@@ -94,7 +94,6 @@ export const equipoModel = {
     });
   },
   async update(data) {
-    console.log("Datos recibidos para actualizar equipo:", data);
     const equipoId = Number(data.id_equipo);
     const categoriaId = Number(data.categoria_id);
     const marcaId = Number(data.marca_id);
