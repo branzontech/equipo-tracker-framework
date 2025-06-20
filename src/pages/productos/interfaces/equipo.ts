@@ -1,3 +1,4 @@
+import { devoluciones } from './../../../../node_modules/.prisma/client/index.d';
 import { Categoria } from "@/pages/configuracion/maestros/interfaces/categorias";
 import { Marca } from "@/pages/configuracion/maestros/interfaces/marcas";
 import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
@@ -5,6 +6,7 @@ import { Sucursal } from "@/pages/configuracion/maestros/interfaces/sucursales";
 import { Prestamo } from "./prestamo";
 import { Traslado } from "./traslados";
 import { Mantenimiento } from "@/pages/mantenimientos/interfaces/mantenimiento";
+import { Devolucion } from './devoluciones';
 
 export interface Equipo {
   sedes: string;
@@ -34,6 +36,7 @@ export interface Equipo {
       traslados: Traslado;
     }[];
     mantenimientos?: Mantenimiento[];
+    devoluciones?: Devolucion[];
   };
 
   // Información Técnica
