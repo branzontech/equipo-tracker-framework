@@ -9,7 +9,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { useActa } from "@/pages/productos/hooks/use-acta";
-import { CheckCircle, FileX, Wrench, ShieldAlert, ArrowRightLeft, Truck, XCircle } from "lucide-react";
+import { CheckCircle, FileX, Wrench, ArrowRightLeft, Truck, XCircle } from "lucide-react";
+import { format, toZonedTime } from "date-fns-tz";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -198,8 +199,8 @@ export const useGlobal = () => {
         );
       case "fuera de servicio":
         return (
-          <div className="flex items-center space-x-1 text-orange-700">
-            <FileX className="mr-2 h-4 w-4 text-orange-500" />
+          <div className="flex items-center space-x-1 text-gray-700">
+            <FileX className="mr-2 h-4 w-4 text-gray-500" />
             <span>Fuera de servicio</span>
           </div>
         );
@@ -257,10 +258,13 @@ export const useGlobal = () => {
 
 export const formatFecha = (fechaIso?: string | Date) => {
   if (!fechaIso) return "No disponible";
-  return new Date(fechaIso).toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "America/Bogota",
+
+  const zona = "America/Bogota";
+  const fecha = typeof fechaIso === "string" ? new Date(fechaIso) : fechaIso;
+  const fechaZonificada = toZonedTime(fecha, zona);
+
+  return format(fechaZonificada, "d 'de' MMMM 'de' yyyy", {
+    timeZone: zona,
+    locale: undefined,
   });
 };
