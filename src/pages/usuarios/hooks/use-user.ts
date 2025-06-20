@@ -70,9 +70,9 @@ export const useUser = () => {
         toast.success(response.message || "Usuario creado exitosamente", {
           icon: icons.success,
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 4500);
       }
       return response;
     } catch (error) {
