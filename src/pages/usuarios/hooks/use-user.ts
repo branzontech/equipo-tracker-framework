@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getUserByName, getUsers } from "@/api/axios/user.api";
+import { createUser, getUserByName, getUsers } from "@/api/axios/user.api";
+import { icons } from "@/components/interfaces/icons";
 import {
   Firma,
   Usuario,
 } from "@/pages/configuracion/usuarios/interfaces/usuarios";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const useUser = () => {
   const [users, setUsers] = useState<Usuario[]>([]);
@@ -16,10 +18,12 @@ export const useUser = () => {
     rol: "",
     sede_id: 0,
     sedes: null,
-    activo: false,
+    estado: null,
     firma_entrega: "",
     firma_recibe: "",
     firma: "",
+    telefono: "",
+    sucursales: null,
   });
   const [count, setCount] = useState(0);
   const [selectedEntregaUser, setSelectedEntregaUser] = useState<Firma | null>(
@@ -59,6 +63,25 @@ export const useUser = () => {
     }
   };
 
+  const handleSumbit = async (usuario: Usuario) => {
+    try {
+      const response = await createUser(usuario);
+      if (response.success) {
+        toast.success(response.message || "Usuario creado exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Error al crear el usuario", {
+        icon: icons.error,
+      });
+    }
+  };
+
   return {
     setNombreUser,
     handleNombreInput,
@@ -74,5 +97,6 @@ export const useUser = () => {
     setSelectedEntregaUser,
     selectedRecibeUser,
     setSelectedRecibeUser,
+    handleSumbit,
   };
 };
