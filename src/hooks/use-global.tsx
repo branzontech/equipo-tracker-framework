@@ -64,6 +64,7 @@ export const useGlobal = () => {
         if (disponibilidad.enPrestamo) mensaje += "Está en préstamo. ";
         if (disponibilidad.enBaja) mensaje += "Está dado de baja. ";
         if (disponibilidad.enTraslado) mensaje += "Está en traslado. ";
+        if (disponibilidad.enMantenimiento) mensaje += "Está en mantenimiento. ";
 
         toast.error(mensaje, { icon: icons.error });
         setHaBuscado(false);
