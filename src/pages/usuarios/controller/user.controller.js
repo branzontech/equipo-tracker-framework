@@ -18,3 +18,13 @@ export const findByName = async (req, res) => {
     res.status(401).json({ error: error.message });
   }
 };
+
+export const create = async (req, res) => {
+  try {
+    const usuario = req.body;
+    const user = await UserService.create(usuario);
+    res.json({ usuario: user, success: true });
+  } catch (error) {
+    res.status(401).json({ message: error.message });
+  }
+};
