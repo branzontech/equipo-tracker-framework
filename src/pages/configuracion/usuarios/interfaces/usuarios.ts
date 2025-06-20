@@ -1,4 +1,5 @@
 import { Sede } from "../../maestros/interfaces/sedes";
+import { Sucursal } from "../../maestros/interfaces/sucursales";
 
 export const usuarios = [
   { id: "user1", nombre: "Juan Pérez", perfil: "Técnico" },
@@ -14,13 +15,14 @@ export type Usuario = {
   rol: string;
   sede_id: number;
   sedes: Sede | null;
-  activo: boolean;
+  sucursales: Sucursal | null;
+  estado: string;
   firma_entrega: string;
   firma_recibe: string;
   firma: string;
+  telefono?: string;
 };
 
-// extends to User
 export interface Firma extends Usuario {
   firma: string;
 }
