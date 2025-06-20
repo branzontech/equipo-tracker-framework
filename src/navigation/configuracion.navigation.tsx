@@ -4,11 +4,13 @@ import Marcas from "@/pages/configuracion/maestros/views/Marcas";
 import Perifericos from "@/pages/configuracion/maestros/views/Perifericos";
 import PerfilesAcceso from "@/pages/configuracion/maestros/views/PerfilesAcceso";
 import Agentes from "@/pages/configuracion/usuarios/Agentes";
-import Responsables from "@/pages/configuracion/usuarios/Responsables";
+import Administradores from "@/pages/configuracion/usuarios/Administradores";
 import Permisos from "@/pages/configuracion/usuarios/Permisos";
 import Ubicaciones from "@/pages/configuracion/maestros/views/Sucursales";
 import Categoria from "@/pages/configuracion/maestros/views/Categoria";
 import UpdateSede from "@/pages/configuracion/maestros/views/UpdateSede";
+import Auditores from "@/pages/configuracion/usuarios/Auditores";
+import Clientes from "@/pages/configuracion/usuarios/Clientes";
 
 export const configuracionNavigation = [
   { path: "/configuracion/maestros/sedes", element: <Sedes /> },
@@ -34,6 +36,8 @@ export const configuracionNavigation = [
     element: <PerfilesAcceso />,
   },
   { path: "/configuracion/usuarios/agentes", element: <Agentes /> },
-  { path: "/configuracion/usuarios/responsables", element: <Responsables /> },
+  { path: "/configuracion/usuarios/administradores", element: <Administradores /> },
+  { path: "/configuracion/usuarios/auditores", element: <Auditores /> },
+  { path: "/configuracion/usuarios/clientes", element: <Clientes /> },
   { path: "/configuracion/nivel-acceso", element: <Permisos /> },
 ];
