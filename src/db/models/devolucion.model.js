@@ -147,16 +147,19 @@ export const devolucionModel = {
         });
       }
 
-      // Cambiar estado del equipo a "Activo"
+      // Determinar el estado del equipo
+      const estadoEquipo = devolucion.estado_equipo === "Óptimo" ? "Activo" : "Inactivo";
+
+      // Cambiar estado del equipo 
       await prisma.equipos.update({
         where: { id_equipo: devolucion.equipo_id },
-        data: { estado_actual: "Activo" },
+        data: { estado_actual: estadoEquipo },
       });
 
       // Cambiar el estado de los perifericos con el mismo id_equipo
       await prisma.perifericos.updateMany({
         where: { equipo_asociado_id: devolucion.equipo_id },
-        data: { estado: "Activo" },
+        data: { estado: estadoEquipo },
       });
 
       return devolucionCreated;
