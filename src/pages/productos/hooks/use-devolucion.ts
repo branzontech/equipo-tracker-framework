@@ -25,6 +25,14 @@ export const useDevolucion = () => {
     usuario_recibe_id: 0,
     observaciones: "",
     usuario_entrega_id: 0,
+    usuarios_devoluciones_usuario_entrega_idTousuarios: {
+      id: 0,
+      nombre: "",
+    },
+    usuarios_devoluciones_usuario_recibe_idTousuarios: {
+      id: 0,
+      nombre: "",
+    },
   });
 
   useEffect(() => {
@@ -47,10 +55,10 @@ export const useDevolucion = () => {
         toast.success(devolucionCreated.message || "Devolución creada exitosamente", {
           icon: icons.success,
         });
-        setTimeout(() => {
-          navigate("/productos/actas");
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   navigate("/productos/actas");
+        //   window.location.reload();
+        // }, 4500);
       } else {
         toast.error(devolucionCreated.message || "Error al crear la devolución", {
           icon: icons.error,
