@@ -9,7 +9,8 @@ const {
     ENV_PORT, 
     ENV_ROOT, 
     ENV_PASS, 
-    ENV_DB 
+    ENV_DB,
+    ALLOWED_ORIGINS, 
 } = process.env;
 
 // Define the configuration object
@@ -19,6 +20,7 @@ export const config = () => {
         port: ENV_PORT,
         root: ENV_ROOT,
         pass: ENV_PASS,
-        db: ENV_DB
+        db: ENV_DB,
+        allowedOrigins: ALLOWED_ORIGINS ? ALLOWED_ORIGINS.split(',') : [],
     }
 }
