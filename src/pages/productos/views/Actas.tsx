@@ -80,6 +80,8 @@ const Actas = () => {
   } = useActa();
   const { formatFecha } = useGlobal();
 
+  console.log(new Date());
+
   // const handleProcessReturn = (acta: Acta) => {
   //   if (
   //     acta.tipo === "prestamo" &&
