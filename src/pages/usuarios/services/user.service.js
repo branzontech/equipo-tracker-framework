@@ -9,6 +9,14 @@ class UserService {
     const user = await UserModel.findByName(name);
     return user;
   }
+  async create(userData) {
+    try {
+    const user = await UserModel.create(userData);
+    return user;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
 }
 
 export default new UserService();
