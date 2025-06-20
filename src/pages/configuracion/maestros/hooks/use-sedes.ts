@@ -25,6 +25,7 @@ export const useSedes = () => {
     regional: "",
     usuarios: [],
     estado: null,
+    sucursales: null,
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSedeId, setSelectedSedeId] = useState<number | null>(null);
