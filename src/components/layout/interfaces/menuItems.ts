@@ -119,7 +119,9 @@ export const menuItems = [
         path: "/configuracion/usuarios",
         submenu: [
           { title: "Agentes", icon: UserCog, path: "/configuracion/usuarios/agentes" },
-          { title: "Responsables", icon: UserCog, path: "/configuracion/usuarios/responsables" },
+          { title: "Administradores", icon: UserCog, path: "/configuracion/usuarios/administradores" },
+          { title: "Auditores", icon: UserCog, path: "/configuracion/usuarios/auditores" },
+          { title: "Clientes", icon: UserCog, path: "/configuracion/usuarios/clientes" },
         ],
       },
       {
