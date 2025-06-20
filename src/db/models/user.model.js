@@ -28,12 +28,24 @@ export const UserModel = {
     });
 
     // Convierte firma a base64 si es Uint8Array
-    const usersWithFirmaBase64 = users.map((user) => ({
-      ...user,
-      firma: user.firma
-        ? `data:image/png;base64,${Buffer.from(user.firma).toString("base64")}`
-        : null,
-    }));
+    const usersWithFirmaBase64 = users.map((user) => {
+      const isBase64 =
+        typeof user.firma === "string" &&
+        user.firma.startsWith("data:image/png;base64,");
+
+      console.log("User with firma:", user);
+
+      return {
+        ...user,
+        firma: user.firma
+          ? isBase64
+            ? user.firma
+            : `data:image/png;base64,${Buffer.from(user.firma).toString(
+                "base64"
+              )}`
+          : null,
+      };
+    });
 
     return usersWithFirmaBase64;
   },
@@ -86,7 +98,14 @@ export const UserModel = {
           contrase_a: userData.contraseña,
           rol: userData.rol,
           estado: userData.estado,
-          firma: userData.firma ? Buffer.from(userData.firma, "base64") : null,
+          firma: userData.firma
+            ? Buffer.from(
+                userData.firma.includes(",")
+                  ? userData.firma.split(",")[1]
+                  : userData.firma,
+                "base64"
+              )
+            : null,
           telefono: userData.telefono,
         },
       });
@@ -98,7 +117,9 @@ export const UserModel = {
         throw new Error("El email ya está en uso. Por favor, utilice otro.");
       }
 
-      throw new Error("Error al crear el usuario. Verifique los datos ingresados.");
+      throw new Error(
+        "Error al crear el usuario. Verifique los datos ingresados."
+      );
     }
   },
 };
