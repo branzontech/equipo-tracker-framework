@@ -84,7 +84,8 @@ const EditEquipo = () => {
                 Volver
               </Button>
               <h1 className="text-2xl font-bold text-[#040d50]">
-                Actualización del Equipo: {newEquipo.nombre_equipo || "Cargando..."}
+                Actualización del Equipo:{" "}
+                {newEquipo.nombre_equipo || "Cargando..."}
               </h1>
             </div>
 
@@ -304,6 +305,12 @@ const EditEquipo = () => {
                               <SelectItem value="Fuera de Servicio">
                                 Fuera de Servicio
                               </SelectItem>
+                              <SelectItem value="En Préstamo">
+                                En Préstamo{" "}
+                                <span className="text-xs text-gray-500">
+                                  (Se encuentra en préstamo)
+                                </span>
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -412,9 +419,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 512 GB"
-                            value={
-                              newEquipo.especificaciones?.almacenamiento
-                            }
+                            value={newEquipo.especificaciones?.almacenamiento}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -433,9 +438,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: SSD, HDD, NVMe"
-                            value={
-                              newEquipo.especificaciones?.tarjeta_grafica
-                            }
+                            value={newEquipo.especificaciones?.tarjeta_grafica}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -854,9 +857,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Código de Inventario"
-                            value={
-                              newEquipo.administrativa?.codigo_inventario
-                            }
+                            value={newEquipo.administrativa?.codigo_inventario}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -892,9 +893,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Autorizado por"
-                            value={
-                              newEquipo.administrativa?.autorizado_por
-                            }
+                            value={newEquipo.administrativa?.autorizado_por}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -940,8 +939,7 @@ const EditEquipo = () => {
                               <Calendar
                                 mode="single"
                                 selected={
-                                  newEquipo.administrativa
-                                    ?.fecha_activacion
+                                  newEquipo.administrativa?.fecha_activacion
                                     ? new Date(
                                         newEquipo.administrativa?.fecha_activacion
                                       )
@@ -968,9 +966,7 @@ const EditEquipo = () => {
                             Estado de Contabilidad
                           </Label>
                           <Select
-                            value={
-                              newEquipo.administrativa?.estado_contable
-                            }
+                            value={newEquipo.administrativa?.estado_contable}
                             onValueChange={(value) =>
                               setNewEquipo({
                                 ...newEquipo,
@@ -1009,9 +1005,7 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Valor Depreciado"
                             type="text"
-                            value={
-                              newEquipo.administrativa?.valor_depreciado
-                            }
+                            value={newEquipo.administrativa?.valor_depreciado}
                             onChange={(e) => {
                               const raw = e.target.value.replace(/\./g, "");
                               setNewEquipo({
@@ -1030,9 +1024,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Vida Útil Restante"
-                            value={
-                              newEquipo.administrativa?.vida_util_restante
-                            }
+                            value={newEquipo.administrativa?.vida_util_restante}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
