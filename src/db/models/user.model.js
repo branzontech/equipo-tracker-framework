@@ -8,13 +8,20 @@ export const UserModel = {
         nombre: true,
         email: true,
         rol: true,
-        activo: true,
+        estado: true,
         sede_id: true,
         firma: true,
+        telefono: true,
         sedes: {
           select: {
             id_sede: true,
             nombre: true,
+            sucursales: {
+              select: {
+                id_sucursal: true,
+                nombre: true,
+              },
+            },
           },
         },
       },
@@ -47,7 +54,8 @@ export const UserModel = {
         nombre: true,
         email: true,
         rol: true,
-        activo: true,
+        estado: true,
+        telefono: true,
         sede_id: true,
         firma: true,
         sedes: {
@@ -68,5 +76,29 @@ export const UserModel = {
     }));
 
     return usersWithFirmaBase64;
+  },
+  create: async (userData) => {
+    try {
+      const newUser = await prisma.usuarios.create({
+        data: {
+          nombre: userData.nombre,
+          email: userData.email,
+          contrase_a: userData.contraseña,
+          rol: userData.rol,
+          estado: userData.estado,
+          firma: userData.firma ? Buffer.from(userData.firma, "base64") : null,
+          telefono: userData.telefono,
+        },
+      });
+      return newUser;
+    } catch (error) {
+      console.error("Error creating user:", error);
+
+      if (error.code === "P2002") {
+        throw new Error("El email ya está en uso. Por favor, utilice otro.");
+      }
+
+      throw new Error("Error al crear el usuario. Verifique los datos ingresados.");
+    }
   },
 };
