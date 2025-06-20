@@ -27,6 +27,7 @@ import {
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import SignatureCanvas from "@/components/SignatureCanvas";
 
 interface UserFormProps {
   isOpen: boolean;
@@ -34,8 +35,18 @@ interface UserFormProps {
   setIsOpen: (isOpen: boolean) => void;
 }
 
-export const UserForm: React.FC<UserFormProps> = ({ isOpen, rol, setIsOpen }) => {
-  const { newUser, setNewUser, handleSumbit } = useUser();
+export const UserForm: React.FC<UserFormProps> = ({
+  isOpen,
+  rol,
+  setIsOpen,
+}) => {
+  const {
+    newUser,
+    setNewUser,
+    handleSumbit,
+    selectedRecibeUser,
+    setSelectedRecibeUser,
+  } = useUser();
   const form = useForm();
 
   return (
@@ -160,6 +171,23 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, rol, setIsOpen }) =>
                       <SelectItem value="Inactivo">Inactivo</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="firma">Firma</Label>
+                  <SignatureCanvas
+                    value={selectedRecibeUser?.firma || ""}
+                    onChange={(value: string) => {
+                      newUser.firma = value;
+                      if (selectedRecibeUser) {
+                        setSelectedRecibeUser({
+                          ...selectedRecibeUser,
+                          firma: value,
+                        });
+                      }
+                    }}
+                    readOnly={!!selectedRecibeUser?.firma}
+                  />
                 </div>
               </div>
               <Button type="submit" className="w-full">
