@@ -44,9 +44,11 @@ const Agentes = () => {
                   <TableCell>{agente.telefono ?? "No asignado"}</TableCell>
                   <TableCell>{agente.sedes?.nombre ?? "No asignado"}</TableCell>
                   <TableCell>
-                    {agente.sedes?.sucursales
-                      ?.map((suc) => suc.nombre)
-                      .join(", ") ?? "No asignado"}
+                    {agente.sedes?.sucursales?.length
+                      ? agente.sedes.sucursales
+                          .map((suc) => suc.nombre)
+                          .join(", ")
+                      : "No asignado"}
                   </TableCell>
                 </TableRow>
               ))
