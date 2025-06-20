@@ -1,26 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://192.168.1.8:3003/api",
+  baseURL: import.meta.env.VITE_API_URL,
 });
-
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     const status = error.response?.status;
-
-//     if (status === 401) {
-//       alert("No autorizado. Redirigiendo a login.");
-//       // Redirige si estás usando React Router
-//       window.location.href = "/login";
-//     } else if (status === 500) {
-//       alert("Error interno del servidor. Intenta más tarde.");
-//     } else {
-//       console.error("Error desconocido:", error);
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
 
 export default api;
