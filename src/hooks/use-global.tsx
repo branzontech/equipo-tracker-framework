@@ -9,8 +9,16 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { useActa } from "@/pages/productos/hooks/use-acta";
-import { CheckCircle, FileX, Wrench, ArrowRightLeft, Truck, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  FileX,
+  Wrench,
+  ArrowRightLeft,
+  Truck,
+  XCircle,
+} from "lucide-react";
 import { format, toZonedTime } from "date-fns-tz";
+import { es } from "date-fns/locale";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -65,7 +73,8 @@ export const useGlobal = () => {
         if (disponibilidad.enPrestamo) mensaje += "Está en préstamo. ";
         if (disponibilidad.enBaja) mensaje += "Está dado de baja. ";
         if (disponibilidad.enTraslado) mensaje += "Está en traslado. ";
-        if (disponibilidad.enMantenimiento) mensaje += "Está en mantenimiento. ";
+        if (disponibilidad.enMantenimiento)
+          mensaje += "Está en mantenimiento. ";
 
         toast.error(mensaje, { icon: icons.error });
         setHaBuscado(false);
@@ -252,7 +261,7 @@ export const useGlobal = () => {
     getInfoEquipo,
     buscarEquipo,
     saveSign_,
-    StatusBadge
+    StatusBadge,
   };
 };
 
@@ -260,11 +269,20 @@ export const formatFecha = (fechaIso?: string | Date) => {
   if (!fechaIso) return "No disponible";
 
   const zona = "America/Bogota";
-  const fecha = typeof fechaIso === "string" ? new Date(fechaIso) : fechaIso;
+  let fecha: Date;
+
+  if (typeof fechaIso === "string") {
+    // Si es solo la fecha sin hora, se le asigna el mediodía
+    const input = fechaIso.length === 10 ? `${fechaIso}T12:00:00` : fechaIso;
+    fecha = new Date(input);
+  } else {
+    fecha = fechaIso;
+  }
+
   const fechaZonificada = toZonedTime(fecha, zona);
 
   return format(fechaZonificada, "d 'de' MMMM 'de' yyyy", {
     timeZone: zona,
-    locale: undefined,
+    locale: es,
   });
 };
