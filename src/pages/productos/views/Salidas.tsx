@@ -64,6 +64,8 @@ const Salidas = () => {
   } = useUser();
   const methods = useForm();
 
+  console.log(selectedRecibeUser);  
+
   const selectedEntregaId = selectedEntregaUser?.id_usuario;
   const selectedRecibeId = selectedRecibeUser?.id_usuario;
 
@@ -368,7 +370,7 @@ const Salidas = () => {
               <SignatureCanvas
                 value={selectedRecibeUser?.firma || ""}
                 onChange={(value: string) => {
-                  newUser.firma_recibe = value;
+                  newUser.firma = value;
                   if (selectedRecibeUser) {
                     setSelectedRecibeUser({
                       ...selectedRecibeUser,
