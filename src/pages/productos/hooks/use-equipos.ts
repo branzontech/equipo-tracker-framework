@@ -125,8 +125,11 @@ export const useEquipos = () => {
           categorias: equipo.categorias?.nombre || "Sin Categoria",
           estadoActual: equipo.estado_actual ? "Activo" : "Inactivo",
         }));
+        const equiposActivos = equipos.filter(
+          (equipo: any) => equipo.estado_actual === "Activo"
+        );
         setEquipo(equipos);
-        setCountEquipo(equipos.length);
+        setCountEquipo(equiposActivos.length);
 
         const sedesConEquipos = new Set(
           response
