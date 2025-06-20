@@ -117,7 +117,7 @@ const Devoluciones = () => {
                             const prestamo =
                               selectedEquipo?.prestamo_equipos?.[0]?.prestamos;
                             const traslado =
-                              selectedEquipo?.traslado_equipos?.[0]?.traslados;
+                              selectedEquipo?.traslados_equipos?.[0]?.traslados;
 
                             setNewDevo({
                               ...newDevo,
@@ -201,19 +201,10 @@ const Devoluciones = () => {
                             <SelectValue placeholder="Seleccionar motivo" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="fin_prestamo">
+                            <SelectItem value="Fin de Préstamo">
                               Fin de Préstamo
                             </SelectItem>
-                            <SelectItem value="traslado">Traslado</SelectItem>
-                            <SelectItem value="mantenimiento">
-                              Requiere Mantenimiento
-                            </SelectItem>
-                            <SelectItem value="cambio">
-                              Cambio de Equipo
-                            </SelectItem>
-                            <SelectItem value="baja">
-                              Baja del Equipo
-                            </SelectItem>
+                            <SelectItem value="Fin de traslado">Traslado</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
