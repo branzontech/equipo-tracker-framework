@@ -4,7 +4,7 @@ export const createPrestamo = async (req, res) => {
   try {
     const prestamo = req.body;
     const prestamoCreado = await PrestamoService.create(prestamo);
-    res.status(201).json({ prestamoCreado, success: true });
+    res.status(200).json({ prestamoCreado, success: true });
   } catch (error) {
     res.status(500).json({ error: "Error creating prestamo" });
   }

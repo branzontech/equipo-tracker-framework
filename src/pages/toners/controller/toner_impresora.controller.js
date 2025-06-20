@@ -5,6 +5,6 @@ export const getAll = async (req, res) => {
     const tonerImpresora = await tonerImpresoraService.getAll();
     res.status(200).json({ tonerImpresora });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

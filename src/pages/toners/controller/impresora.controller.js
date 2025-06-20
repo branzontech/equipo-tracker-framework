@@ -5,7 +5,7 @@ export const getAll = async (req, res) => {
     const impresoras = await impresoraService.getAll();
     res.status(200).json({ impresoras });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 

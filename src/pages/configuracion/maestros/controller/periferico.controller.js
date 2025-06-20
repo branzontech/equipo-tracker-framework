@@ -35,7 +35,7 @@ export const create = async (req, res) => {
     equipo_asociado_id,
   });
 
-  res.status(201).json({ success: true, data: periferico });
+  res.status(200).json({ success: true, data: periferico });
 };
 
 export const delete_ = async (req, res) => {

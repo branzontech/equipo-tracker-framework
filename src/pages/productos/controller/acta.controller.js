@@ -5,7 +5,7 @@ export const getActas = async (req, res) => {
     const actas = await actaService.findAll();
     res.status(200).json(actas);
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -15,7 +15,7 @@ export const getInfoEquipo = async (req, res) => {
     const infoEquipo = await actaService.getInfoEquipo(nro_serie);
     res.status(200).json(infoEquipo);
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -25,6 +25,6 @@ export const updateStatus = async (req, res) => {
     const updatedActa = await actaService.update(id, newStatus, tipo, acta_equipos);
     res.status(200).json({ updatedActa, success: true });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

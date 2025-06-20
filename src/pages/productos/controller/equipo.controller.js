@@ -40,7 +40,7 @@ export const create = async (req, res) => {
 
     res.status(201).json({ success: true, data: equipo });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -86,7 +86,7 @@ export const update = async (req, res) => {
 
     res.status(200).json({ success: true, data: equipo });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -95,7 +95,7 @@ export const findAll = async (req, res) => {
     const equipos = await equipoService.findAll();
     res.status(200).json(equipos);
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -105,7 +105,7 @@ export const findAllById = async (req, res) => {
     const equipo = await equipoService.findById(nro_serie);
     res.status(200).json(equipo);
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -128,6 +128,6 @@ export const getTrazabilidadByEquipoId = async (req, res) => {
     const trazabilidad = await equipoService.getTrazabilidadByEquipoId(id_equipo);
     res.status(200).json(trazabilidad);
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

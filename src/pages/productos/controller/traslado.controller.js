@@ -13,7 +13,7 @@ export const create = async (req, res) => {
   try {
     const traslado = req.body;
     const createdTraslado = await trasladoServices.create(traslado);
-    res.status(201).json({ createdTraslado, success: true });
+    res.status(200).json({ createdTraslado, success: true });
   } catch (error) {
     res.status(500).json({ error: "Error al crear el traslado" });
   }

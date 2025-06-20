@@ -4,7 +4,7 @@ export const createContrato = async (req, res) => {
   try {
     const contrato = req.body;
     const contratoCreado = await contratoService.create(contrato);
-    res.status(201).json({ contratoCreado, success: true });
+    res.status(200).json({ contratoCreado, success: true });
   } catch (error) {
     res.status(500).json({ error: "Error creating contrato" });
   }

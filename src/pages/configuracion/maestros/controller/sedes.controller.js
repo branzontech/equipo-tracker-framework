@@ -11,7 +11,7 @@ export const getSedes = async (req, res) => {
 
     res.json({ success: true, sedes });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -26,7 +26,7 @@ export const getSedeById = async (req, res) => {
 
     res.json({ success: true, sede });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -35,9 +35,9 @@ export const createSede = async (req, res) => {
     const sede = req.body;
 
     const sedeCreated = await SedesService.create(sede);
-    res.status(201).json({ success: true, sede: sedeCreated });
+    res.status(200).json({ success: true, sede: sedeCreated });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -47,7 +47,7 @@ export const deleteSede = async (req, res) => {
     const deletedSede = await SedesService.delete(id);
     res.json({ success: true, deletedSede });
   } catch (error) {
-    res.status(401).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -59,6 +59,6 @@ export const updateSede = async (req, res) => {
     const updatedSede = await SedesService.update(id, sede);
     res.json({ success: true, updatedSede });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

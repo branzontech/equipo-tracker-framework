@@ -34,7 +34,7 @@ export const create = async (req, res) => {
   try {
     const marca = req.body;
     const createdMarca = await MarcasService.create(marca);
-    res.status(201).json({ success: true, createdMarca });
+    res.status(200).json({ success: true, createdMarca });
   } catch (error) {
     res.status(500).json({ error: "Error creating marca" });
   }
@@ -46,6 +46,6 @@ export const deleteM = async (req, res) => {
     const deletedMarca = await MarcasService.delete(id);
     res.status(200).json({ deletedMarca, success: true });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
