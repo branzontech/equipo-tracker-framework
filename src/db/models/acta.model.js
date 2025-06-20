@@ -242,7 +242,7 @@ export const ActaModel = {
           prestamos: {
             where: {
               estado: {
-                not: "finalizado",
+                not: "Finalizado",
               },
             },
           },
@@ -254,7 +254,7 @@ export const ActaModel = {
           traslados: {
             where: {
               estado: {
-                not: "finalizado",
+                not: "Finalizado",
               },
             },
           },
