@@ -287,32 +287,34 @@ export const equipoModel = {
   },
   async getTrazabilidadByEquipoId(id_equipo) {
     const equipoId = Number(id_equipo);
-    return await prisma.equipos.findUnique({
-      where: { id_equipo: equipoId },
-      include: {
-        prestamo_equipos: {
-          include: {
-            prestamos: {
-              include: {
-                actas: true,
-                usuarios_prestamos_responsable_salida_idTousuarios: {
-                  select: { nombre: true },
+    try {
+      const equipo = await prisma.equipos.findUnique({
+        where: { id_equipo: equipoId },
+        include: {
+          prestamo_equipos: {
+            include: {
+              prestamos: {
+                include: {
+                  actas: true,
+                  usuarios_prestamos_responsable_salida_idTousuarios: {
+                    select: { nombre: true },
+                  },
                 },
               },
             },
           },
-        },
-        traslados_equipos: {
-          include: {
-            traslados: {
-              include: {
-                actas: true,
-                sucursales: {
-                  include: {
-                    sedes: {
-                      include: {
-                        usuarios: {
-                          select: { nombre: true },
+          traslados_equipos: {
+            include: {
+              traslados: {
+                include: {
+                  actas: true,
+                  sucursales: {
+                    include: {
+                      sedes: {
+                        include: {
+                          usuarios: {
+                            select: { nombre: true },
+                          },
                         },
                       },
                     },
@@ -321,15 +323,99 @@ export const equipoModel = {
               },
             },
           },
-        },
-        mantenimientos: {
-          include: {
-            usuarios: {
-              select: { nombre: true },
+          bajas_equipos: {
+            include: {
+              bajas: {
+                include: {
+                  actas: true,
+                  usuarios_bajas_responsable_autorizacion_idTousuarios: {
+                    select: { nombre: true },
+                  },
+                  usuarios_bajas_responsable_solicitud_idTousuarios: {
+                    select: { nombre: true },
+                  },
+                },
+              },
+            },
+          },
+          mantenimientos: {
+            include: {
+              usuarios: {
+                select: { nombre: true },
+              },
             },
           },
         },
-      },
-    });
+      });
+
+      // Obtener devoluciones relacionadas por préstamo o traslado
+      const devoluciones = await prisma.devoluciones.findMany({
+        where: {
+          OR: [
+            {
+              prestamos: {
+                prestamo_equipos: {
+                  some: {
+                    equipo_id: equipoId,
+                  },
+                },
+              },
+            },
+            {
+              traslados: {
+                traslados_equipos: {
+                  some: {
+                    equipo_id: equipoId,
+                  },
+                },
+              },
+            },
+          ],
+        },
+        include: {
+          actas: true,
+          usuarios_devoluciones_usuario_entrega_idTousuarios: {
+            select: { nombre: true },
+          },
+          usuarios_devoluciones_usuario_recibe_idTousuarios: {
+            select: { nombre: true },
+          },
+          prestamos: {
+            include: {
+              usuarios_prestamos_responsable_salida_idTousuarios: {
+                select: { nombre: true },
+              },
+              actas: true,
+            },
+          },
+          traslados: {
+            include: {
+              sucursales: {
+                include: {
+                  sedes: {
+                    include: {
+                      usuarios: {
+                        select: { nombre: true },
+                      },
+                    },
+                  },
+                },
+              },
+              actas: true,
+            },
+          },
+        },
+      });
+
+      return {
+        ...equipo,
+        devoluciones,
+      };
+    } catch (error) {
+      console.error("Error en getTrazabilidadByEquipoId:", error);
+      throw new Error(
+        error.message || "Error al obtener la trazabilidad del equipo."
+      );
+    }
   },
 };
