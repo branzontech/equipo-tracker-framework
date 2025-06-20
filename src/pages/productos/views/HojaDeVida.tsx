@@ -148,6 +148,24 @@ const HojaDeVida = () => {
     }
   });
 
+  // Devoluciones
+  newEquipo.trazabilidad.devoluciones?.forEach((devolucion) => {
+    historialEventos.push({
+      id: `devolucion-${devolucion.id_devolucion}`,
+      tipo: "devolucion",
+      fecha: devolucion.fecha_devolucion,
+      descripcion: "Devolución Realizada",
+      responsable:
+        devolucion.usuarios_devoluciones_usuario_entrega_idTousuarios?.nombre ||
+        `ID ${devolucion.usuario_entrega_id}`,
+      detalles: {
+        descripcion: devolucion.motivo || "-",
+        estado: devolucion.estado_equipo || "-",
+        observaciones: devolucion.observaciones || "-",
+      },
+    });
+  });
+
   const getIconoEvento = (tipo: string) => {
     switch (tipo) {
       case "ingreso":
@@ -161,6 +179,8 @@ const HojaDeVida = () => {
         return <Truck className="h-6 w-6 text-orange-500" />;
       case "prestamo":
         return <Repeat className="h-6 w-6 text-purple-500" />;
+      case "devolucion":
+        return <CheckCircle2 className="h-6 w-6 text-rose-500" />;
       default:
         return <Info className="h-6 w-6 text-muted-foreground" />;
     }
@@ -202,6 +222,12 @@ const HojaDeVida = () => {
         return (
           <Badge variant="outline" className="bg-purple-500 text-white">
             Préstamo
+          </Badge>
+        );
+      case "devolucion":
+        return (
+          <Badge variant="outline" className="bg-rose-500 text-white">
+            Devolución
           </Badge>
         );
       default:
