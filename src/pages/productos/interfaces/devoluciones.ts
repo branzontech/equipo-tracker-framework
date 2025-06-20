@@ -9,4 +9,12 @@ export interface Devolucion {
   observaciones: string;
   usuario_entrega_id: number;
   usuario_recibe_id: number;
+  usuarios_devoluciones_usuario_entrega_idTousuarios: {
+    id: number;
+    nombre: string;
+  };
+  usuarios_devoluciones_usuario_recibe_idTousuarios: {
+    id: number;
+    nombre: string;
+  };
 }
