@@ -44,6 +44,7 @@ import { Equipo } from "../productos/interfaces/equipo";
 import { useState } from "react";
 import { useUser } from "../usuarios/hooks/use-user";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
+import { SearchUser } from "../usuarios/components/SearchUser";
 
 const MantenimientosIndex = () => {
   const navigate = useNavigate();
@@ -59,15 +60,41 @@ const MantenimientosIndex = () => {
     equipoSeleccionado,
     setEquipoSeleccionado,
     onSubmit,
+    setTecnicoResponsable,
+    validEquipo,
+    validDetalles,
   } = useMantenimiento();
   const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
-  const { users } = useUser();
+  const {
+    setSelectedRecibeUser,
+    handleNombreInput,
+    nombreInput,
+    sugerencias,
+    setSugerencias,
+    setNombreUser,
+  } = useUser();
 
   const selectEquipo = (equipo: Equipo) => {
     setEquipoSeleccionado(equipo);
     setNewMante((prev) => ({ ...prev, id_equipo: equipo.id_equipo }));
     setNewEquipo((prev) => ({ ...prev, nro_serie: "" }));
     setEquipo([]);
+  };
+
+  const handleUserSelect = (user) => {
+    setNombreUser(user.nombre);
+    setSelectedRecibeUser(user);
+    setTecnicoResponsable({
+      id: user.id_usuario.toString(),
+      name: user.nombre,
+      position: user.rol,
+      department: user.sedes?.nombre || "Sin sede",
+    });
+    setNewMante((prev) => ({
+      ...prev,
+      tecnico_id: user.id_usuario,
+    }));
+    setSugerencias([]);
   };
 
   return (
@@ -93,7 +120,7 @@ const MantenimientosIndex = () => {
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-3xl h-[90vh] max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-white">
+          <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-white">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl">
                 Nuevo Mantenimiento
@@ -110,14 +137,19 @@ const MantenimientosIndex = () => {
               }}
             >
               <Tabs
+                defaultValue="equipo"
                 value={currentTab}
                 onValueChange={handleTabChange}
                 className="w-full"
               >
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="equipo">Equipo</TabsTrigger>
-                  <TabsTrigger value="detalles">Detalles</TabsTrigger>
-                  <TabsTrigger value="programacion">Programación</TabsTrigger>
+                  <TabsTrigger value="detalles" disabled={!validEquipo}>
+                    Detalles
+                  </TabsTrigger>
+                  <TabsTrigger value="programacion" disabled={!validDetalles}>
+                    Programación
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="equipo" className="space-y-4 mt-4">
@@ -282,7 +314,9 @@ const MantenimientosIndex = () => {
                       <Label htmlFor="prioridad">Prioridad</Label>
                       <Select
                         value={newMante.prioridad ? newMante.prioridad : ""}
-                          onValueChange={(value) => setNewMante({ ...newMante, prioridad: value })}
+                        onValueChange={(value) =>
+                          setNewMante({ ...newMante, prioridad: value })
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar prioridad" />
@@ -326,7 +360,17 @@ const MantenimientosIndex = () => {
                       )}
                     /> */}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <SearchUser
+                    label="Técnico asignado"
+                    nombreInput={nombreInput}
+                    onInputChange={handleNombreInput}
+                    sugerencias={sugerencias.filter(
+                      (user) => user.rol === "Agente"
+                    )}
+                    onUserSelect={handleUserSelect}
+                  />
+
+                  {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2 col-span-2">
                       <Label htmlFor="tecnico">Técnico asignado</Label>
                       <Select
@@ -352,7 +396,7 @@ const MantenimientosIndex = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="space-y-2">
                     <Label htmlFor="descripcion">
