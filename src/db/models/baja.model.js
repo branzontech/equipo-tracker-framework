@@ -18,11 +18,14 @@ export const bajaModel = {
   },
   create: async (baja) => {
     try {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+
       // 1. Crear el acta
       const nuevaActa = await prisma.actas.create({
         data: {
           tipo: "Baja",
-          fecha: new Date(),
+          fecha: hoy,
         },
       });
 
