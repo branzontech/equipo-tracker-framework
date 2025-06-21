@@ -11,11 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   Form,
-  FormField,
-  FormItem,
-  FormLabel,
   FormControl,
-  FormMessage,
 } from "@/components/ui/form";
 import {
   Select,
@@ -25,7 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import SignatureCanvas from "@/components/SignatureCanvas";
 
@@ -79,7 +74,6 @@ export const UserForm: React.FC<UserFormProps> = ({
                   <Input
                     id="nombre"
                     autoComplete="off"
-                    required
                     placeholder="Ingrese el nombre"
                     onChange={(e) =>
                       setNewUser({ ...newUser, nombre: e.target.value })
@@ -93,7 +87,6 @@ export const UserForm: React.FC<UserFormProps> = ({
                     id="email"
                     type="email"
                     autoComplete="off"
-                    required
                     placeholder="Ingrese el correo electrónico"
                     onChange={(e) =>
                       setNewUser({ ...newUser, email: e.target.value })
@@ -107,7 +100,6 @@ export const UserForm: React.FC<UserFormProps> = ({
                     id="password"
                     type="password"
                     autoComplete="off"
-                    required
                     placeholder="Ingrese la contraseña"
                     onChange={(e) =>
                       setNewUser({ ...newUser, contraseña: e.target.value })
@@ -142,7 +134,6 @@ export const UserForm: React.FC<UserFormProps> = ({
                   <Input
                     id="telefono"
                     autoComplete="off"
-                    required
                     placeholder="Ingrese el teléfono"
                     onChange={(e) =>
                       setNewUser({ ...newUser, telefono: e.target.value })
@@ -151,7 +142,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="activo">Activo</Label>
+                  <Label htmlFor="estado">Estado</Label>
                   <Select
                     value={newUser.estado || ""}
                     onValueChange={(value) =>
