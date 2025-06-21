@@ -58,6 +58,13 @@ export const useSedes = () => {
       return;
     }
 
+    if (!sede.regional) {
+      toast.error("Debe ingresar una regional", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     if (!sede.usuarios || sede.usuarios.length === 0) {
       toast.error("Debe seleccionar al menos un usuario", {
         icon: icons.error,
