@@ -447,7 +447,7 @@ const Actas = () => {
                         </Label>
                       </Button>
                     )}
-                    {estado !== "En proceso" && (
+                    {/* {estado !== "En proceso" && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -460,13 +460,13 @@ const Actas = () => {
                           Marcar como En Proceso
                         </Label>
                       </Button>
-                    )}
+                    )} */}
                   </>
                 )}
               </div>
             </div>
 
-            {currentActa.tipo === "Prestamo" && estado !== "Vigente" && (
+            {/* {currentActa.tipo === "Prestamo" && estado !== "Vigente" && (
               <>
                 <Separator />
                 <div className="space-y-4">
@@ -484,7 +484,7 @@ const Actas = () => {
                       </Button>
                     )}
 
-                    {(estado === "vigente" ||
+                    {(estado === "Vigente" ||
                       estado === "pendiente_devolucion") && (
                       <Button
                         variant="secondary"
@@ -498,7 +498,7 @@ const Actas = () => {
                   </div>
                 </div>
               </>
-            )}
+            )} */}
 
             {estado === "En proceso" && (
               <>
@@ -574,6 +574,7 @@ const Actas = () => {
             <SelectItem value="Prestamo">Préstamos</SelectItem>
             <SelectItem value="Traslado">Traslados</SelectItem>
             <SelectItem value="Baja">Bajas</SelectItem>
+            <SelectItem value="Devolucion">Devoluciones</SelectItem>
           </SelectContent>
         </Select>
 
@@ -583,10 +584,10 @@ const Actas = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos los estados</SelectItem>
-            <SelectItem value="En proceso">En proceso</SelectItem>
             <SelectItem value="Vigente">Vigente</SelectItem>
             <SelectItem value="Finalizado">Finalizada</SelectItem>
             <SelectItem value="Cancelada">Cancelada</SelectItem>
+            <SelectItem value="Satisfactoria">Satisfactoria</SelectItem>
           </SelectContent>
         </Select>
       </div>
