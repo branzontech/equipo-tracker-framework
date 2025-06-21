@@ -88,6 +88,12 @@ export const useCategoria = () => {
   };
 
   const update = async (id: number, categoria: Categoria) => {
+    if (!categoria.nombre) {
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
+      return;
+    }
     const response = await updateCategoria(id, categoria);
     if (response.success) {
       toast.success(response.message || "Categoria actualizada exitosamente");
