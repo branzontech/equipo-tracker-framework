@@ -1,19 +1,9 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -21,30 +11,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
 import { useDevolucion } from "../hooks/use-devolucion";
 import { Label } from "@/components/ui/label";
 import ResponsibleSearch from "@/components/ResponsibleSearch";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import SignatureCanvas from "@/components/SignatureCanvas";
+import { useState } from "react";
+import { Combobox } from "@headlessui/react";
 
 const Devoluciones = () => {
   const { equiposEnMovimiento, newDevo, setNewDevo, handleSubmit } =
@@ -58,6 +40,7 @@ const Devoluciones = () => {
     setSelectedRecibeUser,
   } = useUser();
   const form = useForm();
+  const [query, setQuery] = useState("");
 
   const selectedEntregaId = selectedEntregaUser?.id_usuario;
   const selectedRecibeId = selectedRecibeUser?.id_usuario;
@@ -69,6 +52,13 @@ const Devoluciones = () => {
   const recibeUsuarios = users.filter(
     (u) => u.id_usuario !== selectedEntregaId
   );
+
+  const filteredEquipos =
+    query === ""
+      ? equiposEnMovimiento
+      : equiposEnMovimiento.filter(
+          (eq) => `${eq.nombre_equipo} ${eq.estado_actual} ${eq.nro_serie}`.toLowerCase().includes(query.toLowerCase())
+        );
 
   return (
     <div className="container p-6  max-w-4xl mx-auto">
@@ -88,15 +78,12 @@ const Devoluciones = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="equipoId">Equipo</Label>
-                  <Select
-                    value={
-                      newDevo.equipo_id > 0 ? newDevo.equipo_id.toString() : ""
-                    }
-                    onValueChange={(value) => {
+                  <Combobox
+                    value={newDevo.equipo_id}
+                    onChange={(value) => {
                       const selectedEquipo = equiposEnMovimiento.find(
-                        (eq) => eq.id_equipo === Number(value)
+                        (eq) => eq.id_equipo === value
                       );
-
                       const prestamo =
                         selectedEquipo?.prestamo_equipos?.[0]?.prestamos;
                       const traslado =
@@ -104,33 +91,49 @@ const Devoluciones = () => {
 
                       setNewDevo({
                         ...newDevo,
-                        equipo_id: Number(value),
+                        equipo_id: value,
                         prestamo_id: prestamo?.id_prestamo || 0,
                         traslado_id: traslado?.id_traslado || 0,
                       });
                     }}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar equipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.isArray(equiposEnMovimiento) &&
-                      equiposEnMovimiento.length > 0 ? (
-                        equiposEnMovimiento.map((equipo) => (
-                          <SelectItem
-                            key={equipo.id_equipo}
-                            value={equipo.id_equipo.toString()}
-                          >
-                            {equipo.nombre_equipo} - {equipo.estado_actual}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="px-4 py-2 text-sm text-muted-foreground">
-                          No hay equipos disponibles
-                        </div>
-                      )}
-                    </SelectContent>
-                  </Select>
+                    <div className="relative">
+                      <Combobox.Input
+                        className="w-full text-[14px] border border-input rounded-md px-3 py-2"
+                        onChange={(event) => setQuery(event.target.value)}
+                        displayValue={(id) => {
+                          const eq = equiposEnMovimiento.find(
+                            (e) => e.id_equipo === id
+                          );
+                          return eq
+                            ? `${eq.nombre_equipo} - ${eq.estado_actual}`
+                            : "";
+                        }}
+                        placeholder="Buscar equipo..."
+                      />
+                      <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white border border-gray-300 shadow-lg">
+                        {filteredEquipos.length === 0 ? (
+                          <div className="px-4 py-2 text-sm text-muted-foreground">
+                            No hay equipos disponibles
+                          </div>
+                        ) : (
+                          filteredEquipos.map((equipo) => (
+                            <Combobox.Option
+                              key={equipo.id_equipo}
+                              value={equipo.id_equipo}
+                              className={({ active }) =>
+                                `cursor-pointer select-none px-4 py-2 ${
+                                  active ? "bg-blue-100" : ""
+                                }`
+                              }
+                            >
+                              {equipo.nombre_equipo} - {equipo.estado_actual}
+                            </Combobox.Option>
+                          ))
+                        )}
+                      </Combobox.Options>
+                    </div>
+                  </Combobox>
                 </div>
 
                 <div className="space-y-2">
