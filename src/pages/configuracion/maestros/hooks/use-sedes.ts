@@ -133,6 +133,33 @@ export const useSedes = () => {
   };
 
   const update = async (id: number, sede: Sede) => {
+    if (!sede.nombre) {
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!sede.regional) {
+      toast.error("Debe ingresar una regional", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!sede.usuarios || sede.usuarios.length === 0) {
+      toast.error("Debe seleccionar al menos un usuario", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (sede.estado === undefined || sede.estado === null) {
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
+      return;
+    }
     try {
       const response = await updateSede(id, sede);
       if (response.success) {
