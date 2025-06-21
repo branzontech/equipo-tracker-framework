@@ -311,6 +311,33 @@ export const useSucursales = () => {
   };
 
   const update = async (id: number, sucursal: Sucursal) => {
+    if (!sucursal.nombre) {
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!sucursal.tipo) {
+      toast.error("Debe seleccionar un tipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!sucursal.sede_id) {
+      toast.error("Debe seleccionar una sede", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (sucursal.estado === undefined || sucursal.estado === null) {
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
+      return;
+    }
     try {
       const response = await updateSucursal(id, sucursal);
       if (response.success) {
