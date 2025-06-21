@@ -1,47 +1,17 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import * as z from "zod";
 import { format } from "date-fns";
 import {
   CalendarIcon,
-  FileX,
-  Plus,
-  Upload,
-  Download,
-  Search,
 } from "lucide-react";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import SignatureCanvas from "@/components/SignatureCanvas";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { EquipoForm } from "./EquipoForm";
-import { EquiposTable } from "./EquiposTable";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import ResponsibleSearch from "@/components/ResponsibleSearch";
 import { Label } from "@/components/ui/label";
@@ -199,37 +169,6 @@ export function BajaEquiposForm() {
                   }));
                 }}
               />
-
-              {/* <Sheet>
-                    <SheetTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        className="flex items-center bg-[#bff036] hover:bg-[#bff036]/90 text-[#01242c]"
-                      >
-                        <Plus className="mr-1 h-4 w-4" /> Agregar equipo
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent className="sm:max-w-md">
-                      <SheetHeader>
-                        <SheetTitle>Agregar Equipo</SheetTitle>
-                        <SheetDescription>
-                          Complete los datos del equipo que desea dar de baja.
-                        </SheetDescription>
-                      </SheetHeader>
-                      <EquipoForm
-                        onAddEquipo={agregarEquipo}
-                        handleBulkImport={handleBulkImport}
-                        exportTemplate={exportTemplate}
-                      />
-                    </SheetContent>
-                  </Sheet> */}
-
-              {/* Table to display equipos */}
-              {/* <EquiposTable
-                equipos={form.getValues().equipos}
-                onDeleteEquipo={eliminarEquipo}
-              /> */}
             </div>
 
             <div className="mb-6">
@@ -272,6 +211,10 @@ export function BajaEquiposForm() {
                   }}
                   onClear={() => {
                     setSelectedEntregaUser(null);
+                    setNewBaja((prev) => ({
+                      ...prev,
+                      responsable_autorizacion_id: null,
+                    }));
                   }}
                 />
 
@@ -298,6 +241,10 @@ export function BajaEquiposForm() {
                   }}
                   onClear={() => {
                     setSelectedRecibeUser(null);
+                    setNewBaja((prev) => ({
+                      ...prev,
+                      responsable_solicitud_id: null,
+                    }));
                   }}
                 />
               </div>
@@ -339,17 +286,6 @@ export function BajaEquiposForm() {
             </div>
 
             <div className="flex justify-end space-x-4">
-              {/* <Button
-                type="button"
-                variant="outline"
-                // onClick={() => {
-                //   form.reset();
-                //   setEquipos([{ id: Date.now().toString() }]);
-                // }}
-                className="bg-white hover:bg-gray-100 w-full"
-              >
-                Cancelar
-              </Button> */}
               <Button type="submit" className=" w-full">
                 Registrar Baja
               </Button>
