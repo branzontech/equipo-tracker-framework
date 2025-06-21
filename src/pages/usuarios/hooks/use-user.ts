@@ -64,15 +64,64 @@ export const useUser = () => {
   };
 
   const handleSumbit = async (usuario: Usuario) => {
+    if (!usuario.nombre) {
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!usuario.email) {
+      toast.error("Debe ingresar un email", {
+        icon: icons.error,
+      });
+      return;
+    } 
+
+    if (!usuario.contraseña) {
+      toast.error("Debe ingresar una contraseña", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!usuario.rol) {
+      toast.error("Debe seleccionar un rol", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!usuario.telefono) {
+      toast.error("Debe ingresar un número de teléfono", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!usuario.estado) {
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!usuario.firma || !usuario.firma.length) {
+      toast.error("Debe seleccionar una firma", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     try {
       const response = await createUser(usuario);
       if (response.success) {
         toast.success(response.message || "Usuario creado exitosamente", {
           icon: icons.success,
         });
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 4500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
       }
       return response;
     } catch (error) {
