@@ -33,8 +33,6 @@ export const UserModel = {
         typeof user.firma === "string" &&
         user.firma.startsWith("data:image/png;base64,");
 
-      console.log("User with firma:", user);
-
       return {
         ...user,
         firma: user.firma
