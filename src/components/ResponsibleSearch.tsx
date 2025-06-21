@@ -31,7 +31,7 @@ const ResponsibleSearch = ({
   onSelect,
   onClear,
 }: ResponsibleSearchProps) => {
-  const { control, setValue, watch } = useFormContext();
+  const { control, setValue, watch, getValues } = useFormContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<ResponsiblePerson[]>([]);
