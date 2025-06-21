@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Cookies from "js-cookie";
 import { loginUser } from "@/api/axios/auth.api";
@@ -16,7 +17,8 @@ export const useLogin = () => {
     rol: "",
     sede_id: 0,
     sedes: null,
-    activo: false,
+    estado: "",
+    sucursales: null,
     firma_entrega: "",
     firma_recibe: "",
     firma: "",
@@ -29,7 +31,7 @@ export const useLogin = () => {
     if (savedUser && savedPassword) {
       setUser({ ...user, email: savedUser, contraseña: savedPassword });
     }
-  }, [user]);
+  }, []);
 
   const SignIn = async (
     email: string,
