@@ -287,12 +287,18 @@ export const useEquipos = () => {
   };
 
   const applyFilters = (data: typeof equipo) => {
+    const visibleKeys = columns
+      .filter((col) => col.isVisible)
+      .map((col) => col.key);
+
     return data.filter((item) => {
-      const matchesSearch = Object.values(item).some(
-        (value) =>
+      const matchesSearch = visibleKeys.some((key) => {
+        const value = item[key];
+        return (
           value &&
           value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
+        );
+      });
 
       if (!matchesSearch) return false;
 
