@@ -35,7 +35,7 @@ export const trasladoModel = {
           fecha_traslado: traslado.fecha_traslado,
           motivo: traslado.motivo,
           observaciones: traslado.observaciones,
-          estado: "Pendiente",
+          estado: "Vigente",
           actas: { connect: { id_acta: nuevaActa.id_acta } },
           usuarios_traslados_responsable_entrada_idTousuarios: {
             connect: { id_usuario: traslado.responsable_entrada_id },
