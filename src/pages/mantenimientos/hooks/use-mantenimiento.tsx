@@ -13,7 +13,15 @@ import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { icons } from "@/components/interfaces/icons";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Check, Clock, AlertCircle, Pause, Play, Rocket, AlertTriangle } from "lucide-react";
+import {
+  Check,
+  Clock,
+  AlertCircle,
+  Pause,
+  Play,
+  Rocket,
+  AlertTriangle,
+} from "lucide-react";
 
 const listadoChequeo = [
   "Limpieza de hardware",
@@ -72,6 +80,9 @@ export const useMantenimiento = () => {
   const [selectedSede, setSelectedSede] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSucursal, setSelectedSucursal] = useState<string>("all");
+  const [tecnicoResponsable, setTecnicoResponsable] = useState(null);
+  const [validEquipo, setValidEquipo] = useState(false);
+  const [validDetalles, setValidDetalles] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -160,8 +171,10 @@ export const useMantenimiento = () => {
     if (error) return;
 
     if (currentTab === "equipo") {
+      setValidEquipo(true);
       setCurrentTab("detalles");
     } else if (currentTab === "detalles") {
+      setValidDetalles(true);
       setCurrentTab("programacion");
     }
   };
@@ -175,6 +188,9 @@ export const useMantenimiento = () => {
   };
 
   const handleTabChange = (value: string) => {
+    if (value === "detalles" && !validEquipo) return;
+    if (value === "programacion" && !validDetalles) return;
+
     setCurrentTab(value);
   };
 
@@ -685,5 +701,9 @@ export const useMantenimiento = () => {
     searchTerm,
     getEstadoBadge,
     getProgresoBar,
+    tecnicoResponsable,
+    setTecnicoResponsable,
+    validEquipo,
+    validDetalles,
   };
 };
