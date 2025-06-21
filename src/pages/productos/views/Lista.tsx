@@ -116,14 +116,12 @@ const ListaInventario = () => {
               <TabsTrigger value="perifericos">Periféricos</TabsTrigger>
             </TabsList>
           </div>
-          <Button
-            onClick={
-              activeTab === "inventario" ? handleNuevoProducto : undefined
-            }
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {activeTab === "inventario" ? "Nuevo Producto" : "Nuevo Periférico"}
-          </Button>
+          {activeTab === "inventario" && (
+            <Button onClick={handleNuevoProducto}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Producto
+            </Button>
+          )}
         </div>
 
         <TabsContent value="inventario" className="mt-0">
