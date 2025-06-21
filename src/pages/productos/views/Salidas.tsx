@@ -1,7 +1,6 @@
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Plus, Search, Trash2 } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -9,17 +8,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  PDFViewer,
-  PDFDownloadLink,
-  Image,
-} from "@react-pdf/renderer";
 import ResponsibleSearch from "@/components/ResponsibleSearch";
 import { usePrestamo } from "../hooks/use-prestamo";
 import { Label } from "@/components/ui/label";
@@ -31,14 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEquipos } from "../hooks/use-equipos";
 import SignatureCanvas from "@/components/SignatureCanvas";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
-import { useEffect, useState } from "react";
-import { AccesoriosContainer } from "@/components/AccesorioItem";
-import { toast } from "sonner";
-import { Equipo } from "../interfaces/equipo";
 import { SearchEquipo } from "@/components/SearchEquipo";
 import { SearchUser } from "@/pages/usuarios/components/SearchUser";
 
@@ -64,6 +47,8 @@ const Salidas = () => {
     setNombreUser,
   } = useUser();
   const methods = useForm();
+
+  console.log("newPrestamo", newPrestamo);
 
   const selectedEntregaId = selectedEntregaUser?.id_usuario;
   const selectedRecibeId = selectedRecibeUser?.id_usuario;
@@ -305,6 +290,10 @@ const Salidas = () => {
               }}
               onClear={() => {
                 setSelectedEntregaUser(null);
+                setNewPrestamo((prev) => ({
+                  ...prev,
+                  responsable_salida_id: null,
+                }));
               }}
             />
 
@@ -338,6 +327,10 @@ const Salidas = () => {
               onClear={() => {
                 setSelectedRecibeUser(null);
                 setResponsableRecibeInput(null);
+                setNewPrestamo((prev) => ({
+                  ...prev,
+                  responsable_entrada_id: null,
+                }));
               }}
             />
           </div>
