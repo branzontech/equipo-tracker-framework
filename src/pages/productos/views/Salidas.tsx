@@ -40,6 +40,7 @@ import { AccesoriosContainer } from "@/components/AccesorioItem";
 import { toast } from "sonner";
 import { Equipo } from "../interfaces/equipo";
 import { SearchEquipo } from "@/components/SearchEquipo";
+import { SearchUser } from "@/pages/usuarios/components/SearchUser";
 
 const Salidas = () => {
   const {
@@ -64,8 +65,6 @@ const Salidas = () => {
   } = useUser();
   const methods = useForm();
 
-  console.log(selectedRecibeUser);  
-
   const selectedEntregaId = selectedEntregaUser?.id_usuario;
   const selectedRecibeId = selectedRecibeUser?.id_usuario;
 
@@ -76,6 +75,22 @@ const Salidas = () => {
   const recibeUsuarios = users.filter(
     (u) => u.id_usuario !== selectedEntregaId
   );
+
+  const handleUserSelect = (user) => {
+    setNombreUser(user.nombre);
+    setSelectedRecibeUser(user);
+    setResponsableRecibeInput({
+      id: user.id_usuario.toString(),
+      name: user.nombre,
+      position: user.rol,
+      department: user.sedes?.nombre || "Sin sede",
+    });
+    setNewPrestamo((prev) => ({
+      ...prev,
+      responsable_entrada_id: user.id_usuario,
+    }));
+    setSugerencias([]);
+  };
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -94,7 +109,12 @@ const Salidas = () => {
             const firmaFinalRecibe =
               newUser.firma_recibe || selectedRecibeUser?.firma || "";
 
-            addPrestamo(newPrestamo, firmaFinalEntrega, firmaFinalRecibe, nombreInput);
+            addPrestamo(
+              newPrestamo,
+              firmaFinalEntrega,
+              firmaFinalRecibe,
+              nombreInput
+            );
           }}
         >
           <div className="grid grid-cols-2 gap-6">
@@ -131,6 +151,12 @@ const Salidas = () => {
                       })
                     }
                     initialFocus
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+
+                      return date < today || date < new Date("1900-01-01");
+                    }}
                   />
                 </PopoverContent>
               </Popover>
@@ -169,54 +195,22 @@ const Salidas = () => {
                       })
                     }
                     initialFocus
-                    disabled={(date) =>
-                      newPrestamo.fecha_retorno
-                        ? date < newPrestamo.fecha_retorno
-                        : false
-                    }
+                    disabled={(date) => {
+                      const today = new Date();
+                      return date < today || date < new Date("1900-01-01");
+                    }}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
-            <div className="space-y-2 relative">
-              <Label>Usuario de recepción</Label>
-              <Input
-                type="text"
-                value={nombreInput}
-                placeholder="Ingrese el nombre del usuario"
-                onChange={(e) => handleNombreInput(e.target.value)}
-                autoComplete="off"
-              />
-
-              {Array.isArray(sugerencias) && sugerencias.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border rounded-md shadow-md mt-1 max-h-60 overflow-y-auto text-sm">
-                  {sugerencias.map((usuario) => (
-                    <li
-                      key={usuario.id_usuario}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setNombreUser(usuario.nombre);
-                        setSelectedRecibeUser(usuario);
-                        setResponsableRecibeInput({
-                          id: usuario.id_usuario.toString(),
-                          name: usuario.nombre,
-                          position: usuario.rol,
-                          department: usuario.sedes?.nombre || "Sin sede",
-                        });
-                        setNewPrestamo((prev) => ({
-                          ...prev,
-                          responsable_entrada_id: usuario.id_usuario,
-                        }));
-                        setSugerencias([]);
-                      }}
-                    >
-                      {usuario.nombre}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <SearchUser
+              label="Usuario de recepción"
+              nombreInput={nombreInput}
+              onInputChange={handleNombreInput}
+              sugerencias={sugerencias}
+              onUserSelect={handleUserSelect}
+            />
 
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
