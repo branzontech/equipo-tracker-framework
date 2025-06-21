@@ -80,8 +80,6 @@ const Actas = () => {
   } = useActa();
   const { formatFecha } = useGlobal();
 
-  console.log(new Date());
-
   // const handleProcessReturn = (acta: Acta) => {
   //   if (
   //     acta.tipo === "prestamo" &&
@@ -248,21 +246,13 @@ const Actas = () => {
             )
             .map((acta) => {
               const { usuario, descripcion } = getActaData(acta);
-
-              const estado = getEstadoFromActa(acta);
-
+              console.log("acta", acta);
               return (
                 <TableRow key={acta.id_acta}>
                   <TableCell className="font-medium">{`ACT${acta.id_acta
                     .toString()
                     .padStart(3, "0")}`}</TableCell>
-                  <TableCell>
-                    {formatFecha(
-                      typeof acta.fecha === "string"
-                        ? acta.fecha
-                        : acta.fecha.toISOString()
-                    )}
-                  </TableCell>
+                  <TableCell>{formatFecha(acta.fecha)}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {getTipoIcon(acta.tipo)}
