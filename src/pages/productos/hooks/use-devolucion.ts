@@ -55,10 +55,10 @@ export const useDevolucion = () => {
         toast.success(devolucionCreated.message || "Devolución creada exitosamente", {
           icon: icons.success,
         });
-        // setTimeout(() => {
-        //   navigate("/productos/actas");
-        //   window.location.reload();
-        // }, 4500);
+        setTimeout(() => {
+          navigate("/productos/actas");
+          window.location.reload();
+        }, 4500);
       } else {
         toast.error(devolucionCreated.message || "Error al crear la devolución", {
           icon: icons.error,
