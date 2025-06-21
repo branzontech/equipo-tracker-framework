@@ -86,6 +86,12 @@ export const useMarcas = () => {
   };
 
   const update = async (id: number, marca: Marca) => {
+    if (!marca.nombre) {
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
+      return;
+    }
     try {
       const response = await updateMarca(id, marca);
       if (response.success) {
