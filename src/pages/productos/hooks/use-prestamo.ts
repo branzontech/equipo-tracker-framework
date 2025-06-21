@@ -25,7 +25,6 @@ export const usePrestamo = () => {
     },
   });
   const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
-
   const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } =
     useGlobal();
   const navigate = useNavigate();
