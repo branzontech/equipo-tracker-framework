@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -15,22 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CheckCircle, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useSedes } from "../hooks/use-sedes";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { UpdateProps } from "../interfaces/props";
-import { useSucursales } from "../hooks/use-sucursales";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 import { listTypes } from "../interfaces/periferico";
@@ -78,13 +66,7 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                 <div className="space-y-2">
                   <Label htmlFor="estado">Estado</Label>
                   <Select
-                    value={
-                      newPeriferico.estado === "Activo"
-                        ? "Activo"
-                        : newPeriferico.estado === "Inactivo"
-                        ? "Inactivo"
-                        : ""
-                    }
+                    value={newPeriferico.estado}
                     onValueChange={(value) =>
                       setNewPeriferico({ ...newPeriferico, estado: value })
                     }
@@ -95,6 +77,11 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                     <SelectContent>
                       <SelectItem value="Activo">Activo</SelectItem>
                       <SelectItem value="Inactivo">Inactivo</SelectItem>
+                      <SelectItem value="En Traslado">En traslado</SelectItem>
+                      <SelectItem value="En Prestamo">En prestamo</SelectItem>
+                      <SelectItem value="Fuera de Servicio">
+                        Fuera de Servicio
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -120,7 +107,7 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sedes">Sedes</Label>
+                  <Label htmlFor="equipo_asociado">Equipo Asociado</Label>
                   <Select
                     value={
                       newPeriferico.equipo_asociado_id
