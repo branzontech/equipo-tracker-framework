@@ -1,22 +1,9 @@
 import { Equipo } from "@/pages/productos/interfaces/equipo";
 
-export interface Periferico {
-  id: number;
-  descripcion: string;
-  estado: "Activo" | "Inactivo";
-  serial?: string;
-  marca?: string;
-  campoPersonalizado?: {
-    nombre: string;
-    valor: string;
-  };
-  observacion?: string;
-}
-
 export interface Perifericos {
   id_periferico: number;
   nombre: string;
-  estado: string; // "Activo" | "Inactivo"
+  estado: string; 
   tipo: string;
   equipo_asociado_id: Equipo | number;
   equipos: Equipo | null;
