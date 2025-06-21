@@ -56,8 +56,10 @@ const Devoluciones = () => {
   const filteredEquipos =
     query === ""
       ? equiposEnMovimiento
-      : equiposEnMovimiento.filter(
-          (eq) => `${eq.nombre_equipo} ${eq.estado_actual} ${eq.nro_serie}`.toLowerCase().includes(query.toLowerCase())
+      : equiposEnMovimiento.filter((eq) =>
+          `${eq.nombre_equipo} ${eq.estado_actual} ${eq.nro_serie}`
+            .toLowerCase()
+            .includes(query.toLowerCase())
         );
 
   return (
@@ -166,6 +168,12 @@ const Devoluciones = () => {
                           })
                         }
                         initialFocus
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+
+                          return date < today || date < new Date("1900-01-01");
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -313,17 +321,16 @@ const Devoluciones = () => {
                   />
                 </div>
               </div>
+              <div className="flex justify-end space-x-4 mt-4">
+                <Button
+                  type="submit"
+                  className="bg-[#040d50] hover:bg-[#0a1668] w-full"
+                >
+                  Registrar Devolución
+                </Button>
+              </div>
             </CardContent>
           </Card>
-
-          <div className="flex justify-end gap-4">
-            <Button variant="outline" type="button">
-              Cancelar
-            </Button>
-            <Button type="submit" className="bg-[#040d50] hover:bg-[#0a1668]">
-              Registrar Devolución
-            </Button>
-          </div>
         </form>
       </Form>
     </div>
