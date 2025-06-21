@@ -1,18 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, FormProvider } from "react-hook-form";
-import * as z from "zod";
-import { format, set } from "date-fns";
-import { Calendar as CalendarIcon, Plus, Search, Trash2 } from "lucide-react";
+import { useForm, FormProvider } from "react-hook-form";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -27,29 +16,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  PDFViewer,
-  PDFDownloadLink,
-  Image,
-} from "@react-pdf/renderer";
-import { useToast } from "@/components/ui/use-toast";
-import { AccesoriosContainer } from "@/components/AccesorioItem";
 import SignatureCanvas from "@/components/SignatureCanvas";
 import ResponsibleSearch from "@/components/ResponsibleSearch";
 import { Label } from "@/components/ui/label";
 import { useTraslados } from "../hooks/use-traslados";
 import { es } from "date-fns/locale";
-import { useSedes } from "@/pages/configuracion/maestros/hooks/use-sedes";
-import { useSucursales } from "@/pages/configuracion/maestros/hooks/use-sucursales";
 import { SearchEquipo } from "@/components/SearchEquipo";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
-import { useState } from "react";
 
 const Traslados = () => {
   const {
@@ -276,6 +249,10 @@ const Traslados = () => {
               }}
               onClear={() => {
                 setSelectedEntregaUser(null);
+                setNewTraslado((prev) => ({
+                  ...prev,
+                  responsable_salida_id: null,
+                }));
               }}
             />
 
@@ -302,6 +279,10 @@ const Traslados = () => {
               }}
               onClear={() => {
                 setSelectedRecibeUser(null);
+                setNewTraslado((prev) => ({
+                  ...prev,
+                  responsable_entrada_id: null,
+                }));
               }}
             />
           </div>
