@@ -57,115 +57,6 @@ import {
 import { SearchEquipo } from "@/components/SearchEquipo";
 
 export function BajaEquiposForm() {
-  // const agregarEquipo = (nuevoEquipo: EquipoType) => {
-  //   const equipoId = { id: Date.now().toString() };
-  //   setEquipos([...equipos, equipoId]);
-
-  //   const currentEquipos = form.getValues().equipos || [];
-  //   form.setValue("equipos", [...currentEquipos, nuevoEquipo]);
-
-  //   toast({
-  //     title: "Equipo agregado",
-  //     description: `Se ha agregado el equipo con serial ${nuevoEquipo.serial}`,
-  //   });
-  // };
-
-  // const eliminarEquipo = (index: number) => {
-  //   if (equipos.length === 1) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Error",
-  //       description: "Debe tener al menos un equipo en la baja.",
-  //     });
-  //     return;
-  //   }
-
-  //   const nuevosEquipos = [...equipos];
-  //   nuevosEquipos.splice(index, 1);
-  //   setEquipos(nuevosEquipos);
-
-  //   const currentEquipos = form.getValues().equipos || [];
-  //   const updatedEquipos = [...currentEquipos];
-  //   updatedEquipos.splice(index, 1);
-  //   form.setValue("equipos", updatedEquipos);
-
-  //   toast({
-  //     title: "Equipo eliminado",
-  //     description: "Se ha eliminado el equipo de la lista.",
-  //   });
-  // };
-
-  // Function to reset the form and start a new equipment withdrawal
-  // const nuevaBajaEquipo = () => {
-  //   form.reset({
-  //     observaciones: "",
-  //     equipos: [
-  //       { serial: "", activoFijo: "", motivo: "", descripcionEstado: "" },
-  //     ],
-  //   });
-  //   setEquipos([{ id: Date.now().toString() }]);
-
-  //   toast({
-  //     title: "Nueva baja de equipos",
-  //     description: "Se ha iniciado un nuevo formulario de baja de equipos.",
-  //   });
-  // };
-
-  // Function to handle bulk import from CSV or Excel
-  // const handleBulkImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   // This would be implemented with a CSV/Excel parsing library
-  //   // For demo purposes, we'll just simulate adding multiple items
-  //   const mockData: EquipoType[] = [
-  //     {
-  //       serial: "SER1001",
-  //       activoFijo: "AF2001",
-  //       motivo: "Obsolescencia",
-  //       descripcionEstado:
-  //         "Equipo con 5 años de uso, lento para tareas actuales",
-  //     },
-  //     {
-  //       serial: "SER1002",
-  //       activoFijo: "AF2002",
-  //       motivo: "Daño irreparable",
-  //       descripcionEstado:
-  //         "Placa madre dañada, costo de reparación superior al 70% del valor",
-  //     },
-  //     {
-  //       serial: "SER1003",
-  //       activoFijo: "AF2003",
-  //       motivo: "Actualización tecnológica",
-  //       descripcionEstado:
-  //         "Se reemplaza por equipos nuevos según política de renovación",
-  //     },
-  //   ];
-
-  //   const currentEquipos = form.getValues().equipos || [];
-  //   const newEquipos = [...currentEquipos, ...mockData];
-
-  //   form.setValue("equipos", newEquipos);
-
-  //   // Update equipos state
-  //   const newEquiposState = [
-  //     ...equipos,
-  //     ...mockData.map(() => ({ id: Date.now().toString() + Math.random() })),
-  //   ];
-  //   setEquipos(newEquiposState);
-
-  //   toast({
-  //     title: "Importación completada",
-  //     description: `Se han agregado ${mockData.length} equipos a la lista.`,
-  //   });
-  // };
-
-  // Function to export template
-  // const exportTemplate = () => {
-  //   // In a real application, this would generate and download a CSV/Excel template
-  //   toast({
-  //     title: "Plantilla descargada",
-  //     description: "La plantilla para importación ha sido descargada.",
-  //   });
-  // };
-
   const {
     newUser,
     users,
@@ -242,6 +133,11 @@ export function BajaEquiposForm() {
                         })
                       }
                       initialFocus
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return date < today || date < new Date("1900-01-01");
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
