@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Devolucion } from "../interfaces/devoluciones";
 import {
-    create,
+  create,
   getDevoluciones,
   getEquiposEnMovimiento,
 } from "@/api/axios/devolucion.api";
@@ -49,20 +49,75 @@ export const useDevolucion = () => {
   }, []);
 
   const handleSubmit = async (data: Devolucion) => {
+    if (!data.equipo_id) {
+      toast.error("Debe seleccionar un equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.fecha_devolucion) {
+      toast.error("Debe seleccionar una fecha de devolución", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.motivo) {
+      toast.error("Debe seleccionar un motivo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.estado_equipo) {
+      toast.error("Debe seleccionar el estado del equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.observaciones) {
+      toast.error("Debe ingresar observaciones", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.usuario_recibe_id) {
+      toast.error("Debe seleccionar un usuario que recibe", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.usuario_entrega_id) {
+      toast.error("Debe seleccionar un usuario que entrega", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     try {
       const devolucionCreated = await create(data);
       if (devolucionCreated.success) {
-        toast.success(devolucionCreated.message || "Devolución creada exitosamente", {
-          icon: icons.success,
-        });
+        toast.success(
+          devolucionCreated.message || "Devolución creada exitosamente",
+          {
+            icon: icons.success,
+          }
+        );
         setTimeout(() => {
           navigate("/productos/actas");
           window.location.reload();
         }, 4500);
       } else {
-        toast.error(devolucionCreated.message || "Error al crear la devolución", {
-          icon: icons.error,
-        });
+        toast.error(
+          devolucionCreated.message || "Error al crear la devolución",
+          {
+            icon: icons.error,
+          }
+        );
       }
     } catch (error) {
       toast.error(error.message || "Error al crear la devolución", {
@@ -78,6 +133,6 @@ export const useDevolucion = () => {
     setNewDevo,
     setDevoluciones,
     setEquiposEnMovimiento,
-    handleSubmit
+    handleSubmit,
   };
 };
