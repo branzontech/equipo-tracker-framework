@@ -89,6 +89,8 @@ export const devolucionModel = {
   },
   create: async (devolucion) => {
     try {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
       // Validar que solo se proporcione préstamo o traslado (nunca ambos)
       if (
         (devolucion.prestamo_id && devolucion.traslado_id) ||
@@ -101,7 +103,7 @@ export const devolucionModel = {
       const nuevaActa = await prisma.actas.create({
         data: {
           tipo: "Devolucion",
-          fecha: new Date(),
+          fecha: hoy,
         },
       });
 
@@ -148,9 +150,10 @@ export const devolucionModel = {
       }
 
       // Determinar el estado del equipo
-      const estadoEquipo = devolucion.estado_equipo === "Óptimo" ? "Activo" : "Inactivo";
+      const estadoEquipo =
+        devolucion.estado_equipo === "Óptimo" ? "Activo" : "Inactivo";
 
-      // Cambiar estado del equipo 
+      // Cambiar estado del equipo
       await prisma.equipos.update({
         where: { id_equipo: devolucion.equipo_id },
         data: { estado_actual: estadoEquipo },
