@@ -116,6 +116,34 @@ export const usePeriferico = () => {
   };
 
   const update = async (id: number, periferico: Perifericos) => {
+    if (!periferico.nombre) {
+      toast.error("Debe ingresar un nombre", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!periferico.tipo) {
+      toast.error("Debe seleccionar un tipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!periferico.equipo_asociado_id) {
+      toast.error("Debe seleccionar un equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (periferico.estado === undefined || periferico.estado === null) {
+      toast.error("Debe seleccionar un estado", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     try {
       const response = await updatePeriferico(id, periferico);
       if (response.success) {
