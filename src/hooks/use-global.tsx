@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { format, toZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
+import { parseISO } from "date-fns";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -272,9 +273,19 @@ export const formatFecha = (fechaIso?: string | Date) => {
   let fecha: Date;
 
   if (typeof fechaIso === "string") {
-    // Si es solo la fecha sin hora, se le asigna el mediodía
-    const input = fechaIso.length === 10 ? `${fechaIso}T12:00:00` : fechaIso;
-    fecha = new Date(input);
+    // Parseamos la cadena ISO a objeto Date
+    fecha = parseISO(fechaIso);
+
+    // Si la hora es medianoche UTC, hay riesgo de que al convertir a zona horaria se reste un día
+    // Por eso, forzamos la hora a las 12:00 UTC
+    const isMedianocheUTC =
+      fecha.getUTCHours() === 0 &&
+      fecha.getUTCMinutes() === 0 &&
+      fecha.getUTCSeconds() === 0;
+
+    if (isMedianocheUTC) {
+      fecha.setUTCHours(12, 0, 0, 0); // 👈 evita que se reste un día al convertir a Bogotá
+    }
   } else {
     fecha = fechaIso;
   }
