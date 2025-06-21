@@ -204,6 +204,7 @@ export const useActa = () => {
       prestamo: "Préstamo",
       traslado: "Traslado",
       baja: "Baja",
+      devolucion: "Devolución",
     };
     return labels[tipo] || tipo;
   };
