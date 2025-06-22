@@ -8,6 +8,7 @@ export const sucursalesModel = {
         nombre: true,
         tipo: true,
         estado: true,
+        area: true,
         sedes: {
           select: {
             id_sede: true,
@@ -37,6 +38,7 @@ export const sucursalesModel = {
           estado: id_sucursal.estado,
           sede_id: id_sucursal.sede_id,
           tipo: id_sucursal.tipo,
+          area: id_sucursal.area,
         },
       });
       return newUbi;
@@ -94,6 +96,7 @@ export const sucursalesModel = {
           estado: sucursal.estado,
           sede_id: sucursal.sede_id,
           tipo: sucursal.tipo,
+          area: sucursal.area,
         },
       });
       return updated;
