@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Upload } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
@@ -34,6 +35,11 @@ import { useMarcas } from "../../configuracion/maestros/hooks/use-marcas";
 import { useCategoria } from "../../configuracion/maestros/hooks/use-categoria";
 import { useSucursales } from "../../configuracion/maestros/hooks/use-sucursales";
 import { Label } from "@/components/ui/label";
+import { useTipos } from "@/pages/configuracion/maestros/hooks/use-tipos";
+import { useEstado } from "@/pages/configuracion/maestros/hooks/use-estado";
+import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
+import { useEffect } from "react";
 
 const IngresoProducto = () => {
   const {
@@ -47,6 +53,59 @@ const IngresoProducto = () => {
   const { marcas } = useMarcas();
   const { categoria } = useCategoria();
   const { sucursales } = useSucursales();
+  const { estados } = useEstado();
+  const { tipos } = useTipos();
+
+  function formatearVidaUtil(vidaUtilDecimal: number): string {
+    const años = Math.floor(vidaUtilDecimal);
+    const meses = Math.round((vidaUtilDecimal - años) * 12);
+
+    const parteAños = años > 0 ? `${años} año${años !== 1 ? "s" : ""}` : "";
+    const parteMeses =
+      meses > 0 ? `${meses} mes${meses !== 1 ? "es" : ""}` : "";
+
+    if (parteAños && parteMeses) return `${parteAños} y ${parteMeses}`;
+    if (parteAños) return parteAños;
+    if (parteMeses) return parteMeses;
+    return "0 meses";
+  }
+
+  useEffect(() => {
+    const { valor_depreciado } = newEquipo.administrativa;
+    const { precio_compra, fecha_compra } = newEquipo.adquisicion;
+
+    if (
+      precio_compra &&
+      valor_depreciado &&
+      fecha_compra &&
+      precio_compra > 0 &&
+      valor_depreciado >= 0
+    ) {
+      const fechaCompra = new Date(fecha_compra);
+      const hoy = new Date();
+      const añosTranscurridos =
+        hoy.getFullYear() -
+        fechaCompra.getFullYear() +
+        (hoy.getMonth() - fechaCompra.getMonth()) / 12;
+
+      const depreciacionAnual = valor_depreciado / añosTranscurridos;
+      const vidaUtilTotal = precio_compra / depreciacionAnual;
+      const vidaUtilRestante = vidaUtilTotal - añosTranscurridos;
+
+      setNewEquipo((prev) => ({
+        ...prev,
+        administrativa: {
+          ...prev.administrativa,
+          vida_util_restante:
+            vidaUtilRestante > 0 ? formatearVidaUtil(vidaUtilRestante) : "0 meses",
+        },
+      }));
+    }
+  }, [
+    newEquipo.adquisicion.precio_compra,
+    newEquipo.administrativa.valor_depreciado,
+    newEquipo.adquisicion.fecha_compra,
+  ]);
 
   return (
     <div className="relative w-full overflow-x-hidden">
@@ -118,13 +177,14 @@ const IngresoProducto = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="w-full">
-                          <SelectItem value="Equipo de Cómputo">
-                            Equipo de Cómputo
-                          </SelectItem>
-                          <SelectItem value="Impresora">Impresora</SelectItem>
-                          <SelectItem value="Escáner">Escáner</SelectItem>
-                          <SelectItem value="Proyector">Proyector</SelectItem>
-                          <SelectItem value="Otro">Otro</SelectItem>
+                          {tipos.map((tipo) => (
+                            <SelectItem
+                              key={tipo.id_tipo}
+                              value={tipo.id_tipo.toString()}
+                            >
+                              {tipo.nombre_tipo}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -258,16 +318,14 @@ const IngresoProducto = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="w-full">
-                          <SelectItem value="Activo">Activo</SelectItem>
-                          <SelectItem value="En Mantenimiento">
-                            En Mantenimiento
-                          </SelectItem>
-                          <SelectItem value="En Reparación">
-                            En Reparación
-                          </SelectItem>
-                          <SelectItem value="Fuera de Servicio">
-                            Fuera de Servicio
-                          </SelectItem>
+                          {estados.map((estado) => (
+                            <SelectItem
+                              key={estado.id_estado}
+                              value={estado.id_estado.toString()}
+                            >
+                              {estado.nombre_estado}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -654,7 +712,19 @@ const IngresoProducto = () => {
                           newEquipo.adquisicion.precio_compra
                         )}
                         onChange={(e) => {
-                          const raw = e.target.value.replace(/\./g, "");
+                          const input = e.target.value;
+
+                          if (/[^0-9.]/.test(input)) {
+                            toast.error(
+                              "Solo se permiten números. Se han removido caracteres inválidos.",
+                              {
+                                icon: icons.error,
+                              }
+                            );
+                          }
+
+                          const raw = input.replace(/\D/g, "");
+
                           setNewEquipo({
                             ...newEquipo,
                             adquisicion: {
@@ -1373,15 +1443,7 @@ const IngresoProducto = () => {
                       <Input
                         placeholder="Vida Útil Restante"
                         value={newEquipo.administrativa.vida_util_restante}
-                        onChange={(e) => {
-                          setNewEquipo({
-                            ...newEquipo,
-                            administrativa: {
-                              ...newEquipo.administrativa,
-                              vida_util_restante: e.target.value,
-                            },
-                          });
-                        }}
+                        readOnly
                       />
                     </div>
                   </div>
