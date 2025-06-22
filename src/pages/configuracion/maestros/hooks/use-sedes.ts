@@ -1,4 +1,3 @@
-import { AlertTriangle } from "lucide-react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   getSedes,
@@ -22,9 +21,9 @@ export const useSedes = () => {
   const [newSede, setNewSede] = useState<Sede>({
     id_sede: 0,
     nombre: "",
-    usuarios: [],
     estado: null,
     sucursales: null,
+    usuario_sede: [],
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSedeId, setSelectedSedeId] = useState<number | null>(null);
@@ -57,8 +56,12 @@ export const useSedes = () => {
       return;
     }
 
-    if (!sede.usuarios || sede.usuarios.length === 0) {
-      toast.error("Debe seleccionar al menos un usuario", {
+    if (
+      !sede.usuario_sede ||
+      sede.usuario_sede.length === 0 ||
+      sede.usuario_sede.some((u) => !u.usuarios || !u.usuarios.id_usuario)
+    ) {
+      toast.error("Debe seleccionar al menos un usuario válido", {
         icon: icons.error,
       });
       return;
@@ -132,8 +135,12 @@ export const useSedes = () => {
       return;
     }
 
-    if (!sede.usuarios || sede.usuarios.length === 0) {
-      toast.error("Debe seleccionar al menos un usuario", {
+    if (
+      !sede.usuario_sede ||
+      sede.usuario_sede.length === 0 ||
+      sede.usuario_sede.some((u) => !u.usuarios || !u.usuarios.id_usuario)
+    ) {
+      toast.error("Debe seleccionar al menos un usuario válido", {
         icon: icons.error,
       });
       return;
@@ -164,6 +171,7 @@ export const useSedes = () => {
   };
 
   const handleOpenEditModal = (id: number) => {
+    console.log("handleOpenEditModal", id);
     setSelectedSedeId(id);
     setShowEditModal(true);
   };
