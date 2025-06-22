@@ -22,6 +22,7 @@ export const useSucursales = () => {
     tipo: "",
     estado: null,
     sedes: null,
+    area: "",
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSucursal, setSelectedSucursal] = useState<number | null>(null);
@@ -66,6 +67,13 @@ export const useSucursales = () => {
       return;
     }
 
+    if (!sucursal.area) {
+      toast.error("Debe ingresar una area", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     if (!sucursal.sede_id) {
       toast.error("Debe seleccionar una sede", {
         icon: icons.error,
@@ -103,6 +111,7 @@ export const useSucursales = () => {
     tipo: "",
     estado: "",
     sede: "",
+    area: "",
   });
 
   const [columns, setColumns] = useState<ColumnConfig[]>([
@@ -121,13 +130,14 @@ export const useSucursales = () => {
       order: 1,
     },
     { id: "tipo", label: "Tipo", key: "tipo", isVisible: true, order: 2 },
-    { id: "sede", label: "Sede", key: "sede", isVisible: true, order: 3 },
+    { id: "area", label: "Area", key: "area", isVisible: true, order: 3 },
+    { id: "sede", label: "Sede", key: "sede", isVisible: true, order: 4 },
     {
       id: "estado",
       label: "Estado",
       key: "estado",
       isVisible: true,
-      order: 4,
+      order: 5,
     },
   ]);
 
@@ -223,6 +233,13 @@ export const useSucursales = () => {
       )
         return false;
 
+      if (
+        filters.area &&
+        filters.area !== "todas" &&
+        item.area.toLowerCase() !== filters.area.toLowerCase()
+      )
+        return false;
+
       return true;
     });
   };
@@ -238,6 +255,7 @@ export const useSucursales = () => {
       tipo: "",
       estado: "",
       sede: "",
+      area: "",
     });
     setCurrentPage(1);
   };
@@ -273,6 +291,9 @@ export const useSucursales = () => {
   );
   const uniqueSedes = Array.from(
     new Set(sucursales.map((item) => item.sedes?.nombre || "Sin Sede"))
+  );
+  const uniqueAreas = Array.from(
+    new Set(sucursales.map((item) => item.area))
   );
 
   const activeFiltersCount = Object.values(filters).filter(
@@ -325,6 +346,13 @@ export const useSucursales = () => {
       return;
     }
 
+    if (!sucursal.area) {
+      toast.error("Debe ingresar el area", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     if (!sucursal.sede_id) {
       toast.error("Debe seleccionar una sede", {
         icon: icons.error,
@@ -362,6 +390,7 @@ export const useSucursales = () => {
   };
 
   return {
+    uniqueAreas,
     getById,
     handleOpenEditModal,
     selectedSucursal,
