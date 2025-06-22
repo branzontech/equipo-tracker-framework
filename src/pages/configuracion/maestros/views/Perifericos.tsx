@@ -30,6 +30,7 @@ import { usePeriferico } from "../hooks/use-perifierico";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 import UpdatePeriferico from "./UpdatePeriferico";
 import { useGlobal } from "@/hooks/use-global";
+import { useEstado } from "../hooks/use-estado";
 
 const Perifericos = () => {
   const {
@@ -45,6 +46,7 @@ const Perifericos = () => {
   } = usePeriferico();
   const { StatusBadge } = useGlobal();
   const { equipo } = useEquipos();
+  const { estados } = useEstado();
 
   const equiposDisponible = equipo.filter(
     (equipo) => equipo.estado_actual !== "Fuera de servicio"
@@ -141,8 +143,11 @@ const Perifericos = () => {
                   <SelectValue placeholder="Seleccione el estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Activo">Activo</SelectItem>
-                  <SelectItem value="Inactivo">Inactivo</SelectItem>
+                  {estados.map((estado) => (
+                    <SelectItem key={estado.id_estado} value={estado.id_estado.toString()}>
+                      {estado.nombre_estado}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
