@@ -46,7 +46,14 @@ const Sedes = () => {
   const { StatusBadge } = useGlobal();
   const { estados } = useEstado();
 
-  const usuariosDisponibles = users.filter((user) => user.sede_id === null);
+  console.log("newSede", sedes);
+
+  const usuariosDisponibles = users.filter(
+    (user) => (user.usuario_sede?.length ?? 0) === 0
+  );
+
+  const responsablesSeleccionados =
+    newSede.usuario_sede?.map((u) => u.usuarios) || [];
 
   return (
     <>
@@ -59,7 +66,7 @@ const Sedes = () => {
           </CardHeader>
           <CardContent>
             <form
-              className="grid gap-4 md:grid-cols-5"
+              className="grid gap-4 md:grid-cols-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 create(newSede);
@@ -81,8 +88,10 @@ const Sedes = () => {
                 <Label htmlFor="responsables">Responsable(s)</Label>
                 <Popover>
                   <PopoverTrigger className="w-full px-3 py-2 border rounded text-left text-sm bg-white">
-                    {newSede.usuarios?.length > 0
-                      ? newSede.usuarios.map((u) => u.nombre).join(", ")
+                    {responsablesSeleccionados.length > 0
+                      ? responsablesSeleccionados
+                          .map((u) => u.nombre)
+                          .join(", ")
                       : "Seleccione responsables"}
                   </PopoverTrigger>
 
@@ -90,7 +99,7 @@ const Sedes = () => {
                     <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
                       {usuariosDisponibles.length > 0 ? (
                         usuariosDisponibles.map((user) => {
-                          const isChecked = newSede.usuarios?.some(
+                          const isChecked = responsablesSeleccionados.some(
                             (u) => u.id_usuario === user.id_usuario
                           );
 
@@ -104,15 +113,20 @@ const Sedes = () => {
                                   id={`user-${user.id_usuario}`}
                                   checked={isChecked}
                                   onCheckedChange={(checked) => {
-                                    const updatedUsuarios = checked
-                                      ? [...(newSede.usuarios || []), user]
-                                      : (newSede.usuarios || []).filter(
+                                    const updatedUsuarioSede = checked
+                                      ? [
+                                          ...(newSede.usuario_sede || []),
+                                          { usuarios: user },
+                                        ]
+                                      : (newSede.usuario_sede || []).filter(
                                           (u) =>
-                                            u.id_usuario !== user.id_usuario
+                                            u.usuarios.id_usuario !==
+                                            user.id_usuario
                                         );
+
                                     setNewSede({
                                       ...newSede,
-                                      usuarios: updatedUsuarios,
+                                      usuario_sede: updatedUsuarioSede,
                                     });
                                   }}
                                   required
@@ -158,7 +172,10 @@ const Sedes = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {estados.map((estado) => (
-                      <SelectItem key={estado.id_estado} value={estado.id_estado.toString()}>
+                      <SelectItem
+                        key={estado.id_estado}
+                        value={estado.nombre_estado}
+                      >
                         {estado.nombre_estado}
                       </SelectItem>
                     ))}
@@ -197,9 +214,9 @@ const Sedes = () => {
                     <TableRow key={sede.id_sede}>
                       <TableCell>{sede.nombre}</TableCell>
                       <TableCell>
-                        {sede.usuarios.length > 0
-                          ? sede.usuarios
-                              .map((usuario) => usuario.nombre)
+                        {sede.usuario_sede && sede.usuario_sede.length > 0
+                          ? sede.usuario_sede
+                              .map((rel) => rel.usuarios?.nombre)
                               .join(", ")
                           : "No hay usuarios"}
                       </TableCell>
@@ -214,6 +231,7 @@ const Sedes = () => {
                           size="icon"
                           className="hover:bg-slate-100"
                           onClick={() => {
+                            console.log("handleOpenEditModal", sede.id_sede);
                             handleOpenEditModal(sede.id_sede);
                           }}
                         >
