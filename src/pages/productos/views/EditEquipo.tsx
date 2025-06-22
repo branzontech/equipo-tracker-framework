@@ -1,17 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Upload } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import {
   Select,
@@ -35,7 +30,7 @@ import { useMarcas } from "../../configuracion/maestros/hooks/use-marcas";
 import { useCategoria } from "../../configuracion/maestros/hooks/use-categoria";
 import { useSucursales } from "../../configuracion/maestros/hooks/use-sucursales";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "@/components/Loading";
 
@@ -288,6 +283,10 @@ const EditEquipo = () => {
                                 estado_actual: value,
                               })
                             }
+                            disabled={
+                              newEquipo.estado_actual !== "Activo" &&
+                              newEquipo.estado_actual !== "Inactivo"
+                            }
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -296,19 +295,28 @@ const EditEquipo = () => {
                             </FormControl>
                             <SelectContent className="w-full">
                               <SelectItem value="Activo">Activo</SelectItem>
-                              <SelectItem value="En Mantenimiento">
-                                En Mantenimiento
-                              </SelectItem>
-                              <SelectItem value="En Reparación">
-                                En Reparación
-                              </SelectItem>
-                              <SelectItem value="Fuera de Servicio">
-                                Fuera de Servicio
-                              </SelectItem>
                               <SelectItem value="En Préstamo">
                                 En Préstamo{" "}
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-gray-900">
                                   (Se encuentra en préstamo)
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="En Traslado">
+                                En Traslado{" "}
+                                <span className="text-xs text-gray-900">
+                                  (Se encuentra en traslado)
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="En Mantenimiento">
+                                En Mantenimiento{" "}
+                                <span className="text-xs text-gray-900">
+                                  (Se encuentra en mantenimiento)
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="Fuera de Servicio">
+                                Fuera de Servicio{" "}
+                                <span className="text-xs text-gray-900">
+                                  (Se encuentra fuera de servicio)
                                 </span>
                               </SelectItem>
                             </SelectContent>
