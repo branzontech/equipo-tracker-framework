@@ -7,6 +7,7 @@ export interface Sucursal {
   sedes: Sede | null;
   tipo: string;
   estado: string;
+  area: string;
 }
 
 export interface SucursalConEstado extends Sucursal {

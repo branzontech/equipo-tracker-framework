@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -15,19 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CheckCircle, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSedes } from "../hooks/use-sedes";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { UpdateProps } from "../interfaces/props";
 import { useSucursales } from "../hooks/use-sucursales";
@@ -81,15 +71,29 @@ const UpdateSucursal = ({ open, onOpenChange, id }: UpdateProps) => {
                       <SelectValue placeholder="Seleccione el tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Administrativa">
-                        Administrativa
+                      <SelectItem value="Principal">
+                        Principal
                       </SelectItem>
-                      <SelectItem value="Departamento">Departamento</SelectItem>
-                      <SelectItem value="Ubicacion Terciaria">
-                        Ubicacion Terciaria
+                      <SelectItem value="Terciaria">
+                        Terciaria
+                      </SelectItem>
+                      <SelectItem value="Secundaria">
+                        Secundaria
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="area">Area</Label>
+                  <Input
+                    value={newSucursal.area}
+                    onChange={(e) =>
+                      setNewSucursal({ ...newSucursal, area: e.target.value })
+                    }
+                    placeholder="Ingrese el area"
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -125,7 +129,7 @@ const UpdateSucursal = ({ open, onOpenChange, id }: UpdateProps) => {
                     onValueChange={(value) =>
                       setNewSucursal({
                         ...newSucursal,
-                        estado: value
+                        estado: value,
                       })
                     }
                     required

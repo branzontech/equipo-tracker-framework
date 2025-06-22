@@ -21,7 +21,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowDown,
   ArrowUp,
-  Download,
   Filter,
   GripVertical,
   PencilIcon,
@@ -51,9 +50,9 @@ import {
 import { useSucursales } from "../hooks/use-sucursales";
 import UpdateSucursal from "./UpdateSucursal";
 import { useGlobal } from "@/hooks/use-global";
+import { useEstado } from "../hooks/use-estado";
 
 const Ubicaciones = () => {
-  const { sedes } = useSedes();
   const {
     newSucursal,
     setNewSucursal,
@@ -87,8 +86,11 @@ const Ubicaciones = () => {
     showEditModal,
     selectedSucursal,
     handleOpenEditModal,
+    uniqueAreas,
   } = useSucursales();
+  const { sedes } = useSedes();
   const { StatusBadge } = useGlobal();
+  const { estados } = useEstado();
 
   return (
     <div className="container mx-auto p-6">
@@ -133,6 +135,18 @@ const Ubicaciones = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="area">Area</Label>
+              <Input
+                value={newSucursal.area}
+                onChange={(e) =>
+                  setNewSucursal({ ...newSucursal, area: e.target.value })
+                }
+                placeholder="Ingrese el area"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="sedes">Sedes</Label>
               <Select
                 value={
@@ -173,8 +187,14 @@ const Ubicaciones = () => {
                   <SelectValue placeholder="Seleccione el estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Activo">Activo</SelectItem>
-                  <SelectItem value="Inactivo">Inactivo</SelectItem>
+                  {estados.map((estado) => (
+                    <SelectItem
+                      key={estado.id_estado}
+                      value={estado.id_estado.toString()}
+                    >
+                      {estado.nombre_estado}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -271,6 +291,28 @@ const Ubicaciones = () => {
                       </div>
 
                       <div className="space-y-2">
+                        <label className="text-sm font-medium">Area</label>
+                        <Select
+                          value={filters.area}
+                          onValueChange={(value) =>
+                            handleFilterChange("area", value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccionar area" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todas">Todas</SelectItem>
+                            {uniqueAreas.map((area) => (
+                              <SelectItem key={area} value={area}>
+                                {area}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
                         <label className="text-sm font-medium">Estado</label>
                         <Select
                           value={filters.estado}
@@ -345,6 +387,7 @@ const Ubicaciones = () => {
                   tipo: "Tipo",
                   estado: "Estado",
                   sede: "Sede",
+                  area: "Area",
                 }[key];
 
                 return (
