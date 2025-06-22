@@ -96,7 +96,9 @@ export const useCategoria = () => {
     }
     const response = await updateCategoria(id, categoria);
     if (response.success) {
-      toast.success(response.message || "Categoria actualizada exitosamente");
+      toast.success(response.message || "Categoria actualizada exitosamente", {
+        icon: icons.success,
+      });
       setTimeout(() => {
         window.location.reload();
       }, 4500);
