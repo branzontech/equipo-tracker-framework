@@ -23,7 +23,7 @@ import SignatureCanvas from "@/components/SignatureCanvas";
 import { FormProvider, useForm } from "react-hook-form";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { SearchEquipo } from "@/components/SearchEquipo";
-import { SearchUser } from "@/pages/usuarios/components/SearchUser";
+import { SearchSelect } from "@/components/SearchSelect";
 
 const Salidas = () => {
   const {
@@ -47,9 +47,6 @@ const Salidas = () => {
     setNombreUser,
   } = useUser();
   const methods = useForm();
-
-  console.log("newPrestamo", newPrestamo);
-
   const selectedEntregaId = selectedEntregaUser?.id_usuario;
   const selectedRecibeId = selectedRecibeUser?.id_usuario;
 
@@ -189,12 +186,15 @@ const Salidas = () => {
               </Popover>
             </div>
 
-            <SearchUser
+            <SearchSelect
               label="Usuario de recepción"
-              nombreInput={nombreInput}
+              placeholder="Ingrese el nombre del usuario"
+              value={nombreInput}
               onInputChange={handleNombreInput}
-              sugerencias={sugerencias}
-              onUserSelect={handleUserSelect}
+              suggestions={sugerencias}
+              onSelect={handleUserSelect}
+              getKey={(u) => u.id_usuario}
+              getLabel={(u) => u.nombre}
             />
 
             <div className="space-y-2">
