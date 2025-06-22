@@ -33,7 +33,6 @@ import { icons } from "@/components/interfaces/icons";
 import { useEffect } from "react";
 import { SearchSelect } from "@/components/SearchSelect";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
-import { Searchproveedor } from "@/pages/configuracion/components/SearchProveedor";
 import { useProveedor } from "@/pages/configuracion/maestros/hooks/use-proveedor";
 
 const IngresoProducto = () => {
