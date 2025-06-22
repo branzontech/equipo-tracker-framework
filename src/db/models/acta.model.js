@@ -35,6 +35,11 @@ export const ActaModel = {
                 equipos: {
                   include: {
                     marcas: true,
+                    sucursales: {
+                      include: {
+                        sedes: true,
+                      },
+                    },
                   },
                 },
               },
