@@ -70,16 +70,18 @@ const UpdateSede = ({ open, onOpenChange, id }: UpdateProps) => {
                   <Label htmlFor="responsables">Responsable(s)</Label>
                   <Popover>
                     <PopoverTrigger className="w-full px-3 py-2 border rounded text-left text-sm bg-white">
-                      {newSede.usuarios?.length > 0
-                        ? newSede.usuarios.map((u) => u.nombre).join(", ")
+                      {newSede.usuario_sede?.length > 0
+                        ? newSede.usuario_sede
+                            .map((u) => u.usuarios.nombre)
+                            .join(", ")
                         : "Seleccione responsables"}
                     </PopoverTrigger>
 
                     <PopoverContent className="w-64 bg-white border rounded shadow">
                       <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
                         {users.map((user) => {
-                          const isChecked = newSede.usuarios?.some(
-                            (u) => u.id_usuario === user.id_usuario
+                          const isChecked = newSede.usuario_sede?.some(
+                            (u) => u.usuarios.id_usuario === user.id_usuario
                           );
 
                           return (
@@ -92,15 +94,20 @@ const UpdateSede = ({ open, onOpenChange, id }: UpdateProps) => {
                                   id={`user-${user.id_usuario}`}
                                   checked={isChecked}
                                   onCheckedChange={(checked) => {
-                                    const updatedUsuarios = checked
-                                      ? [...(newSede.usuarios || []), user]
-                                      : (newSede.usuarios || []).filter(
+                                    const updatedUsuarioSede = checked
+                                      ? [
+                                          ...(newSede.usuario_sede || []),
+                                          { usuarios: user },
+                                        ]
+                                      : (newSede.usuario_sede || []).filter(
                                           (u) =>
-                                            u.id_usuario !== user.id_usuario
+                                            u.usuarios.id_usuario !==
+                                            user.id_usuario
                                         );
+
                                     setNewSede({
                                       ...newSede,
-                                      usuarios: updatedUsuarios,
+                                      usuario_sede: updatedUsuarioSede,
                                     });
                                   }}
                                   required
