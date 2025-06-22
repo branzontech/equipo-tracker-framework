@@ -4,7 +4,9 @@ import { Sucursal } from "./sucursales";
 export interface Sede {
   id_sede: number;
   nombre: string;
-  usuarios: Usuario[];
   estado: string;
   sucursales?: Sucursal[];
+  usuario_sede: {
+    usuarios: Usuario;
+  }[];
 }
