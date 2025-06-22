@@ -22,7 +22,6 @@ export const useSedes = () => {
   const [newSede, setNewSede] = useState<Sede>({
     id_sede: 0,
     nombre: "",
-    regional: "",
     usuarios: [],
     estado: null,
     sucursales: null,
@@ -53,13 +52,6 @@ export const useSedes = () => {
   const create = async (sede: Sede) => {
     if (!sede.nombre) {
       toast.error("Debe ingresar un nombre", {
-        icon: icons.error,
-      });
-      return;
-    }
-
-    if (!sede.regional) {
-      toast.error("Debe ingresar una regional", {
         icon: icons.error,
       });
       return;
@@ -135,13 +127,6 @@ export const useSedes = () => {
   const update = async (id: number, sede: Sede) => {
     if (!sede.nombre) {
       toast.error("Debe ingresar un nombre", {
-        icon: icons.error,
-      });
-      return;
-    }
-
-    if (!sede.regional) {
-      toast.error("Debe ingresar una regional", {
         icon: icons.error,
       });
       return;
