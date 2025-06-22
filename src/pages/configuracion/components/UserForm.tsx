@@ -9,10 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-} from "@/components/ui/form";
+import { Form, FormControl } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -23,6 +20,9 @@ import {
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { useForm } from "react-hook-form";
 import SignatureCanvas from "@/components/SignatureCanvas";
+import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
+import { useEstado } from "../maestros/hooks/use-estado";
 
 interface UserFormProps {
   isOpen: boolean;
@@ -43,6 +43,7 @@ export const UserForm: React.FC<UserFormProps> = ({
     setSelectedRecibeUser,
   } = useUser();
   const form = useForm();
+  const { estados } = useEstado();
 
   return (
     <div className="flex justify-between items-center">
@@ -133,11 +134,19 @@ export const UserForm: React.FC<UserFormProps> = ({
                   <Label htmlFor="telefono">Teléfono</Label>
                   <Input
                     id="telefono"
+                    type="tel"
                     autoComplete="off"
                     placeholder="Ingrese el teléfono"
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, telefono: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        setNewUser({ ...newUser, telefono: value });
+                      } else {
+                        toast.error("No se aceptan letras (solo números)", {
+                          icon: icons.error,
+                        });
+                      }
+                    }}
                     value={newUser.telefono}
                   />
                 </div>
@@ -158,8 +167,14 @@ export const UserForm: React.FC<UserFormProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Activo">Activo</SelectItem>
-                      <SelectItem value="Inactivo">Inactivo</SelectItem>
+                      {estados.map((estado) => (
+                        <SelectItem
+                          key={estado.id_estado}
+                          value={estado.id_estado.toString()}
+                        >
+                          {estado.nombre_estado}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
