@@ -33,4 +33,36 @@ export const ProveedorModel = {
       throw new Error(error.message);
     }
   },
+  async findByName(name) {
+    try {
+      const proveedor = await prisma.proveedores.findMany({
+        where: {
+          OR: [
+            {
+              nombre: {
+                contains: name,
+                mode: "insensitive",
+              },
+            },
+          ],
+        },
+        select: {
+          id_proveedor: true,
+          nombre: true,
+          tipo_proveedor: true,
+          identificacion: true,
+          contacto: true,
+          telefono: true,
+          correo: true,
+          direccion: true,
+          sitio_web: true,
+        },
+        take: 10,
+      });
+      return proveedor;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  },
 };

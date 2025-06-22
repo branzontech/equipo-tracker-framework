@@ -17,3 +17,13 @@ export const createProveedor = async (req, res) => {
     res.status(500).json({ messagge: error.message });
   }
 };
+
+export const getProveedorByName = async (req, res) => {
+  const { name } = req.params;
+  try {
+    const proveedor = await ProveedorService.findByName(name);
+    res.status(200).json(proveedor);
+  } catch (error) {
+    res.status(500).json({ messagge: error.message });
+  }
+};

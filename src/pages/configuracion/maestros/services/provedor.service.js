@@ -7,4 +7,7 @@ export const ProveedorService = {
   async create(data) {
     return await ProveedorModel.create(data);
   },
+  async findByName(name) {
+    return await ProveedorModel.findByName(name);
+  },
 };

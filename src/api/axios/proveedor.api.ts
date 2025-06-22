@@ -14,3 +14,8 @@ export const createProveedor = async (data: Proveedor) => {
     throw new Error(error.response?.data?.message);
   }
 };
+
+export const getProveedorByName = async (name: string) => {
+  const response = await api.get(`/proveedores/get/${name}`);
+  return response.data;
+};
