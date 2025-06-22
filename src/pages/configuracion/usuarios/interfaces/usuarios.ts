@@ -13,9 +13,14 @@ export type Usuario = {
   contraseña: string;
   email: string;
   rol: string;
-  sede_id: number;
-  sedes: Sede | null;
   sucursales: Sucursal | null;
+  usuario_sede: {
+    id: number;
+    id_usuario: number;
+    id_sede: number;
+    sedes: Sede;
+  }[];
+
   estado: string;
   firma_entrega: string;
   firma_recibe: string;
