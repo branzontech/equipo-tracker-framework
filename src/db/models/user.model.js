@@ -9,17 +9,20 @@ export const UserModel = {
         email: true,
         rol: true,
         estado: true,
-        sede_id: true,
-        firma: true,
         telefono: true,
-        sedes: {
+        firma: true,
+        usuario_sede: {
           select: {
-            id_sede: true,
-            nombre: true,
-            sucursales: {
+            sedes: {
               select: {
-                id_sucursal: true,
+                id_sede: true,
                 nombre: true,
+                sucursales: {
+                  select: {
+                    id_sucursal: true,
+                    nombre: true,
+                  },
+                },
               },
             },
           },
