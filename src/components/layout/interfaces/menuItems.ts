@@ -112,11 +112,6 @@ export const menuItems = [
       },
     ],
   },
-  // {
-  //   title: "Actas",
-  //   icon: FileText,
-  //   path: "/productos/actas",
-  // },
   {
     title: "Configuración",
     icon: Settings,
@@ -137,7 +132,9 @@ export const menuItems = [
             icon: Box,
             path: "/configuracion/maestros/sucursales",
           },
-          // { title: "Bodegas", icon: Box, path: "/configuracion/maestros/bodegas" },
+          { title: "Tipos", icon: Tag, path: "/configuracion/maestros/tipos" },
+          { title: "Estados", icon: Tag, path: "/configuracion/maestros/estados" },
+          { title: "Proveedores", icon: Tag, path: "/configuracion/maestros/proveedores" },
           {
             title: "Marcas",
             icon: Tag,
@@ -148,7 +145,6 @@ export const menuItems = [
             icon: Cable,
             path: "/configuracion/maestros/perifericos",
           },
-          // { title: "Accesorios", icon: Laptop2, path: "/configuracion/maestros/accesorios" },
           {
             title: "Categorias",
             icon: Tag,
