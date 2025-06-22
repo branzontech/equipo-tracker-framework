@@ -212,13 +212,16 @@ export const equipoModel = {
       include: {
         marcas: true,
         categorias: true,
-        sucursales: true,
         sucursales: {
           include: {
             sedes: true,
             sedes: {
               include: {
-                usuarios: true,
+                usuario_sede: {
+                  include: {
+                    usuarios: true,
+                  },
+                },
               },
             },
           },
