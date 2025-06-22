@@ -1,18 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Upload } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormLabel } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -40,6 +31,10 @@ import { useEstado } from "@/pages/configuracion/maestros/hooks/use-estado";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { useEffect } from "react";
+import { SearchSelect } from "@/components/SearchSelect";
+import { useUser } from "@/pages/usuarios/hooks/use-user";
+import { Searchproveedor } from "@/pages/configuracion/components/SearchProveedor";
+import { useProveedor } from "@/pages/configuracion/maestros/hooks/use-proveedor";
 
 const IngresoProducto = () => {
   const {
@@ -49,26 +44,28 @@ const IngresoProducto = () => {
     formatNumber,
     setNewEquipo,
     newEquipo,
+    formatearVidaUtil,
+    setResponsableRecibeInput,
   } = useEquipos();
+  const {
+    handleNombreInput,
+    nombreInput,
+    sugerencias,
+    setSugerencias,
+    setNombreUser,
+  } = useUser();
+  const {
+    handleNombre,
+    nombreProvee,
+    sugerenciasProveedor,
+    setNombreProveedor,
+    setSugerenciasProveedor,
+  } = useProveedor();
   const { marcas } = useMarcas();
   const { categoria } = useCategoria();
   const { sucursales } = useSucursales();
   const { estados } = useEstado();
   const { tipos } = useTipos();
-
-  function formatearVidaUtil(vidaUtilDecimal: number): string {
-    const años = Math.floor(vidaUtilDecimal);
-    const meses = Math.round((vidaUtilDecimal - años) * 12);
-
-    const parteAños = años > 0 ? `${años} año${años !== 1 ? "s" : ""}` : "";
-    const parteMeses =
-      meses > 0 ? `${meses} mes${meses !== 1 ? "es" : ""}` : "";
-
-    if (parteAños && parteMeses) return `${parteAños} y ${parteMeses}`;
-    if (parteAños) return parteAños;
-    if (parteMeses) return parteMeses;
-    return "0 meses";
-  }
 
   useEffect(() => {
     const { valor_depreciado } = newEquipo.administrativa;
@@ -97,7 +94,9 @@ const IngresoProducto = () => {
         administrativa: {
           ...prev.administrativa,
           vida_util_restante:
-            vidaUtilRestante > 0 ? formatearVidaUtil(vidaUtilRestante) : "0 meses",
+            vidaUtilRestante > 0
+              ? formatearVidaUtil(vidaUtilRestante)
+              : "0 meses",
         },
       }));
     }
@@ -106,6 +105,38 @@ const IngresoProducto = () => {
     newEquipo.administrativa.valor_depreciado,
     newEquipo.adquisicion.fecha_compra,
   ]);
+
+  const handleUserSelect = (user) => {
+    setNombreUser(user.nombre);
+    setResponsableRecibeInput({
+      id: user.id_usuario.toString(),
+      name: user.nombre,
+    });
+    setNewEquipo((prev) => ({
+      ...prev,
+      administrativa: {
+        ...prev.administrativa,
+        autorizado_por_id: user.id_usuario,
+      },
+    }));
+    setSugerencias([]);
+  };
+
+  const handleProveedorSelect = (proveedor) => {
+    setNombreProveedor(proveedor.nombre);
+    setResponsableRecibeInput({
+      id: proveedor.id_proveedor.toString(),
+      name: proveedor.nombre,
+    });
+    setNewEquipo((prev) => ({
+      ...prev,
+      adquisicion: {
+        ...prev.adquisicion,
+        proveedor: proveedor.id_proveedor,
+      },
+    }));
+    setSugerenciasProveedor([]);
+  };
 
   return (
     <div className="relative w-full overflow-x-hidden">
@@ -666,19 +697,15 @@ const IngresoProducto = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="adquisicion.proveedor">Proveedor</Label>
-                      <Input
-                        placeholder="Nombre del proveedor"
-                        value={newEquipo.adquisicion.proveedor}
-                        onChange={(e) => {
-                          setNewEquipo({
-                            ...newEquipo,
-                            adquisicion: {
-                              ...newEquipo.adquisicion,
-                              proveedor: e.target.value,
-                            },
-                          });
-                        }}
+                      <SearchSelect
+                        label="Proveedor"
+                        placeholder="Ingrese el nombre del proveedor"
+                        value={nombreProvee}
+                        onInputChange={handleNombre}
+                        suggestions={sugerenciasProveedor}
+                        onSelect={handleProveedorSelect}
+                        getKey={(u) => u.id_proveedor}
+                        getLabel={(u) => u.nombre}
                       />
                     </div>
 
@@ -1309,21 +1336,15 @@ const IngresoProducto = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="administrativa.autorizado_por">
-                        Autorizado por
-                      </Label>
-                      <Input
-                        placeholder="Autorizado por"
-                        value={newEquipo.administrativa.autorizado_por}
-                        onChange={(e) => {
-                          setNewEquipo({
-                            ...newEquipo,
-                            administrativa: {
-                              ...newEquipo.administrativa,
-                              autorizado_por: e.target.value,
-                            },
-                          });
-                        }}
+                      <SearchSelect
+                        label="Autorizado por"
+                        placeholder="Ingrese el nombre del usuario"
+                        value={nombreInput}
+                        onInputChange={handleNombreInput}
+                        suggestions={sugerencias}
+                        onSelect={handleUserSelect}
+                        getKey={(u) => u.id_usuario}
+                        getLabel={(u) => u.nombre}
                       />
                     </div>
                     <div className="space-y-2">
