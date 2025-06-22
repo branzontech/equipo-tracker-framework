@@ -1,5 +1,5 @@
 import Sedes from "@/pages/configuracion/maestros/views/Sedes";
-import Bodegas from "@/pages/configuracion/maestros/views/Bodegas";
+import Bodegas from "@/pages/configuracion/maestros/views/Tipos";
 import Marcas from "@/pages/configuracion/maestros/views/Marcas";
 import Perifericos from "@/pages/configuracion/maestros/views/Perifericos";
 import PerfilesAcceso from "@/pages/configuracion/maestros/views/PerfilesAcceso";
@@ -11,6 +11,9 @@ import Categoria from "@/pages/configuracion/maestros/views/Categoria";
 import UpdateSede from "@/pages/configuracion/maestros/views/UpdateSede";
 import Auditores from "@/pages/configuracion/usuarios/Auditores";
 import Clientes from "@/pages/configuracion/usuarios/Clientes";
+import Tipos from "@/pages/configuracion/maestros/views/Tipos";
+import Estados from "@/pages/configuracion/maestros/views/Estado";
+import Proveedores from "@/pages/configuracion/maestros/views/Proveedores";
 
 export const configuracionNavigation = [
   { path: "/configuracion/maestros/sedes", element: <Sedes /> },
@@ -31,6 +34,9 @@ export const configuracionNavigation = [
   { path: "/configuracion/maestros/marcas", element: <Marcas /> },
   { path: "/configuracion/maestros/perifericos", element: <Perifericos /> },
   { path: "/configuracion/maestros/categorias", element: <Categoria /> },
+  { path: "/configuracion/maestros/tipos", element: <Tipos /> },
+  { path: "/configuracion/maestros/estados", element: <Estados /> },
+  { path: "/configuracion/maestros/proveedores", element: <Proveedores /> },
   {
     path: "/configuracion/maestros/perfiles-acceso",
     element: <PerfilesAcceso />,
