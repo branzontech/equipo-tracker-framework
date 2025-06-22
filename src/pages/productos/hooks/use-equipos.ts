@@ -111,6 +111,7 @@ export const useEquipos = () => {
   const [activeTab, setActiveTab] = useState("inventario");
   const [sedesConEquiposCount, setSedesConEquiposCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -834,7 +835,22 @@ export const useEquipos = () => {
     }));
   }, [equipo]);
 
+  function formatearVidaUtil(vidaUtilDecimal: number): string {
+    const años = Math.floor(vidaUtilDecimal);
+    const meses = Math.round((vidaUtilDecimal - años) * 12);
+
+    const parteAños = años > 0 ? `${años} año${años !== 1 ? "s" : ""}` : "";
+    const parteMeses =
+      meses > 0 ? `${meses} mes${meses !== 1 ? "es" : ""}` : "";
+
+    if (parteAños && parteMeses) return `${parteAños} y ${parteMeses}`;
+    if (parteAños) return parteAños;
+    if (parteMeses) return parteMeses;
+    return "0 meses";
+  }
+
   return {
+    formatearVidaUtil,
     aplicarFiltros,
     update,
     isLoading,
@@ -884,5 +900,7 @@ export const useEquipos = () => {
     filters,
     count,
     sedesConEquiposCount,
+    setResponsableRecibeInput,
+    responsableRecibeInput,
   };
 };
