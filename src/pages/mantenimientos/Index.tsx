@@ -44,7 +44,7 @@ import { Equipo } from "../productos/interfaces/equipo";
 import { useState } from "react";
 import { useUser } from "../usuarios/hooks/use-user";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
-import { SearchUser } from "../usuarios/components/SearchUser";
+import { SearchSelect } from "../../components/SearchSelect";
 
 const MantenimientosIndex = () => {
   const navigate = useNavigate();
@@ -360,14 +360,16 @@ const MantenimientosIndex = () => {
                       )}
                     /> */}
 
-                  <SearchUser
+                  <SearchSelect
                     label="Técnico asignado"
-                    nombreInput={nombreInput}
+                    value={nombreInput}
                     onInputChange={handleNombreInput}
-                    sugerencias={sugerencias.filter(
+                    suggestions={sugerencias.filter(
                       (user) => user.rol === "Agente"
                     )}
-                    onUserSelect={handleUserSelect}
+                    onSelect={handleUserSelect}
+                    getKey={(u) => u.id_usuario}
+                    getLabel={(u) => u.nombre}
                   />
 
                   {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
