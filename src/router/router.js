@@ -17,6 +17,9 @@ import bajasRoutes from "./routes/baja.routes.js";
 import actaRoutes from "./routes/acta.routes.js";
 import manteRoutes from "./routes/mante.routes.js";
 import devolucionRoutes from "./routes/devolucion.routes.js";
+import tiposRoutes from "./routes/tipos.routes.js";
+import estadosRoutes from "./routes/estado.routes.js";
+import proveedorRoutes from "./routes/proveedor.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -40,6 +43,9 @@ const routerApi = (app) => {
   router.use("/actas", actaRoutes);
   router.use("/mantenimientos", manteRoutes);
   router.use("/devoluciones", devolucionRoutes);
+  router.use("/tipos", tiposRoutes);
+  router.use("/estados", estadosRoutes);
+  router.use("/proveedores", proveedorRoutes);
 };
 
 export default routerApi;
