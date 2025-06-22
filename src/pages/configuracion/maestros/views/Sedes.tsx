@@ -28,6 +28,7 @@ import {
 } from "@radix-ui/react-popover";
 import UpdateSede from "./UpdateSede";
 import { useGlobal } from "@/hooks/use-global";
+import { useEstado } from "../hooks/use-estado";
 
 const Sedes = () => {
   const {
@@ -43,6 +44,7 @@ const Sedes = () => {
   } = useSedes();
   const { users } = useUser();
   const { StatusBadge } = useGlobal();
+  const { estados } = useEstado();
 
   const usuariosDisponibles = users.filter((user) => user.sede_id === null);
 
@@ -73,18 +75,6 @@ const Sedes = () => {
                     setNewSede({ ...newSede, nombre: e.target.value });
                   }}
                   placeholder="Ingrese el nombre"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="regional">Regional</Label>
-                <Input
-                  id="regional"
-                  autoComplete="off"
-                  value={newSede.regional || ""}
-                  onChange={(e) => {
-                    setNewSede({ ...newSede, regional: e.target.value });
-                  }}
-                  placeholder="Ingrese la regional"
                 />
               </div>
               <div className="space-y-2">
@@ -167,8 +157,11 @@ const Sedes = () => {
                     <SelectValue placeholder="Seleccione el estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Activo">Activo</SelectItem>
-                    <SelectItem value="Inactivo">Inactivo</SelectItem>
+                    {estados.map((estado) => (
+                      <SelectItem key={estado.id_estado} value={estado.id_estado.toString()}>
+                        {estado.nombre_estado}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -192,7 +185,6 @@ const Sedes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nombre</TableHead>
-                  <TableHead>Regional</TableHead>
                   <TableHead>Responsable(s)</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
@@ -204,7 +196,6 @@ const Sedes = () => {
                   .map((sede) => (
                     <TableRow key={sede.id_sede}>
                       <TableCell>{sede.nombre}</TableCell>
-                      <TableCell>{sede.regional}</TableCell>
                       <TableCell>
                         {sede.usuarios.length > 0
                           ? sede.usuarios
