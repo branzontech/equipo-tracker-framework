@@ -246,7 +246,6 @@ const Actas = () => {
             )
             .map((acta) => {
               const { usuario, descripcion } = getActaData(acta);
-              console.log("acta", acta);
               return (
                 <TableRow key={acta.id_acta}>
                   <TableCell className="font-medium">{`ACT${acta.id_acta
