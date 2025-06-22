@@ -22,10 +22,12 @@ import { UpdateProps } from "../interfaces/props";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 import { listTypes } from "../interfaces/periferico";
+import { useEstado } from "../hooks/use-estado";
 
 const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
   const { getById, newPeriferico, setNewPeriferico, update } = usePeriferico();
   const { equipo } = useEquipos();
+  const { estados } = useEstado();
 
   useEffect(() => {
     if (id !== null) {
@@ -70,6 +72,7 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                     onValueChange={(value) =>
                       setNewPeriferico({ ...newPeriferico, estado: value })
                     }
+                    disabled={newPeriferico.estado !== "Activo" && newPeriferico.estado !== "Inactivo"}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccione el estado" />
@@ -79,7 +82,7 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                       <SelectItem value="Inactivo">Inactivo</SelectItem>
                       <SelectItem value="En Traslado">En traslado</SelectItem>
                       <SelectItem value="En Prestamo">En prestamo</SelectItem>
-                      <SelectItem value="Fuera de Servicio">
+                      <SelectItem value="Fuera de servicio">
                         Fuera de Servicio
                       </SelectItem>
                     </SelectContent>
