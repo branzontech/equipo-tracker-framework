@@ -29,7 +29,7 @@ export const ActaBaja = ({ data }) => {
 
       <Text style={styles.subheader}>
         Por medio del presente documento, se deja constancia de la baja de los
-        siguientes equipos del inventario de la entidad. 
+        siguientes equipos del inventario de la entidad.
       </Text>
 
       <View style={styles.table}>
@@ -72,6 +72,13 @@ export const ActaBaja = ({ data }) => {
           <Text style={styles.text}>{baja.observaciones_adicionales}</Text>
         </>
       )}
+
+      <Text style={styles.sectionTitle}>Ubicación de los equipos bajados:</Text>
+      <Text style={styles.text}>
+        El equipo bajado se encuentra ubicado en la sede{" "}
+        {baja?.bajas_equipos?.[0]?.equipos?.sucursales?.sedes?.regional}, en la
+        sucursal {baja?.bajas_equipos?.[0]?.equipos?.sucursales?.nombre}.
+      </Text>
 
       <Text style={styles.sectionTitle}>Notas legales:</Text>
       <Text style={styles.text}>
