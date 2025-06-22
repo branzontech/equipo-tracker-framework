@@ -76,7 +76,7 @@ export const useUser = () => {
         icon: icons.error,
       });
       return;
-    } 
+    }
 
     if (!usuario.contraseña) {
       toast.error("Debe ingresar una contraseña", {
@@ -94,6 +94,13 @@ export const useUser = () => {
 
     if (!usuario.telefono) {
       toast.error("Debe ingresar un número de teléfono", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!/^\d{7,10}$/.test(newUser.telefono)) {
+      toast.error("Ingrese un número de teléfono válido (de 7 a 10 dígitos)", {
         icon: icons.error,
       });
       return;
