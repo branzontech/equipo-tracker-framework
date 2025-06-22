@@ -1,4 +1,5 @@
-import { createProveedor, getAllProveedores } from "@/api/axios/proveedor.api";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createProveedor, getAllProveedores, getProveedorByName } from "@/api/axios/proveedor.api";
 import { useEffect, useState } from "react";
 import { Proveedor } from "../interfaces/proveedor";
 import { toast } from "sonner";
@@ -17,6 +18,8 @@ export const useProveedor = () => {
     direccion: "",
     sitio_web: "",
   });
+  const [nombreProvee, setNombreProveedor] = useState("");
+  const [sugerenciasProveedor, setSugerenciasProveedor] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +35,21 @@ export const useProveedor = () => {
 
     fetchData();
   }, []);
+
+  const handleNombre = async (name: string) => {
+    setNombreProveedor(name);
+
+    if (name.length >= 3) {
+      try {
+        const res = await getProveedorByName(name);
+        setSugerenciasProveedor(res);
+      } catch (err) {
+        console.error("Error buscando usuarios:", err);
+      }
+    } else {
+      setSugerenciasProveedor([]);
+    }
+  };
 
   const create = async (proveedor: Proveedor) => {
     if (!proveedor.tipo_proveedor) {
@@ -115,5 +133,10 @@ export const useProveedor = () => {
     newProveedor,
     setNewProveedor,
     create,
+    handleNombre,
+    nombreProvee,
+    sugerenciasProveedor,
+    setSugerenciasProveedor,
+    setNombreProveedor,
   };
 };
