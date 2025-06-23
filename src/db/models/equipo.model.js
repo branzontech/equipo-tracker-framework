@@ -3,95 +3,147 @@ import { prisma } from "../../../prisma/prismaCliente.js";
 
 export const equipoModel = {
   async create(data) {
+    console.log(data);
     const categoriaId = Number(data.categoria_id);
     const marcaId = Number(data.marca_id);
-    const sucursalId = Number(data.sucursal_id);
 
-    if ([categoriaId, marcaId, sucursalId].some(isNaN)) {
+    if ([categoriaId, marcaId].some(isNaN)) {
       throw new Error("ID de categoría, marca o sucursal inválido.");
     }
 
-    return await prisma.equipos.create({
-      data: {
-        nombre_equipo: data.nombre_equipo,
-        nro_serie: data.nro_serie,
-        estado_actual: data.estado_actual,
-        modelo: data.modelo,
-        tipo_activo: data.tipo_activo,
-        fecha_registro: new Date(data.fecha_registro),
-        garantia_fecha_fin: new Date(data.garantia_fecha_fin),
-        observaciones: data.observaciones,
+    try {
+      return await prisma.equipos.create({
+        data: {
+          nombre_equipo: data.nombre_equipo,
+          nro_serie: data.nro_serie,
+          modelo: data.modelo,
+          tipo_activo: data.tipo_activo,
+          fecha_registro: new Date(data.fecha_registro),
+          observaciones: data.observaciones,
+          tags: data.tags.join(","),
+          imagen: data.imagen
+            ? Buffer.from(
+                data.imagen.includes(",")
+                  ? data.imagen.split(",")[1]
+                  : data.imagen,
+                "base64"
+              )
+            : null,
 
-        // Relaciones con otras tablas (FKs)
-        categorias: {
-          connect: { id_categoria: categoriaId },
-        },
-        marcas: {
-          connect: { id_marca: marcaId },
-        },
-        sucursales: {
-          connect: { id_sucursal: sucursalId },
-        },
+          // Relaciones con otras tablas (FKs)
+          categorias: {
+            connect: { id_categoria: categoriaId },
+          },
+          marcas: {
+            connect: { id_marca: marcaId },
+          },
 
-        // Relaciones 1:N con create
-        especificaciones: {
-          create: {
-            procesador: data.especificaciones.procesador,
-            memoria_ram: data.especificaciones.memoria_ram,
-            almacenamiento: data.especificaciones.almacenamiento,
-            tarjeta_grafica: data.especificaciones.tarjeta_grafica,
-            pantalla: data.especificaciones.pantalla,
-            sistema_operativo: data.especificaciones.sistema_operativo,
-            bateria: data.especificaciones.bateria,
-            puertos: data.especificaciones.puertos,
+          // Relaciones 1:N con create
+          especificaciones: {
+            create: {
+              procesador: data.especificaciones.procesador,
+              memoria_ram: data.especificaciones.memoria_ram,
+              almacenamiento: data.especificaciones.almacenamiento,
+              tarjeta_grafica: data.especificaciones.tarjeta_grafica,
+              pantalla: data.especificaciones.pantalla,
+              sistema_operativo: data.especificaciones.sistema_operativo,
+              bateria: data.especificaciones.bateria,
+              puertos: data.especificaciones.puertos,
+              tienecargador: data.especificaciones.tienecargador,
+              serialcargador: data.especificaciones.serialcargador,
+              tipo_discoduro: data.especificaciones.tipo_discoduro,
+            },
+          },
+
+          seguridad: {
+            create: {
+              nivel_acceso: data.seguridad.nivel_acceso,
+              software_seguridad: data.seguridad.software_seguridad,
+              cifrado_disco: data.seguridad.cifrado_disco,
+              politicas_aplicadas:
+                data.seguridad.politicas_aplicadas.join(", "),
+            },
+          },
+
+          adquisicion: {
+            create: {
+              orden_compra: data.adquisicion.orden_compra,
+              fecha_compra: new Date(data.adquisicion.fecha_compra),
+              precio_compra: data.adquisicion.precio_compra,
+              forma_pago: data.adquisicion.forma_pago,
+              plazo_pago: data.adquisicion.plazo_pago,
+              numero_factura: data.adquisicion.numero_factura,
+              proveedores: {
+                connect: {
+                  id_proveedor: data.adquisicion.proveedor_id,
+                },
+              },
+              inicio_garantia: data.adquisicion.inicio_garantia,
+              garantia_fecha_fin: data.adquisicion.garantia_fecha_fin,
+            },
+          },
+
+          estado_ubicacion: {
+            create: {
+              estado_actual: data.estado_ubicacion.estado_actual,
+              sucursales: {
+                connect: {
+                  id_sucursal: Number(data.estado_ubicacion.sucursal_id),
+                },
+              },
+              departamento: data.estado_ubicacion.departamento,
+              usuarios: {
+                connect: {
+                  id_usuario: Number(data.estado_ubicacion.responsable_id),
+                },
+              },
+              disponibilidad: data.estado_ubicacion.disponibilidad,
+              condicion_fisica: data.estado_ubicacion.condicion_fisica,
+            },
+          },
+
+          administrativa: {
+            create: {
+              codigo_inventario: data.administrativa.codigo_inventario,
+              centro_coste: data.administrativa.centro_coste,
+              usuarios: {
+                connect: {
+                  id_usuario: Number(data.administrativa.autorizado_por_id),
+                },
+              },
+              fecha_activacion: new Date(data.administrativa.fecha_activacion),
+              estado_contable: data.administrativa.estado_contable,
+              valor_depreciado: new Prisma.Decimal(
+                data.administrativa.valor_depreciado
+              ),
+              vida_util_restante: data.administrativa.vida_util_restante,
+            },
           },
         },
-
-        seguridad: {
-          create: {
-            nivel_acceso: data.seguridad.nivel_acceso,
-            software_seguridad: data.seguridad.software_seguridad,
-            cifrado_disco: data.seguridad.cifrado_disco,
-            politicas_aplicadas: data.seguridad.politicas_aplicadas.join(", "),
+        include: {
+          categorias: true,
+          marcas: true,
+          especificaciones: true,
+          seguridad: true,
+          adquisicion: true,
+          administrativa: true,
+          estado_ubicacion: {
+            include: {
+              sucursales: {
+                include: {
+                  sedes: true,
+                },
+              },
+            },
           },
         },
-
-        adquisicion: {
-          create: {
-            orden_compra: data.adquisicion.orden_compra,
-            fecha_compra: new Date(data.adquisicion.fecha_compra),
-            precio_compra: data.adquisicion.precio_compra,
-            forma_pago: data.adquisicion.forma_pago,
-            plazo_pago: data.adquisicion.plazo_pago,
-            numero_factura: data.adquisicion.numero_factura,
-            proveedor: data.adquisicion.proveedor,
-          },
-        },
-
-        administrativa: {
-          create: {
-            codigo_inventario: data.administrativa.codigo_inventario,
-            centro_coste: data.administrativa.centro_coste,
-            autorizado_por: data.administrativa.autorizado_por,
-            fecha_activacion: new Date(data.administrativa.fecha_activacion),
-            estado_contable: data.administrativa.estado_contable,
-            valor_depreciado: new Prisma.Decimal(
-              data.administrativa.valor_depreciado
-            ),
-            vida_util_restante: data.administrativa.vida_util_restante,
-          },
-        },
-      },
-      include: {
-        categorias: true,
-        marcas: true,
-        sucursales: true,
-        especificaciones: true,
-        seguridad: true,
-        adquisicion: true,
-        administrativa: true,
-      },
-    });
+      });
+    } catch (error) {
+      console.error("Error al crear el equipo:", error);
+      throw new Error(
+        "Error al crear el equipo. Verifique los datos ingresados."
+      );
+    }
   },
   async update(data) {
     const equipoId = Number(data.id_equipo);
@@ -209,27 +261,33 @@ export const equipoModel = {
   },
   async findAll() {
     return await prisma.equipos.findMany({
+      where: {
+        estado_ubicacion: {
+          none: {
+            OR: [{ estado_actual: "Fuera de servicio" }],
+          },
+        },
+      },
       include: {
         marcas: true,
         categorias: true,
-        sucursales: {
+        estado_ubicacion: {
           include: {
-            sedes: true,
-            sedes: {
+            sucursales: {
               include: {
-                usuario_sede: {
+                sedes: true,
+                sedes: {
                   include: {
-                    usuarios: true,
+                    usuario_sede: {
+                      include: {
+                        usuarios: true,
+                      },
+                    },
                   },
                 },
               },
             },
           },
-        },
-      },
-      where: {
-        estado_actual: {
-          not: "Fuera de servicio",
         },
       },
     });
@@ -240,27 +298,30 @@ export const equipoModel = {
       include: {
         marcas: true,
         categorias: true,
-        sucursales: true,
-        sucursales: {
+        especificaciones: true,
+        seguridad: true,
+        adquisicion: true,
+        administrativa: true,
+        perifericos: true,
+        estado_ubicacion: {
           include: {
-            sedes: true,
-            sedes: {
+            sucursales: {
               include: {
-                usuarios: {
-                  select: {
-                    id_usuario: true,
-                    nombre: true,
+                sedes: true,
+                sedes: {
+                  include: {
+                    usuarios: {
+                      select: {
+                        id_usuario: true,
+                        nombre: true,
+                      },
+                    },
                   },
                 },
               },
             },
           },
         },
-        especificaciones: true,
-        seguridad: true,
-        adquisicion: true,
-        administrativa: true,
-        perifericos: true,
       },
     });
 
