@@ -1,21 +1,17 @@
 import { Equipo } from "@/pages/productos/interfaces/equipo";
+import { Sede } from "./sedes";
+import { Marca } from "./marcas";
 
 export interface Perifericos {
   id_periferico: number;
   nombre: string;
   estado: string; 
+  serial: string;
+  id_sede: number;
+  sedes: Sede;
+  marca_id: number;
+  marcas: Marca;
   tipo: string;
   equipo_asociado_id: Equipo | number;
   equipos: Equipo | null;
 }
-
-export const listTypes = [
-  { name: "Monitor", value: "Monitor" },
-  { name: "Teclado", value: "Teclado" },
-  { name: "Mouse", value: "Mouse" },
-  { name: "Cámara", value: "Camera" },
-  { name: "Altavoces", value: "Altavoces" },
-  { name: "Docking Station", value: "Docking Station" },
-  { name: "Adaptador", value: "Adaptador" },
-  { name: "Micrófono", value: "Micrófono" },
-];
