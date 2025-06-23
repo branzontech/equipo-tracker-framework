@@ -81,10 +81,10 @@ const HojaDeVida = () => {
     tipo: "ingreso",
     fecha: newEquipo.fecha_registro,
     descripcion: "Registro inicial del equipo",
-    responsable: newEquipo.sucursales?.sedes?.usuarios?.[0]?.nombre || "-",
+    responsable: newEquipo.estado_ubicacion?.usuarios?.nombre || "-",
     detalles: {
-      sucursal: newEquipo.sucursales?.nombre || "-",
-      estado: newEquipo.estado_actual,
+      sucursal: newEquipo?.estado_ubicacion?.sucursales?.nombre || "-",
+      estado: newEquipo.estado_ubicacion?.estado_actual,
       tipo_activo: newEquipo.tipo_activo,
     },
   });
@@ -274,13 +274,15 @@ const HojaDeVida = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {newEquipo.sucursales?.nombre ?? "Sin sucursal"}
+              {newEquipo?.estado_ubicacion?.sucursales?.nombre ??
+                "Sin sucursal"}
             </div>
             <p className="text-xs text-muted-foreground">
-              {newEquipo.sucursales?.sedes?.nombre ?? "Sin sede"} -{" "}
-              {newEquipo.sucursales?.sedes?.usuarios
-                ?.map((usuario) => usuario.nombre)
-                .join(", ") ?? "Sin usuarios"}
+              {newEquipo?.estado_ubicacion?.sucursales?.sedes?.nombre ??
+                "Sin sede"}{" "}
+              -{" "}
+              {newEquipo?.estado_ubicacion?.usuarios?.nombre ??
+                "Sin responsable"}
             </p>
           </CardContent>
         </Card>
@@ -292,7 +294,7 @@ const HojaDeVida = () => {
           <CardContent>
             <div className="text-2xl font-bold">
               <Badge variant="outline" className="bg-green-500 text-white">
-                {newEquipo.estado_actual}
+                {newEquipo.estado_ubicacion?.estado_actual}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -366,6 +368,32 @@ const HojaDeVida = () => {
                         </span>{" "}
                         {formatFecha(newEquipo.fecha_registro)}
                       </p>
+                      {/* <p>
+                        <span className="font-medium text-slate-700">
+                          Imagen:
+                        </span>{" "}
+                        {newEquipo.imagen ? (
+                          <img
+                            src={newEquipo.imagen}
+                            alt="Equipo"
+                            className="w-20 h-20 rounded-full"
+                          />
+                        ) : (
+                          <span>Sin imagen</span>
+                        )}
+                      </p> */}
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Tags:
+                        </span>{" "}
+                        {newEquipo.tags?.join(", ") || "Sin tags"}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Observaciones:
+                        </span>{" "}
+                        {newEquipo.observaciones || "Sin observaciones"}
+                      </p>
                     </div>
                   </div>
 
@@ -401,6 +429,12 @@ const HojaDeVida = () => {
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
+                          Tipo de Disco Duro:
+                        </span>{" "}
+                          {newEquipo.especificaciones?.tipo_discoduro}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
                           Pantalla:
                         </span>{" "}
                         {newEquipo.especificaciones?.pantalla}
@@ -422,6 +456,18 @@ const HojaDeVida = () => {
                           Puertos:
                         </span>{" "}
                         {newEquipo.especificaciones?.puertos}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Tiene Cargador:
+                        </span>{" "}
+                        {String(newEquipo.especificaciones?.tienecargador) === "true" ? "Sí" : "No"}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Serial Cargador:
+                        </span>{" "}
+                        {newEquipo.especificaciones?.serialcargador}
                       </p>
                     </div>
                   </div>
@@ -454,8 +500,7 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Políticas Aplicadas:
                         </span>{" "}
-                        {newEquipo.seguridad?.politicas_aplicadas}{" "}
-                        {/* .join(", ") */}
+                        {newEquipo.seguridad?.politicas_aplicadas?.join(", ") || "Sin políticas aplicadas"}
                       </p>
                     </div>
                   </div>
@@ -484,8 +529,7 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Precio de Compra:
                         </span>{" "}
-                        ${formatPrecio(newEquipo.adquisicion?.precio_compra)}{" "}
-                        {/* .toLocaleString() */}
+                        ${formatPrecio(newEquipo.adquisicion?.precio_compra.toLocaleString())}{" "}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -509,13 +553,21 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Proveedor:
                         </span>{" "}
-                        {newEquipo.adquisicion?.proveedor}
+                        {typeof newEquipo.adquisicion?.proveedores === "object"
+                          ? newEquipo.adquisicion?.proveedores?.nombre
+                          : newEquipo.adquisicion?.proveedores}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Garantia desde:
+                        </span>{" "}
+                          {formatFecha(newEquipo.adquisicion?.inicio_garantia)}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Garantía hasta:
                         </span>{" "}
-                        {formatFecha(newEquipo.garantia_fecha_fin)}
+                        {formatFecha(newEquipo.adquisicion?.garantia_fecha_fin)}
                       </p>
                     </div>
                   </div>
@@ -542,7 +594,9 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Autorizado Por:
                         </span>{" "}
-                        {newEquipo.administrativa?.autorizado_por}
+                        {typeof newEquipo.administrativa?.usuarios === "object"
+                          ? newEquipo.administrativa?.usuarios?.nombre
+                          : newEquipo.administrativa?.usuarios}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -585,27 +639,26 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Sede:
                         </span>{" "}
-                        {newEquipo.sucursales.sedes?.nombre}
+                        {newEquipo?.estado_ubicacion?.sucursales?.sedes?.nombre}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Tipo de Sucursal:
                         </span>{" "}
-                        {newEquipo.sucursales.tipo}
+                        {newEquipo?.estado_ubicacion?.sucursales?.tipo}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
-                          Responsable(s):
+                          Responsable:
                         </span>{" "}
-                        {newEquipo.sucursales?.sedes?.usuarios
-                          ?.map((usuario) => usuario.nombre)
-                          .join(", ") ?? "Sin usuarios"}
+                        {newEquipo?.estado_ubicacion?.usuarios?.nombre ??
+                          "Sin usuarios"}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
                           Estado:
                         </span>{" "}
-                        {newEquipo.estado_actual}
+                        {newEquipo?.estado_ubicacion?.estado_actual}
                       </p>
                     </div>
                   </div>
