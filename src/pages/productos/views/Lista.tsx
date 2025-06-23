@@ -215,24 +215,8 @@ const ListaInventario = () => {
                           <SelectContent>
                             <SelectItem value="todas">Todas</SelectItem>
                             {uniqueCategorias.map((categorias, index) => (
-                              <SelectItem
-                                key={`${
-                                  typeof categorias === "object" &&
-                                  categorias !== null
-                                    ? categorias.id_categoria
-                                    : categorias
-                                }-${index}`}
-                                value={
-                                  typeof categorias === "object" &&
-                                  categorias !== null
-                                    ? String(categorias.id_categoria)
-                                    : String(categorias)
-                                }
-                              >
-                                {typeof categorias === "object" &&
-                                categorias !== null
-                                  ? categorias.nombre
-                                  : String(categorias)}
+                              <SelectItem key={index} value={String(categorias)}>
+                                {String(categorias)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -280,24 +264,8 @@ const ListaInventario = () => {
                           <SelectContent>
                             <SelectItem value="todas">Todas</SelectItem>
                             {uniqueSucursales.map((sucursal, index) => (
-                              <SelectItem
-                                key={`${
-                                  typeof sucursal === "object" &&
-                                  sucursal !== null
-                                    ? sucursal.id_sucursal
-                                    : sucursal
-                                }-${index}`}
-                                value={
-                                  typeof sucursal === "object" &&
-                                  sucursal !== null
-                                    ? String(sucursal.id_sucursal)
-                                    : String(sucursal)
-                                }
-                              >
-                                {typeof sucursal === "object" &&
-                                sucursal !== null
-                                  ? sucursal.nombre
-                                  : String(sucursal)}
+                              <SelectItem key={index} value={sucursal}>
+                                {sucursal}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -381,6 +349,8 @@ const ListaInventario = () => {
                   marcas: "Marca",
                   estado: "Estado",
                   sede: "Sede",
+                  sucursales: "Sucursal",
+                  categorias: "Categoria",
                 }[key];
 
                 return (
@@ -475,8 +445,8 @@ const ListaInventario = () => {
                                 {column.id === "estado_actual" ? (
                                   <StatusBadge
                                     status={
-                                      item.estado_ubicacion?.estado_actual ??
-                                      "Sin estado"
+                                      item.estado_ubicacion?.[0]
+                                        ?.estado_actual ?? "Sin estado"
                                     }
                                   />
                                 ) : typeof item[
