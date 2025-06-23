@@ -212,16 +212,17 @@ const MantenimientoDetalle = () => {
                 <CardContent className="space-y-2">
                   <p>
                     <span className="font-semibold">Sucursal: </span>
-                    {newMante.equipos?.sucursales?.nombre ?? "No disponible"}
-                  </p>
-                  <p>
-                    <span className="font-semibold">Sede: </span>
-                    {newMante.equipos?.sucursales?.sedes?.nombre ??
+                    {newMante.equipos?.estado_ubicacion?.sucursales?.nombre ??
                       "No disponible"}
                   </p>
                   <p>
-                    <span className="font-semibold">Encargado(s): </span>
-                    {newMante.equipos?.sucursales?.sedes?.usuarios?.length > 0
+                    <span className="font-semibold">Sede: </span>
+                    {newMante.equipos?.estado_ubicacion?.sucursales?.sedes
+                      ?.nombre ?? "No disponible"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Responsable: </span>
+                    {newMante.equipos?.estado_ubicacion?.sucursales?.sedes?.usuarios?.length > 0
                       ? newMante.equipos?.sucursales?.sedes?.usuarios
                           .map((u) => u.nombre)
                           .join(", ")
@@ -326,11 +327,13 @@ const MantenimientoDetalle = () => {
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
                   className="hidden"
                   onChange={(e) => {
-                    const files = Array.from(e.target.files || []).map((file) => ({
-                      ...file,
-                      nombre_archivo: file.name,
-                      tipo_archivo: file.type,
-                    }));
+                    const files = Array.from(e.target.files || []).map(
+                      (file) => ({
+                        ...file,
+                        nombre_archivo: file.name,
+                        tipo_archivo: file.type,
+                      })
+                    );
                     if (files.length > 0) {
                       setNewMante((prev) => ({
                         ...prev,
@@ -362,10 +365,9 @@ const MantenimientoDetalle = () => {
                       size="icon"
                       className="h-6 w-6"
                       onClick={() => {
-                        const newFiles =
-                          newMante.archivosmantenimiento.filter(
-                            (_, i) => i !== index
-                          );
+                        const newFiles = newMante.archivosmantenimiento.filter(
+                          (_, i) => i !== index
+                        );
                         setNewMante((prev) => ({
                           ...prev,
                           archivosmantenimiento: newFiles,
