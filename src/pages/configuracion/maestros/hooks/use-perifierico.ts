@@ -21,6 +21,11 @@ export const usePeriferico = () => {
     estado: null,
     equipo_asociado_id: 0,
     equipos: null,
+    serial: "",
+    id_sede: 0,
+    sedes: null,
+    marca_id: 0,
+    marcas: null,
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedPerifericoId, setSelectedPerifericoId] = useState<
@@ -51,6 +56,13 @@ export const usePeriferico = () => {
       return;
     }
 
+    if (!periferico.serial) {
+      toast.error("Debe ingresar un serial", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     if (!periferico.tipo) {
       toast.error("Debe seleccionar un tipo", {
         icon: icons.error,
@@ -58,12 +70,26 @@ export const usePeriferico = () => {
       return;
     }
 
-    if (!periferico.equipo_asociado_id) {
-      toast.error("Debe seleccionar un equipo", {
+    if (!periferico.id_sede) {
+      toast.error("Debe seleccionar una sede", {
         icon: icons.error,
       });
       return;
     }
+
+    if (!periferico.marca_id) {
+      toast.error("Debe seleccionar una marca", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    // if (!periferico.equipo_asociado_id) {
+    //   toast.error("Debe seleccionar un equipo", {
+    //     icon: icons.error,
+    //   });
+    //   return;
+    // }
 
     if (periferico.estado === undefined || periferico.estado === null) {
       toast.error("Debe seleccionar un estado", {
@@ -125,13 +151,6 @@ export const usePeriferico = () => {
 
     if (!periferico.tipo) {
       toast.error("Debe seleccionar un tipo", {
-        icon: icons.error,
-      });
-      return;
-    }
-
-    if (!periferico.equipo_asociado_id) {
-      toast.error("Debe seleccionar un equipo", {
         icon: icons.error,
       });
       return;
