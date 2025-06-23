@@ -53,16 +53,15 @@ export const update = async (req, res) => {
       modelo,
       marca_id,
       categoria_id,
-      sucursal_id,
-      estado_actual,
       fecha_registro,
       tipo_activo,
-      garantia_fecha_fin,
       observaciones,
+      tags,
       especificaciones,
       seguridad,
       adquisicion,
       administrativa,
+      estado_ubicacion,
     } = req.body;
 
     const equipo = await equipoService.update({
@@ -72,16 +71,15 @@ export const update = async (req, res) => {
       modelo,
       marca_id,
       categoria_id,
-      sucursal_id,
-      estado_actual,
       fecha_registro,
       tipo_activo,
-      garantia_fecha_fin,
       observaciones,
+      tags,
       especificaciones,
       seguridad,
       adquisicion,
       administrativa,
+      estado_ubicacion,
     });
 
     res.status(200).json({ success: true, data: equipo });
