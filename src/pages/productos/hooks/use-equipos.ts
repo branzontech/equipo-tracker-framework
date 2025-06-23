@@ -42,7 +42,7 @@ export const useEquipos = () => {
       procesador: "",
       memoria_ram: "",
       almacenamiento: "",
-      tipo_discoDuro: "",
+      tipo_discoduro: "",
       pantalla: "",
       sistema_operativo: "",
       bateria: "",
@@ -62,6 +62,16 @@ export const useEquipos = () => {
       plazo_pago: "",
       numero_factura: "",
       proveedor_id: 0,
+      proveedores: {
+        id_proveedor: 0,
+        tipo_proveedor: "",
+        nombre: "",
+        identificacion: "",
+        contacto: "",
+        telefono: "",
+        correo: "",
+        direccion: "",
+      },
       inicio_garantia: "",
       garantia_fecha_fin: "",
     },
@@ -83,7 +93,8 @@ export const useEquipos = () => {
         area: "",
       },
       departamento: "",
-      responsable: "",
+      responsable_id: 0,
+      usuarios: null,
       disponibilidad: "",
       condicion_fisica: "",
     },
@@ -91,6 +102,7 @@ export const useEquipos = () => {
       codigo_inventario: "",
       centro_coste: "",
       autorizado_por_id: "",
+      usuarios: null,
       fecha_activacion: "",
       estado_contable: "",
       valor_depreciado: 0,
@@ -122,7 +134,9 @@ export const useEquipos = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
   const [responsableEntregaInput, setResponsableEntregaInput] = useState(null);
-  const [sugerenciasResponsable, setSugerenciasResponsable] = useState<any[]>([]);
+  const [sugerenciasResponsable, setSugerenciasResponsable] = useState<any[]>(
+    []
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,17 +144,19 @@ export const useEquipos = () => {
         const response = await getEquipos();
         const equipos = response.map((equipo: any) => ({
           ...equipo,
-          sucursales: equipo.sucursales?.nombre || "Sin Sucursal",
-          sedes: equipo.sucursales?.sedes?.nombre || "Sin Sede",
-          tipo: equipo.sucursales?.tipo || "Sin Tipo",
+          sucursales:
+            equipo.estado_ubicacion?.[0]?.sucursales?.nombre || "Sin Sucursal",
+          sedes:
+            equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.nombre ||
+            "Sin Sede",
+          tipo: equipo.estado_ubicacion?.[0]?.sucursales?.tipo || "Sin Tipo",
           marcas: equipo.marcas?.nombre || "Sin Marca",
           categorias: equipo.categorias?.nombre || "Sin Categoria",
-          estadoActual: equipo.estado_ubicacion?.estado_actual
-            ? "Activo"
-            : "Inactivo",
+          estadoActual:
+            equipo.estado_ubicacion?.[0]?.estado_actual || "Sin estado",
         }));
         const equiposActivos = equipos.filter(
-          (equipo: any) => equipo.estado_ubicacion?.estado_actual === "Activo"
+          (equipo: any) => equipo.estadoActual === "Activo"
         );
         setEquipo(equipos);
         setCountEquipo(equiposActivos.length);
@@ -205,13 +221,6 @@ export const useEquipos = () => {
       isVisible: true,
       order: 6,
     },
-    // {
-    //   id: "tipo",
-    //   label: "Tipo de Sucursal",
-    //   key: "tipo",
-    //   isVisible: true,
-    //   order: 6,
-    // },
   ]);
 
   const aplicarFiltros = () => {
@@ -319,28 +328,30 @@ export const useEquipos = () => {
       if (
         filters.marcas &&
         filters.marcas !== "todas" &&
-        item.marcas.toString() !== filters.marcas
+        item.marcas?.toString() !== filters.marcas
       )
         return false;
 
       if (
         filters.categorias &&
         filters.categorias !== "todas" &&
-        item.categorias.toString() !== filters.categorias
+        item.categorias?.toString() !== filters.categorias
       )
         return false;
+
+      const estadoActual =
+        item.estado_ubicacion?.[0]?.estado_actual?.toLowerCase();
       if (
         filters.estado &&
         filters.estado !== "todos" &&
-        item.estado_ubicacion.estado_actual.toLowerCase() !==
-          filters.estado.toLowerCase()
+        estadoActual !== filters.estado.toLowerCase()
       )
         return false;
 
       if (
         filters.sucursales &&
         filters.sucursales !== "todas" &&
-        item.estado_ubicacion.sucursales.toString() !== filters.sucursales
+        item.estado_ubicacion?.[0]?.sucursales?.nombre !== filters.sucursales
       )
         return false;
 
@@ -481,7 +492,10 @@ export const useEquipos = () => {
       valor: newEquipo.categoria_id,
       mensaje: "Debe seleccionar una categoría",
     },
-    { valor: newEquipo.estado_ubicacion.sucursal_id, mensaje: "Debe seleccionar una sucursal" },
+    {
+      valor: newEquipo.estado_ubicacion.sucursal_id,
+      mensaje: "Debe seleccionar una sucursal",
+    },
     { valor: newEquipo.modelo, mensaje: "Debe ingresar un modelo" },
     {
       valor: newEquipo.adquisicion.garantia_fecha_fin,
@@ -502,7 +516,7 @@ export const useEquipos = () => {
       mensaje: "Debe ingresar un almacenamiento",
     },
     {
-      valor: newEquipo.especificaciones.tipo_discoDuro,
+      valor: newEquipo.especificaciones.tipo_discoduro,
       mensaje: "Debe ingresar una tarjeta gráfica",
     },
     {
@@ -604,7 +618,6 @@ export const useEquipos = () => {
   ];
 
   const handleSubmit = async (data: Equipo) => {
-    console.log(data);
     for (const campo of camposRequeridos) {
       if (!campo.valor) {
         toast.error(campo.mensaje, {
@@ -625,10 +638,10 @@ export const useEquipos = () => {
         toast.success(response.message || "Equipo creado exitosamente", {
           icon: icons.success,
         });
-        // setTimeout(() => {
-        //   navigate("/productos/lista");
-        //   window.location.reload();
-        // }, 4500);
+        setTimeout(() => {
+          navigate("/productos/lista");
+          window.location.reload();
+        }, 4500);
       } else {
         toast.error(response.message || "Error al crear el equipo", {
           icon: icons.error,
@@ -722,11 +735,13 @@ export const useEquipos = () => {
   );
 
   const uniqueEstados = Array.from(
-    new Set(equipo.map((item) => item.estado_ubicacion?.estado_actual))
+    new Set(equipo.map((item) => item.estado_ubicacion?.[0]?.estado_actual))
   );
 
   const uniqueSucursales = Array.from(
-    new Set(equipo.map((item) => item.estado_ubicacion?.sucursales))
+    new Set(
+      equipo.map((item) => item.estado_ubicacion?.[0]?.sucursales?.nombre)
+    )
   );
 
   const activeFiltersCount = Object.values(filters).filter(
@@ -739,6 +754,14 @@ export const useEquipos = () => {
     const trazabilidad = await getTrazabilidadByEquipoId(response.id_equipo);
     const seguridadRaw = response.seguridad?.[0] || {};
 
+    // Normaliza tags: de string a string[]
+    const tagsProcesadas =
+      typeof response.tags === "string"
+        ? response.tags.split(",").map((tag) => tag.trim())
+        : Array.isArray(response.tags)
+        ? response.tags
+        : [];
+
     const especificacionesProcesadas = response.especificaciones?.[0] || {
       id_especificacion: 0,
       procesador: "",
@@ -749,6 +772,9 @@ export const useEquipos = () => {
       sistema_operativo: "",
       bateria: "",
       puertos: "",
+      tienecargador: false,
+      serialcargador: "",
+      tipo_discoduro: "",
     };
 
     const seguridadProcesada = {
@@ -768,6 +794,42 @@ export const useEquipos = () => {
       plazo_pago: "",
       numero_factura: "",
       proveedor: "",
+      inicio_garantia: "",
+      garantia_fecha_fin: "",
+      proveedores: {
+        id_proveedor: 0,
+        tipo_proveedor: "",
+        nombre: "",
+        identificacion: "",
+        contacto: "",
+        telefono: "",
+        correo: "",
+        direccion: "",
+        sitio_web: "",
+      },
+    };
+
+    const estado_ubicacionProcesada = response.estado_ubicacion?.[0] || {
+      estado_actual: "",
+      sucursal_id: 0,
+      sucursales: {
+        id_sucursal: 0,
+        nombre: "",
+        sede_id: 0,
+        sedes: {
+          id_sede: 0,
+          nombre: "",
+          usuario_sede: [],
+          estado: null,
+        },
+        tipo: "",
+        estado: null,
+        area: "",
+      },
+      departamento: "",
+      responsable: "",
+      disponibilidad: "",
+      condicion_fisica: "",
     };
 
     const administrativaProcesada = response.administrativa?.[0] || {
@@ -783,10 +845,12 @@ export const useEquipos = () => {
 
     setNewEquipo({
       ...response,
+      tags: tagsProcesadas,
       especificaciones: especificacionesProcesadas,
       seguridad: seguridadProcesada,
       adquisicion: adquisicionProcesada,
       administrativa: administrativaProcesada,
+      estado_ubicacion: estado_ubicacionProcesada,
       trazabilidad,
     });
     setIsLoading(false);
@@ -851,7 +915,6 @@ export const useEquipos = () => {
   }, [equipo]);
 
   function formatearVidaUtil(vidaUtilDecimal: number): string {
-    console.log(vidaUtilDecimal); // OJO
     const años = Math.floor(vidaUtilDecimal);
     const meses = Math.round((vidaUtilDecimal - años) * 12);
 
@@ -865,25 +928,25 @@ export const useEquipos = () => {
     return "0 meses";
   }
 
-    const handleResponsable = async (name: string) => {
-      setResponsableEntregaInput(name);
-  
-      if (name.length >= 3) {
-        try {
-          const res = await getUserByName(name);
-          setSugerenciasResponsable(res);
-        } catch (err) {
-          console.error("Error buscando usuarios:", err);
-        }
-      } else {
-        setSugerenciasResponsable([]);
+  const handleResponsable = async (name: string) => {
+    setResponsableEntregaInput(name);
+
+    if (name.length >= 3) {
+      try {
+        const res = await getUserByName(name);
+        setSugerenciasResponsable(res);
+      } catch (err) {
+        console.error("Error buscando usuarios:", err);
       }
-    };
+    } else {
+      setSugerenciasResponsable([]);
+    }
+  };
 
   return {
     setResponsableEntregaInput,
     responsableEntregaInput,
-    handleResponsable,  
+    handleResponsable,
     sugerenciasResponsable,
     setSugerenciasResponsable,
     formatearVidaUtil,
