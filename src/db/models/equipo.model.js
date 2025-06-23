@@ -3,7 +3,6 @@ import { prisma } from "../../../prisma/prismaCliente.js";
 
 export const equipoModel = {
   async create(data) {
-    console.log(data);
     const categoriaId = Number(data.categoria_id);
     const marcaId = Number(data.marca_id);
 
@@ -149,118 +148,176 @@ export const equipoModel = {
     const equipoId = Number(data.id_equipo);
     const categoriaId = Number(data.categoria_id);
     const marcaId = Number(data.marca_id);
-    const sucursalId = Number(data.sucursal_id);
 
-    if ([categoriaId, marcaId, sucursalId, equipoId].some(isNaN)) {
+    if ([categoriaId, marcaId, equipoId].some(isNaN)) {
       throw new Error("ID de categoría, marca, sucursal o equipo inválido.");
     }
 
-    return await prisma.equipos.update({
-      where: { id_equipo: equipoId },
-      data: {
-        nombre_equipo: data.nombre_equipo,
-        nro_serie: data.nro_serie,
-        estado_actual: data.estado_actual,
-        modelo: data.modelo,
-        tipo_activo: data.tipo_activo,
-        fecha_registro: new Date(data.fecha_registro),
-        garantia_fecha_fin: new Date(data.garantia_fecha_fin),
-        observaciones: data.observaciones,
+    try {
+      const updatedEquipo = await prisma.equipos.update({
+        where: { id_equipo: equipoId },
+        data: {
+          nombre_equipo: data.nombre_equipo,
+          nro_serie: data.nro_serie,
+          estado_actual: data.estado_actual,
+          modelo: data.modelo,
+          tipo_activo: data.tipo_activo,
+          fecha_registro: new Date(data.fecha_registro),
+          observaciones: data.observaciones,
+          tags: data.tags.join(", "),
+          imagen: data.imagen
+            ? Buffer.from(
+                data.imagen.includes(",")
+                  ? data.imagen.split(",")[1]
+                  : data.imagen,
+                "base64"
+              )
+            : null,
 
-        // Relaciones con FK
-        categorias: {
-          connect: { id_categoria: categoriaId },
-        },
-        marcas: {
-          connect: { id_marca: marcaId },
-        },
-        sucursales: {
-          connect: { id_sucursal: sucursalId },
-        },
+          // Relaciones con FK
+          categorias: {
+            connect: { id_categoria: categoriaId },
+          },
+          marcas: {
+            connect: { id_marca: marcaId },
+          },
 
-        // Relaciones 1:1 con update anidado
-        especificaciones: {
-          update: {
-            where: {
-              id_especificacion: data.especificaciones.id_especificacion,
+          // Relaciones 1:1 con update anidado
+          especificaciones: {
+            update: {
+              where: {
+                id_especificacion: data.especificaciones.id_especificacion,
+              },
+              data: {
+                procesador: data.especificaciones.procesador,
+                memoria_ram: data.especificaciones.memoria_ram,
+                almacenamiento: data.especificaciones.almacenamiento,
+                tarjeta_grafica: data.especificaciones.tarjeta_grafica,
+                pantalla: data.especificaciones.pantalla,
+                sistema_operativo: data.especificaciones.sistema_operativo,
+                bateria: data.especificaciones.bateria,
+                puertos: data.especificaciones.puertos,
+                tienecargador: data.especificaciones.tienecargador,
+                serialcargador: data.especificaciones.serialcargador,
+                tipo_discoduro: data.especificaciones.tipo_discoduro,
+              },
             },
-            data: {
-              procesador: data.especificaciones.procesador,
-              memoria_ram: data.especificaciones.memoria_ram,
-              almacenamiento: data.especificaciones.almacenamiento,
-              tarjeta_grafica: data.especificaciones.tarjeta_grafica,
-              pantalla: data.especificaciones.pantalla,
-              sistema_operativo: data.especificaciones.sistema_operativo,
-              bateria: data.especificaciones.bateria,
-              puertos: data.especificaciones.puertos,
+          },
+
+          seguridad: {
+            update: {
+              where: {
+                id_seguridad: data.seguridad.id_seguridad,
+              },
+              data: {
+                nivel_acceso: data.seguridad.nivel_acceso,
+                software_seguridad: data.seguridad.software_seguridad,
+                cifrado_disco: data.seguridad.cifrado_disco,
+                politicas_aplicadas:
+                  data.seguridad.politicas_aplicadas.join(", "),
+              },
+            },
+          },
+
+          estado_ubicacion: {
+            update: {
+              where: {
+                id_estadoubi: data.estado_ubicacion.id_estadoubi,
+              },
+              data: {
+                estado_actual: data.estado_ubicacion.estado_actual,
+                sucursales: {
+                  connect: {
+                    id_sucursal: Number(data.estado_ubicacion.sucursal_id),
+                  },
+                },
+                departamento: data.estado_ubicacion.departamento,
+                usuarios: {
+                  connect: {
+                    id_usuario: Number(data.estado_ubicacion.responsable_id),
+                  },
+                },
+                disponibilidad: data.estado_ubicacion.disponibilidad,
+                condicion_fisica: data.estado_ubicacion.condicion_fisica,
+              },
+            },
+          },
+
+          adquisicion: {
+            update: {
+              where: {
+                id_adquisicion: data.adquisicion.id_adquisicion,
+              },
+              data: {
+                orden_compra: data.adquisicion.orden_compra,
+                fecha_compra: new Date(data.adquisicion.fecha_compra),
+                precio_compra: data.adquisicion.precio_compra,
+                forma_pago: data.adquisicion.forma_pago,
+                plazo_pago: data.adquisicion.plazo_pago,
+                numero_factura: data.adquisicion.numero_factura,
+                proveedores: {
+                  connect: {
+                    id_proveedor: data.adquisicion.proveedor_id,
+                  },
+                },
+                inicio_garantia: data.adquisicion.inicio_garantia,
+                garantia_fecha_fin: data.adquisicion.garantia_fecha_fin,
+              },
+            },
+          },
+
+          administrativa: {
+            update: {
+              where: {
+                id_admin: data.administrativa.id_admin,
+              },
+              data: {
+                codigo_inventario: data.administrativa.codigo_inventario,
+                centro_coste: data.administrativa.centro_coste,
+                usuarios: {
+                  connect: {
+                    id_usuario: Number(data.administrativa.autorizado_por_id),
+                  },
+                },
+                fecha_activacion: new Date(
+                  data.administrativa.fecha_activacion
+                ),
+                estado_contable: data.administrativa.estado_contable,
+                valor_depreciado: new Prisma.Decimal(
+                  data.administrativa.valor_depreciado
+                ),
+                vida_util_restante: data.administrativa.vida_util_restante,
+              },
             },
           },
         },
-
-        seguridad: {
-          update: {
-            where: {
-              id_seguridad: data.seguridad.id_seguridad,
-            },
-            data: {
-              nivel_acceso: data.seguridad.nivel_acceso,
-              software_seguridad: data.seguridad.software_seguridad,
-              cifrado_disco: data.seguridad.cifrado_disco,
-              politicas_aplicadas:
-                data.seguridad.politicas_aplicadas.join(", "),
-            },
-          },
-        },
-
-        adquisicion: {
-          update: {
-            where: {
-              id_adquisicion: data.adquisicion.id_adquisicion,
-            },
-            data: {
-              orden_compra: data.adquisicion.orden_compra,
-              fecha_compra: new Date(data.adquisicion.fecha_compra),
-              precio_compra: data.adquisicion.precio_compra,
-              forma_pago: data.adquisicion.forma_pago,
-              plazo_pago: data.adquisicion.plazo_pago,
-              numero_factura: data.adquisicion.numero_factura,
-              proveedor: data.adquisicion.proveedor,
+        include: {
+          categorias: true,
+          marcas: true,
+          especificaciones: true,
+          seguridad: true,
+          adquisicion: true,
+          administrativa: true,
+          estado_ubicacion: {
+            include: {
+              sucursales: {
+                include: {
+                  sedes: true,
+                },
+              },
             },
           },
         },
+      });
 
-        administrativa: {
-          update: {
-            where: {
-              id_admin: data.administrativa.id_admin,
-            },
-            data: {
-              codigo_inventario: data.administrativa.codigo_inventario,
-              centro_coste: data.administrativa.centro_coste,
-              autorizado_por: data.administrativa.autorizado_por,
-              fecha_activacion: new Date(data.administrativa.fecha_activacion),
-              estado_contable: data.administrativa.estado_contable,
-              valor_depreciado: new Prisma.Decimal(
-                data.administrativa.valor_depreciado
-              ),
-              vida_util_restante: data.administrativa.vida_util_restante,
-            },
-          },
-        },
-      },
-      include: {
-        categorias: true,
-        marcas: true,
-        sucursales: true,
-        especificaciones: true,
-        seguridad: true,
-        adquisicion: true,
-        administrativa: true,
-      },
-    });
+      return updatedEquipo;
+    } catch (error) {
+      console.error("Error actualizando el equipo:", error);
+      throw new Error("Error actualizando el equipo: " + error.message);
+    }
   },
   async findAll() {
-    return await prisma.equipos.findMany({
+    const equipos = await prisma.equipos.findMany({
       where: {
         estado_ubicacion: {
           none: {
@@ -276,21 +333,38 @@ export const equipoModel = {
             sucursales: {
               include: {
                 sedes: true,
-                sedes: {
-                  include: {
-                    usuario_sede: {
-                      include: {
-                        usuarios: true,
-                      },
-                    },
-                  },
-                },
+              },
+            },
+            usuarios: {
+              select: {
+                id_usuario: true,
+                nombre: true,
               },
             },
           },
         },
       },
     });
+
+    // Convierte imagen a base64 si es Uint8Array
+    const equiposWithImageBase64 = equipos.map((equipo) => {
+      const isBase64 =
+        typeof equipo.imagen === "string" &&
+        equipo.imagen.startsWith("data:image/png;base64,");
+
+      return {
+        ...equipo,
+        imagen: equipo.imagen
+          ? isBase64
+            ? equipo.imagen
+            : `data:image/png;base64,${Buffer.from(equipo.imagen).toString(
+                "base64"
+              )}`
+          : null,
+      };
+    });
+
+    return equiposWithImageBase64;
   },
   async findById(nro_serie) {
     const equipo = await prisma.equipos.findUnique({
@@ -300,20 +374,38 @@ export const equipoModel = {
         categorias: true,
         especificaciones: true,
         seguridad: true,
-        adquisicion: true,
-        administrativa: true,
+        adquisicion: {
+          include: {
+            proveedores: true,
+          },
+        },
+        administrativa: {
+          include: {
+            usuarios: true,
+          },
+        },
         perifericos: true,
         estado_ubicacion: {
           include: {
+            usuarios: {
+              select: {
+                id_usuario: true,
+                nombre: true,
+              },
+            },
             sucursales: {
               include: {
                 sedes: true,
                 sedes: {
                   include: {
-                    usuarios: {
+                    usuario_sede: {
                       select: {
                         id_usuario: true,
-                        nombre: true,
+                        usuarios: {
+                          select: {
+                            nombre: true,
+                          },
+                        },
                       },
                     },
                   },
@@ -328,8 +420,20 @@ export const equipoModel = {
     if (!equipo) {
       throw new Error("No se encontró el equipo.");
     }
+    const imagen = equipo.imagen;
+    const isBase64 =
+      typeof imagen === "string" && imagen.startsWith("data:image/png;base64,");
 
-    return equipo;
+    const equipoWithImageBase64 = {
+      ...equipo,
+      imagen: imagen
+        ? isBase64
+          ? imagen
+          : `data:image/png;base64,${Buffer.from(imagen).toString("base64")}`
+        : null,
+    };
+
+    return equipoWithImageBase64;
   },
   async delete_(id) {
     const equipo_id = Number(id);
@@ -376,8 +480,10 @@ export const equipoModel = {
                     include: {
                       sedes: {
                         include: {
-                          usuarios: {
-                            select: { nombre: true },
+                          usuario_sede: {
+                            select: {
+                              id_usuario: true,
+                            },
                           },
                         },
                       },
@@ -458,8 +564,10 @@ export const equipoModel = {
                 include: {
                   sedes: {
                     include: {
-                      usuarios: {
-                        select: { nombre: true },
+                      usuario_sede: {
+                        select: {
+                          id_usuario: true,
+                        },
                       },
                     },
                   },
