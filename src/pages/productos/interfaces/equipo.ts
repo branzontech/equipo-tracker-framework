@@ -1,4 +1,4 @@
-import { devoluciones } from "./../../../../node_modules/.prisma/client/index.d";
+import { Usuario } from './../../configuracion/usuarios/interfaces/usuarios';
 import { Categoria } from "@/pages/configuracion/maestros/interfaces/categorias";
 import { Marca } from "@/pages/configuracion/maestros/interfaces/marcas";
 import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
@@ -18,7 +18,7 @@ export interface Equipo {
   marca_id: Marca | number;
   marcas: Marca | null;
   categoria_id: Categoria | number;
-  categorias: Categoria | string;
+  categorias: Categoria | null;
   tipo_activo: string;
   fecha_registro: string;
   observaciones?: string;
@@ -49,14 +49,14 @@ export interface Equipo {
     procesador: string;
     memoria_ram: string;
     almacenamiento: string;
-    tipo_discoDuro?: string; // UEW
+    tipo_discoduro?: string; // UEW
     pantalla?: string;
     tarjeta_grafica?: string;
     sistema_operativo?: string;
     bateria?: string;
     puertos?: string;
-    tieneCargador?: boolean; // NUE
-    serialCargador?: string; // NUE
+    tienecargador?: boolean; // NUE
+    serialcargador?: string; // NUE
   };
 
   // Seguridad
@@ -75,6 +75,7 @@ export interface Equipo {
     forma_pago: string;
     plazo_pago: string;
     numero_factura: string;
+    proveedores: Proveedor;
     proveedor_id: Proveedor | number;
     inicio_garantia: string; // NUE
     garantia_fecha_fin: string; // No es nuevo pero debe ir en esta tabla
@@ -86,7 +87,8 @@ export interface Equipo {
     sucursal_id: Sucursal | number;
     sucursales: Sucursal | null;
     departamento: string;
-    responsable: string;
+    responsable_id: number;
+    usuarios: Usuario;
     disponibilidad: string;
     condicion_fisica: string;
   };
@@ -96,6 +98,7 @@ export interface Equipo {
     codigo_inventario: string;
     centro_coste: string;
     autorizado_por_id: string;
+    usuarios: Usuario;
     fecha_activacion: string;
     estado_contable: string;
     valor_depreciado: number;
