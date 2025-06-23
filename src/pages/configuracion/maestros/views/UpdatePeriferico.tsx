@@ -21,14 +21,19 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { UpdateProps } from "../interfaces/props";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
-import { listTypes } from "../interfaces/periferico";
 import { useEstado } from "../hooks/use-estado";
+import { useMarcas } from "../hooks/use-marcas";
+import { useTipos } from "../hooks/use-tipos";
+import { useSedes } from "../hooks/use-sedes";
 
 const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
   const { getById, newPeriferico, setNewPeriferico, update } = usePeriferico();
   const { equipo } = useEquipos();
   const { estados } = useEstado();
-
+  const { marcas } = useMarcas();
+  const { sedes } = useSedes();
+  const { tipos } = useTipos();
+  
   useEffect(() => {
     if (id !== null) {
       getById(id);
@@ -66,27 +71,19 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="estado">Estado</Label>
-                  <Select
-                    value={newPeriferico.estado}
-                    onValueChange={(value) =>
-                      setNewPeriferico({ ...newPeriferico, estado: value })
+                  <Label htmlFor="serial">Serial</Label>
+                  <Input
+                    id="serial"
+                    value={newPeriferico.serial}
+                    onChange={(e) =>
+                      setNewPeriferico({
+                        ...newPeriferico,
+                        serial: e.target.value,
+                      })
                     }
-                    disabled={newPeriferico.estado !== "Activo" && newPeriferico.estado !== "Inactivo"}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione el estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Activo">Activo</SelectItem>
-                      <SelectItem value="Inactivo">Inactivo</SelectItem>
-                      <SelectItem value="En Traslado">En traslado</SelectItem>
-                      <SelectItem value="En Prestamo">En prestamo</SelectItem>
-                      <SelectItem value="Fuera de servicio">
-                        Fuera de Servicio
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                    placeholder="Serial del periférico"
+                    autoComplete="off"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -101,14 +98,77 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                       <SelectValue placeholder="Seleccione el tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {listTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.name}
+                      {tipos.map((type) => (
+                        <SelectItem key={type.id_tipo} value={type.nombre_tipo}>
+                          {type.nombre_tipo}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="id_sede">Sede</Label>
+                  <Select
+                    value={
+                      newPeriferico.id_sede
+                        ? newPeriferico.id_sede.toString()
+                        : ""
+                    }
+                    onValueChange={(value: string) =>
+                      setNewPeriferico({
+                        ...newPeriferico,
+                        id_sede: Number(value),
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione la sede" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sedes.map((sede) => (
+                        <SelectItem
+                          key={sede.id_sede}
+                          value={sede.id_sede.toString()}
+                        >
+                          {sede.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="marca_id">Marca</Label>
+                  <Select
+                    value={
+                      newPeriferico.marca_id
+                        ? newPeriferico.marca_id.toString()
+                        : ""
+                    }
+                    onValueChange={(value: string) =>
+                      setNewPeriferico({
+                        ...newPeriferico,
+                        marca_id: Number(value),
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione la marca" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {marcas.map((marca) => (
+                        <SelectItem
+                          key={marca.id_marca}
+                          value={marca.id_marca.toString()}
+                        >
+                          {marca.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="equipo_asociado">Equipo Asociado</Label>
                   <Select
@@ -125,7 +185,7 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                     }
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Seleccione la sede" />
+                      <SelectValue placeholder="Seleccione el equipo asociado" />
                     </SelectTrigger>
                     <SelectContent>
                       {equipo.map((equipo) => (
@@ -134,6 +194,34 @@ const UpdatePeriferico = ({ open, onOpenChange, id }: UpdateProps) => {
                           value={equipo.id_equipo.toString()}
                         >
                           {equipo.nombre_equipo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado</Label>
+                  <Select
+                    value={newPeriferico.estado}
+                    onValueChange={(value) =>
+                      setNewPeriferico({ ...newPeriferico, estado: value })
+                    }
+                    disabled={
+                      newPeriferico.estado !== "Activo" &&
+                      newPeriferico.estado !== "Inactivo"
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione el estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estados.map((estado) => (
+                        <SelectItem
+                          key={estado.id_estado}
+                          value={estado.nombre_estado}
+                        >
+                          {estado.nombre_estado}
                         </SelectItem>
                       ))}
                     </SelectContent>
