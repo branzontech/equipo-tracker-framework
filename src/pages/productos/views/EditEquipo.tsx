@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -6,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormLabel,
 } from "@/components/ui/form";
 import {
@@ -33,6 +35,15 @@ import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "@/components/Loading";
+import { useEstado } from "@/pages/configuracion/maestros/hooks/use-estado";
+import { useTipos } from "@/pages/configuracion/maestros/hooks/use-tipos";
+import ImagenEquipoUploader from "../components/ImagenEquipo";
+import { Checkbox } from "@/components/ui/checkbox";
+import { SearchSelect } from "@/components/SearchSelect";
+import { useProveedor } from "@/pages/configuracion/maestros/hooks/use-proveedor";
+import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
+import { useUser } from "@/pages/usuarios/hooks/use-user";
 
 const EditEquipo = () => {
   const { nroSeries } = useParams();
@@ -45,10 +56,34 @@ const EditEquipo = () => {
     isLoading,
     setIsLoading,
     update,
+    setResponsableRecibeInput,
+    setResponsableEntregaInput,
+    responsableEntregaInput,
+    handleResponsable,
+    sugerenciasResponsable,
+    formatNumber,
+    setSugerenciasResponsable,
+    formatearVidaUtil
   } = useEquipos();
+  const {
+    handleNombreInput,
+    nombreInput,
+    sugerencias,
+    setSugerencias,
+    setNombreUser,
+  } = useUser();
+  const {
+    handleNombre,
+    nombreProvee,
+    sugerenciasProveedor,
+    setNombreProveedor,
+    setSugerenciasProveedor,
+  } = useProveedor();
   const { marcas } = useMarcas();
   const { categoria } = useCategoria();
   const { sucursales } = useSucursales();
+  const { estados } = useEstado();
+  const { tipos } = useTipos();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +96,88 @@ const EditEquipo = () => {
       fetchData();
     }
   }, [nroSeries]);
+
+  useEffect(() => {
+    const { valor_depreciado } = newEquipo.administrativa;
+    const { precio_compra, fecha_compra } = newEquipo.adquisicion;
+
+    if (
+      precio_compra &&
+      valor_depreciado &&
+      fecha_compra &&
+      precio_compra > 0 &&
+      valor_depreciado >= 0
+    ) {
+      const fechaCompra = new Date(fecha_compra);
+      const hoy = new Date();
+      const añosTranscurridos =
+        hoy.getFullYear() -
+        fechaCompra.getFullYear() +
+        (hoy.getMonth() - fechaCompra.getMonth()) / 12;
+
+      const depreciacionAnual = valor_depreciado / añosTranscurridos;
+      const vidaUtilTotal = precio_compra / depreciacionAnual;
+      const vidaUtilRestante = vidaUtilTotal - añosTranscurridos;
+
+      setNewEquipo((prev) => ({
+        ...prev,
+        administrativa: {
+          ...prev.administrativa,
+          vida_util_restante:
+            vidaUtilRestante > 0
+              ? formatearVidaUtil(vidaUtilRestante)
+              : "0 meses",
+        },
+      }));
+    }
+  }, [
+    newEquipo.adquisicion.precio_compra,
+    newEquipo.administrativa.valor_depreciado,
+    newEquipo.adquisicion.fecha_compra,
+  ]);
+
+  const handleSelect = (
+    tipo: "usuario" | "responsable" | "proveedor",
+    data: any
+  ) => {
+    const nombre = data.nombre;
+    const id = tipo === "proveedor" ? data.id_proveedor : data.id_usuario;
+
+    // Inputs
+    if (tipo === "usuario") setNombreUser(nombre);
+    if (tipo === "responsable") setResponsableEntregaInput(nombre);
+    if (tipo === "proveedor") setNombreProveedor(nombre);
+
+    setResponsableRecibeInput({ id: id.toString(), name: nombre });
+
+    // newEquipo update
+    setNewEquipo((prev) => ({
+      ...prev,
+      ...(tipo === "usuario" && {
+        administrativa: {
+          ...prev.administrativa,
+          autorizado_por_id: id,
+        },
+      }),
+      ...(tipo === "responsable" && {
+        estado_ubicacion: {
+          ...prev.estado_ubicacion,
+          responsable_id: id,
+        },
+      }),
+      ...(tipo === "proveedor" && {
+        adquisicion: {
+          ...prev.adquisicion,
+          proveedor_id: id,
+        },
+      }),
+    }));
+
+    // Limpiar sugerencias
+    if (tipo === "usuario") setSugerencias([]);
+    if (tipo === "responsable") setSugerenciasResponsable([]);
+    if (tipo === "proveedor") setSugerenciasProveedor([]);
+  };
 
   return (
     <>
@@ -139,17 +256,14 @@ const EditEquipo = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="w-full">
-                              <SelectItem value="Equipo de Cómputo">
-                                Equipo de Cómputo
-                              </SelectItem>
-                              <SelectItem value="Impresora">
-                                Impresora
-                              </SelectItem>
-                              <SelectItem value="Escáner">Escáner</SelectItem>
-                              <SelectItem value="Proyector">
-                                Proyector
-                              </SelectItem>
-                              <SelectItem value="Otro">Otro</SelectItem>
+                              {tipos.map((tipo) => (
+                                <SelectItem
+                                  key={tipo.id_tipo}
+                                  value={tipo.nombre_tipo}
+                                >
+                                  {tipo.nombre_tipo}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -225,41 +339,6 @@ const EditEquipo = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="sucursal_id">
-                            Sucursal del Equipo
-                          </Label>
-                          <Select
-                            value={
-                              newEquipo.sucursal_id
-                                ? newEquipo.sucursal_id.toString()
-                                : ""
-                            }
-                            onValueChange={(value) =>
-                              setNewEquipo({
-                                ...newEquipo,
-                                sucursal_id: Number(value),
-                              })
-                            }
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar una sucursal" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {sucursales.map((sucursal) => (
-                                <SelectItem
-                                  key={sucursal.id_sucursal}
-                                  value={sucursal.id_sucursal.toString()}
-                                >
-                                  {sucursal.nombre}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
                           <Label htmlFor="modelo">Modelo</Label>
                           <Input
                             placeholder="Modelo del equipo"
@@ -274,102 +353,14 @@ const EditEquipo = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="estado_actual">Estado Actual</Label>
-                          <Select
-                            value={newEquipo.estado_actual}
-                            onValueChange={(value) =>
-                              setNewEquipo({
-                                ...newEquipo,
-                                estado_actual: value,
-                              })
+                          <ImagenEquipoUploader
+                            onChange={(base64) =>
+                              setNewEquipo((prev) => ({
+                                ...prev,
+                                imagen: base64,
+                              }))
                             }
-                            disabled={
-                              newEquipo.estado_actual !== "Activo" &&
-                              newEquipo.estado_actual !== "Inactivo"
-                            }
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar estado" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="w-full">
-                              <SelectItem value="Activo">Activo</SelectItem>
-                              <SelectItem value="En Préstamo">
-                                En Préstamo{" "}
-                                <span className="text-xs text-gray-900">
-                                  (Se encuentra en préstamo)
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="En Traslado">
-                                En Traslado{" "}
-                                <span className="text-xs text-gray-900">
-                                  (Se encuentra en traslado)
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="En Mantenimiento">
-                                En Mantenimiento{" "}
-                                <span className="text-xs text-gray-900">
-                                  (Se encuentra en mantenimiento)
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="Fuera de Servicio">
-                                Fuera de Servicio{" "}
-                                <span className="text-xs text-gray-900">
-                                  (Se encuentra fuera de servicio)
-                                </span>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                          <FormLabel>Garantía Fin</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal"
-                                  )}
-                                >
-                                  {newEquipo.garantia_fecha_fin ? (
-                                    format(newEquipo.garantia_fecha_fin, "PP")
-                                  ) : (
-                                    <span>Seleccionar fecha</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={
-                                  newEquipo.garantia_fecha_fin
-                                    ? new Date(newEquipo.garantia_fecha_fin)
-                                    : undefined
-                                }
-                                onSelect={(date) =>
-                                  setNewEquipo({
-                                    ...newEquipo,
-                                    garantia_fecha_fin: date
-                                      ? date.toISOString()
-                                      : "",
-                                  })
-                                }
-                                disabled={(date) =>
-                                  date < new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          />
                         </div>
                       </div>
                     </CardContent>
@@ -390,7 +381,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: Intel Core i5 11th Gen"
-                            value={newEquipo.especificaciones?.procesador || ""}
+                            value={newEquipo.especificaciones.procesador}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -409,7 +400,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 16 GB"
-                            value={newEquipo.especificaciones?.memoria_ram}
+                            value={newEquipo.especificaciones.memoria_ram}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -427,7 +418,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 512 GB"
-                            value={newEquipo.especificaciones?.almacenamiento}
+                            value={newEquipo.especificaciones.almacenamiento}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -445,8 +436,8 @@ const EditEquipo = () => {
                             Tarjeta Gráfica
                           </Label>
                           <Input
-                            placeholder="Ej: SSD, HDD, NVMe"
-                            value={newEquipo.especificaciones?.tarjeta_grafica}
+                            placeholder="Ej. NVIDIA GeForce GTX 1660"
+                            value={newEquipo.especificaciones.tarjeta_grafica}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -460,12 +451,31 @@ const EditEquipo = () => {
                         </div>
 
                         <div className="space-y-2">
+                          <Label htmlFor="especificaciones.tipo_discoduro">
+                            Tipo de Disco Duro
+                          </Label>
+                          <Input
+                            placeholder="Ej: SSD, HDD, NVMe"
+                            value={newEquipo.especificaciones.tipo_discoduro}
+                            onChange={(e) => {
+                              setNewEquipo({
+                                ...newEquipo,
+                                especificaciones: {
+                                  ...newEquipo.especificaciones,
+                                  tipo_discoduro: e.target.value,
+                                },
+                              });
+                            }}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
                           <Label htmlFor="especificaciones.pantalla">
                             Pantalla
                           </Label>
                           <Input
                             placeholder="Ej: 15.6 pulgadas Full HD"
-                            value={newEquipo.especificaciones?.pantalla}
+                            value={newEquipo.especificaciones.pantalla}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -484,9 +494,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: Windows 10"
-                            value={
-                              newEquipo.especificaciones?.sistema_operativo
-                            }
+                            value={newEquipo.especificaciones.sistema_operativo}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -505,7 +513,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: 120 Wh"
-                            value={newEquipo.especificaciones?.bateria}
+                            value={newEquipo.especificaciones.bateria}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -524,7 +532,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Ej: USB 3.0, HDMI, VGA"
-                            value={newEquipo.especificaciones?.puertos}
+                            value={newEquipo.especificaciones.puertos}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -536,6 +544,54 @@ const EditEquipo = () => {
                             }}
                           />
                         </div>
+
+                        {/* Tiene Cargador */}
+                        <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <div className="pt-1">
+                            <Checkbox
+                              checked={newEquipo.especificaciones.tienecargador}
+                              onCheckedChange={(checked) =>
+                                setNewEquipo((prev) => ({
+                                  ...prev,
+                                  especificaciones: {
+                                    ...prev.especificaciones,
+                                    tienecargador: checked as boolean,
+                                  },
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1 leading-none">
+                            <label className="text-sm font-medium">
+                              Tiene Cargador
+                            </label>
+                            <p className="text-sm text-muted-foreground">
+                              Marque esta casilla si el equipo incluye cargador
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Serial del cargador (si aplica) */}
+                        {newEquipo.especificaciones.tienecargador && (
+                          <div className="mt-4 space-y-2">
+                            <label className="text-sm font-medium">
+                              Serial del Cargador
+                            </label>
+                            <Input
+                              placeholder="Ingrese el serial del cargador"
+                              value={newEquipo.especificaciones.serialcargador}
+                              onChange={(e) =>
+                                setNewEquipo((prev) => ({
+                                  ...prev,
+                                  especificaciones: {
+                                    ...prev.especificaciones,
+                                    serialcargador: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -562,10 +618,10 @@ const EditEquipo = () => {
                                     "w-full pl-3 text-left font-normal"
                                   )}
                                 >
-                                  {newEquipo.adquisicion?.fecha_compra ? (
+                                  {newEquipo.adquisicion.fecha_compra ? (
                                     format(
-                                      newEquipo.adquisicion?.fecha_compra,
-                                      "PP"
+                                      newEquipo.adquisicion.fecha_compra,
+                                      "P"
                                     )
                                   ) : (
                                     <span>Seleccionar fecha</span>
@@ -581,7 +637,7 @@ const EditEquipo = () => {
                               <Calendar
                                 mode="single"
                                 selected={
-                                  newEquipo.adquisicion?.fecha_compra
+                                  newEquipo.adquisicion.fecha_compra
                                     ? new Date(
                                         newEquipo.adquisicion.fecha_compra
                                       )
@@ -605,21 +661,19 @@ const EditEquipo = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="adquisicion.proveedor">
-                            Proveedor
-                          </Label>
-                          <Input
-                            placeholder="Nombre del proveedor"
-                            value={newEquipo.adquisicion?.proveedor}
-                            onChange={(e) => {
-                              setNewEquipo({
-                                ...newEquipo,
-                                adquisicion: {
-                                  ...newEquipo.adquisicion,
-                                  proveedor: e.target.value,
-                                },
-                              });
-                            }}
+                          <SearchSelect
+                            label="Proveedor"
+                            placeholder="Ingrese el nombre del proveedor"
+                            value={
+                              nombreProvee ||
+                              newEquipo.adquisicion?.proveedores?.nombre ||
+                              ""
+                            }
+                            onInputChange={handleNombre}
+                            suggestions={sugerenciasProveedor}
+                            onSelect={(data) => handleSelect("proveedor", data)}
+                            getKey={(u) => u.id_proveedor}
+                            getLabel={(u) => u.nombre}
                           />
                         </div>
 
@@ -629,7 +683,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Número de factura"
-                            value={newEquipo.adquisicion?.numero_factura}
+                            value={newEquipo.adquisicion.numero_factura}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -649,9 +703,23 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Precio de Adquisición"
                             type="text"
-                            value={newEquipo.adquisicion?.precio_compra}
+                            value={formatNumber(
+                              newEquipo.adquisicion.precio_compra
+                            )}
                             onChange={(e) => {
-                              const raw = e.target.value.replace(/\./g, "");
+                              const input = e.target.value;
+
+                              if (/[^0-9.]/.test(input)) {
+                                toast.error(
+                                  "Solo se permiten números. Se han removido caracteres inválidos.",
+                                  {
+                                    icon: icons.error,
+                                  }
+                                );
+                              }
+
+                              const raw = input.replace(/\D/g, "");
+
                               setNewEquipo({
                                 ...newEquipo,
                                 adquisicion: {
@@ -668,7 +736,7 @@ const EditEquipo = () => {
                             Forma de Pago
                           </Label>
                           <Select
-                            value={newEquipo.adquisicion?.forma_pago}
+                            value={newEquipo.adquisicion.forma_pago}
                             onValueChange={(value) =>
                               setNewEquipo({
                                 ...newEquipo,
@@ -703,7 +771,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Plazo de Pago"
-                            value={newEquipo.adquisicion?.plazo_pago}
+                            value={newEquipo.adquisicion.plazo_pago}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -722,7 +790,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Número de orden de compra"
-                            value={newEquipo.adquisicion?.orden_compra}
+                            value={newEquipo.adquisicion.orden_compra}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -733,6 +801,297 @@ const EditEquipo = () => {
                               });
                             }}
                           />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Inicio de Garantia</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal"
+                                  )}
+                                >
+                                  {newEquipo.adquisicion.inicio_garantia ? (
+                                    format(
+                                      newEquipo.adquisicion.inicio_garantia,
+                                      "PP"
+                                    )
+                                  ) : (
+                                    <span>Seleccionar fecha</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={
+                                  newEquipo.adquisicion.inicio_garantia
+                                    ? new Date(
+                                        newEquipo.adquisicion.inicio_garantia
+                                      )
+                                    : undefined
+                                }
+                                onSelect={(date) =>
+                                  setNewEquipo({
+                                    ...newEquipo,
+                                    adquisicion: {
+                                      ...newEquipo.adquisicion,
+                                      inicio_garantia: date
+                                        ? date.toISOString()
+                                        : "",
+                                    },
+                                  })
+                                }
+                                disabled={(date) =>
+                                  date < new Date() ||
+                                  date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Fin de Garantia</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal"
+                                  )}
+                                >
+                                  {newEquipo.adquisicion.garantia_fecha_fin ? (
+                                    format(
+                                      newEquipo.adquisicion.garantia_fecha_fin,
+                                      "PP"
+                                    )
+                                  ) : (
+                                    <span>Seleccionar fecha</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={
+                                  newEquipo.adquisicion.garantia_fecha_fin
+                                    ? new Date(
+                                        newEquipo.adquisicion.garantia_fecha_fin
+                                      )
+                                    : undefined
+                                }
+                                onSelect={(date) =>
+                                  setNewEquipo({
+                                    ...newEquipo,
+                                    adquisicion: {
+                                      ...newEquipo.adquisicion,
+                                      garantia_fecha_fin: date
+                                        ? date.toISOString()
+                                        : "",
+                                    },
+                                  })
+                                }
+                                disabled={(date) =>
+                                  date < new Date() ||
+                                  date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Estado y Ubicación */}
+                  <Card className="max-w-full">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg font-semibold text-[#040d50]">
+                        Estado y Ubicación
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="estado_actual">Estado Actual</Label>
+                          <Select
+                            value={newEquipo.estado_ubicacion.estado_actual}
+                            onValueChange={(value) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                estado_ubicacion: {
+                                  ...newEquipo.estado_ubicacion,
+                                  estado_actual: value,
+                                },
+                              })
+                            }
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar estado" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="w-full">
+                              {estados.map((estado) => (
+                                <SelectItem
+                                  key={estado.id_estado}
+                                  value={estado.nombre_estado}
+                                >
+                                  {estado.nombre_estado}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="sucursal_id">
+                            Sucursal del Equipo
+                          </Label>
+                          <Select
+                            value={
+                              newEquipo.estado_ubicacion.sucursal_id
+                                ? newEquipo.estado_ubicacion.sucursal_id.toString()
+                                : ""
+                            }
+                            onValueChange={(value) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                estado_ubicacion: {
+                                  ...newEquipo.estado_ubicacion,
+                                  sucursal_id: Number(value),
+                                },
+                              })
+                            }
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar una sucursal" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {sucursales.map((sucursal) => (
+                                <SelectItem
+                                  key={sucursal.id_sucursal}
+                                  value={sucursal.id_sucursal.toString()}
+                                >
+                                  {sucursal.nombre}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="departamento">Departamento</Label>
+                          <Input
+                            placeholder="Departamento asignado"
+                            value={newEquipo.estado_ubicacion.departamento}
+                            onChange={(e) => {
+                              setNewEquipo({
+                                ...newEquipo,
+                                estado_ubicacion: {
+                                  ...newEquipo.estado_ubicacion,
+                                  departamento: e.target.value,
+                                },
+                              });
+                            }}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <SearchSelect
+                            label="Responsable"
+                            placeholder="Ingrese el nombre del responsable"
+                            value={
+                              responsableEntregaInput ||
+                              newEquipo.estado_ubicacion.usuarios?.nombre
+                            }
+                            onInputChange={handleResponsable}
+                            suggestions={sugerenciasResponsable}
+                            onSelect={(data) =>
+                              handleSelect("responsable", data)
+                            }
+                            getKey={(u) => u.id_usuario}
+                            getLabel={(u) => u.nombre}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="disponibilidad">Disponibilidad</Label>
+                          <Select
+                            value={newEquipo.estado_ubicacion.disponibilidad}
+                            onValueChange={(value) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                estado_ubicacion: {
+                                  ...newEquipo.estado_ubicacion,
+                                  disponibilidad: value,
+                                },
+                              })
+                            }
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar disponibilidad" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="w-full">
+                              <SelectItem value="Disponible">
+                                Disponible
+                              </SelectItem>
+                              <SelectItem value="Asignado">Asignado</SelectItem>
+                              <SelectItem value="Reservado">
+                                Reservado
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="condicionFisica">
+                            Condición Física
+                          </Label>
+                          <Select
+                            value={newEquipo.estado_ubicacion.condicion_fisica}
+                            onValueChange={(value) =>
+                              setNewEquipo({
+                                ...newEquipo,
+                                estado_ubicacion: {
+                                  ...newEquipo.estado_ubicacion,
+                                  condicion_fisica: value,
+                                },
+                              })
+                            }
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar condición" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="w-full">
+                              <SelectItem value="Nuevo">Nuevo</SelectItem>
+                              <SelectItem value="Bueno">Bueno</SelectItem>
+                              <SelectItem value="Malo">Malo</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </CardContent>
@@ -752,7 +1111,7 @@ const EditEquipo = () => {
                             Nivel de Acceso
                           </Label>
                           <Select
-                            value={newEquipo.seguridad?.nivel_acceso}
+                            value={newEquipo.seguridad.nivel_acceso}
                             onValueChange={(value) =>
                               setNewEquipo({
                                 ...newEquipo,
@@ -790,7 +1149,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Software de Seguridad"
-                            value={newEquipo.seguridad?.software_seguridad}
+                            value={newEquipo.seguridad.software_seguridad}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -808,7 +1167,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Cifrado Disco"
-                            value={newEquipo.seguridad?.cifrado_disco}
+                            value={newEquipo.seguridad.cifrado_disco}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -828,19 +1187,20 @@ const EditEquipo = () => {
                             placeholder="Políticas de Aplicación"
                             className="min-h-[100px]"
                             value={
-                              newEquipo.seguridad?.politicas_aplicadas?.join(
-                                ", "
-                              ) || ""
+                              Array.isArray(
+                                newEquipo.seguridad.politicas_aplicadas
+                              )
+                                ? newEquipo.seguridad.politicas_aplicadas.join(
+                                    ", "
+                                  )
+                                : newEquipo.seguridad.politicas_aplicadas || ""
                             }
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
                                 seguridad: {
                                   ...newEquipo.seguridad,
-                                  politicas_aplicadas: e.target.value
-                                    .split(",")
-                                    .map((item) => item.trim())
-                                    .filter((item) => item.length > 0),
+                                  politicas_aplicadas: e.target.value,
                                 },
                               });
                             }}
@@ -865,7 +1225,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Código de Inventario"
-                            value={newEquipo.administrativa?.codigo_inventario}
+                            value={newEquipo.administrativa.codigo_inventario}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -883,7 +1243,7 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Centro de Coste"
-                            value={newEquipo.administrativa?.centro_coste}
+                            value={newEquipo.administrativa.centro_coste}
                             onChange={(e) => {
                               setNewEquipo({
                                 ...newEquipo,
@@ -896,21 +1256,18 @@ const EditEquipo = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="administrativa.autorizado_por">
-                            Autorizado por
-                          </Label>
-                          <Input
-                            placeholder="Autorizado por"
-                            value={newEquipo.administrativa?.autorizado_por}
-                            onChange={(e) => {
-                              setNewEquipo({
-                                ...newEquipo,
-                                administrativa: {
-                                  ...newEquipo.administrativa,
-                                  autorizado_por: e.target.value,
-                                },
-                              });
-                            }}
+                          <SearchSelect
+                            label="Autorizado por"
+                            placeholder="Ingrese el nombre del usuario"
+                            value={
+                              nombreInput ||
+                              newEquipo.administrativa.usuarios?.nombre
+                            }
+                            onInputChange={handleNombreInput}
+                            suggestions={sugerencias}
+                            onSelect={(data) => handleSelect("usuario", data)}
+                            getKey={(u) => u.id_usuario}
+                            getLabel={(u) => u.nombre}
                           />
                         </div>
                         <div className="space-y-2">
@@ -926,12 +1283,10 @@ const EditEquipo = () => {
                                     "w-full pl-3 text-left font-normal"
                                   )}
                                 >
-                                  {newEquipo.administrativa
-                                    ?.fecha_activacion ? (
+                                  {newEquipo.administrativa.fecha_activacion ? (
                                     format(
-                                      newEquipo.administrativa
-                                        ?.fecha_activacion,
-                                      "PP"
+                                      newEquipo.administrativa.fecha_activacion,
+                                      "P"
                                     )
                                   ) : (
                                     <span>Seleccionar fecha</span>
@@ -947,9 +1302,9 @@ const EditEquipo = () => {
                               <Calendar
                                 mode="single"
                                 selected={
-                                  newEquipo.administrativa?.fecha_activacion
+                                  newEquipo.administrativa.fecha_activacion
                                     ? new Date(
-                                        newEquipo.administrativa?.fecha_activacion
+                                        newEquipo.administrativa.fecha_activacion
                                       )
                                     : undefined
                                 }
@@ -974,7 +1329,7 @@ const EditEquipo = () => {
                             Estado de Contabilidad
                           </Label>
                           <Select
-                            value={newEquipo.administrativa?.estado_contable}
+                            value={newEquipo.administrativa.estado_contable}
                             onValueChange={(value) =>
                               setNewEquipo({
                                 ...newEquipo,
@@ -1013,7 +1368,9 @@ const EditEquipo = () => {
                           <Input
                             placeholder="Valor Depreciado"
                             type="text"
-                            value={newEquipo.administrativa?.valor_depreciado}
+                            value={formatNumber(
+                              newEquipo.administrativa.valor_depreciado
+                            )}
                             onChange={(e) => {
                               const raw = e.target.value.replace(/\./g, "");
                               setNewEquipo({
@@ -1032,16 +1389,8 @@ const EditEquipo = () => {
                           </Label>
                           <Input
                             placeholder="Vida Útil Restante"
-                            value={newEquipo.administrativa?.vida_util_restante}
-                            onChange={(e) => {
-                              setNewEquipo({
-                                ...newEquipo,
-                                administrativa: {
-                                  ...newEquipo.administrativa,
-                                  vida_util_restante: e.target.value,
-                                },
-                              });
-                            }}
+                            value={newEquipo.administrativa.vida_util_restante}
+                            readOnly
                           />
                         </div>
                       </div>
@@ -1071,6 +1420,24 @@ const EditEquipo = () => {
                             }}
                           />
                         </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="tags">Etiquetas/Tags</Label>
+                          <Input
+                            placeholder="Etiquetas separadas por comas"
+                            value={newEquipo.tags}
+                            onChange={(e) => {
+                              setNewEquipo({
+                                ...newEquipo,
+                                tags: e.target.value,
+                              });
+                            }}
+                          />
+                          <FormDescription>
+                            Ingrese las etiquetas separadas por comas (ej:
+                            impresora, red, oficina)
+                          </FormDescription>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -1080,7 +1447,35 @@ const EditEquipo = () => {
                       type="submit"
                       onClick={(e: React.FormEvent) => {
                         e.preventDefault();
-                        update(newEquipo);
+
+                        const equipoFormateado = {
+                          ...newEquipo,
+                          seguridad: {
+                            ...newEquipo.seguridad,
+                            politicas_aplicadas:
+                              typeof newEquipo.seguridad.politicas_aplicadas ===
+                              "string"
+                                ? (
+                                    (newEquipo.seguridad.politicas_aplicadas ??
+                                      "") as string
+                                  )
+                                    .split(",")
+                                    .map((p) => p.trim())
+                                    .filter(Boolean)
+                                : newEquipo.seguridad.politicas_aplicadas,
+                          },
+                          tags:
+                            typeof newEquipo.tags === "string"
+                              ? ((newEquipo.tags ?? "") as string)
+                                  .split(",")
+                                  .map((t) => t.trim())
+                                  .filter(Boolean)
+                              : newEquipo.tags,
+                        };
+
+                        console.log(equipoFormateado);
+
+                        update(equipoFormateado);
                       }}
                     >
                       Actualizar
