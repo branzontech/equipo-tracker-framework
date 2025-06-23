@@ -69,14 +69,8 @@ export const UserModel = {
         rol: true,
         estado: true,
         telefono: true,
-        sede_id: true,
         firma: true,
-        sedes: {
-          select: {
-            id_sede: true,
-            nombre: true,
-          },
-        },
+        
       },
       take: 10,
     });
