@@ -1,4 +1,3 @@
-import { set } from "date-fns";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import { Equipo } from "../interfaces/equipo";
@@ -18,6 +17,7 @@ import { ColumnConfig } from "@/pages/configuracion/maestros/interfaces/columns"
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { getUserByName } from "@/api/axios/user.api";
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
@@ -32,32 +32,17 @@ export const useEquipos = () => {
     marcas: null,
     categoria_id: 0,
     categorias: null,
-    sucursal_id: 0,
-    sucursales: {
-      id_sucursal: 0,
-      nombre: "",
-      sede_id: 0,
-      sedes: {
-        id_sede: 0,
-        nombre: "",
-        usuarios: [],
-        estado: null,
-      },
-      tipo: "",
-      estado: null,
-      area: "",
-    },
-    estado_actual: "",
     fecha_registro: new Date().toISOString().split("T")[0],
     tipo_activo: "",
-    garantia_fecha_fin: "",
     observaciones: "",
+    tags: [],
+    imagen: "",
     motivo: "",
     especificaciones: {
       procesador: "",
       memoria_ram: "",
       almacenamiento: "",
-      tarjeta_grafica: "",
+      tipo_discoDuro: "",
       pantalla: "",
       sistema_operativo: "",
       bateria: "",
@@ -76,12 +61,36 @@ export const useEquipos = () => {
       forma_pago: "",
       plazo_pago: "",
       numero_factura: "",
-      proveedor: "",
+      proveedor_id: 0,
+      inicio_garantia: "",
+      garantia_fecha_fin: "",
+    },
+    estado_ubicacion: {
+      estado_actual: "",
+      sucursal_id: 0,
+      sucursales: {
+        id_sucursal: 0,
+        nombre: "",
+        sede_id: 0,
+        sedes: {
+          id_sede: 0,
+          nombre: "",
+          usuario_sede: [],
+          estado: null,
+        },
+        tipo: "",
+        estado: null,
+        area: "",
+      },
+      departamento: "",
+      responsable: "",
+      disponibilidad: "",
+      condicion_fisica: "",
     },
     administrativa: {
       codigo_inventario: "",
       centro_coste: "",
-      autorizado_por: "",
+      autorizado_por_id: "",
       fecha_activacion: "",
       estado_contable: "",
       valor_depreciado: 0,
@@ -112,6 +121,8 @@ export const useEquipos = () => {
   const [sedesConEquiposCount, setSedesConEquiposCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
+  const [responsableEntregaInput, setResponsableEntregaInput] = useState(null);
+  const [sugerenciasResponsable, setSugerenciasResponsable] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -124,10 +135,12 @@ export const useEquipos = () => {
           tipo: equipo.sucursales?.tipo || "Sin Tipo",
           marcas: equipo.marcas?.nombre || "Sin Marca",
           categorias: equipo.categorias?.nombre || "Sin Categoria",
-          estadoActual: equipo.estado_actual ? "Activo" : "Inactivo",
+          estadoActual: equipo.estado_ubicacion?.estado_actual
+            ? "Activo"
+            : "Inactivo",
         }));
         const equiposActivos = equipos.filter(
-          (equipo: any) => equipo.estado_actual === "Activo"
+          (equipo: any) => equipo.estado_ubicacion?.estado_actual === "Activo"
         );
         setEquipo(equipos);
         setCountEquipo(equiposActivos.length);
@@ -319,14 +332,15 @@ export const useEquipos = () => {
       if (
         filters.estado &&
         filters.estado !== "todos" &&
-        item.estado_actual.toLowerCase() !== filters.estado.toLowerCase()
+        item.estado_ubicacion.estado_actual.toLowerCase() !==
+          filters.estado.toLowerCase()
       )
         return false;
 
       if (
         filters.sucursales &&
         filters.sucursales !== "todas" &&
-        item.sucursales.toString() !== filters.sucursales
+        item.estado_ubicacion.sucursales.toString() !== filters.sucursales
       )
         return false;
 
@@ -467,10 +481,10 @@ export const useEquipos = () => {
       valor: newEquipo.categoria_id,
       mensaje: "Debe seleccionar una categoría",
     },
-    { valor: newEquipo.sucursal_id, mensaje: "Debe seleccionar una sucursal" },
+    { valor: newEquipo.estado_ubicacion.sucursal_id, mensaje: "Debe seleccionar una sucursal" },
     { valor: newEquipo.modelo, mensaje: "Debe ingresar un modelo" },
     {
-      valor: newEquipo.garantia_fecha_fin,
+      valor: newEquipo.adquisicion.garantia_fecha_fin,
       mensaje: "Debe ingresar una fecha de garantía",
     },
 
@@ -488,7 +502,7 @@ export const useEquipos = () => {
       mensaje: "Debe ingresar un almacenamiento",
     },
     {
-      valor: newEquipo.especificaciones.tarjeta_grafica,
+      valor: newEquipo.especificaciones.tipo_discoDuro,
       mensaje: "Debe ingresar una tarjeta gráfica",
     },
     {
@@ -510,7 +524,7 @@ export const useEquipos = () => {
       mensaje: "Debe ingresar la fecha de compra",
     },
     {
-      valor: newEquipo.adquisicion.proveedor,
+      valor: newEquipo.adquisicion.proveedor_id,
       mensaje: "Debe ingresar el proveedor",
     },
     {
@@ -562,7 +576,7 @@ export const useEquipos = () => {
       mensaje: "Debe ingresar el centro de coste",
     },
     {
-      valor: newEquipo.administrativa.autorizado_por,
+      valor: newEquipo.administrativa.autorizado_por_id,
       mensaje: "Debe ingresar el autorizado por",
     },
     {
@@ -590,6 +604,7 @@ export const useEquipos = () => {
   ];
 
   const handleSubmit = async (data: Equipo) => {
+    console.log(data);
     for (const campo of camposRequeridos) {
       if (!campo.valor) {
         toast.error(campo.mensaje, {
@@ -610,10 +625,10 @@ export const useEquipos = () => {
         toast.success(response.message || "Equipo creado exitosamente", {
           icon: icons.success,
         });
-        setTimeout(() => {
-          navigate("/productos/lista");
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   navigate("/productos/lista");
+        //   window.location.reload();
+        // }, 4500);
       } else {
         toast.error(response.message || "Error al crear el equipo", {
           icon: icons.error,
@@ -707,11 +722,11 @@ export const useEquipos = () => {
   );
 
   const uniqueEstados = Array.from(
-    new Set(equipo.map((item) => item.estado_actual))
+    new Set(equipo.map((item) => item.estado_ubicacion?.estado_actual))
   );
 
   const uniqueSucursales = Array.from(
-    new Set(equipo.map((item) => item.sucursales))
+    new Set(equipo.map((item) => item.estado_ubicacion?.sucursales))
   );
 
   const activeFiltersCount = Object.values(filters).filter(
@@ -836,6 +851,7 @@ export const useEquipos = () => {
   }, [equipo]);
 
   function formatearVidaUtil(vidaUtilDecimal: number): string {
+    console.log(vidaUtilDecimal); // OJO
     const años = Math.floor(vidaUtilDecimal);
     const meses = Math.round((vidaUtilDecimal - años) * 12);
 
@@ -849,7 +865,27 @@ export const useEquipos = () => {
     return "0 meses";
   }
 
+    const handleResponsable = async (name: string) => {
+      setResponsableEntregaInput(name);
+  
+      if (name.length >= 3) {
+        try {
+          const res = await getUserByName(name);
+          setSugerenciasResponsable(res);
+        } catch (err) {
+          console.error("Error buscando usuarios:", err);
+        }
+      } else {
+        setSugerenciasResponsable([]);
+      }
+    };
+
   return {
+    setResponsableEntregaInput,
+    responsableEntregaInput,
+    handleResponsable,  
+    sugerenciasResponsable,
+    setSugerenciasResponsable,
     formatearVidaUtil,
     aplicarFiltros,
     update,
