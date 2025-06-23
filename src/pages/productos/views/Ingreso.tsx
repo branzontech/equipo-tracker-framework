@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Upload } from "lucide-react";
@@ -117,52 +118,47 @@ const IngresoProducto = () => {
     newEquipo.adquisicion.fecha_compra,
   ]);
 
-  const handleUserSelect = (user) => {
-    setNombreUser(user.nombre);
-    setResponsableRecibeInput({
-      id: user.id_usuario.toString(),
-      name: user.nombre,
-    });
-    setNewEquipo((prev) => ({
-      ...prev,  
-      administrativa: {
-        ...prev.administrativa,
-        autorizado_por_id: user.id_usuario,
-      },
-    }));
-    setSugerencias([]);
-  };
+  const handleSelect = (
+    tipo: "usuario" | "responsable" | "proveedor",
+    data: any
+  ) => {
+    const nombre = data.nombre;
+    const id = tipo === "proveedor" ? data.id_proveedor : data.id_usuario;
 
-  const handleResponsableSelect = (responsable) => {
-    setResponsableEntregaInput(responsable.nombre);
-    setResponsableRecibeInput({
-      id: responsable.id_usuario.toString(),
-      name: responsable.nombre,
-    });
+    // Inputs
+    if (tipo === "usuario") setNombreUser(nombre);
+    if (tipo === "responsable") setResponsableEntregaInput(nombre);
+    if (tipo === "proveedor") setNombreProveedor(nombre);
+
+    setResponsableRecibeInput({ id: id.toString(), name: nombre });
+
+    // newEquipo update
     setNewEquipo((prev) => ({
       ...prev,
-      estado_ubicacion: {
-        ...prev.estado_ubicacion,
-        responsable_id: responsable.id_usuario,
-      },
+      ...(tipo === "usuario" && {
+        administrativa: {
+          ...prev.administrativa,
+          autorizado_por_id: id,
+        },
+      }),
+      ...(tipo === "responsable" && {
+        estado_ubicacion: {
+          ...prev.estado_ubicacion,
+          responsable_id: id,
+        },
+      }),
+      ...(tipo === "proveedor" && {
+        adquisicion: {
+          ...prev.adquisicion,
+          proveedor_id: id,
+        },
+      }),
     }));
-    setSugerenciasResponsable([]);
-  };
 
-  const handleProveedorSelect = (proveedor) => {
-    setNombreProveedor(proveedor.nombre);
-    setResponsableRecibeInput({
-      id: proveedor.id_proveedor.toString(),
-      name: proveedor.nombre,
-    });
-    setNewEquipo((prev) => ({
-      ...prev,
-      adquisicion: {
-        ...prev.adquisicion,
-        proveedor_id: proveedor.id_proveedor,
-      },
-    }));
-    setSugerenciasProveedor([]);
+    // Limpiar sugerencias
+    if (tipo === "usuario") setSugerencias([]);
+    if (tipo === "responsable") setSugerenciasResponsable([]);
+    if (tipo === "proveedor") setSugerenciasProveedor([]);
   };
 
   return (
@@ -430,13 +426,13 @@ const IngresoProducto = () => {
                       </Label>
                       <Input
                         placeholder="Ej: SSD, HDD, NVMe"
-                        value={newEquipo.especificaciones.tipo_discoDuro}
+                        value={newEquipo.especificaciones.tipo_discoduro}
                         onChange={(e) => {
                           setNewEquipo({
                             ...newEquipo,
                             especificaciones: {
                               ...newEquipo.especificaciones,
-                              tipo_discoDuro: e.target.value,
+                              tipo_discoduro: e.target.value,
                             },
                           });
                         }}
@@ -519,13 +515,13 @@ const IngresoProducto = () => {
                     <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <div className="pt-1">
                         <Checkbox
-                          checked={newEquipo.especificaciones.tieneCargador}
+                          checked={newEquipo.especificaciones.tienecargador}
                           onCheckedChange={(checked) =>
                             setNewEquipo((prev) => ({
                               ...prev,
                               especificaciones: {
                                 ...prev.especificaciones,
-                                tieneCargador: checked as boolean,
+                                tienecargador: checked as boolean,
                               },
                             }))
                           }
@@ -542,20 +538,20 @@ const IngresoProducto = () => {
                     </div>
 
                     {/* Serial del cargador (si aplica) */}
-                    {newEquipo.especificaciones.tieneCargador && (
+                    {newEquipo.especificaciones.tienecargador && (
                       <div className="mt-4 space-y-2">
                         <label className="text-sm font-medium">
                           Serial del Cargador
                         </label>
                         <Input
                           placeholder="Ingrese el serial del cargador"
-                          value={newEquipo.especificaciones.serialCargador}
+                          value={newEquipo.especificaciones.serialcargador}
                           onChange={(e) =>
                             setNewEquipo((prev) => ({
                               ...prev,
                               especificaciones: {
                                 ...prev.especificaciones,
-                                serialCargador: e.target.value,
+                                serialcargador: e.target.value,
                               },
                             }))
                           }
@@ -627,7 +623,7 @@ const IngresoProducto = () => {
                         value={nombreProvee}
                         onInputChange={handleNombre}
                         suggestions={sugerenciasProveedor}
-                        onSelect={handleProveedorSelect}
+                        onSelect={(data) => handleSelect("proveedor", data)}
                         getKey={(u) => u.id_proveedor}
                         getLabel={(u) => u.nombre}
                       />
@@ -969,7 +965,7 @@ const IngresoProducto = () => {
                         value={responsableEntregaInput}
                         onInputChange={handleResponsable}
                         suggestions={sugerenciasResponsable}
-                        onSelect={handleResponsableSelect}
+                        onSelect={(data) => handleSelect("responsable", data)}
                         getKey={(u) => u.id_usuario}
                         getLabel={(u) => u.nombre}
                       />
@@ -1314,17 +1310,14 @@ const IngresoProducto = () => {
                         value={
                           Array.isArray(newEquipo.seguridad.politicas_aplicadas)
                             ? newEquipo.seguridad.politicas_aplicadas.join(", ")
-                            : ""
+                            : newEquipo.seguridad.politicas_aplicadas || ""
                         }
                         onChange={(e) => {
                           setNewEquipo({
                             ...newEquipo,
                             seguridad: {
                               ...newEquipo.seguridad,
-                              politicas_aplicadas: e.target.value
-                                .split(",")
-                                .map((item) => item.trim())
-                                .filter((item) => item.length > 0),
+                              politicas_aplicadas: e.target.value,
                             },
                           });
                         }}
@@ -1386,7 +1379,7 @@ const IngresoProducto = () => {
                         value={nombreInput}
                         onInputChange={handleNombreInput}
                         suggestions={sugerencias}
-                        onSelect={handleUserSelect}
+                        onSelect={(data) => handleSelect("usuario", data)}
                         getKey={(u) => u.id_usuario}
                         getLabel={(u) => u.nombre}
                       />
@@ -1574,9 +1567,7 @@ const IngresoProducto = () => {
                         onChange={(e) => {
                           setNewEquipo({
                             ...newEquipo,
-                            tags: e.target.value
-                              .split(",")
-                              .map((item) => item.trim()),
+                            tags: e.target.value,
                           });
                         }}
                       />
@@ -1596,9 +1587,34 @@ const IngresoProducto = () => {
                 </Button>
                 <Button
                   type="submit"
-                  onClick={(e: React.FormEvent) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.preventDefault();
-                    handleSubmit(newEquipo);
+                    const equipoFormateado = {
+                      ...newEquipo,
+                      seguridad: {
+                        ...newEquipo.seguridad,
+                        politicas_aplicadas:
+                          typeof newEquipo.seguridad.politicas_aplicadas ===
+                          "string"
+                            ? (
+                                (newEquipo.seguridad.politicas_aplicadas ??
+                                  "") as string
+                              )
+                                .split(",")
+                                .map((p) => p.trim())
+                                .filter(Boolean)
+                            : newEquipo.seguridad.politicas_aplicadas,
+                      },
+                      tags:
+                        typeof newEquipo.tags === "string"
+                          ? ((newEquipo.tags ?? "") as string)
+                              .split(",")
+                              .map((t) => t.trim())
+                              .filter(Boolean)
+                          : newEquipo.tags,
+                    };
+
+                    handleSubmit(equipoFormateado);
                   }}
                 >
                   Guardar Producto
