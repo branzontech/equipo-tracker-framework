@@ -8,16 +8,16 @@ export const create = async (req, res) => {
       modelo,
       marca_id,
       categoria_id,
-      sucursal_id,
-      estado_actual,
       fecha_registro,
       tipo_activo,
-      garantia_fecha_fin,
       observaciones,
       especificaciones,
       seguridad,
       adquisicion,
       administrativa,
+      estado_ubicacion,
+      tags,
+      imagen,
     } = req.body;
 
     const equipo = await equipoService.create({
@@ -26,16 +26,16 @@ export const create = async (req, res) => {
       modelo,
       marca_id,
       categoria_id,
-      sucursal_id,
-      estado_actual,
       fecha_registro,
       tipo_activo,
-      garantia_fecha_fin,
       observaciones,
       especificaciones,
       seguridad,
       adquisicion,
       administrativa,
+      estado_ubicacion,
+      tags,
+      imagen,
     });
 
     res.status(201).json({ success: true, data: equipo });
