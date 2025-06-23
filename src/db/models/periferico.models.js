@@ -8,6 +8,21 @@ export const PerifericoModel = {
         nombre: true,
         estado: true,
         tipo: true,
+        serial: true,
+        id_sede: true,
+        sedes: {
+          select: {
+            id_sede: true,
+            nombre: true,
+          },
+        },
+        marca_id: true,
+        marcas: {
+          select: {
+            id_marca: true,
+            nombre: true,
+          },
+        },
         equipo_asociado_id: true,
         equipos: {
           select: {
@@ -30,6 +45,21 @@ export const PerifericoModel = {
         estado: true,
         tipo: true,
         equipo_asociado_id: true,
+        serial: true,
+        id_sede: true,
+        sedes: {
+          select: {
+            id_sede: true,
+            nombre: true,
+          },
+        },
+        marca_id: true,
+        marcas: {
+          select: {
+            id_marca: true,
+            nombre: true,
+          },
+        },
       },
     });
     return periferico;
@@ -41,7 +71,21 @@ export const PerifericoModel = {
         nombre: periferico.nombre,
         estado: periferico.estado,
         tipo: periferico.tipo,
-        equipo_asociado_id: periferico.equipo_asociado_id,
+        equipo_asociado_id:
+          periferico.equipo_asociado_id && periferico.equipo_asociado_id > 0
+            ? periferico.equipo_asociado_id
+            : undefined,
+        serial: periferico.serial,
+        sedes: {
+          connect: {
+            id_sede: periferico.id_sede,
+          },
+        },
+        marcas: {
+          connect: {
+            id_marca: periferico.marca_id,
+          },
+        },
       },
     });
     return perifericoCreated;
@@ -56,7 +100,21 @@ export const PerifericoModel = {
           nombre: periferico.nombre,
           estado: periferico.estado,
           tipo: periferico.tipo,
-          equipo_asociado_id: periferico.equipo_asociado_id,
+          equipo_asociado_id:
+            periferico.equipo_asociado_id && periferico.equipo_asociado_id > 0
+              ? periferico.equipo_asociado_id
+              : undefined,
+          serial: periferico.serial,
+          sedes: {
+            connect: {
+              id_sede: periferico.id_sede,
+            },
+          },
+          marcas: {
+            connect: {
+              id_marca: periferico.marca_id,
+            },
+          },
         },
       });
       return updatedPeriferico;
