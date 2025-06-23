@@ -7,6 +7,7 @@ import { Prestamo } from "./prestamo";
 import { Traslado } from "./traslados";
 import { Mantenimiento } from "@/pages/mantenimientos/interfaces/mantenimiento";
 import { Devolucion } from "./devoluciones";
+import { Proveedor } from "@/pages/configuracion/maestros/interfaces/proveedor";
 
 export interface Equipo {
   sedes: string;
@@ -20,12 +21,11 @@ export interface Equipo {
   categorias: Categoria | string;
   tipo_activo: string;
   fecha_registro: string;
-  sucursal_id: Sucursal | number;
-  sucursales: Sucursal | null;
-  garantia_fecha_fin: string;
-  estado_actual: string;
   observaciones?: string;
+  tags: string[];
   motivo: string;
+  imagen: string;
+
   prestamo_equipos?: {
     prestamos: Prestamo;
   }[];
@@ -49,11 +49,14 @@ export interface Equipo {
     procesador: string;
     memoria_ram: string;
     almacenamiento: string;
-    tarjeta_grafica?: string;
+    tipo_discoDuro?: string; // UEW
     pantalla?: string;
+    tarjeta_grafica?: string;
     sistema_operativo?: string;
     bateria?: string;
     puertos?: string;
+    tieneCargador?: boolean; // NUE
+    serialCargador?: string; // NUE
   };
 
   // Seguridad
@@ -72,19 +75,46 @@ export interface Equipo {
     forma_pago: string;
     plazo_pago: string;
     numero_factura: string;
-    proveedor: string;
+    proveedor_id: Proveedor | number;
+    inicio_garantia: string; // NUE
+    garantia_fecha_fin: string; // No es nuevo pero debe ir en esta tabla
+  };
+
+  // Estado y Ubicación // UEVA TABLA
+  estado_ubicacion?: {
+    estado_actual: string;
+    sucursal_id: Sucursal | number;
+    sucursales: Sucursal | null;
+    departamento: string;
+    responsable: string;
+    disponibilidad: string;
+    condicion_fisica: string;
   };
 
   // Información administrativa
   administrativa?: {
     codigo_inventario: string;
     centro_coste: string;
-    autorizado_por: string;
+    autorizado_por_id: string;
     fecha_activacion: string;
     estado_contable: string;
     valor_depreciado: number;
     vida_util_restante: string;
   };
+
+  // Documentos Relacionados
+  documentacion?: {
+    id_archivo: number;
+    nombre_archivo: string;
+    tipo_archivo: string;
+    archivos: File[];
+    archivo: {
+      content: string;
+      nombre: string;
+      tipo: string;
+    };
+    fecha_subida: Date;
+  }[];
 
   perifericos: Perifericos | null;
 }
