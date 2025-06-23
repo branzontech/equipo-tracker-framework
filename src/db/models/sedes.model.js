@@ -154,12 +154,14 @@ export const SedesModel = {
         },
       });
 
-      if (sede.usuarios) {
+      const usuariosPlano = sede.usuario_sede?.map((rel) => rel.usuarios) ?? [];
+
+      if (Array.isArray(usuariosPlano) && usuariosPlano.length > 0) {
         await prisma.usuario_sede.deleteMany({
           where: { id_sede },
         });
 
-        const relations = sede.usuarios.map((u) => ({
+        const relations = usuariosPlano.map((u) => ({
           id_usuario: u.id_usuario,
           id_sede,
         }));
@@ -168,10 +170,12 @@ export const SedesModel = {
           data: relations,
           skipDuplicates: true,
         });
+
       }
 
       return updatedSede;
     } catch (error) {
+      console.error("Error real:", error);
       throw new Error("Error updating sede: " + error.message);
     }
   },
