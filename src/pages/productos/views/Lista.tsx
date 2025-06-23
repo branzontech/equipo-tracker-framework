@@ -475,9 +475,8 @@ const ListaInventario = () => {
                                 {column.id === "estado_actual" ? (
                                   <StatusBadge
                                     status={
-                                      item[
-                                        column.key as keyof typeof item
-                                      ] as string
+                                      item.estado_ubicacion?.estado_actual ??
+                                      "Sin estado"
                                     }
                                   />
                                 ) : typeof item[
