@@ -47,6 +47,8 @@ export const useGlobal = () => {
       fecha_registro: "",
       perifericos: null,
       motivo: "",
+      tags: [],
+      imagen: ""
     },
   ]);
 
