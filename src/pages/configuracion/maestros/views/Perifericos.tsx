@@ -17,20 +17,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  PlusCircle,
-  CheckCircle,
-  XCircle,
-  PencilIcon,
-  FileX,
-  ArrowRightLeft,
-} from "lucide-react";
-import { listTypes } from "@/pages/configuracion/maestros/interfaces/periferico";
+import { PlusCircle, XCircle, PencilIcon } from "lucide-react";
 import { usePeriferico } from "../hooks/use-perifierico";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 import UpdatePeriferico from "./UpdatePeriferico";
 import { useGlobal } from "@/hooks/use-global";
 import { useEstado } from "../hooks/use-estado";
+import { useMarcas } from "../hooks/use-marcas";
+import { useSedes } from "../hooks/use-sedes";
+import { useTipos } from "../hooks/use-tipos";
 
 const Perifericos = () => {
   const {
@@ -47,9 +42,13 @@ const Perifericos = () => {
   const { StatusBadge } = useGlobal();
   const { equipo } = useEquipos();
   const { estados } = useEstado();
+  const { marcas } = useMarcas();
+  const { sedes } = useSedes();
+  const { tipos } = useTipos();
 
   const equiposDisponible = equipo.filter(
-    (equipo) => equipo.estado_actual !== "Fuera de servicio"
+    (equipo) =>
+      equipo.estado_ubicacion?.[0]?.estado_actual !== "Fuera de servicio"
   );
 
   return (
@@ -80,6 +79,22 @@ const Perifericos = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="serial">Serial</Label>
+              <Input
+                id="serial"
+                value={newPeriferico.serial}
+                onChange={(e) =>
+                  setNewPeriferico({
+                    ...newPeriferico,
+                    serial: e.target.value,
+                  })
+                }
+                placeholder="Serial del periférico"
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="tipo">Tipo</Label>
               <Select
                 value={newPeriferico.tipo}
@@ -91,9 +106,71 @@ const Perifericos = () => {
                   <SelectValue placeholder="Seleccione el tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {listTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.name}
+                  {tipos.map((type) => (
+                    <SelectItem key={type.id_tipo} value={type.nombre_tipo}>
+                      {type.nombre_tipo}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="id_sede">Sede</Label>
+              <Select
+                value={
+                  newPeriferico.id_sede
+                    ? newPeriferico.id_sede.toString()
+                    : ""
+                }
+                onValueChange={(value: string) =>
+                  setNewPeriferico({
+                    ...newPeriferico,
+                    id_sede: Number(value),
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione la sede" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sedes.map((sede) => (
+                    <SelectItem
+                      key={sede.id_sede}
+                      value={sede.id_sede.toString()}
+                    >
+                      {sede.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="marca_id">Marca</Label>
+              <Select
+                value={
+                  newPeriferico.marca_id
+                    ? newPeriferico.marca_id.toString()
+                    : ""
+                }
+                onValueChange={(value: string) =>
+                  setNewPeriferico({
+                    ...newPeriferico,
+                    marca_id: Number(value),
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione la marca" />
+                </SelectTrigger>
+                <SelectContent>
+                  {marcas.map((marca) => (
+                    <SelectItem
+                      key={marca.id_marca}
+                      value={marca.id_marca.toString()}
+                    >
+                      {marca.nombre}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -144,7 +221,10 @@ const Perifericos = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {estados.map((estado) => (
-                    <SelectItem key={estado.id_estado} value={estado.id_estado.toString()}>
+                    <SelectItem
+                      key={estado.id_estado}
+                      value={estado.nombre_estado}
+                    >
                       {estado.nombre_estado}
                     </SelectItem>
                   ))}
@@ -177,8 +257,11 @@ const Perifericos = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>N° Serie</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Tipo</TableHead>
+                <TableHead>Marca</TableHead>
+                <TableHead>Sede</TableHead>
                 <TableHead>Equipo Asociado</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
@@ -189,8 +272,11 @@ const Perifericos = () => {
                 .sort((a, b) => b.id_periferico - a.id_periferico)
                 .map((periferico) => (
                   <TableRow key={periferico.id_periferico}>
+                    <TableCell>{periferico.serial}</TableCell>
                     <TableCell>{periferico.nombre}</TableCell>
                     <TableCell>{periferico.tipo}</TableCell>
+                    <TableCell>{periferico.marcas?.nombre}</TableCell>
+                    <TableCell>{periferico.sedes?.nombre}</TableCell>
                     <TableCell>
                       {periferico.equipos?.nombre_equipo ?? "No asignado"}
                     </TableCell>
