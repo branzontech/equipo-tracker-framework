@@ -7,6 +7,9 @@ export const perifericoService = {
   async findById(id) {
     return await PerifericoModel.findById(id);
   },
+  async findBySerial(serial) {
+    return await PerifericoModel.findBySerial(serial);
+  },
   async update(id, periferico) {
     return await PerifericoModel.update(id, periferico);
   },
