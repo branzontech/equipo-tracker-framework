@@ -11,6 +11,12 @@ export const findById = async (req, res) => {
   res.status(200).json(periferico);
 };
 
+export const findBySerial = async (req, res) => {
+  const { serial } = req.params;
+  const periferico = await perifericoService.findBySerial(serial);
+  res.status(200).json(periferico);
+};
+
 export const update = async (req, res) => {
   const { id } = req.params;
   const {
