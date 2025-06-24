@@ -8,39 +8,63 @@ export const ActaPrestamo = ({ data }) => {
   const { firmaEntrega, nombreEntrega, firmaRecibe, nombreRecibe } =
     getFirmas(data);
 
-  const formatAccesorios = (equipos) => {
-    return equipos.map((equipo) => {
-      const perifericos = equipo.prestamo_perifericos || [];
+  const formatEquiposYPerifericos = (prestamo) => {
+    const equipos =
+      prestamo.prestamo_equipos?.map((equipo) => {
+        const perifericos = equipo.prestamo_perifericos || [];
 
-      const accesoriosTexto =
-        perifericos.length > 0
-          ? perifericos
-              .map((p) => {
-                const acc = p.perifericos;
-                return acc?.nombre
-                  ? acc?.tipo
-                    ? `${acc.nombre} (${acc.tipo})`
-                    : acc.nombre
-                  : "Desconocido";
-              })
-              .join(", ")
-          : "Ninguno";
+        const accesoriosTexto =
+          perifericos.length > 0
+            ? perifericos
+                .map((p) => {
+                  const acc = p.perifericos;
+                  return acc?.nombre
+                    ? acc?.tipo
+                      ? `${acc.nombre} (${acc.tipo})`
+                      : acc.nombre
+                    : "Desconocido";
+                })
+                .join(", ")
+            : "Ninguno";
 
-      return {
-        ...equipo,
-        accesoriosTexto,
-        serial: equipo.equipos?.nro_serie || "",
-        marca: equipo.equipos?.marcas?.nombre || "",
-        activoFijo: equipo.equipos?.tipo_activo || "",
-      };
-    });
+        return {
+          serial: equipo.equipos?.nro_serie || "",
+          marca: equipo.equipos?.marcas?.nombre || "",
+          tipo: equipo.equipos?.tipo_activo || "",
+          accesoriosTexto,
+          esPerifericoDirecto: false,
+        };
+      }) || [];
+
+    const perifericosDirectos =
+      prestamo.prestamo_perifericos_directos?.map((item) => {
+        const p = item.perifericos;
+        return {
+          serial: p?.serial || "-",
+          marca:
+            typeof p?.marcas === "object"
+              ? p.marcas?.nombre || "-"
+              : p?.marca || "-",
+          tipo: p?.tipo || "-",
+          nombre: p?.nombre || "-",
+          accesoriosTexto: "-",
+          esPerifericoDirecto: true,
+        };
+      }) || [];
+
+    return [...equipos, ...perifericosDirectos];
   };
 
-  const equiposConAccesorios = formatAccesorios(
-    data.prestamos?.[0]?.prestamo_equipos || []
+  const prestamo = data.prestamos?.[0];
+  const equiposConAccesorios = formatEquiposYPerifericos(prestamo);
+
+  const mostrarColumnaAccesorios = equiposConAccesorios.some(
+    (e) => !e.esPerifericoDirecto
   );
 
-  const prestamo = data.prestamos?.[0];
+  const todosSonPerifericos = equiposConAccesorios.every(
+    (e) => e.esPerifericoDirecto
+  );
 
   return (
     <Page size="A4" style={styles.page}>
@@ -73,10 +97,12 @@ export const ActaPrestamo = ({ data }) => {
             <Text style={styles.tableCell}>Marca</Text>
           </View>
           <View style={styles.tableCol}>
-            <Text style={styles.tableCell}>Tipo de Activo</Text>
+            <Text style={styles.tableCell}>Tipo</Text>
           </View>
           <View style={styles.tableCol}>
-            <Text style={styles.tableCell}>Accesorios</Text>
+            <Text style={styles.tableCell}>
+              {todosSonPerifericos ? "Nombre" : "Accesorios"}
+            </Text>
           </View>
         </View>
 
@@ -89,11 +115,13 @@ export const ActaPrestamo = ({ data }) => {
               <Text style={styles.tableCell}>{equipo.marca || ""}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.activoFijo || ""}</Text>
+              <Text style={styles.tableCell}>{equipo.tipo || ""}</Text>
             </View>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>
-                {equipo.accesoriosTexto || ""}
+                {equipo.esPerifericoDirecto
+                  ? equipo.nombre || "-"
+                  : equipo.accesoriosTexto || "-"}
               </Text>
             </View>
           </View>
