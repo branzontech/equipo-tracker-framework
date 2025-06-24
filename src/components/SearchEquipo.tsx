@@ -8,6 +8,7 @@ import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { useGlobal } from "@/hooks/use-global";
+import { icons } from "./interfaces/icons";
 
 interface SearchEquipoProps {
   onEquipoEncontrado?: (equipo: Equipo) => void;
@@ -65,7 +66,9 @@ export const SearchEquipo = ({
                   onClick={async (e: React.FormEvent) => {
                     e.preventDefault();
                     if (!field.nro_serie.trim()) {
-                      toast.error("Debe ingresar un número de serie");
+                      toast.error("Debe ingresar un número de serie", {
+                        icon: icons.error,
+                      });
                       return;
                     }
 
