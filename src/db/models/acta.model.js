@@ -298,6 +298,76 @@ export const ActaModel = {
       enMantenimiento,
     };
   },
+  async getInfoPeriferico(serial) {
+    const periferico = await prisma.perifericos.findFirst({
+      where: { serial: serial },
+      select: { id_periferico: true },
+    });
+
+    if (!periferico) {
+      throw new Error("No se encontró el periférico.");
+    }
+
+    const perifericoId = periferico.id_periferico;
+
+    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] = await Promise.all([
+      prisma.prestamo_perifericos_directos.findFirst({
+        where: { periferico_id: perifericoId },
+        include: {
+          prestamos: {
+            where: {
+              estado: {
+                not: "Finalizado",
+              },
+            },
+          },
+        },
+      }),
+      // prisma.traslados_perifericos.findFirst({
+      //   where: { periferico_id: perifericoId },
+      //   include: {
+      //     traslados: {
+      //       where: {
+      //         estado: {
+      //           not: "Finalizado",
+      //         },
+      //       },
+      //     },
+      //   },
+      // }),
+      // prisma.bajas_equipos.findFirst({
+      //   where: {
+      //     equipo_id: periferico.equipo_asociado_id,
+      //     bajas: {
+      //       estado: {
+      //         not: "Cancelada",
+      //       },
+      //     },
+      //   },
+      // }),
+      // prisma.mantenimientos.findFirst({
+      //   where: {
+      //     equipo_id: periferico.equipo_asociado_id,
+      //     estado: {
+      //       not: "Finalizado",
+      //     },
+      //   },
+      // }),
+    ]);
+
+    const enPrestamo = !!prestamoActivo?.prestamos;
+    const enTraslado = !!trasladoActivo?.traslados;
+    const enBaja = !!bajaAsociada;
+    const enMantenimiento = !!mantenimientos;
+
+    return {
+      disponible: !(enPrestamo || enTraslado || enBaja || enMantenimiento),
+      enPrestamo,
+      enTraslado,
+      enBaja,
+      enMantenimiento,
+    };
+  },
   updateStatus: async (id, newStatus, tipo, acta_equipos) => {
     try {
       switch (tipo) {
