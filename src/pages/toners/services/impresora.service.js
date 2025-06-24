@@ -9,6 +9,10 @@ class impresoraService {
     return await impresoraModel.getById(id);
   }
 
+  async getBySerial(serial) {
+    return await impresoraModel.findBySerial(serial);
+  }
+
   async create(impresora) {
     return await impresoraModel.create(impresora);
   }
