@@ -291,7 +291,9 @@ export const useActa = () => {
       nombre?: string;
       marca?: string;
       activoFijo?: string;
+      tipo?: string;
       accesorios?: string;
+      esPerifericoDirecto?: boolean;
     }[] = [];
 
     if (acta.tipo === "Prestamo") {
@@ -309,6 +311,20 @@ export const useActa = () => {
             marca: equipo.marcas?.nombre || "-",
             activoFijo: equipo.tipo_activo || "-",
             accesorios: perifericos || "-",
+            esPerifericoDirecto: false,
+          });
+        }
+      });
+
+      prestamo?.prestamo_perifericos_directos.forEach((item) => {
+        const periferico = item.perifericos;
+        if (periferico) {
+          equipos.push({
+            serial: periferico.serial || "-", 
+            nombre: periferico.nombre || "-",
+            marca: periferico.marcas?.nombre || "-",
+            tipo: periferico.tipo || "-",
+            esPerifericoDirecto: true,
           });
         }
       });
