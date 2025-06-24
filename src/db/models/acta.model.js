@@ -20,6 +20,15 @@ export const ActaModel = {
                 },
               },
             },
+            prestamo_perifericos_directos: {
+              include: {
+                perifericos: {
+                  include: {
+                    marcas: true,
+                  }
+                },
+              },
+            },
             usuarios_prestamos_responsable_salida_idTousuarios: {
               select: { nombre: true, firma: true },
             },
@@ -35,11 +44,11 @@ export const ActaModel = {
                 equipos: {
                   include: {
                     marcas: true,
-                    sucursales: {
+                    estado_ubicacion: {
                       include: {
-                        sedes: true,
-                      },
-                    },
+                        sucursales: true,
+                      }
+                    }
                   },
                 },
               },
