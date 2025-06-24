@@ -18,6 +18,16 @@ export const getById = async (req, res) => {
   }
 };
 
+export const getBySerial = async (req, res) => {
+  try {
+    const { serial } = req.params;
+    const impresora = await impresoraService.getBySerial(serial);
+    res.status(200).json(impresora);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener la impresora" });
+  }
+};
+
 export const createImpresora = async (req, res) => {
   try {
     const impresora = req.body;
