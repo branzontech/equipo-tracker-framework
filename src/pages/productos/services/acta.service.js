@@ -10,6 +10,9 @@ export const actaService = {
   async getInfoPeriferico(serial) {
     return await ActaModel.getInfoPeriferico(serial);
   },
+  async getInfoImpresora(serial) {
+    return await ActaModel.getInfoImpresora(serial);
+  },
   async update(id, newStatus, tipo, acta_equipos) {
     return await ActaModel.updateStatus(id, newStatus, tipo, acta_equipos);
   }
