@@ -25,6 +25,7 @@ import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { SearchEquipo } from "@/components/SearchEquipo";
 import { SearchSelect } from "@/components/SearchSelect";
 import { SearchPeriferico } from "@/components/SearchPeriferico";
+import { SearchImpresora } from "@/components/SearchImpresora";
 
 const Salidas = () => {
   const {
@@ -258,24 +259,30 @@ const Salidas = () => {
                       ...(prev.perifericos_directos || []),
                       {
                         id_periferico: periferico,
-                        nombre: "", 
+                        nombre: "",
                       },
                     ],
                   }))
                 }
               />
             )}
-            {/* 
+
             {newPrestamo.tipo === "IMPRESORA" && (
               <SearchImpresora
-                onSeleccion={(impresoraId) =>
+                onSeleccion={(impresora) =>
                   setNewPrestamo((prev) => ({
                     ...prev,
-                    impresoras: [...(prev.impresoras || []), impresoraId],
+                    impresoras: [
+                      ...(prev.impresoras || []),
+                      {
+                        id_impresora: impresora,
+                        nombre: "",
+                      },
+                    ],
                   }))
                 }
               />
-            )} */}
+            )}
           </div>
 
           <div className="space-y-2">
