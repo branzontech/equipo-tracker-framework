@@ -1,11 +1,13 @@
 import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { Sede } from "./sedes";
 import { Marca } from "./marcas";
+import { Prestamo } from "@/pages/productos/interfaces/prestamo";
+import { Traslado } from "@/pages/productos/interfaces/traslados";
 
 export interface Perifericos {
   id_periferico: number;
   nombre: string;
-  estado: string; 
+  estado: string;
   serial: string;
   id_sede: number;
   sedes: Sede;
@@ -14,4 +16,9 @@ export interface Perifericos {
   tipo: string;
   equipo_asociado_id: Equipo | number;
   equipos: Equipo | null;
+
+  prestamos?: Prestamo;
+  traslados: {
+    traslado: Traslado;
+  }[];
 }
