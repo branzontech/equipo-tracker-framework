@@ -21,6 +21,16 @@ export const getPerifericoById = async (id: number) => {
   }
 };
 
+export const getPerifericoBySerial = async (serial: string) => {
+  try {
+    const response = await api.get(`/perifericos/getPeriferico/${serial}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching periferico by serial:", error);
+    throw error;
+  }
+};
+
 export const updatePeriferico = async (id: number, periferico: Perifericos) => {
   try {
     const response = await api.put(`/perifericos/${id}`, periferico);
