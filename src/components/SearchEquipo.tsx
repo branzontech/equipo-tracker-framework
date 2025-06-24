@@ -20,14 +20,7 @@ export const SearchEquipo = ({
   onMotivoChange,
   esBaja = false,
 }: SearchEquipoProps) => {
-  const {
-    haBuscado,
-    accesorios,
-    equipo,
-    setEquipo,
-    buscarEquipo,
-    setHaBuscado,
-  } = useGlobal();
+  const { equipo, setEquipo, buscarEquipo, setHaBuscado } = useGlobal();
   const [motivos, setMotivos] = useState<string[]>([]);
 
   return (
@@ -166,12 +159,11 @@ export const SearchEquipo = ({
             categorias: null,
             tipo_activo: "",
             fecha_registro: "",
-            sucursal_id: 0,
-            sucursales: null,
-            garantia_fecha_fin: "",
-            estado_actual: "",
             perifericos: null,
             motivo: "",
+            tags: null,
+            observaciones: null,
+            imagen: null,
           };
           setEquipo([...equipo, nuevoEquipo]);
           setMotivos([...motivos, ""]);
