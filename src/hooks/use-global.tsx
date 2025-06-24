@@ -1,5 +1,4 @@
 import { saveSign } from "@/api/axios/prestamo.api";
-import { getSedeById } from "../api/axios/sedes.api";
 import { useSedes } from "@/pages/configuracion/maestros/hooks/use-sedes";
 import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
@@ -21,6 +20,8 @@ import { format, toZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { parseISO } from "date-fns";
 import { getPerifericoBySerial } from "@/api/axios/periferico.api";
+import { Impresora } from "@/pages/toners/interfaces/impresora";
+import { getImpresoraBySerial } from "@/api/axios/impresora.api";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -30,7 +31,11 @@ export const useGlobal = () => {
     sedesConEquiposCount,
     getInfoEquipo,
   } = useEquipos();
-  const { findEquipoByNroSerie, findPerifericoBySerial } = useActa();
+  const {
+    findEquipoByNroSerie,
+    findPerifericoBySerial,
+    findImpresoraBySerial,
+  } = useActa();
   const [haBuscado, setHaBuscado] = useState(false);
   const [accesorios, setAccesorios] = useState<Perifericos[]>([]);
   const [equipo, setEquipo] = useState<Equipo[]>([
@@ -65,6 +70,17 @@ export const useGlobal = () => {
       sedes: null,
       marca_id: 0,
       marcas: null,
+    },
+  ]);
+  const [impresoras, setImpresoras] = useState<Impresora[]>([
+    {
+      id_impresora: 0,
+      nombre: "",
+      modelo: "",
+      sucursal_id: 0,
+      sucursales: null,
+      serial: "",
+      estado: null,
     },
   ]);
 
@@ -289,6 +305,33 @@ export const useGlobal = () => {
     }
   };
 
+  const buscarImpresora = async (serial: string): Promise<Impresora | null> => {
+    try {
+      const disponibilidad = await findImpresoraBySerial(serial);
+
+      if (!disponibilidad.disponible) {
+        let mensaje = "La impresora no está disponible. ";
+        if (disponibilidad.enPrestamo) mensaje += "Está en préstamo. ";
+        if (disponibilidad.enBaja) mensaje += "Está dado de baja. ";
+        if (disponibilidad.enTraslado) mensaje += "Está en traslado. ";
+        if (disponibilidad.enMantenimiento)
+          mensaje += "Está en mantenimiento. ";
+
+        toast.error(mensaje, { icon: icons.error });
+        setHaBuscado(false);
+        return null;
+      }
+
+      const data = await getImpresoraBySerial(serial);
+      return data;
+    } catch (error) {
+      toast.error("No se encontró la impresora.", {
+        icon: icons.error,
+      });
+      return null;
+    }
+  };
+
   return {
     sedesCount,
     userCount,
@@ -309,6 +352,9 @@ export const useGlobal = () => {
     buscarPeriferico,
     perifericos,
     setPerifericos,
+    impresoras,
+    setImpresoras,
+    buscarImpresora,
   };
 };
 
