@@ -1,6 +1,7 @@
 import {
   get,
   getInfoEquipo,
+  getInfoImpresora,
   getInfoPeriferico,
   updateStatus,
 } from "@/api/axios/acta.api";
@@ -242,6 +243,11 @@ export const useActa = () => {
     return response;
   };
 
+  const findImpresoraBySerial = async (serial: string) => {
+    const response = await getInfoImpresora(serial);
+    return response;
+  };
+
   const PaginationControls = () => {
     if (totalPages <= 1) return null;
 
@@ -320,11 +326,24 @@ export const useActa = () => {
         const periferico = item.perifericos;
         if (periferico) {
           equipos.push({
-            serial: periferico.serial || "-", 
+            serial: periferico.serial || "-",
             nombre: periferico.nombre || "-",
             marca: periferico.marcas?.nombre || "-",
             tipo: periferico.tipo || "-",
             esPerifericoDirecto: true,
+          });
+        }
+      });
+
+      prestamo?.prestamo_impresoras.forEach((item) => {
+        const impresora = item.impresoras;
+        if (impresora) {
+          equipos.push({
+            serial: impresora.serial || "-",
+            nombre: impresora.nombre || "-",
+            marca: impresora.marcas?.nombre || "-",
+            activoFijo: impresora.tipo || "-",
+            esPerifericoDirecto: false,
           });
         }
       });
@@ -382,6 +401,32 @@ export const useActa = () => {
               marca: equipo.marcas?.nombre || "-",
               activoFijo: equipo.tipo_activo || "-",
               accesorios: perifericos || "-",
+            });
+          }
+        });
+
+        devolucion.prestamos.prestamo_perifericos_directos?.forEach((item) => {
+          const perif = item.perifericos;
+          if (perif) {
+            equipos.push({
+              serial: perif.serial,
+              nombre: perif.nombre,
+              marca: perif.marcas?.nombre || "-",
+              activoFijo: perif.tipo || "-",
+              accesorios: "-",
+            });
+          }
+        });
+
+        devolucion.prestamos.prestamo_impresoras?.forEach((item) => {
+          const impresora = item.impresoras;
+          if (impresora) {
+            equipos.push({
+              serial: impresora.serial,
+              nombre: impresora.nombre,
+              marca: impresora.marcas?.nombre || "-",
+              activoFijo: impresora.tipo || "-",
+              accesorios:  "-",
             });
           }
         });
@@ -618,5 +663,6 @@ export const useActa = () => {
     generarYDescargarPDF,
     findEquipoByNroSerie,
     findPerifericoBySerial,
+    findImpresoraBySerial,
   };
 };
