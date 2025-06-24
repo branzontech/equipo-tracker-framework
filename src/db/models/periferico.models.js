@@ -65,6 +65,40 @@ export const PerifericoModel = {
     return periferico;
   },
 
+  findBySerial: async (serial) => {
+    const periferico = await prisma.perifericos.findFirst({
+      where: {
+        serial: {
+          equals: serial,
+          mode: "insensitive", // Ignora mayúsculas y minúsculas
+        },
+      },
+      select: {
+        id_periferico: true,
+        nombre: true,
+        estado: true,
+        tipo: true,
+        equipo_asociado_id: true,
+        serial: true,
+        id_sede: true,
+        sedes: {
+          select: {
+            id_sede: true,
+            nombre: true,
+          },
+        },
+        marca_id: true,
+        marcas: {
+          select: {
+            id_marca: true,
+            nombre: true,
+          },
+        },
+      },
+    });
+    return periferico;
+  },
+
   create: async (periferico) => {
     const perifericoCreated = await prisma.perifericos.create({
       data: {
