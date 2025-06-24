@@ -70,7 +70,7 @@ export const PerifericoModel = {
       where: {
         serial: {
           equals: serial,
-          mode: "insensitive", // Ignora mayúsculas y minúsculas
+          mode: "insensitive", 
         },
       },
       select: {
