@@ -10,6 +10,11 @@ export const getInfoEquipo = async (nro_serie) => {
   return data;
 };
 
+export const getInfoPeriferico = async (serial) => {
+  const { data } = await api.get(`/actas/getPeriferico/${serial}`);
+  return data;
+};
+
 export const updateStatus = async (id, newStatus, tipo, acta_equipos) => {
   const { data } = await api.post("/actas/updateStatus", {
     id,
