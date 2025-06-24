@@ -20,6 +20,7 @@ import {
 import { format, toZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { parseISO } from "date-fns";
+import { getPerifericoBySerial } from "@/api/axios/periferico.api";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -29,7 +30,7 @@ export const useGlobal = () => {
     sedesConEquiposCount,
     getInfoEquipo,
   } = useEquipos();
-  const { findEquipoByNroSerie } = useActa();
+  const { findEquipoByNroSerie, findPerifericoBySerial } = useActa();
   const [haBuscado, setHaBuscado] = useState(false);
   const [accesorios, setAccesorios] = useState<Perifericos[]>([]);
   const [equipo, setEquipo] = useState<Equipo[]>([
@@ -48,7 +49,22 @@ export const useGlobal = () => {
       perifericos: null,
       motivo: "",
       tags: [],
-      imagen: ""
+      imagen: "",
+    },
+  ]);
+  const [perifericos, setPerifericos] = useState<Perifericos[]>([
+    {
+      id_periferico: 0,
+      nombre: "",
+      estado: "",
+      serial: "",
+      tipo: "",
+      equipo_asociado_id: 0,
+      equipos: null,
+      id_sede: 0,
+      sedes: null,
+      marca_id: 0,
+      marcas: null,
     },
   ]);
 
@@ -244,6 +260,35 @@ export const useGlobal = () => {
     }
   };
 
+  const buscarPeriferico = async (
+    serial: string
+  ): Promise<Perifericos | null> => {
+    try {
+      const disponibilidad = await findPerifericoBySerial(serial);
+
+      if (!disponibilidad.disponible) {
+        let mensaje = "El equipo no está disponible. ";
+        if (disponibilidad.enPrestamo) mensaje += "Está en préstamo. ";
+        if (disponibilidad.enBaja) mensaje += "Está dado de baja. ";
+        if (disponibilidad.enTraslado) mensaje += "Está en traslado. ";
+        if (disponibilidad.enMantenimiento)
+          mensaje += "Está en mantenimiento. ";
+
+        toast.error(mensaje, { icon: icons.error });
+        setHaBuscado(false);
+        return null;
+      }
+
+      const data = await getPerifericoBySerial(serial);
+      return data;
+    } catch (error) {
+      toast.error("No se encontró el accesorio.", {
+        icon: icons.error,
+      });
+      return null;
+    }
+  };
+
   return {
     sedesCount,
     userCount,
@@ -261,6 +306,9 @@ export const useGlobal = () => {
     buscarEquipo,
     saveSign_,
     StatusBadge,
+    buscarPeriferico,
+    perifericos,
+    setPerifericos,
   };
 };
 
