@@ -137,22 +137,22 @@ export const prestamoModel = {
         }
       }
 
-      // if (prestamo.impresoras?.length > 0) {
-      //   for (const impresora_id of prestamo.impresoras) {
-      //     await prisma.prestamo_impresoras.create({
-      //       data: {
-      //         prestamo_id: nuevoPrestamo.id_prestamo,
-      //         impresora_id,
-      //       },
-      //     });
+      if (prestamo.impresoras?.length > 0) {
+        for (const impresora of prestamo.impresoras) {
+          await prisma.prestamo_impresoras.create({
+            data: {
+              prestamo_id: nuevoPrestamo.id_prestamo,
+              impresora_id: impresora.id_impresora,
+            },
+          });
 
-      //     // Actualizar estado de la impresora
-      //     await prisma.impresoras.update({
-      //       where: { id_impresora: impresora_id },
-      //       data: { estado: "En Préstamo" }, // IMPRESORA NO TIENE ESTADO
-      //     });
-      //   }
-      // }
+          // Actualizar estado de la impresora
+          await prisma.impresoras.update({
+            where: { id_impresora: impresora.impresora_id },
+            data: { estado: "En Préstamo" },
+          });
+        }
+      }
 
       return nuevoPrestamo;
     } catch (error) {
