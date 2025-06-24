@@ -1,4 +1,9 @@
-import { get, getInfoEquipo, updateStatus } from "@/api/axios/acta.api";
+import {
+  get,
+  getInfoEquipo,
+  getInfoPeriferico,
+  updateStatus,
+} from "@/api/axios/acta.api";
 import { useEffect, useState } from "react";
 import { Acta } from "../interfaces/acta";
 import {
@@ -112,7 +117,7 @@ export const useActa = () => {
           usuario:
             devolucion?.usuarios_devoluciones_usuario_entrega_idTousuarios
               ?.nombre ?? "Sin usuario",
-              estado: devolucion?.estado ?? "Sin estado",
+          estado: devolucion?.estado ?? "Sin estado",
           descripcion: devolucion?.observaciones ?? "Sin descripción",
         };
       }
@@ -229,6 +234,11 @@ export const useActa = () => {
 
   const findEquipoByNroSerie = async (nroSeries: string) => {
     const response = await getInfoEquipo(nroSeries);
+    return response;
+  };
+
+  const findPerifericoBySerial = async (serial: string) => {
+    const response = await getInfoPeriferico(serial);
     return response;
   };
 
@@ -591,5 +601,6 @@ export const useActa = () => {
     handleStatusChange,
     generarYDescargarPDF,
     findEquipoByNroSerie,
+    findPerifericoBySerial,
   };
 };
