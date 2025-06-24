@@ -65,6 +65,10 @@ export function VerActaDialog({
   const { firmaEntrega, nombreEntrega, firmaRecibe, nombreRecibe } =
     getFirmas(acta);
 
+  const mostrarColumnaPerifericos =
+    acta.tipo !== "Baja" &&
+    equipos.some((e) => e.accesorios && e.accesorios !== "-");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -286,13 +290,9 @@ export function VerActaDialog({
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Tipo de Activo
                             </th>
-
-                            {acta.tipo === "Baja" ||
-                            equipos.every(
-                              (e) => e.esPerifericoDirecto
-                            ) ? null : (
+                            {mostrarColumnaPerifericos && (
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Perifericos
+                                Periféricos
                               </th>
                             )}
                           </tr>
@@ -310,13 +310,19 @@ export function VerActaDialog({
                                 {equipo.marca}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                {equipo.esPerifericoDirecto ? equipo.tipo : equipo.activoFijo}
+                                {equipo.esPerifericoDirecto
+                                  ? equipo.tipo
+                                  : equipo.activoFijo}
                               </td>
-                              {!equipo.esPerifericoDirecto && (
-                                <td className="px-6 py-4 text-sm">
-                                  {equipo.accesorios || "-"}
-                                </td>
-                              )}
+                              {mostrarColumnaPerifericos &&
+                                !equipo.esPerifericoDirecto && (
+                                  <td>
+                                    {equipo.accesorios &&
+                                    equipo.accesorios !== "-"
+                                      ? equipo.accesorios
+                                      : ""}
+                                  </td>
+                                )}
                             </tr>
                           ))}
                         </tbody>
