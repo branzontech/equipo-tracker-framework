@@ -14,6 +14,8 @@ export const useImpresora = () => {
     sucursales: null,
     serial: "",
     estado: null,
+    marcas: null,
+    tipo: "",
   });
 
   useEffect(() => {

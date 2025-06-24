@@ -120,6 +120,8 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
             sucursales: null,
             serial: "",
             estado: null,
+            marcas: null,
+            tipo: "",
           };
           setImpresoras([...impresoras, nuevoImpresora]);
         }}
