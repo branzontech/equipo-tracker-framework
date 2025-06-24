@@ -10,6 +10,7 @@ export const usePrestamo = () => {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
   const [newPrestamo, setNewPrestamo] = useState<Prestamo>({
     id_prestamo: 0,
+    tipo: "",
     acta_id: 0,
     actas: null,
     responsable_salida_id: 0,
