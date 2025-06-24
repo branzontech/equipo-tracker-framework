@@ -25,7 +25,16 @@ export const ActaModel = {
                 perifericos: {
                   include: {
                     marcas: true,
-                  }
+                  },
+                },
+              },
+            },
+            prestamo_impresoras: {
+              include: {
+                impresoras: {
+                  include: {
+                    marcas: true,
+                  },
                 },
               },
             },
@@ -47,8 +56,8 @@ export const ActaModel = {
                     estado_ubicacion: {
                       include: {
                         sucursales: true,
-                      }
-                    }
+                      },
+                    },
                   },
                 },
               },
@@ -105,6 +114,23 @@ export const ActaModel = {
                     prestamo_perifericos: {
                       include: {
                         perifericos: true,
+                      },
+                    },
+                  },
+                },
+                prestamo_perifericos_directos: {
+                  include: {
+                    perifericos: {
+                      include: { marcas: true },
+                    },
+                  },
+                },
+                prestamo_impresoras: {
+                  include: {
+                    impresoras: {
+                      include: {
+                        marcas: true,
+                        sucursales: true,
                       },
                     },
                   },
@@ -249,50 +275,51 @@ export const ActaModel = {
 
     const equipoId = equipo.id_equipo;
 
-    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] = await Promise.all([
-      prisma.prestamo_equipos.findFirst({
-        where: { equipo_id: equipoId },
-        include: {
-          prestamos: {
-            where: {
-              estado: {
-                not: "Finalizado",
+    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] =
+      await Promise.all([
+        prisma.prestamo_equipos.findFirst({
+          where: { equipo_id: equipoId },
+          include: {
+            prestamos: {
+              where: {
+                estado: {
+                  not: "Finalizado",
+                },
               },
             },
           },
-        },
-      }),
-      prisma.traslados_equipos.findFirst({
-        where: { equipo_id: equipoId },
-        include: {
-          traslados: {
-            where: {
-              estado: {
-                not: "Finalizado",
+        }),
+        prisma.traslados_equipos.findFirst({
+          where: { equipo_id: equipoId },
+          include: {
+            traslados: {
+              where: {
+                estado: {
+                  not: "Finalizado",
+                },
               },
             },
           },
-        },
-      }),
-      prisma.bajas_equipos.findFirst({
-        where: {
-          equipo_id: equipoId,
-          bajas: {
+        }),
+        prisma.bajas_equipos.findFirst({
+          where: {
+            equipo_id: equipoId,
+            bajas: {
+              estado: {
+                not: "Cancelada",
+              },
+            },
+          },
+        }),
+        prisma.mantenimientos.findFirst({
+          where: {
+            equipo_id: equipoId,
             estado: {
-              not: "Cancelada",
+              not: "Finalizado",
             },
           },
-        },
-      }),
-      prisma.mantenimientos.findFirst({
-        where: {
-          equipo_id: equipoId,
-          estado: {
-            not: "Finalizado",
-          },
-        },
-      }),
-    ]);
+        }),
+      ]);
 
     const enPrestamo = !!prestamoActivo?.prestamos;
     const enTraslado = !!trasladoActivo?.traslados;
@@ -319,50 +346,122 @@ export const ActaModel = {
 
     const perifericoId = periferico.id_periferico;
 
-    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] = await Promise.all([
-      prisma.prestamo_perifericos_directos.findFirst({
-        where: { periferico_id: perifericoId },
-        include: {
-          prestamos: {
-            where: {
-              estado: {
-                not: "Finalizado",
+    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] =
+      await Promise.all([
+        prisma.prestamo_perifericos_directos.findFirst({
+          where: { periferico_id: perifericoId },
+          include: {
+            prestamos: {
+              where: {
+                estado: {
+                  not: "Finalizado",
+                },
               },
             },
           },
-        },
-      }),
-      // prisma.traslados_perifericos.findFirst({
-      //   where: { periferico_id: perifericoId },
-      //   include: {
-      //     traslados: {
-      //       where: {
-      //         estado: {
-      //           not: "Finalizado",
-      //         },
-      //       },
-      //     },
-      //   },
-      // }),
-      // prisma.bajas_equipos.findFirst({
-      //   where: {
-      //     equipo_id: periferico.equipo_asociado_id,
-      //     bajas: {
-      //       estado: {
-      //         not: "Cancelada",
-      //       },
-      //     },
-      //   },
-      // }),
-      // prisma.mantenimientos.findFirst({
-      //   where: {
-      //     equipo_id: periferico.equipo_asociado_id,
-      //     estado: {
-      //       not: "Finalizado",
-      //     },
-      //   },
-      // }),
-    ]);
+        }),
+        // prisma.traslados_perifericos.findFirst({
+        //   where: { periferico_id: perifericoId },
+        //   include: {
+        //     traslados: {
+        //       where: {
+        //         estado: {
+        //           not: "Finalizado",
+        //         },
+        //       },
+        //     },
+        //   },
+        // }),
+        // prisma.bajas_equipos.findFirst({
+        //   where: {
+        //     equipo_id: periferico.equipo_asociado_id,
+        //     bajas: {
+        //       estado: {
+        //         not: "Cancelada",
+        //       },
+        //     },
+        //   },
+        // }),
+        // prisma.mantenimientos.findFirst({
+        //   where: {
+        //     equipo_id: periferico.equipo_asociado_id,
+        //     estado: {
+        //       not: "Finalizado",
+        //     },
+        //   },
+        // }),
+      ]);
+
+    const enPrestamo = !!prestamoActivo?.prestamos;
+    const enTraslado = !!trasladoActivo?.traslados;
+    const enBaja = !!bajaAsociada;
+    const enMantenimiento = !!mantenimientos;
+
+    return {
+      disponible: !(enPrestamo || enTraslado || enBaja || enMantenimiento),
+      enPrestamo,
+      enTraslado,
+      enBaja,
+      enMantenimiento,
+    };
+  },
+  async getInfoImpresora(serial) {
+    const impresora = await prisma.impresoras.findFirst({
+      where: { serial: serial },
+      select: { id_impresora: true },
+    });
+
+    if (!impresora) {
+      throw new Error("No se encontró el impresora.");
+    }
+
+    const impresoraId = impresora.id_impresora;
+
+    const [prestamoActivo, trasladoActivo, bajaAsociada, mantenimientos] =
+      await Promise.all([
+        prisma.prestamo_impresoras.findFirst({
+          where: { impresora_id: impresoraId },
+          include: {
+            prestamos: {
+              where: {
+                estado: {
+                  not: "Finalizado",
+                },
+              },
+            },
+          },
+        }),
+        // prisma.traslados_impresoras.findFirst({
+        //   where: { impresora_id: impresoraId },
+        //   include: {
+        //     traslados: {
+        //       where: {
+        //         estado: {
+        //           not: "Finalizado",
+        //         },
+        //       },
+        //     },
+        //   },
+        // }),
+        // prisma.bajas_impresoras.findFirst({
+        //   where: {
+        //     impresora_id: impresoraId,
+        //     bajas: {
+        //       estado: {
+        //         not: "Cancelada",
+        //       },
+        //     },
+        //   },
+        // }),
+        // prisma.mantenimientos_impresoras.findFirst({
+        //   where: {
+        //     impresora_id: impresoraId,
+        //     estado: {
+        //       not: "Finalizado",
+        //     },
+        //   },
+        // }),
+      ]);
 
     const enPrestamo = !!prestamoActivo?.prestamos;
     const enTraslado = !!trasladoActivo?.traslados;
