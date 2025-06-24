@@ -267,7 +267,7 @@ export const useGlobal = () => {
       const disponibilidad = await findPerifericoBySerial(serial);
 
       if (!disponibilidad.disponible) {
-        let mensaje = "El equipo no está disponible. ";
+        let mensaje = "El periferico no está disponible. ";
         if (disponibilidad.enPrestamo) mensaje += "Está en préstamo. ";
         if (disponibilidad.enBaja) mensaje += "Está dado de baja. ";
         if (disponibilidad.enTraslado) mensaje += "Está en traslado. ";
