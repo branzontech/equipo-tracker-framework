@@ -149,9 +149,7 @@ const Actas = () => {
   const GridView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {[...currentActas]
-        .sort(
-          (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-        )
+        .sort((a, b) => b.id_acta - a.id_acta)
         .map((acta) => {
           const { usuario, descripcion } = getActaData(acta);
 
@@ -240,10 +238,7 @@ const Actas = () => {
         </TableHeader>
         <TableBody>
           {[...currentActas]
-            .sort(
-              (a, b) =>
-                new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-            )
+            .sort((a, b) => b.id_acta - a.id_acta)
             .map((acta) => {
               const { usuario, descripcion } = getActaData(acta);
               return (
