@@ -52,7 +52,20 @@ export const ActaPrestamo = ({ data }) => {
         };
       }) || [];
 
-    return [...equipos, ...perifericosDirectos];
+    const impresoras =
+      prestamo?.prestamo_impresoras?.map((item) => {
+        const impresora = item.impresoras;
+        return {
+          serial: impresora?.serial || "-",
+          marca: impresora?.marcas?.nombre || "-",
+          tipo: impresora?.tipo || "-",
+          nombre: impresora?.nombre || "-",
+          accesoriosTexto: "-",
+          esPerifericoDirecto: false,
+        };
+      }) || [];
+
+    return [...equipos, ...perifericosDirectos, ...impresoras];
   };
 
   const prestamo = data.prestamos?.[0];
@@ -62,8 +75,8 @@ export const ActaPrestamo = ({ data }) => {
     (e) => !e.esPerifericoDirecto
   );
 
-  const todosSonPerifericos = equiposConAccesorios.every(
-    (e) => e.esPerifericoDirecto
+  const mostrarNombreEnVezDeAccesorios = equiposConAccesorios.every(
+    (e) => e.esPerifericoDirecto || e.tipo === "Impresora"
   );
 
   return (
@@ -101,7 +114,7 @@ export const ActaPrestamo = ({ data }) => {
           </View>
           <View style={styles.tableCol}>
             <Text style={styles.tableCell}>
-              {todosSonPerifericos ? "Nombre" : "Accesorios"}
+              {mostrarNombreEnVezDeAccesorios ? "Nombre" : "Accesorios"}
             </Text>
           </View>
         </View>
@@ -119,7 +132,7 @@ export const ActaPrestamo = ({ data }) => {
             </View>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>
-                {equipo.esPerifericoDirecto
+                {equipo.esPerifericoDirecto || equipo.tipo === "Impresora"
                   ? equipo.nombre || "-"
                   : equipo.accesoriosTexto || "-"}
               </Text>
