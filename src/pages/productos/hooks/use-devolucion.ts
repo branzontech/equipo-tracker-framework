@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Devolucion } from "../interfaces/devoluciones";
+import { Devolucion, EquipoEnMovimientoBase } from "../interfaces/devoluciones";
 import {
   create,
   getDevoluciones,
@@ -13,7 +13,9 @@ import { useNavigate } from "react-router-dom";
 export const useDevolucion = () => {
   const [devoluciones, setDevoluciones] = useState<Devolucion[]>([]);
   const navigate = useNavigate();
-  const [equiposEnMovimiento, setEquiposEnMovimiento] = useState<Equipo[]>([]);
+  const [equiposEnMovimiento, setEquiposEnMovimiento] = useState<
+    EquipoEnMovimientoBase[]
+  >([]);
   const [newDevo, setNewDevo] = useState<Devolucion>({
     equipo_id: 0,
     prestamo_id: 0,
@@ -33,13 +35,48 @@ export const useDevolucion = () => {
       id: 0,
       nombre: "",
     },
+    tipo: "EQUIPO",
   });
 
   useEffect(() => {
     const fetchDevoluciones = async () => {
       const devoluciones = await getDevoluciones();
-      const { prestamos, traslados } = await getEquiposEnMovimiento();
-      const combinados = [...prestamos, ...traslados];
+      const { prestamos, traslados, prestamos_directos, impresoras } =
+        await getEquiposEnMovimiento();
+
+      const equiposConTipo: EquipoEnMovimientoBase[] = prestamos.map((e) => ({
+        id: e.id_equipo,
+        tipo: "EQUIPO",
+        nombre: e.nombre_equipo,
+        serial: e.nro_serie,
+        equipo: e,
+      }));
+
+      const perifericosConTipo: EquipoEnMovimientoBase[] = prestamos_directos.map(
+        (p) => ({
+          id: p.perifericos.id_periferico,
+          tipo: "PERIFERICO",
+          nombre: p.perifericos.nombre,
+          serial: p.perifericos.serial,
+          periferico: p,
+        })
+      );
+
+      const impresorasConTipo: EquipoEnMovimientoBase[] = impresoras.map(
+        (i) => ({
+          id: i.impresoras.id_impresora,
+          tipo: "IMPRESORA",
+          nombre: i.impresoras.nombre,
+          serial: i.impresoras.serial,
+          impresora: i,
+        })
+      );
+
+      const combinados = [
+        ...equiposConTipo,
+        ...perifericosConTipo,
+        ...impresorasConTipo,
+      ];
 
       setEquiposEnMovimiento(combinados);
       setDevoluciones(devoluciones);
@@ -107,10 +144,10 @@ export const useDevolucion = () => {
             icon: icons.success,
           }
         );
-        setTimeout(() => {
-          navigate("/productos/actas");
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   navigate("/productos/actas");
+        //   window.location.reload();
+        // }, 4500);
       } else {
         toast.error(
           devolucionCreated.message || "Error al crear la devolución",
