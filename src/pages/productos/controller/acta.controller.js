@@ -19,6 +19,16 @@ export const getInfoEquipo = async (req, res) => {
   }
 };
 
+export const getInfoPerifericos = async (req, res) => {
+  try {
+    const { serial } = req.params;
+    const infoPeriferico = await actaService.getInfoPeriferico(serial);
+    res.status(200).json(infoPeriferico);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const updateStatus = async (req, res) => {
   try {
     const { id, newStatus, tipo, acta_equipos } = req.body;
