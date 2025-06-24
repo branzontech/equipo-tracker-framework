@@ -5,6 +5,7 @@ import { Search, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useGlobal } from "@/hooks/use-global";
 import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
+import { icons } from "./interfaces/icons";
 
 interface SearchPerifericoProps {
   onSeleccion?: (id_periferico: number) => void;
@@ -39,7 +40,7 @@ export const SearchPeriferico = ({ onSeleccion }: SearchPerifericoProps) => {
 
           <div className="grid grid-cols-12 gap-4 items-start">
             <div className="col-span-12 md:col-span-3">
-              <Label>Serial del periférico</Label>
+              <Label>N° Serial periférico</Label>
               <div className="relative">
                 <Input
                   placeholder="Ingrese N° serial"
@@ -52,12 +53,17 @@ export const SearchPeriferico = ({ onSeleccion }: SearchPerifericoProps) => {
                   size="icon"
                   onClick={async (e: React.FormEvent) => {
                     e.preventDefault();
+
+                    console.log(item.serial);
                     if (!item.serial?.trim()) {
-                      toast.error("Debe ingresar un número de serie");
+                      toast.error("Debe ingresar un número de serie", {
+                        icon: icons.error,
+                      });
                       return;
                     }
 
                     const data = await buscarPeriferico(item.serial);
+                    console.log(data);
 
                     if (data) {
                       const actualizados = [...perifericos];
