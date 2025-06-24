@@ -15,6 +15,11 @@ export const getInfoPeriferico = async (serial) => {
   return data;
 };
 
+export const getInfoImpresora = async (serial) => {
+  const { data } = await api.get(`/actas/getImpresora/${serial}`);
+  return data;
+};
+
 export const updateStatus = async (id, newStatus, tipo, acta_equipos) => {
   const { data } = await api.post("/actas/updateStatus", {
     id,
