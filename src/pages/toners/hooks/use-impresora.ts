@@ -12,6 +12,8 @@ export const useImpresora = () => {
     modelo: "",
     sucursal_id: 0,
     sucursales: null,
+    serial: "",
+    estado: null,
   });
 
   useEffect(() => {
