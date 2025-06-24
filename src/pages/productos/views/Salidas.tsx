@@ -24,6 +24,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { SearchEquipo } from "@/components/SearchEquipo";
 import { SearchSelect } from "@/components/SearchSelect";
+import { SearchPeriferico } from "@/components/SearchPeriferico";
 
 const Salidas = () => {
   const {
@@ -198,24 +199,30 @@ const Salidas = () => {
             />
 
             <div className="space-y-2">
-              <Label htmlFor="estado">Estado</Label>
+              <Label htmlFor="tipoPrestamo">Tipo de préstamo</Label>
               <Select
-                disabled
-                value={newPrestamo.estado || ""}
+                value={newPrestamo.tipo || ""}
                 onValueChange={(value) =>
-                  setNewPrestamo({ ...newPrestamo, estado: value })
+                  setNewPrestamo({
+                    ...newPrestamo,
+                    tipo: value,
+                    equipos: [],
+                    perifericos_directos: [],
+                    impresoras: [],
+                  })
                 }
               >
-                <SelectTrigger id="estado">
-                  <SelectValue placeholder="Seleccione un estado" />
+                <SelectTrigger id="tipoPrestamo">
+                  <SelectValue placeholder="Seleccione el tipo de préstamo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Vigente">Vigente</SelectItem>
+                  <SelectItem value="EQUIPO">Equipo</SelectItem>
+                  <SelectItem value="PERIFERICO">Periférico</SelectItem>
+                  <SelectItem value="IMPRESORA">Impresora</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="mb-4 text-gray-700">
               Señor(a) <span className="font-semibold">{nombreInput}</span> a
@@ -223,22 +230,52 @@ const Salidas = () => {
               trabajo:
             </p>
 
-            <SearchEquipo
-              onEquipoEncontrado={(equipo) => {
-                setNewPrestamo((prev) => ({
-                  ...prev,
-                  equipos: [
-                    ...prev.equipos,
-                    {
-                      id_equipo: equipo.id_equipo,
-                      perifericos: Array.isArray(equipo.perifericos)
-                        ? equipo.perifericos.map((p) => p.id_periferico)
-                        : [],
-                    },
-                  ],
-                }));
-              }}
-            />
+            {newPrestamo.tipo === "EQUIPO" && (
+              <SearchEquipo
+                onEquipoEncontrado={(equipo) => {
+                  setNewPrestamo((prev) => ({
+                    ...prev,
+                    equipos: [
+                      ...prev.equipos,
+                      {
+                        id_equipo: equipo.id_equipo,
+                        perifericos: Array.isArray(equipo.perifericos)
+                          ? equipo.perifericos.map((p) => p.id_periferico)
+                          : [],
+                      },
+                    ],
+                  }));
+                }}
+              />
+            )}
+
+            {newPrestamo.tipo === "PERIFERICO" && (
+              <SearchPeriferico
+                onSeleccion={(periferico) =>
+                  setNewPrestamo((prev) => ({
+                    ...prev,
+                    perifericos_directos: [
+                      ...(prev.perifericos_directos || []),
+                      {
+                        id_periferico: periferico,
+                        nombre: "", 
+                      },
+                    ],
+                  }))
+                }
+              />
+            )}
+            {/* 
+            {newPrestamo.tipo === "IMPRESORA" && (
+              <SearchImpresora
+                onSeleccion={(impresoraId) =>
+                  setNewPrestamo((prev) => ({
+                    ...prev,
+                    impresoras: [...(prev.impresoras || []), impresoraId],
+                  }))
+                }
+              />
+            )} */}
           </div>
 
           <div className="space-y-2">
