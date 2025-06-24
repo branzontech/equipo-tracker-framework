@@ -1,3 +1,4 @@
+import { Perifericos } from './../../configuracion/maestros/interfaces/periferico';
 import { Equipo } from "./equipo";
 
 export interface Acta {
@@ -31,6 +32,10 @@ export interface Acta {
           nombre: string;
         } | null;
       }[];
+    }[];
+    prestamo_perifericos_directos: {
+      id: number;
+      perifericos: Perifericos | null;
     }[];
   }[];
 
