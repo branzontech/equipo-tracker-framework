@@ -2,6 +2,7 @@ import { Acta } from "./acta";
 
 export interface Prestamo {
   id_prestamo: number;
+  tipo: string;
   acta_id: number;
   actas: Acta | null;
   responsable_salida_id: number;
@@ -16,6 +17,14 @@ export interface Prestamo {
   descripcion: string;
   equipos: {
     id_equipo: number;
-    perifericos: number[]; 
+    perifericos: number[];
+  }[];
+  perifericos_directos: {
+    id_periferico: number;
+    nombre: string;
+  }[];
+  impresoras: {
+    id_impresora: number;
+    nombre: string;
   }[];
 }
