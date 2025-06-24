@@ -1,4 +1,5 @@
-import { Perifericos } from './../../configuracion/maestros/interfaces/periferico';
+import { Impresora } from "@/pages/toners/interfaces/impresora";
+import { Perifericos } from "./../../configuracion/maestros/interfaces/periferico";
 import { Equipo } from "./equipo";
 
 export interface Acta {
@@ -36,6 +37,10 @@ export interface Acta {
     prestamo_perifericos_directos: {
       id: number;
       perifericos: Perifericos | null;
+    }[];
+    prestamo_impresoras: {
+      id: number;
+      impresoras: Impresora | null;
     }[];
   }[];
 
@@ -130,6 +135,16 @@ export interface Acta {
             nombre: string;
           } | null;
         }[];
+      }[];
+
+      prestamo_perifericos_directos: {
+        id: number;
+        perifericos: Perifericos | null;
+      }[];
+
+      prestamo_impresoras: {
+        id: number;
+        impresoras: Impresora | null;
       }[];
     } | null;
 
