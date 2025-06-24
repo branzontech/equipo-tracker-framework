@@ -7,10 +7,18 @@ export const impresoraModel = {
         id_impresora: true,
         nombre: true,
         modelo: true,
-        sucursal_id: true,
+        serial: true,
+        tipo: true,
+        estado: true,
         sucursales: {
           select: {
             id_sucursal: true,
+            nombre: true,
+          },
+        },
+        marcas: {
+          select: {
+            id_marca: true,
             nombre: true,
           },
         },
@@ -26,12 +34,57 @@ export const impresoraModel = {
     });
     return impresora;
   },
+
+  findBySerial: async (serial) => {
+    const impresora = await prisma.impresoras.findFirst({
+      where: {
+        serial: {
+          equals: serial,
+          mode: "insensitive",
+        },
+      },
+      select: {
+        id_impresora: true,
+        nombre: true,
+        modelo: true,
+        serial: true,
+        estado: true,
+        sucursal_id: true,
+        sucursales: {
+          select: {
+            id_sucursal: true,
+            nombre: true,
+          },
+        },
+        marcas: {
+          select: {
+            id_marca: true,
+            nombre: true,
+          },
+        },
+      },
+    });
+    return impresora;
+  },
+
   async create(impresora) {
     const impresoraCreated = await prisma.impresoras.create({
       data: {
         nombre: impresora.nombre,
         modelo: impresora.modelo,
-        sucursal_id: impresora.sucursal_id,
+        tipo: impresora.tipo,
+        serial: impresora.serial,
+        estado: impresora.estado,
+        marcas: {
+          connect: {
+            id_marca: impresora.marca_id,
+          },
+        },
+        sucursales: {
+          connect: {
+            id_sucursal: impresora.sucursal_id,
+          },
+        },
       },
     });
     return impresoraCreated;
