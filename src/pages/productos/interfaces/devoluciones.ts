@@ -1,3 +1,7 @@
+import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
+import { Equipo } from "./equipo";
+import { Impresora } from "@/pages/toners/interfaces/impresora";
+
 export interface Devolucion {
   equipo_id: number;
   id_devolucion: number;
@@ -17,4 +21,15 @@ export interface Devolucion {
     id: number;
     nombre: string;
   };
+  tipo: "EQUIPO" | "PERIFERICO" | "IMPRESORA";
+}
+
+export interface EquipoEnMovimientoBase {
+  id: number;
+  tipo: "EQUIPO" | "PERIFERICO" | "IMPRESORA";
+  nombre: string;
+  serial: string;
+  equipo?: Equipo;
+  periferico?: Perifericos;
+  impresora?: Impresora;
 }
