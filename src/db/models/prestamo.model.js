@@ -88,8 +88,8 @@ export const prestamoModel = {
         });
 
         // 3.1.1 Actualizar el estado del equipo a "En préstamo"
-        await prisma.equipos.update({
-          where: { id_equipo: equipo.id_equipo },
+        await prisma.estado_ubicacion.updateMany({
+          where: { equipo_id: equipo.id_equipo },
           data: {
             estado_actual: "En Préstamo",
           },
@@ -119,6 +119,40 @@ export const prestamoModel = {
           }
         }
       }
+
+      if (prestamo.perifericos_directos?.length > 0) {
+        for (const periferico_id of prestamo.perifericos_directos) {
+          await prisma.prestamo_perifericos_directos.create({
+            data: {
+              prestamo_id: nuevoPrestamo.id_prestamo,
+              periferico_id,
+            },
+          });
+
+          // Actualizar estado del periférico
+          await prisma.perifericos.update({
+            where: { id_periferico: periferico_id },
+            data: { estado: "En Préstamo" },
+          });
+        }
+      }
+
+      // if (prestamo.impresoras?.length > 0) {
+      //   for (const impresora_id of prestamo.impresoras) {
+      //     await prisma.prestamo_impresoras.create({
+      //       data: {
+      //         prestamo_id: nuevoPrestamo.id_prestamo,
+      //         impresora_id,
+      //       },
+      //     });
+
+      //     // Actualizar estado de la impresora
+      //     await prisma.impresoras.update({
+      //       where: { id_impresora: impresora_id },
+      //       data: { estado: "En Préstamo" }, // IMPRESORA NO TIENE ESTADO
+      //     });
+      //   }
+      // }
 
       return nuevoPrestamo;
     } catch (error) {
