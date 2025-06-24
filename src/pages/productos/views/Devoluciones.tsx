@@ -57,9 +57,7 @@ const Devoluciones = () => {
     query === ""
       ? equiposEnMovimiento
       : equiposEnMovimiento.filter((eq) =>
-          `${eq.nombre_equipo} ${eq.estado_actual} ${eq.nro_serie}`
-            .toLowerCase()
-            .includes(query.toLowerCase())
+          eq.serial?.toLowerCase().includes(query.toLowerCase())
         );
 
   return (
@@ -83,19 +81,38 @@ const Devoluciones = () => {
                   <Combobox
                     value={newDevo.equipo_id}
                     onChange={(value) => {
-                      const selectedEquipo = equiposEnMovimiento.find(
-                        (eq) => eq.id_equipo === value
+                      const selected = equiposEnMovimiento.find(
+                        (eq) => eq.id === value
                       );
-                      const prestamo =
-                        selectedEquipo?.prestamo_equipos?.[0]?.prestamos;
-                      const traslado =
-                        selectedEquipo?.traslados_equipos?.[0]?.traslados;
+
+                      let prestamoId = 0;
+                      let trasladoId = 0;
+
+                      if (selected?.tipo === "EQUIPO") {
+                        prestamoId =
+                          selected.equipo?.prestamo_equipos?.[0]?.prestamos
+                            ?.id_prestamo || 0;
+                        trasladoId =
+                          selected.equipo?.traslados_equipos?.[0]?.traslados
+                            ?.id_traslado || 0;
+                      } else if (selected?.tipo === "PERIFERICO") {
+                        prestamoId =
+                          selected.periferico?.prestamos?.id_prestamo;
+
+                      } else if (selected?.tipo === "IMPRESORA") {
+                        console.log(selected);
+                        prestamoId =
+                          selected.impresora?.prestamos?.id_prestamo;
+
+                            console.log(prestamoId);
+                      }
 
                       setNewDevo({
                         ...newDevo,
                         equipo_id: value,
-                        prestamo_id: prestamo?.id_prestamo || 0,
-                        traslado_id: traslado?.id_traslado || 0,
+                        tipo: selected?.tipo,
+                        prestamo_id: prestamoId,
+                        traslado_id: trasladoId,
                       });
                     }}
                   >
@@ -104,12 +121,10 @@ const Devoluciones = () => {
                         className="w-full text-[14px] border border-input rounded-md px-3 py-2"
                         onChange={(event) => setQuery(event.target.value)}
                         displayValue={(id) => {
-                          const eq = equiposEnMovimiento.find(
-                            (e) => e.id_equipo === id
+                          const item = equiposEnMovimiento.find(
+                            (e) => e.id === id
                           );
-                          return eq
-                            ? `${eq.nombre_equipo} - ${eq.estado_actual}`
-                            : "";
+                          return item?.nombre ?? "";
                         }}
                         placeholder="Buscar equipo..."
                       />
@@ -119,17 +134,17 @@ const Devoluciones = () => {
                             No hay equipos disponibles
                           </div>
                         ) : (
-                          filteredEquipos.map((equipo) => (
+                          filteredEquipos.map((item) => (
                             <Combobox.Option
-                              key={equipo.id_equipo}
-                              value={equipo.id_equipo}
+                              key={item.id}
+                              value={item.id}
                               className={({ active }) =>
                                 `cursor-pointer select-none px-4 py-2 ${
                                   active ? "bg-blue-100" : ""
                                 }`
                               }
                             >
-                              {equipo.nombre_equipo} - {equipo.estado_actual}
+                              {item.nombre}
                             </Combobox.Option>
                           ))
                         )}
