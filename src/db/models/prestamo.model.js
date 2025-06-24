@@ -121,17 +121,17 @@ export const prestamoModel = {
       }
 
       if (prestamo.perifericos_directos?.length > 0) {
-        for (const periferico_id of prestamo.perifericos_directos) {
+        for (const periferico of prestamo.perifericos_directos) {
           await prisma.prestamo_perifericos_directos.create({
             data: {
               prestamo_id: nuevoPrestamo.id_prestamo,
-              periferico_id,
+              periferico_id: periferico.id_periferico, 
             },
           });
 
           // Actualizar estado del periférico
           await prisma.perifericos.update({
-            where: { id_periferico: periferico_id },
+            where: { id_periferico: periferico.id_periferico }, 
             data: { estado: "En Préstamo" },
           });
         }
