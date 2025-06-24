@@ -24,6 +24,8 @@ export const usePrestamo = () => {
       id_usuario: 0,
       nombre: "",
     },
+    perifericos_directos: [],
+    impresoras: [],
   });
   const [responsableRecibeInput, setResponsableRecibeInput] = useState(null);
   const { equipo, accesorios, haBuscado, buscarEquipo, saveSign_ } =
@@ -65,12 +67,12 @@ export const usePrestamo = () => {
       return;
     }
 
-    if (!prestamo.equipos.length) {
-      toast.error("Debe agregar al menos un equipo", {
-        icon: icons.error,
-      });
-      return;
-    }
+    // if (!prestamo.equipos.length) {
+    //   toast.error("Debe agregar al menos un equipo", {
+    //     icon: icons.error,
+    //   });
+    //   return;
+    // }
 
     if (!prestamo.descripcion) {
       toast.error("Debe ingresar una descripcion", {
