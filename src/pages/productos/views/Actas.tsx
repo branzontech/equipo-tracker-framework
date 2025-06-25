@@ -29,9 +29,7 @@ import {
   User,
   Calendar,
   CheckCircle,
-  RotateCw,
   XCircle,
-  AlertCircle,
   CheckCircle2,
 } from "lucide-react";
 import { Sheet, SheetDescription } from "@/components/ui/sheet";
