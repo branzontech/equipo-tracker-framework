@@ -1,4 +1,3 @@
-
 export interface Traslado {
   id_traslado: number;
   acta_id: number;
@@ -7,10 +6,11 @@ export interface Traslado {
   observaciones: string;
   responsable_salida_id: number;
   responsable_entrada_id: number;
+  tipo: string;
   usuarios: {
     id_usuario: number;
     nombre: string;
-  }
+  };
   sucursal_destino_id: number;
   sucursales: {
     id_sucursal: number;
@@ -23,9 +23,17 @@ export interface Traslado {
         nombre: string;
       }[];
     }[];
-  }
+  };
   equipos: {
     id_equipo: number;
-    perifericos: number[]; 
+    perifericos: number[];
+  }[];
+  perifericos_directos: {
+    id_periferico: number;
+    nombre: string;
+  }[];
+  impresoras: {
+    id_impresora: number;
+    nombre: string;
   }[];
 }
