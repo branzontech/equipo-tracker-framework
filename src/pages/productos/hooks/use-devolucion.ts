@@ -16,6 +16,8 @@ export const useDevolucion = () => {
   const [equiposEnMovimiento, setEquiposEnMovimiento] = useState<
     EquipoEnMovimientoBase[]
   >([]);
+  const [equiposTrasladoEnMovimiento, setEquiposTrasladoEnMovimiento] =
+    useState<EquipoEnMovimientoBase[]>([]);
   const [newDevo, setNewDevo] = useState<Devolucion>({
     equipo_id: 0,
     prestamo_id: 0,
@@ -41,8 +43,14 @@ export const useDevolucion = () => {
   useEffect(() => {
     const fetchDevoluciones = async () => {
       const devoluciones = await getDevoluciones();
-      const { prestamos, traslados, prestamos_directos, impresoras } =
-        await getEquiposEnMovimiento();
+      const {
+        prestamos,
+        prestamos_directos,
+        impresoras,
+        traslados,
+        traslados_directos,
+        traslados_impresoras,
+      } = await getEquiposEnMovimiento();
 
       const equiposConTipo: EquipoEnMovimientoBase[] = prestamos.map((e) => ({
         id: e.id_equipo,
@@ -50,17 +58,18 @@ export const useDevolucion = () => {
         nombre: e.nombre_equipo,
         serial: e.nro_serie,
         equipo: e,
+        origin: "PRESTAMO"
       }));
 
-      const perifericosConTipo: EquipoEnMovimientoBase[] = prestamos_directos.map(
-        (p) => ({
+      const perifericosConTipo: EquipoEnMovimientoBase[] =
+        prestamos_directos.map((p) => ({
           id: p.perifericos.id_periferico,
           tipo: "PERIFERICO",
           nombre: p.perifericos.nombre,
           serial: p.perifericos.serial,
           periferico: p,
-        })
-      );
+          origin: "PRESTAMO"
+        }));
 
       const impresorasConTipo: EquipoEnMovimientoBase[] = impresoras.map(
         (i) => ({
@@ -69,6 +78,37 @@ export const useDevolucion = () => {
           nombre: i.impresoras.nombre,
           serial: i.impresoras.serial,
           impresora: i,
+          origin: "PRESTAMO"
+        })
+      );
+
+      const equipoTraslado: EquipoEnMovimientoBase[] = traslados.map((e) => ({
+        id: e.id_equipo,
+        tipo: "EQUIPO",
+        nombre: e.nombre_equipo,
+        serial: e.nro_serie,
+        equipo: e,
+        origin: "TRASLADO"
+      }));
+
+      const perifericosTraslado: EquipoEnMovimientoBase[] =
+        traslados_directos.map((p) => ({
+          id: p.perifericos.id_periferico,
+          tipo: "PERIFERICO",
+          nombre: p.perifericos.nombre,
+          serial: p.perifericos.serial,
+          periferico: p,
+          origin: "TRASLADO"
+        }));
+
+      const impresorasTraslado: EquipoEnMovimientoBase[] = traslados_impresoras.map(
+        (i) => ({
+          id: i.impresoras.id_impresora,
+          tipo: "IMPRESORA",
+          nombre: i.impresoras.nombre,
+          serial: i.impresoras.serial,
+          impresora: i,
+          origin: "TRASLADO"
         })
       );
 
@@ -78,7 +118,14 @@ export const useDevolucion = () => {
         ...impresorasConTipo,
       ];
 
+      const combinadosTraslado = [
+        ...equipoTraslado,
+        ...perifericosTraslado,
+        ...impresorasTraslado,
+      ];
+
       setEquiposEnMovimiento(combinados);
+      setEquiposTrasladoEnMovimiento(combinadosTraslado);
       setDevoluciones(devoluciones);
     };
 
@@ -144,10 +191,10 @@ export const useDevolucion = () => {
             icon: icons.success,
           }
         );
-        // setTimeout(() => {
-        //   navigate("/productos/actas");
-        //   window.location.reload();
-        // }, 4500);
+        setTimeout(() => {
+          navigate("/productos/actas");
+          window.location.reload();
+        }, 4500);
       } else {
         toast.error(
           devolucionCreated.message || "Error al crear la devolución",
@@ -171,5 +218,6 @@ export const useDevolucion = () => {
     setDevoluciones,
     setEquiposEnMovimiento,
     handleSubmit,
+    equiposTrasladoEnMovimiento,
   };
 };
