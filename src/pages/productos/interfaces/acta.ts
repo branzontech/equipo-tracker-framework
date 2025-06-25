@@ -102,6 +102,14 @@ export interface Acta {
         } | null;
       }[];
     }[];
+    traslado_perifericos_directos: {
+      id: number;
+      perifericos: Perifericos | null;
+    }[];
+    traslado_impresoras: {
+      id: number;
+      impresoras: Impresora | null;
+    }[];
   }[];
 
   devoluciones: {
