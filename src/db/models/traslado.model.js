@@ -59,8 +59,8 @@ export const trasladoModel = {
           },
         });
 
-        await prisma.equipos.update({
-          where: { id_equipo: equipo.id_equipo },
+        await prisma.estado_ubicacion.updateMany({
+          where: { equipo_id: equipo.id_equipo },
           data: {
             estado_actual: "En Traslado",
           },
@@ -88,6 +88,40 @@ export const trasladoModel = {
               );
             }
           }
+        }
+      }
+
+      if (traslado.perifericos_directos?.length > 0) {
+        for (const periferico of traslado.perifericos_directos) {
+          await prisma.traslado_perifericos_directos.create({
+            data: {
+              traslado_id: trasladoCreated.id_traslado,
+              periferico_id: periferico.id_periferico,
+            },
+          });
+
+          // Actualizar estado del periférico
+          await prisma.perifericos.update({
+            where: { id_periferico: periferico.id_periferico },
+            data: { estado: "En Traslado" },
+          });
+        }
+      }
+
+      if (traslado.impresoras?.length > 0) {
+        for (const impresora of traslado.impresoras) {
+          await prisma.traslado_impresoras.create({
+            data: {
+              traslado_id: trasladoCreated.id_traslado,
+              impresora_id: impresora.id_impresora,
+            },
+          });
+
+          // Actualizar estado de la impresora
+          await prisma.impresoras.update({
+            where: { id_impresora: impresora.impresora_id },
+            data: { estado: "En Traslado" },
+          });
         }
       }
 
