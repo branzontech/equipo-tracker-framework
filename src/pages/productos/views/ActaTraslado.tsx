@@ -8,37 +8,69 @@ export const ActaTraslado = ({ data }) => {
   const { firmaEntrega, nombreEntrega, firmaRecibe, nombreRecibe } =
     getFirmas(data);
 
-  const formatAccesorios = (equipos) => {
-    return equipos.map((equipo) => {
-      const perifericos = equipo.traslados_perifericos || [];
+  const formatTodosLosElementos = (traslado) => {
+    const equipos =
+      traslado?.traslados_equipos?.map((item) => {
+        const perifericos = item.traslados_perifericos || [];
 
-      const accesoriosTexto =
-        perifericos.length > 0
-          ? perifericos
-              .map((p) => {
-                const acc = p.perifericos;
-                return acc?.nombre
-                  ? acc?.tipo
-                    ? `${acc.nombre} (${acc.tipo})`
-                    : acc.nombre
-                  : "Desconocido";
-              })
-              .join(", ")
-          : "Ninguno";
+        const accesoriosTexto =
+          perifericos.length > 0
+            ? perifericos
+                .map((p) => {
+                  const acc = p.perifericos;
+                  return acc?.nombre
+                    ? acc?.tipo
+                      ? `${acc.nombre} (${acc.tipo})`
+                      : acc.nombre
+                    : "Desconocido";
+                })
+                .join(", ")
+            : "Ninguno";
 
-      return {
-        ...equipo,
-        accesoriosTexto,
-        serial: equipo.equipos?.nro_serie || "",
-        marca: equipo.equipos?.marcas?.nombre || "",
-        activoFijo: equipo.equipos?.tipo_activo || "",
-      };
-    });
+        return {
+          serial: item.equipos?.nro_serie || "-",
+          marca: item.equipos?.marcas?.nombre || "-",
+          tipo: item.equipos?.tipo_activo || "-",
+          nombre: item.equipos?.nombre_equipo || "-",
+          accesoriosTexto,
+          esPerifericoDirecto: false,
+        };
+      }) || [];
+
+    const perifericosDirectos =
+      traslado?.traslado_perifericos_directos?.map((item) => {
+        const p = item.perifericos;
+        return {
+          serial: p?.serial || "-",
+          marca: p?.marcas?.nombre || "-",
+          tipo: p?.tipo || "-",
+          nombre: p?.nombre || "-",
+          accesoriosTexto: "-",
+          esPerifericoDirecto: true,
+        };
+      }) || [];
+
+    const impresoras =
+      traslado?.traslado_impresoras?.map((item) => {
+        const i = item.impresoras;
+        return {
+          serial: i?.serial || "-",
+          marca: i?.marcas?.nombre || "-",
+          tipo: i?.tipo || "-",
+          nombre: i?.nombre || "-",
+          accesoriosTexto: "-",
+          esPerifericoDirecto: true,
+        };
+      }) || [];
+
+    return [...equipos, ...perifericosDirectos, ...impresoras];
   };
 
   const traslado = data.traslados?.[0];
-  const equiposConAccesorios = formatAccesorios(
-    traslado?.traslados_equipos || []
+  const equiposConTodo = formatTodosLosElementos(traslado);
+
+  const mostrarNombreEnVezDeAccesorios = equiposConTodo.every(
+    (e) => e.esPerifericoDirecto || e.tipo === "Impresora"
   );
 
   return (
@@ -55,7 +87,7 @@ export const ActaTraslado = ({ data }) => {
           ""}
         , a continuación se relacionan los equipos trasladados a la{" "}
         {traslado?.sucursales?.nombre || ""} (
-        {traslado?.sucursales?.sedes?.regional || ""}):
+        {traslado?.sucursales?.sedes?.nombre || ""}):
       </Text>
 
       <View style={styles.table}>
@@ -70,23 +102,29 @@ export const ActaTraslado = ({ data }) => {
             <Text style={styles.tableCell}>Tipo de Activo</Text>
           </View>
           <View style={styles.tableCol}>
-            <Text style={styles.tableCell}>Accesorios</Text>
+            <Text style={styles.tableCell}>
+              {mostrarNombreEnVezDeAccesorios ? "Nombre" : "Accesorios"}
+            </Text>
           </View>
         </View>
 
-        {equiposConAccesorios.map((equipo, index) => (
+        {equiposConTodo.map((item, index) => (
           <View style={[styles.tableRow, styles.tableHeader]} key={index}>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.serial}</Text>
+              <Text style={styles.tableCell}>{item.serial}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.marca}</Text>
+              <Text style={styles.tableCell}>{item.marca}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.activoFijo}</Text>
+              <Text style={styles.tableCell}>{item.tipo}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.accesoriosTexto}</Text>
+              <Text style={styles.tableCell}>
+                {mostrarNombreEnVezDeAccesorios
+                  ? item.nombre || "-"
+                  : item.accesoriosTexto || "-"}
+              </Text>
             </View>
           </View>
         ))}
