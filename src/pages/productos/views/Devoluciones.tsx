@@ -25,12 +25,17 @@ import { Label } from "@/components/ui/label";
 import ResponsibleSearch from "@/components/ResponsibleSearch";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import SignatureCanvas from "@/components/SignatureCanvas";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Combobox } from "@headlessui/react";
 
 const Devoluciones = () => {
-  const { equiposEnMovimiento, newDevo, setNewDevo, handleSubmit } =
-    useDevolucion();
+  const {
+    equiposEnMovimiento,
+    newDevo,
+    setNewDevo,
+    handleSubmit,
+    equiposTrasladoEnMovimiento,
+  } = useDevolucion();
   const {
     newUser,
     users,
@@ -53,10 +58,15 @@ const Devoluciones = () => {
     (u) => u.id_usuario !== selectedEntregaId
   );
 
+  const todosLosEquipos = useMemo(
+    () => [...equiposEnMovimiento, ...equiposTrasladoEnMovimiento],
+    [equiposEnMovimiento, equiposTrasladoEnMovimiento]
+  );
+
   const filteredEquipos =
     query === ""
-      ? equiposEnMovimiento
-      : equiposEnMovimiento.filter((eq) =>
+      ? todosLosEquipos
+      : todosLosEquipos.filter((eq) =>
           eq.serial?.toLowerCase().includes(query.toLowerCase())
         );
 
@@ -81,32 +91,38 @@ const Devoluciones = () => {
                   <Combobox
                     value={newDevo.equipo_id}
                     onChange={(value) => {
-                      const selected = equiposEnMovimiento.find(
+                      const selected = todosLosEquipos.find(
                         (eq) => eq.id === value
                       );
 
                       let prestamoId = 0;
                       let trasladoId = 0;
 
-                      if (selected?.tipo === "EQUIPO") {
-                        prestamoId =
-                          selected.equipo?.prestamo_equipos?.[0]?.prestamos
-                            ?.id_prestamo || 0;
-                        trasladoId =
-                          selected.equipo?.traslados_equipos?.[0]?.traslados
-                            ?.id_traslado || 0;
-                      } else if (selected?.tipo === "PERIFERICO") {
-                        prestamoId =
-                          selected.periferico?.prestamos?.id_prestamo;
-
-                      } else if (selected?.tipo === "IMPRESORA") {
-                        console.log(selected);
-                        prestamoId =
-                          selected.impresora?.prestamos?.id_prestamo;
-
-                            console.log(prestamoId);
+                      if (selected?.origin === "PRESTAMO") {
+                        if (selected?.tipo === "EQUIPO") {
+                          prestamoId =
+                            selected.equipo?.prestamo_equipos?.[0]?.prestamos
+                              ?.id_prestamo || 0;
+                        } else if (selected?.tipo === "PERIFERICO") {
+                          prestamoId =
+                            selected.periferico?.prestamos?.id_prestamo;
+                        } else if (selected?.tipo === "IMPRESORA") {
+                          prestamoId =
+                            selected.impresora?.prestamos?.id_prestamo;
+                        }
+                      } else if (selected?.origin === "TRASLADO") {
+                        if (selected.tipo === "EQUIPO") {
+                          trasladoId =
+                            selected.equipo?.traslados_equipos?.[0]?.traslados
+                              ?.id_traslado || 0;
+                        } else if (selected.tipo === "PERIFERICO") {
+                          trasladoId =
+                            selected.periferico?.traslados?.id_traslado || 0;
+                        } else if (selected.tipo === "IMPRESORA") {
+                          trasladoId =
+                            selected.impresora?.traslados?.id_traslado || 0;
+                        }
                       }
-
                       setNewDevo({
                         ...newDevo,
                         equipo_id: value,
@@ -121,12 +137,11 @@ const Devoluciones = () => {
                         className="w-full text-[14px] border border-input rounded-md px-3 py-2"
                         onChange={(event) => setQuery(event.target.value)}
                         displayValue={(id) => {
-                          const item = equiposEnMovimiento.find(
-                            (e) => e.id === id
-                          );
+                          const item = todosLosEquipos.find((e) => e.id === id);
                           return item?.nombre ?? "";
                         }}
                         placeholder="Buscar equipo..."
+                        autoComplete="off"
                       />
                       <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white border border-gray-300 shadow-lg">
                         {filteredEquipos.length === 0 ? (
@@ -209,7 +224,7 @@ const Devoluciones = () => {
                       <SelectItem value="Fin de Préstamo">
                         Fin de Préstamo
                       </SelectItem>
-                      <SelectItem value="Fin de traslado">Traslado</SelectItem>
+                      <SelectItem value="Fin de traslado">Fin del Traslado</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
