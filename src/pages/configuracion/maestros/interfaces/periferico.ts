@@ -18,7 +18,5 @@ export interface Perifericos {
   equipos: Equipo | null;
 
   prestamos?: Prestamo;
-  traslados: {
-    traslado: Traslado;
-  }[];
+  traslados?: Traslado;
 }
