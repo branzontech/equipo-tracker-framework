@@ -1,5 +1,5 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -23,13 +23,14 @@ import { useTraslados } from "../hooks/use-traslados";
 import { es } from "date-fns/locale";
 import { SearchEquipo } from "@/components/SearchEquipo";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
+import { SearchPeriferico } from "@/components/SearchPeriferico";
+import { SearchImpresora } from "@/components/SearchImpresora";
+import { useSedes } from "@/pages/configuracion/maestros/hooks/use-sedes";
 
 const Traslados = () => {
   const {
     newTraslado,
     setNewTraslado,
-    sedesFiltradas,
-    setRegionalSeleccionado,
     sucursalesFiltradas,
     setSedesSelect,
     registerTraslado,
@@ -42,8 +43,8 @@ const Traslados = () => {
     selectedRecibeUser,
     setSelectedRecibeUser,
   } = useUser();
+  const { sedes } = useSedes();
   const methods = useForm();
-
   const selectedEntregaId = selectedEntregaUser?.id_usuario;
   const selectedRecibeId = selectedRecibeUser?.id_usuario;
 
@@ -119,32 +120,15 @@ const Traslados = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="regionalDestino">Regional Destino</Label>
-              <Select onValueChange={setRegionalSeleccionado}>
-                <SelectTrigger id="regionalDestino">
-                  <SelectValue placeholder="Seleccione un regional" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cartagena">Cartagena</SelectItem>
-                  <SelectItem value="medellin">Medellín</SelectItem>
-                  <SelectItem value="cali">Cali</SelectItem>
-                  <SelectItem value="barranquilla">Barranquilla</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
               <Label htmlFor="regionalDestino">Sede Destino</Label>
               <Select onValueChange={(value) => setSedesSelect(Number(value))}>
                 <SelectTrigger id="regionalDestino">
                   <SelectValue placeholder="Seleccione un sede" />
                 </SelectTrigger>
                 <SelectContent>
-                  {sedesFiltradas.map((sede) => (
+                  {sedes.map((sede) => (
                     <SelectItem key={sede.id_sede} value={String(sede.id_sede)}>
-                      {sede.nombre} - {sede.regional}
+                      {sede.nombre}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -176,6 +160,31 @@ const Traslados = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tipoTraslado">Tipo de traslado</Label>
+              <Select
+                value={newTraslado.tipo || ""}
+                onValueChange={(value) =>
+                  setNewTraslado({
+                    ...newTraslado,
+                    tipo: value,
+                    equipos: [],
+                    perifericos_directos: [],
+                    impresoras: [],
+                  })
+                }
+              >
+                <SelectTrigger id="tipoPrestamo">
+                  <SelectValue placeholder="Seleccione el tipo de traslado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EQUIPO">Equipo</SelectItem>
+                  <SelectItem value="PERIFERICO">Periférico</SelectItem>
+                  <SelectItem value="IMPRESORA">Impresora</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -193,22 +202,58 @@ const Traslados = () => {
             />
           </div>
 
-          <SearchEquipo
-            onEquipoEncontrado={(equipo) => {
-              setNewTraslado((prev) => ({
-                ...prev,
-                equipos: [
-                  ...prev.equipos,
-                  {
-                    id_equipo: equipo.id_equipo,
-                    perifericos: Array.isArray(equipo.perifericos)
-                      ? equipo.perifericos.map((p) => p.id_periferico)
-                      : [],
-                  },
-                ],
-              }));
-            }}
-          />
+          {newTraslado.tipo === "EQUIPO" && (
+            <SearchEquipo
+              onEquipoEncontrado={(equipo) => {
+                setNewTraslado((prev) => ({
+                  ...prev,
+                  equipos: [
+                    ...prev.equipos,
+                    {
+                      id_equipo: equipo.id_equipo,
+                      perifericos: Array.isArray(equipo.perifericos)
+                        ? equipo.perifericos.map((p) => p.id_periferico)
+                        : [],
+                    },
+                  ],
+                }));
+              }}
+            />
+          )}
+
+          {newTraslado.tipo === "PERIFERICO" && (
+            <SearchPeriferico
+              onSeleccion={(periferico) =>
+                setNewTraslado((prev) => ({
+                  ...prev,
+                  perifericos_directos: [
+                    ...(prev.perifericos_directos || []),
+                    {
+                      id_periferico: periferico,
+                      nombre: "",
+                    },
+                  ],
+                }))
+              }
+            />
+          )}
+
+          {newTraslado.tipo === "IMPRESORA" && (
+            <SearchImpresora
+              onSeleccion={(impresora) =>
+                setNewTraslado((prev) => ({
+                  ...prev,
+                  impresoras: [
+                    ...(prev.impresoras || []),
+                    {
+                      id_impresora: impresora,
+                      nombre: "",
+                    },
+                  ],
+                }))
+              }
+            />
+          )}
 
           <div className="space-y-6">
             <Label>Observaciones</Label>
