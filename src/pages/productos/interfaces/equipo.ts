@@ -1,4 +1,4 @@
-import { Usuario } from './../../configuracion/usuarios/interfaces/usuarios';
+import { Usuario } from "./../../configuracion/usuarios/interfaces/usuarios";
 import { Categoria } from "@/pages/configuracion/maestros/interfaces/categorias";
 import { Marca } from "@/pages/configuracion/maestros/interfaces/marcas";
 import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
@@ -29,6 +29,7 @@ export interface Equipo {
   prestamo_equipos?: {
     prestamos: Prestamo;
   }[];
+
   traslados_equipos?: {
     traslados: Traslado;
   }[];
@@ -105,18 +106,24 @@ export interface Equipo {
     vida_util_restante: string;
   };
 
+  mantenimiento?: {
+    frecuencia_mantenimiento: string;
+    ultima_fecha_mantenimiento: string;
+    proveedor_servicio_id: number;
+    proveedores: Proveedor;
+  };
+
   // Documentos Relacionados
-  documentacion?: {
+  archivosequipo?: {
     id_archivo: number;
     nombre_archivo: string;
     tipo_archivo: string;
-    archivos: File[];
+    contenido: string;
     archivo: {
       content: string;
       nombre: string;
       tipo: string;
-    };
-    fecha_subida: Date;
+    }
   }[];
 
   perifericos: Perifericos | null;
