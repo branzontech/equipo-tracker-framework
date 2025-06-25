@@ -26,6 +26,9 @@ import {
   Shield,
   Clock,
   Repeat,
+  Download,
+  Eye,
+  XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,7 +70,8 @@ const HojaDeVida = () => {
   const { nroSeries } = useParams();
   const [activeTab, setActiveTab] = useState("informacion");
   const { navigate, getInfoEquipo, newEquipo } = useEquipos();
-  const { formatFecha, formatPrecio } = useGlobal();
+  const { formatFecha, formatPrecio, openFileInNewTab, downloadFile } =
+    useGlobal();
 
   useEffect(() => {
     getInfoEquipo(nroSeries);
@@ -138,11 +142,11 @@ const HojaDeVida = () => {
         fecha: traslado.fecha_traslado,
         descripcion: "Traslado Realizado",
         responsable:
-          traslado.usuarios?.nombre || `ID ${traslado.responsable_salida_id}`,
+          traslado.usuarios_traslados_responsable_salida_idTousuarios?.nombre,
         detalles: {
           destino: traslado.sucursales?.nombre || "-",
           descripcion: traslado.motivo || "-",
-          sede: traslado.sucursales?.sedes || "-",
+          sede: traslado.sucursales?.sedes?.nombre || "-",
         },
       });
     }
@@ -259,10 +263,25 @@ const HojaDeVida = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{newEquipo.nro_serie}</div>
-            <p className="text-xs text-muted-foreground">
-              {newEquipo.nombre_equipo}
-            </p>
+            <div className="flex items-center gap-4">
+              {newEquipo.imagen ? (
+                <img
+                  src={newEquipo.imagen}
+                  alt="Equipo"
+                  className="w-30 h-20"
+                />
+              ) : (
+                <div className="w-20 h-20 flex items-center justify-center border rounded-md text-xs text-muted-foreground">
+                  Sin imagen
+                </div>
+              )}
+              <div>
+                <div className="text-2xl font-bold">{newEquipo.nro_serie}</div>
+                <p className="text-xs text-muted-foreground">
+                  {newEquipo.nombre_equipo}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -368,20 +387,6 @@ const HojaDeVida = () => {
                         </span>{" "}
                         {formatFecha(newEquipo.fecha_registro)}
                       </p>
-                      {/* <p>
-                        <span className="font-medium text-slate-700">
-                          Imagen:
-                        </span>{" "}
-                        {newEquipo.imagen ? (
-                          <img
-                            src={newEquipo.imagen}
-                            alt="Equipo"
-                            className="w-20 h-20 rounded-full"
-                          />
-                        ) : (
-                          <span>Sin imagen</span>
-                        )}
-                      </p> */}
                       <p>
                         <span className="font-medium text-slate-700">
                           Tags:
@@ -431,7 +436,7 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Tipo de Disco Duro:
                         </span>{" "}
-                          {newEquipo.especificaciones?.tipo_discoduro}
+                        {newEquipo.especificaciones?.tipo_discoduro}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -461,7 +466,10 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Tiene Cargador:
                         </span>{" "}
-                        {String(newEquipo.especificaciones?.tienecargador) === "true" ? "Sí" : "No"}
+                        {String(newEquipo.especificaciones?.tienecargador) ===
+                        "true"
+                          ? "Sí"
+                          : "No"}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -500,7 +508,8 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Políticas Aplicadas:
                         </span>{" "}
-                        {newEquipo.seguridad?.politicas_aplicadas?.join(", ") || "Sin políticas aplicadas"}
+                        {newEquipo.seguridad?.politicas_aplicadas?.join(", ") ||
+                          "Sin políticas aplicadas"}
                       </p>
                     </div>
                   </div>
@@ -529,7 +538,10 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Precio de Compra:
                         </span>{" "}
-                        ${formatPrecio(newEquipo.adquisicion?.precio_compra.toLocaleString())}{" "}
+                        $
+                        {formatPrecio(
+                          newEquipo.adquisicion?.precio_compra.toLocaleString()
+                        )}{" "}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -561,7 +573,7 @@ const HojaDeVida = () => {
                         <span className="font-medium text-slate-700">
                           Garantia desde:
                         </span>{" "}
-                          {formatFecha(newEquipo.adquisicion?.inicio_garantia)}
+                        {formatFecha(newEquipo.adquisicion?.inicio_garantia)}
                       </p>
                       <p>
                         <span className="font-medium text-slate-700">
@@ -632,6 +644,36 @@ const HojaDeVida = () => {
 
                   <div>
                     <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      Mantenimientos
+                    </h3>
+                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Frecuencia:
+                        </span>{" "}
+                        {newEquipo.mantenimiento?.frecuencia_mantenimiento ||
+                          "No disponible"}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Última Fecha de Mantenimiento:
+                        </span>{" "}
+                        {formatFecha(
+                          newEquipo.mantenimiento?.ultima_fecha_mantenimiento
+                        )}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Proveedor de Servicio:
+                        </span>{" "}
+                        {newEquipo.mantenimiento?.proveedores?.nombre ||
+                          "No disponible"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
                       <Wifi className="h-5 w-5 mr-2" /> Ubicación Actual
                     </h3>
                     <div className="space-y-2 bg-slate-50 p-4 rounded-md">
@@ -660,6 +702,70 @@ const HojaDeVida = () => {
                         </span>{" "}
                         {newEquipo?.estado_ubicacion?.estado_actual}
                       </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                      Documentos Relacionados
+                    </h3>
+                    <div className="space-y-2">
+                      {newEquipo.archivosequipo?.length > 0 ? (
+                        <ul className="space-y-2">
+                          {newEquipo.archivosequipo.map((archivo, index) => (
+                            <li
+                              key={index}
+                              className="flex items-center justify-between border rounded-md p-3 bg-white shadow-sm"
+                            >
+                              <div className="flex items-center gap-2 overflow-hidden">
+                                <span className="text-blue-600 font-medium truncate">
+                                  {archivo.nombre_archivo}
+                                </span>
+                              </div>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="slate-100"
+                                onClick={() => {
+                                  openFileInNewTab({
+                                    content: archivo.contenido,
+                                    tipo: archivo.tipo_archivo,
+                                    nombre: archivo.nombre_archivo,
+                                  });
+                                }}
+                              >
+                                <Eye className="h-5 w-5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="slate-100"
+                                onClick={() => {
+                                  downloadFile({
+                                    content: archivo.contenido,
+                                    tipo: archivo.tipo_archivo,
+                                    nombre: archivo.nombre_archivo,
+                                  });
+                                }}
+                              >
+                                <Download className="h-5 w-5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="slate-100"
+                              >
+                                <XCircle className="h-5 w-5" />
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-500 text-sm">
+                          No hay archivos adjuntos.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
