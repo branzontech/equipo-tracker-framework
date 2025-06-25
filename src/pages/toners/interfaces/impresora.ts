@@ -15,7 +15,5 @@ export interface Impresora {
   tipo: string;
 
   prestamos?: Prestamo;
-  traslado?: {
-    traslados: Traslado;
-  }[];
+  traslados?: Traslado;
 }
