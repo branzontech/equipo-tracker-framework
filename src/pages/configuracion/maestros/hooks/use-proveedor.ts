@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createProveedor, getAllProveedores, getProveedorByName } from "@/api/axios/proveedor.api";
+import {
+  createProveedor,
+  getAllProveedores,
+  getProveedorByName,
+} from "@/api/axios/proveedor.api";
 import { useEffect, useState } from "react";
 import { Proveedor } from "../interfaces/proveedor";
 import { toast } from "sonner";
@@ -19,7 +23,10 @@ export const useProveedor = () => {
     sitio_web: "",
   });
   const [nombreProvee, setNombreProveedor] = useState("");
+  const [proveedorServicio, setProveedorServicio] = useState("");
   const [sugerenciasProveedor, setSugerenciasProveedor] = useState<any[]>([]);
+  const [sugerenciasProveedorServicio, setSugerenciasProveedorServicio] =
+    useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,18 +43,24 @@ export const useProveedor = () => {
     fetchData();
   }, []);
 
-  const handleNombre = async (name: string) => {
-    setNombreProveedor(name);
+  const handleNombre = async (
+    name: string,
+    tipo: "proveedor" | "proveedor_servicio"
+  ) => {
+    if (tipo === "proveedor") setNombreProveedor(name);
+    else setProveedorServicio(name);
 
     if (name.length >= 3) {
       try {
         const res = await getProveedorByName(name);
-        setSugerenciasProveedor(res);
+        if (tipo === "proveedor") setSugerenciasProveedor(res);
+        else setSugerenciasProveedorServicio(res);
       } catch (err) {
-        console.error("Error buscando usuarios:", err);
+        console.error("Error buscando proveedores:", err);
       }
     } else {
-      setSugerenciasProveedor([]);
+      if (tipo === "proveedor") setSugerenciasProveedor([]);
+      else setSugerenciasProveedorServicio([]);
     }
   };
 
@@ -138,5 +151,9 @@ export const useProveedor = () => {
     sugerenciasProveedor,
     setSugerenciasProveedor,
     setNombreProveedor,
+    proveedorServicio,
+    setProveedorServicio,
+    sugerenciasProveedorServicio,
+    setSugerenciasProveedorServicio,
   };
 };
