@@ -16,8 +16,10 @@ export const create = async (req, res) => {
       adquisicion,
       administrativa,
       estado_ubicacion,
+      mantenimiento,
       tags,
       imagen,
+      archivosequipo,
     } = req.body;
 
     const equipo = await equipoService.create({
@@ -34,8 +36,10 @@ export const create = async (req, res) => {
       adquisicion,
       administrativa,
       estado_ubicacion,
+      mantenimiento,
       tags,
       imagen,
+      archivosequipo,
     });
 
     res.status(201).json({ success: true, data: equipo });
@@ -62,6 +66,9 @@ export const update = async (req, res) => {
       adquisicion,
       administrativa,
       estado_ubicacion,
+      archivosequipo,
+      mantenimiento,
+      imagen,
     } = req.body;
 
     const equipo = await equipoService.update({
@@ -80,6 +87,9 @@ export const update = async (req, res) => {
       adquisicion,
       administrativa,
       estado_ubicacion,
+      archivosequipo,
+      imagen,
+      mantenimiento,
     });
 
     res.status(200).json({ success: true, data: equipo });
@@ -123,7 +133,9 @@ export const delete_ = async (req, res) => {
 export const getTrazabilidadByEquipoId = async (req, res) => {
   try {
     const { id_equipo } = req.params;
-    const trazabilidad = await equipoService.getTrazabilidadByEquipoId(id_equipo);
+    const trazabilidad = await equipoService.getTrazabilidadByEquipoId(
+      id_equipo
+    );
     res.status(200).json(trazabilidad);
   } catch (error) {
     res.status(500).json({ error: error.message });
