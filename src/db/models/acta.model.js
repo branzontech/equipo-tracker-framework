@@ -86,6 +86,25 @@ export const ActaModel = {
                 },
               },
             },
+            traslado_perifericos_directos: {
+              include: {
+                perifericos: {
+                  include: {
+                    marcas: true,
+                  },
+                },
+              },
+            },
+            traslado_impresoras: {
+              include: {
+                impresoras: {
+                  include: {
+                    marcas: true,
+                    sucursales: true,
+                  },
+                },
+              },
+            },
             usuarios_traslados_responsable_salida_idTousuarios: {
               select: { nombre: true, firma: true },
             },
