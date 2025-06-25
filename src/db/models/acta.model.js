@@ -167,7 +167,30 @@ export const ActaModel = {
                     },
                     traslados_perifericos: {
                       include: {
-                        perifericos: true,
+                        perifericos: {
+                          include: {
+                            marcas: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                traslado_perifericos_directos: {
+                  include: {
+                    perifericos: {
+                      include: {
+                        marcas: true,
+                      },
+                    },
+                  },
+                },
+                traslado_impresoras: {
+                  include: {
+                    impresoras: {
+                      include: {
+                        marcas: true,
+                        sucursales: true,
                       },
                     },
                   },
