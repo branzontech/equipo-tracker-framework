@@ -1,3 +1,5 @@
+import { Sede } from "@/pages/configuracion/maestros/interfaces/sedes";
+
 export interface Traslado {
   id_traslado: number;
   acta_id: number;
@@ -15,14 +17,7 @@ export interface Traslado {
   sucursales: {
     id_sucursal: number;
     nombre: string;
-    sedes: {
-      id_sede: number;
-      nombre: string;
-      usuarios: {
-        id_usuario: number;
-        nombre: string;
-      }[];
-    }[];
+    sedes: Sede;
   };
   equipos: {
     id_equipo: number;
@@ -36,4 +31,12 @@ export interface Traslado {
     id_impresora: number;
     nombre: string;
   }[];
+  usuarios_traslados_responsable_salida_idTousuarios: {
+    id_usuario: number;
+    nombre: string;
+  };
+  usuarios_traslados_responsable_entrada_idTousuarios: {
+    id_usuario: number;
+    nombre: string;
+  }
 }
