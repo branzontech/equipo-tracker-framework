@@ -32,4 +32,5 @@ export interface EquipoEnMovimientoBase {
   equipo?: Equipo;
   periferico?: Perifericos;
   impresora?: Impresora;
+  origin?: "PRESTAMO" | "TRASLADO"
 }
