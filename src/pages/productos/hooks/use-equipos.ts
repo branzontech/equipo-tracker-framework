@@ -115,11 +115,34 @@ export const useEquipos = () => {
       tipo: "",
       equipo_asociado_id: 0,
       equipos: null,
+      prestamos: null,
+      traslados: null,
+      serial: "",
+      id_sede: 0,
+      sedes: null,
+      marca_id: 0,
+      marcas: null,
     },
     trazabilidad: {
       prestamo_equipos: [],
       traslados_equipos: [],
       mantenimientos: [],
+    },
+    mantenimiento: {
+      frecuencia_mantenimiento: "",
+      ultima_fecha_mantenimiento: "",
+      proveedor_servicio_id: 0,
+      proveedores: {
+        id_proveedor: 0,
+        tipo_proveedor: "",
+        nombre: "",
+        identificacion: "",
+        contacto: "",
+        telefono: "",
+        correo: "",
+        direccion: "",
+        sitio_web: "",
+      },
     },
   });
   const navigate = useNavigate();
@@ -137,6 +160,13 @@ export const useEquipos = () => {
   const [sugerenciasResponsable, setSugerenciasResponsable] = useState<any[]>(
     []
   );
+  const [archivosEquipo, setArchivosEquipo] = useState<
+    {
+      nombre_archivo: string;
+      tipo_archivo: string;
+      contenido: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -843,6 +873,23 @@ export const useEquipos = () => {
       vida_util_restante: "",
     };
 
+    const mantenimientoProcesada = {
+      frecuencia_mantenimiento: response.frecuencia_mantenimiento || "",
+      ultima_fecha_mantenimiento: response.ultima_fecha_mantenimiento || "",
+      proveedor_servicio_id: response.proveedor_servicio_id || 0,
+      proveedores: response.proveedores || {
+        id_proveedor: 0,
+        tipo_proveedor: "",
+        nombre: "",
+        identificacion: "",
+        contacto: "",
+        telefono: "",
+        correo: "",
+        direccion: "",
+        sitio_web: "",
+      },
+    };
+
     setNewEquipo({
       ...response,
       tags: tagsProcesadas,
@@ -852,6 +899,7 @@ export const useEquipos = () => {
       administrativa: administrativaProcesada,
       estado_ubicacion: estado_ubicacionProcesada,
       trazabilidad,
+      mantenimiento: mantenimientoProcesada,
     });
     setIsLoading(false);
     return response;
@@ -943,6 +991,45 @@ export const useEquipos = () => {
     }
   };
 
+  const handleArchivosChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(e.target.files || []);
+
+    const archivosConvertidos = await Promise.all(
+      files.map(
+        (file) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              resolve({
+                nombre_archivo: file.name,
+                tipo_archivo: file.type,
+                contenido: reader.result as string,
+              });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          })
+      )
+    );
+
+    const nuevosArchivos = archivosConvertidos as {
+      nombre_archivo: string;
+      tipo_archivo: string;
+      contenido: string;
+    }[];
+
+    setArchivosEquipo(nuevosArchivos);
+    setNewEquipo((prev) => ({
+      ...prev,
+      archivosequipo: nuevosArchivos.map((archivo) => ({
+        id_archivo: 0,
+        ...archivo,
+      })),
+    }));
+  };
+
   return {
     setResponsableEntregaInput,
     responsableEntregaInput,
@@ -1001,5 +1088,8 @@ export const useEquipos = () => {
     sedesConEquiposCount,
     setResponsableRecibeInput,
     responsableRecibeInput,
+    archivosEquipo,
+    setArchivosEquipo,
+    handleArchivosChange,
   };
 };
