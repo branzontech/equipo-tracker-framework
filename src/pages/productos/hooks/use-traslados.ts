@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Traslado } from "../interfaces/traslados";
 import { useGlobal } from "@/hooks/use-global";
-import { useSedes } from "@/pages/configuracion/maestros/hooks/use-sedes";
 import { useSucursales } from "@/pages/configuracion/maestros/hooks/use-sucursales";
 import { create } from "@/api/axios/traslado.api";
 import { toast } from "sonner";
@@ -20,10 +19,14 @@ export const useTraslados = () => {
     responsable_entrada_id: 0,
     sucursal_destino_id: 0,
     equipos: [],
+    sucursales: null,
+    usuarios: null,
+    tipo: "",
+    perifericos_directos: [],
+    impresoras: [],
   });
   const [regionalSeleccionado, setRegionalSeleccionado] = useState("");
   const [sedesSelect, setSedesSelect] = useState<number | null>(null);
-  const { sedes } = useSedes();
   const { sucursales } = useSucursales();
   const { buscarEquipo, saveSign_ } = useGlobal();
   const navigate = useNavigate();
@@ -46,11 +49,7 @@ export const useTraslados = () => {
     }
   };
 
-  const sedesFiltradas = sedes.filter(
-    (sede) => sede.regional.toLowerCase() === regionalSeleccionado.toLowerCase()
-  );
-
-  const sucursalesFiltradas = sedesSelect
+    const sucursalesFiltradas = sedesSelect
     ? sucursales.filter(
         (sucursal) => Number(sucursal.sedes?.id_sede) === Number(sedesSelect)
       )
@@ -82,12 +81,12 @@ export const useTraslados = () => {
       return;
     }
 
-    if (!traslado.equipos.length) {
-      toast.error("Debe agregar al menos un equipo", {
-        icon: icons.error
-      });
-      return;
-    }
+    // if (!traslado.equipos.length) {
+    //   toast.error("Debe agregar al menos un equipo", {
+    //     icon: icons.error
+    //   });
+    //   return;
+    // }
 
     if (!traslado.observaciones) {
       toast.error("Debe ingresar observaciones", {
@@ -142,7 +141,6 @@ export const useTraslados = () => {
     setNewTraslado,
     setTraslados,
     buscarEquipo: buscarEquipotraslados,
-    sedesFiltradas,
     regionalSeleccionado,
     setRegionalSeleccionado,
     sucursalesFiltradas,
