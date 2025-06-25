@@ -478,6 +478,32 @@ export const useActa = () => {
             });
           }
         });
+
+        devolucion.traslados.traslado_perifericos_directos?.forEach((item) => {
+          const periferico = item.perifericos;
+          if (periferico) {
+            equipos.push({
+              serial: periferico.serial || "-",
+              nombre: periferico.nombre || "-",
+              marca: periferico.marcas?.nombre || "-",
+              activoFijo: periferico.tipo || "-",
+              accesorios: "-",
+            });
+          }
+        });
+
+        devolucion.traslados.traslado_impresoras?.forEach((item) => {
+          const impresora = item.impresoras;
+          if (impresora) {
+            equipos.push({
+              serial: impresora.serial || "-",
+              nombre: impresora.nombre || "-",
+              marca: impresora.marcas?.nombre || "-",
+              activoFijo: impresora.tipo || "-",
+              accesorios: "-",
+            });
+          }
+        });
       }
     }
 
