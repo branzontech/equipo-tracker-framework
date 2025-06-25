@@ -28,6 +28,14 @@ export const equipoModel = {
                 "base64"
               )
             : null,
+          frecuencia_mantenimiento: data.mantenimiento.frecuencia_mantenimiento,
+          ultima_fecha_mantenimiento:
+            data.mantenimiento.ultima_fecha_mantenimiento,
+          proveedores: {
+            connect: {
+              id_proveedor: data.mantenimiento.proveedor_servicio_id,
+            },
+          },
 
           // Relaciones con otras tablas (FKs)
           categorias: {
@@ -118,6 +126,19 @@ export const equipoModel = {
               vida_util_restante: data.administrativa.vida_util_restante,
             },
           },
+
+          archivosequipo: {
+            create: data.archivosequipo.map((archivo) => ({
+              nombre_archivo: archivo.nombre_archivo,
+              tipo_archivo: archivo.tipo_archivo,
+              contenido: Buffer.from(
+                archivo.contenido.includes(",")
+                  ? archivo.contenido.split(",")[1]
+                  : archivo.contenido,
+                "base64"
+              ),
+            })),
+          },
         },
         include: {
           categorias: true,
@@ -173,6 +194,14 @@ export const equipoModel = {
                 "base64"
               )
             : null,
+          frecuencia_mantenimiento: data.mantenimiento.frecuencia_mantenimiento,
+          ultima_fecha_mantenimiento:
+            data.mantenimiento.ultima_fecha_mantenimiento,
+          proveedores: {
+            connect: {
+              id_proveedor: data.mantenimiento.proveedor_servicio_id,
+            },
+          },
 
           // Relaciones con FK
           categorias: {
@@ -370,6 +399,7 @@ export const equipoModel = {
     const equipo = await prisma.equipos.findUnique({
       where: { nro_serie },
       include: {
+        proveedores: true,
         marcas: true,
         categorias: true,
         especificaciones: true,
@@ -414,12 +444,21 @@ export const equipoModel = {
             },
           },
         },
+        archivosequipo: true,
       },
     });
 
     if (!equipo) {
       throw new Error("No se encontró el equipo.");
     }
+
+    const archivosequipo = equipo.archivosequipo?.map((archivo) => ({
+      ...archivo,
+      contenido: `data:${archivo.tipo_archivo};base64,${Buffer.from(
+        archivo.contenido
+      ).toString("base64")}`,
+    }));
+
     const imagen = equipo.imagen;
     const isBase64 =
       typeof imagen === "string" && imagen.startsWith("data:image/png;base64,");
@@ -431,6 +470,7 @@ export const equipoModel = {
           ? imagen
           : `data:image/png;base64,${Buffer.from(imagen).toString("base64")}`
         : null,
+      archivosequipo: archivosequipo,
     };
 
     return equipoWithImageBase64;
@@ -476,13 +516,21 @@ export const equipoModel = {
               traslados: {
                 include: {
                   actas: true,
+                  usuarios_traslados_responsable_salida_idTousuarios: {
+                    select: { nombre: true },
+                  },
                   sucursales: {
                     include: {
                       sedes: {
                         include: {
                           usuario_sede: {
-                            select: {
-                              id_usuario: true,
+                            include: {
+                              usuarios: {
+                                select: {
+                                  id_usuario: true,
+                                  nombre: true,
+                                },
+                              },
                             },
                           },
                         },
