@@ -364,6 +364,35 @@ export const useActa = () => {
             marca: equipo.marcas?.nombre || "-",
             activoFijo: equipo.tipo_activo || "-",
             accesorios: perifericos || "-",
+            esPerifericoDirecto: false,
+          });
+        }
+      });
+
+      traslado?.traslado_perifericos_directos.forEach((item) => {
+        const periferico = item.perifericos;
+        if (periferico) {
+          equipos.push({
+            serial: periferico.serial || "-",
+            nombre: periferico.nombre || "-",
+            marca: periferico.marcas?.nombre || "-",
+            tipo: periferico.tipo || "-",
+            accesorios: "-",
+            esPerifericoDirecto: true,
+          });
+        }
+      });
+
+      traslado?.traslado_impresoras.forEach((item) => {
+        const impresora = item.impresoras;
+        if (impresora) {
+          equipos.push({
+            serial: impresora.serial || "-",
+            nombre: impresora.nombre || "-",
+            marca: impresora.marcas?.nombre || "-",
+            tipo: impresora.tipo || "-",
+            accesorios: "-",
+            esPerifericoDirecto: false,
           });
         }
       });
