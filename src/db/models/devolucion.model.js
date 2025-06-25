@@ -157,11 +157,63 @@ export const devolucionModel = {
       },
     });
 
+    const perifericosTraslado =
+      await prisma.traslado_perifericos_directos.findMany({
+        where: {
+          perifericos: {
+            estado: "En Traslado",
+          },
+        },
+        include: {
+          perifericos: true,
+          traslados: {
+            include: {
+              actas: true,
+              usuarios_traslados_responsable_entrada_idTousuarios: {
+                select: { nombre: true },
+              },
+              usuarios_traslados_responsable_salida_idTousuarios: {
+                select: { nombre: true },
+              },
+              sucursales: {
+                include: {
+                  sedes: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+    const impresorasTraslado = await prisma.traslado_impresoras.findMany({
+      where: {
+        impresoras: {
+          estado: "En Traslado",
+        },
+      },
+      include: {
+        impresoras: true,
+        traslados: {
+          include: {
+            actas: true,
+            usuarios_traslados_responsable_entrada_idTousuarios: {
+              select: { nombre: true },
+            },
+            usuarios_traslados_responsable_salida_idTousuarios: {
+              select: { nombre: true },
+            },
+          },
+        },
+      },  
+    });
+
     return {
       prestamos: equiposPrestamo,
       prestamos_directos: perifericosDirectosPrestamo,
       impresoras: impresorasPrestamo,
       traslados: equiposTraslado,
+      traslados_directos: perifericosTraslado,
+      traslados_impresoras: impresorasTraslado,
     };
   },
   create: async (devolucion) => {
