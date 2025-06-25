@@ -336,6 +336,73 @@ export const useGlobal = () => {
     }
   };
 
+  const openFileInNewTab = (archivo: {
+    content: string;
+    tipo: string;
+    nombre: string;
+  }) => {
+    if (!archivo?.content) return;
+
+    // Si viene como DataURL (ej: data:application/pdf;base64,...)
+    const base64Data = archivo.content.includes(",")
+      ? archivo.content.split(",")[1]
+      : archivo.content;
+
+    const byteCharacters = atob(base64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+      const slice = byteCharacters.slice(offset, offset + 1024);
+      const byteNumbers = new Array(slice.length)
+        .fill(0)
+        .map((_, i) => slice.charCodeAt(i));
+      byteArrays.push(new Uint8Array(byteNumbers));
+    }
+
+    const blob = new Blob(byteArrays, { type: archivo.tipo });
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, "_blank");
+
+    // Limpieza del objeto URL tras un tiempo
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
+  };
+
+  // Function to download a file
+  const downloadFile = (archivo: {
+    content: string;
+    tipo: string;
+    nombre: string;
+  }) => {
+    // If the file has no content, exit the function
+    if (!archivo?.content) return;
+
+    const base64Data = archivo.content.includes(",")
+      ? archivo.content.split(",")[1]
+      : archivo.content;
+
+    const byteCharacters = atob(base64Data);
+    const byteArrays = [];
+
+    // Convert the base64 string into byte arrays
+    for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+      const slice = byteCharacters.slice(offset, offset + 1024);
+      const byteNumbers = new Array(slice.length)
+        .fill(0)
+        .map((_, i) => slice.charCodeAt(i));
+      byteArrays.push(new Uint8Array(byteNumbers));
+    }
+
+    // Create a Blob from the byte arrays
+    const blob = new Blob(byteArrays, { type: archivo?.tipo });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = archivo?.nombre; // Set the file name for the download
+    link.click(); // Trigger the download by simulating a click on the link
+  };
+
   return {
     sedesCount,
     userCount,
@@ -359,6 +426,8 @@ export const useGlobal = () => {
     impresoras,
     setImpresoras,
     buscarImpresora,
+    openFileInNewTab,
+    downloadFile,
   };
 };
 
