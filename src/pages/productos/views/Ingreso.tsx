@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Upload } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  FileText,
+  Paperclip,
+  Upload,
+  X,
+} from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -58,6 +64,8 @@ const IngresoProducto = () => {
     handleResponsable,
     sugerenciasResponsable,
     setSugerenciasResponsable,
+    archivosEquipo,
+    handleArchivosChange,
   } = useEquipos();
   const {
     handleNombreInput,
@@ -72,6 +80,10 @@ const IngresoProducto = () => {
     sugerenciasProveedor,
     setNombreProveedor,
     setSugerenciasProveedor,
+    proveedorServicio,
+    setProveedorServicio,
+    sugerenciasProveedorServicio,
+    setSugerenciasProveedorServicio,
   } = useProveedor();
   const { marcas } = useMarcas();
   const { categoria } = useCategoria();
@@ -119,16 +131,20 @@ const IngresoProducto = () => {
   ]);
 
   const handleSelect = (
-    tipo: "usuario" | "responsable" | "proveedor",
+    tipo: "usuario" | "responsable" | "proveedor" | "proveedor_servicio",
     data: any
   ) => {
     const nombre = data.nombre;
-    const id = tipo === "proveedor" ? data.id_proveedor : data.id_usuario;
+    const id =
+      tipo === "proveedor" || tipo === "proveedor_servicio"
+        ? data.id_proveedor
+        : data.id_usuario;
 
     // Inputs
     if (tipo === "usuario") setNombreUser(nombre);
     if (tipo === "responsable") setResponsableEntregaInput(nombre);
     if (tipo === "proveedor") setNombreProveedor(nombre);
+    if (tipo === "proveedor_servicio") setProveedorServicio(nombre);
 
     setResponsableRecibeInput({ id: id.toString(), name: nombre });
 
@@ -153,12 +169,19 @@ const IngresoProducto = () => {
           proveedor_id: id,
         },
       }),
+      ...(tipo === "proveedor_servicio" && {
+        mantenimiento: {
+          ...prev.mantenimiento,
+          proveedor_servicio_id: id,
+        },
+      }),
     }));
 
     // Limpiar sugerencias
     if (tipo === "usuario") setSugerencias([]);
     if (tipo === "responsable") setSugerenciasResponsable([]);
     if (tipo === "proveedor") setSugerenciasProveedor([]);
+    if (tipo === "proveedor_servicio") setSugerenciasProveedorServicio([]);
   };
 
   return (
@@ -621,7 +644,9 @@ const IngresoProducto = () => {
                         label="Proveedor"
                         placeholder="Ingrese el nombre del proveedor"
                         value={nombreProvee}
-                        onInputChange={handleNombre}
+                        onInputChange={(name) =>
+                          handleNombre(name, "proveedor")
+                        }
                         suggestions={sugerenciasProveedor}
                         onSelect={(data) => handleSelect("proveedor", data)}
                         getKey={(u) => u.id_proveedor}
@@ -1029,7 +1054,7 @@ const IngresoProducto = () => {
               </Card>
 
               {/* Mantenimiento */}
-              {/* <Card className="max-w-full">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Mantenimiento
@@ -1037,186 +1062,220 @@ const IngresoProducto = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="frecuenciaMantenimiento"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Frecuencia de Mantenimiento</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar frecuencia" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="mensual">Mensual</SelectItem>
-                              <SelectItem value="trimestral">
-                                Trimestral
-                              </SelectItem>
-                              <SelectItem value="semestral">
-                                Semestral
-                              </SelectItem>
-                              <SelectItem value="anual">Anual</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-2">
+                      <Label>Frecuencia de Mantenimiento</Label>
+                      <Select
+                        value={newEquipo.mantenimiento.frecuencia_mantenimiento}
+                        onValueChange={(value) =>
+                          setNewEquipo((prev) => ({
+                            ...prev,
+                            mantenimiento: {
+                              ...prev.mantenimiento,
+                              frecuencia_mantenimiento: value,
+                            },
+                          }))
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar frecuencia" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="w-full">
+                          <SelectItem value="Diariamente">
+                            Diariamente
+                          </SelectItem>
+                          <SelectItem value="Semanalmente">
+                            Semanalmente
+                          </SelectItem>
+                          <SelectItem value="Mensualmente">
+                            Mensualmente
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="ultimaFechaMantenimiento"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Última Fecha de Mantenimiento</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "P")
-                                  ) : (
-                                    <span>Seleccionar fecha</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date > new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="proveedorServicio"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Proveedor de Servicio</FormLabel>
+                    <div className="space-y-2">
+                      <Label>Fecha de Último Mantenimiento</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <Input
-                              placeholder="Nombre del proveedor de servicio"
-                              {...field}
-                            />
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal"
+                              )}
+                            >
+                              {newEquipo.mantenimiento
+                                .ultima_fecha_mantenimiento ? (
+                                format(
+                                  new Date(
+                                    newEquipo.mantenimiento.ultima_fecha_mantenimiento
+                                  ),
+                                  "P"
+                                )
+                              ) : (
+                                <span>Seleccionar fecha</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              newEquipo.mantenimiento.ultima_fecha_mantenimiento
+                                ? new Date(
+                                    newEquipo.mantenimiento.ultima_fecha_mantenimiento
+                                  )
+                                : undefined
+                            }
+                            onSelect={(date) =>
+                              setNewEquipo((prev) => ({
+                                ...prev,
+                                mantenimiento: {
+                                  ...prev.mantenimiento,
+                                  ultima_fecha_mantenimiento: date
+                                    ? date.toISOString()
+                                    : "",
+                                },
+                              }))
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="space-y-2">
+                      <SearchSelect
+                        label="Proveedor de Servicio"
+                        placeholder="Ingrese el nombre del proveedor"
+                        value={proveedorServicio}
+                        onInputChange={(name) =>
+                          handleNombre(name, "proveedor_servicio")
+                        }
+                        suggestions={sugerenciasProveedorServicio}
+                        onSelect={(data) =>
+                          handleSelect("proveedor_servicio", data)
+                        }
+                        getKey={(u) => u.id_proveedor}
+                        getLabel={(u) => u.nombre}
+                      />
+                    </div>
                   </div>
                 </CardContent>
-              </Card> */}
+              </Card>
 
-              {/* Documentación Relacionada */}
-              {/* <Card className="max-w-full">
+              <Card className="max-w-full">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-[#040d50]">
                     Documentación Relacionada
                   </CardTitle>
                 </CardHeader>
+
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="manualUsuario"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Manual de Usuario</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              {...field}
-                              value={field.value?.filename}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <div className="space-y-4">
+                    <div className="border border-dashed border-gray-300 rounded-xl p-6 bg-slate-50 relative">
+                      <div className="flex flex-col items-center justify-center gap-3 text-center">
+                        <Paperclip className="h-8 w-8 text-slate-400" />
+                        <p className="text-sm text-slate-600">
+                          Arrastra y suelta archivos aquí o
+                          <label
+                            htmlFor="archivosEquipo"
+                            className="text-blue-600 cursor-pointer font-semibold ml-1"
+                          >
+                            haz clic para seleccionarlos
+                          </label>
+                        </p>
 
-                    <FormField
-                      control={form.control}
-                      name="manualServicio"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Manual de Servicio</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              {...field}
-                              value={field.value?.filename}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        <Input
+                          id="archivosEquipo"
+                          type="file"
+                          multiple
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const files = Array.from(e.target.files || []);
 
-                    <FormField
-                      control={form.control}
-                      name="certificados"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Certificados</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              {...field}
-                              value={field.value?.filename}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            const archivosConvertidos = await Promise.all(
+                              files.map(
+                                (file) =>
+                                  new Promise((resolve, reject) => {
+                                    const reader = new FileReader();
+                                    reader.onload = () => {
+                                      resolve({
+                                        nombre_archivo: file.name,
+                                        tipo_archivo: file.type,
+                                        contenido: reader.result as string,
+                                      });
+                                    };
+                                    reader.onerror = reject;
+                                    reader.readAsDataURL(file);
+                                  })
+                              )
+                            );
 
-                    <FormField
-                      control={form.control}
-                      name="polizasSeguro"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pólizas de Seguro</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              {...field}
-                              value={field.value?.filename}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            const nuevosArchivos = archivosConvertidos as {
+                              nombre_archivo: string;
+                              tipo_archivo: string;
+                              contenido: string;
+                            }[];
+
+                            setNewEquipo((prev) => ({
+                              ...prev,
+                              archivosequipo: [
+                                ...(prev.archivosequipo || []),
+                                ...nuevosArchivos,
+                              ],
+                            }));
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {newEquipo.archivosequipo?.length > 0 && (
+                      <div className="space-y-2">
+                        <Label className="text-sm">
+                          Archivos seleccionados
+                        </Label>
+
+                        {newEquipo.archivosequipo.map((file, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between border rounded-md p-3 bg-white"
+                          >
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <FileText className="h-4 w-4 text-blue-500" />
+                              <span className="text-sm truncate">
+                                {file.nombre_archivo}
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => {
+                                const nuevos = newEquipo.archivosequipo!.filter(
+                                  (_, i) => i !== index
+                                );
+                                setNewEquipo((prev) => ({
+                                  ...prev,
+                                  archivosequipo: nuevos,
+                                }));
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
-              </Card> */}
+              </Card>
 
               {/* seguridad */}
               <Card className="max-w-full">
