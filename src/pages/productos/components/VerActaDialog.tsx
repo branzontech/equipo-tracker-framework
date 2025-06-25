@@ -176,7 +176,7 @@ export function VerActaDialog({
                   <div>
                     <span className="text-sm text-gray-500">Regional:</span>
                     <p className="font-medium">
-                      {acta.traslados[0].sucursales.sedes?.regional}
+                      {acta.traslados[0].sucursales.sedes?.nombre}
                     </p>
                   </div>
                   <div>
