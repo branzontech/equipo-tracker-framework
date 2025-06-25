@@ -70,11 +70,7 @@ export const ActaPrestamo = ({ data }) => {
 
   const prestamo = data.prestamos?.[0];
   const equiposConAccesorios = formatEquiposYPerifericos(prestamo);
-
-  const mostrarColumnaAccesorios = equiposConAccesorios.some(
-    (e) => !e.esPerifericoDirecto
-  );
-
+  
   const mostrarNombreEnVezDeAccesorios = equiposConAccesorios.every(
     (e) => e.esPerifericoDirecto || e.tipo === "Impresora"
   );
