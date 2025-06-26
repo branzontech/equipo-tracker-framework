@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Toner } from "../interfaces/toners";
-import { createToner, getToners } from "@/api/axios/toners.api";
+import { createToner, getTonerById, getToners, updateToner } from "@/api/axios/toners.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 
@@ -10,10 +10,12 @@ export const useToners = () => {
     id_toner: 0,
     modelo: "",
     color: "",
+    estado: "",
     cantidad: 0,
     stock_actual: 0,
     stock_minimo_alerta: 0,
     impresoras: [],
+    toner_impresora: [],
   });
 
   useEffect(() => {
@@ -57,14 +59,13 @@ export const useToners = () => {
       });
       return;
     }
-    
+
     if (!toner.stock_actual) {
       toast.error("Debe ingresar un stock actual", {
         icon: icons.error,
       });
       return;
     }
-
 
     if (!toner.cantidad) {
       toast.error("Debe ingresar una cantidad", {
@@ -91,11 +92,43 @@ export const useToners = () => {
     }
   };
 
+  const getById = async (id: number) => {
+    try {
+      const response = await getTonerById(id);
+      setNewToner(response);
+    } catch (error) {
+      toast.error(error.message, {
+        icon: icons.error,
+      });
+    }
+  };
+
+  const update = async (id: number, toner: Toner) => {
+    try {
+      const response = await updateToner(id, toner);
+      if (response.success) {
+        toast.success(response.message || "Toner actualizado exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message, {
+        icon: icons.error,
+      });
+    }
+  };
+
   return {
     toner,
     setToner,
     newToner,
     setNewToner,
     create,
+    getById,
+    update,
   };
 };
