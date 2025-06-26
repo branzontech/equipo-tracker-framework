@@ -14,6 +14,7 @@ export const tonerImpresoraModel = {
             cantidad: true,
             stock_actual: true,
             stock_minimo_alerta: true,
+            estado: true,
           },
         },
         impresoras: {
