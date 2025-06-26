@@ -5,5 +5,5 @@ export interface TonerImpresora {
   toner_id: number;
   impresora_id: number;
   toner: Toner;
-  impresora: Impresora;
+  impresoras: Impresora;
 }
