@@ -3,7 +3,7 @@ import { tonersService } from "../services/toners.service.js";
 export const getAll = async (req, res) => {
   try {
     const toners = await tonersService.getAll();
-    res.status(200).json({ toners });
+    res.status(200).json(toners);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -11,8 +11,7 @@ export const getAll = async (req, res) => {
 
 export const getById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const toner = await tonersService.getById(id);
+    const toner = await tonersService.getById(req.params.id);
     res.status(200).json(toner);
   } catch (error) {
     res.status(500).json({ error: error.message });
