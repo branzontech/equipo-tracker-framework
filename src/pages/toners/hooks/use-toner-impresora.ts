@@ -72,6 +72,7 @@ const useTonerImpresora = () => {
           modeloImpresora: item.impresoras.modelo,
           sedes: item.impresoras.sucursales.sedes.nombre,
           sucursal: item.impresoras.sucursales.nombre,
+          estado: item.toner.estado,
         }));
 
         setNormalizedData(normalized);
@@ -83,6 +84,8 @@ const useTonerImpresora = () => {
     getAllTonerImpresora();
   }, []);
 
+  console.log(normalizedData);
+
   const [visibleColumns, setVisibleColumns] = useState({
     modelo: true,
     modeloImpresora: true,
@@ -92,6 +95,7 @@ const useTonerImpresora = () => {
     sucursal: true,
     sedes: true,
     cantidad: true,
+    estado: true,
   });
 
   const filteredData = normalizedData.filter((item) => {
