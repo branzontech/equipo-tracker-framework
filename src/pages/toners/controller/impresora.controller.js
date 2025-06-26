@@ -12,7 +12,7 @@ export const getAll = async (req, res) => {
 export const getById = async (req, res) => {
   try {
     const impresora = await impresoraService.getById(req.params.id);
-    res.status(200).json({ impresora });
+    res.status(200).json(impresora);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener la impresora" });
   }
@@ -43,7 +43,7 @@ export const update = async (req, res) => {
   try {
     const impresora = req.body;
     const impresoraUpdated = await impresoraService.update(impresora);
-    res.status(200).json(impresoraUpdated);
+    res.status(200).json({ impresoraUpdated, success: true });
   } catch (error) {
     res.status(500).json({ error: "Error al actualizar la impresora" });
   }
@@ -53,8 +53,8 @@ export const delete_ = async (req, res) => {
   try {
     const id = req.params.id;
     const deletedImpresora = await impresoraService.delete(id);
-    res.status(200).json(deletedImpresora);
+    res.status(200).json({ deletedImpresora, success: true });
   } catch (error) {
-    res.status(500).json({ error: "Error al eliminar la impresora" });
+    res.status(500).json({ message: error.message });
   }
 };
