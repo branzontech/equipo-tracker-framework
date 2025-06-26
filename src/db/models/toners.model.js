@@ -15,15 +15,22 @@ export const tonersModel = {
     return toner;
   },
   async getById(id) {
+    const tonerId = Number(id);
     const toner = await prisma.toner.findUnique({
       where: {
-        id,
+        id_toner: tonerId,
+      },
+      include: {
+        toner_impresora: {
+          include: {
+            impresoras: true,
+          },
+        },
       },
     });
     return toner;
   },
   async create(toner) {
-    console.log(toner);
     const tonerCreated = await prisma.toner.create({
       data: {
         modelo: toner.modelo,
@@ -47,13 +54,43 @@ export const tonersModel = {
     return tonerCreated;
   },
   async update(toner) {
-    const tonerUpdated = await prisma.toner.update({
-      where: {
-        id: toner.id,
-      },
-      data: toner,
-    });
-    return tonerUpdated;
+    console.log(toner);
+
+    try {
+      const tonerId = toner.id_toner;
+      const nuevaImpresoraId = toner.toner_impresora[0]?.impresoras?.id_impresora;
+
+      // 1. Eliminar relaciones anteriores del toner
+      await prisma.toner_impresora.deleteMany({
+        where: {
+          toner_id: tonerId,
+        },
+      });
+
+      // 2. Actualizar el toner e insertar la nueva relación
+      const tonerUpdated = await prisma.toner.update({
+        where: {
+          id_toner: tonerId,
+        },
+        data: {
+          modelo: toner.modelo,
+          color: toner.color,
+          cantidad: toner.cantidad,
+          stock_actual: toner.stock_actual,
+          stock_minimo_alerta: toner.stock_minimo_alerta,
+          toner_impresora: {
+            create: {
+              impresora_id: nuevaImpresoraId,
+            },
+          },
+        },
+      });
+
+      return tonerUpdated;
+    } catch (error) {
+      console.error("Error al actualizar el toner:", error);
+      throw new Error("Error al actualizar el toner: " + error.message);
+    }
   },
   async delete(id) {
     const tonerDeleted = await prisma.toner.delete({
