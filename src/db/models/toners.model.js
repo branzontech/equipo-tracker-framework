@@ -10,6 +10,7 @@ export const tonersModel = {
         cantidad: true,
         stock_actual: true,
         stock_minimo_alerta: true,
+        estado: true,
       },
     });
     return toner;
@@ -54,11 +55,9 @@ export const tonersModel = {
     return tonerCreated;
   },
   async update(toner) {
-    console.log(toner);
-
     try {
       const tonerId = toner.id_toner;
-      const nuevaImpresoraId = toner.toner_impresora[0]?.impresoras?.id_impresora;
+      const nuevaImpresoraId = toner.toner_impresora[0]?.impresora_id;
 
       // 1. Eliminar relaciones anteriores del toner
       await prisma.toner_impresora.deleteMany({
@@ -73,6 +72,7 @@ export const tonersModel = {
           id_toner: tonerId,
         },
         data: {
+          estado: toner.estado,
           modelo: toner.modelo,
           color: toner.color,
           cantidad: toner.cantidad,
@@ -93,11 +93,20 @@ export const tonersModel = {
     }
   },
   async delete(id) {
-    const tonerDeleted = await prisma.toner.delete({
-      where: {
-        id,
-      },
-    });
-    return tonerDeleted;
+    const tonerId = Number(id);
+    try {
+      const tonerDeleted = await prisma.toner.update({
+        where: {
+          id_toner: tonerId,
+        },
+        data: {
+          estado: "Fuera de servicio",
+        },
+      });
+      return tonerDeleted;
+    } catch (error) {
+      console.error("Error al eliminar el toner:", error);
+      throw new Error("Error al eliminar el toner: " + error.message);
+    }
   },
 };
