@@ -196,6 +196,7 @@ export const menuItems = [
     icon: Printer,
     path: "/toners",
     submenu: [
+      { title: "Impresoras", icon: ArrowDownToLine, path: "/impresoras/ingreso" },
       { title: "Ingreso", icon: ArrowDownToLine, path: "/toners/ingreso" },
       { title: "Salida", icon: ArrowUpFromLine, path: "/toners/salida" },
       { title: "Existencia", icon: Database, path: "/toners/existencia" },
