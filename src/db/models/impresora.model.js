@@ -131,12 +131,6 @@ export const impresoraModel = {
         estado: "Fuera de servicio",
       },
     });
-
-    await prisma.toner_impresora.updateMany({
-      where: {
-        impresora_id: ImpreId,
-      },
-    });
     return impresoraDeleted;
   },
 };
