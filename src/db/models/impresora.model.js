@@ -10,16 +10,15 @@ export const impresoraModel = {
         serial: true,
         tipo: true,
         estado: true,
+        marcas: true,
         sucursales: {
-          select: {
-            id_sucursal: true,
-            nombre: true,
-          },
-        },
-        marcas: {
-          select: {
-            id_marca: true,
-            nombre: true,
+          include: {
+            sedes: {
+              select: {
+                id_sede: true,
+                nombre: true,
+              },
+            },
           },
         },
       },
@@ -27,14 +26,18 @@ export const impresoraModel = {
     return impresoras;
   },
   async getById(id) {
+    const ImpreId = Number(id);
     const impresora = await prisma.impresoras.findUnique({
       where: {
-        id,
+        id_impresora: ImpreId,
+      },
+      include: {
+        marcas: true,
+        sucursales: true,
       },
     });
     return impresora;
   },
-
   findBySerial: async (serial) => {
     const impresora = await prisma.impresoras.findFirst({
       where: {
@@ -66,7 +69,6 @@ export const impresoraModel = {
     });
     return impresora;
   },
-
   async create(impresora) {
     const impresoraCreated = await prisma.impresoras.create({
       data: {
@@ -90,18 +92,49 @@ export const impresoraModel = {
     return impresoraCreated;
   },
   async update(impresora) {
-    const impresoraUpdated = await prisma.impresoras.update({
-      where: {
-        id: impresora.id,
-      },
-      data: impresora,
-    });
-    return impresoraUpdated;
+    try {
+      const impresoraUpdated = await prisma.impresoras.update({
+        where: {
+          id_impresora: impresora.id_impresora,
+        },
+        data: {
+          nombre: impresora.nombre,
+          modelo: impresora.modelo,
+          tipo: impresora.tipo,
+          serial: impresora.serial,
+          estado: impresora.estado,
+          marcas: {
+            connect: {
+              id_marca: impresora.marca_id,
+            },
+          },
+          sucursales: {
+            connect: {
+              id_sucursal: impresora.sucursal_id,
+            },
+          },
+        },
+      });
+      return impresoraUpdated;
+    } catch (error) {
+      console.error("Error al actualizar la impresora:", error);
+      throw new Error("Error al actualizar la impresora: " + error.message);
+    }
   },
   async delete(id) {
-    const impresoraDeleted = await prisma.impresoras.delete({
+    const ImpreId = Number(id);
+    const impresoraDeleted = await prisma.impresoras.update({
       where: {
-        id,
+        id_impresora: ImpreId,
+      },
+      data: {
+        estado: "Fuera de servicio",
+      },
+    });
+
+    await prisma.toner_impresora.updateMany({
+      where: {
+        impresora_id: ImpreId,
       },
     });
     return impresoraDeleted;
