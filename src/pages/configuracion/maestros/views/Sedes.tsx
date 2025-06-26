@@ -46,8 +46,6 @@ const Sedes = () => {
   const { StatusBadge } = useGlobal();
   const { estados } = useEstado();
 
-  console.log("newSede", sedes);
-
   const usuariosDisponibles = users.filter(
     (user) => (user.usuario_sede?.length ?? 0) === 0
   );
@@ -231,7 +229,6 @@ const Sedes = () => {
                           size="icon"
                           className="hover:bg-slate-100"
                           onClick={() => {
-                            console.log("handleOpenEditModal", sede.id_sede);
                             handleOpenEditModal(sede.id_sede);
                           }}
                         >
