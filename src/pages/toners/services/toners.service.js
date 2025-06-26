@@ -13,8 +13,8 @@ export default class TonersService {
     return tonersModel.create(toner);
   }
 
-  async update(id, toner) {
-    return tonersModel.update(id, toner);
+  async update(toner) {
+    return tonersModel.update(toner);
   }
 
   async delete(id) {
