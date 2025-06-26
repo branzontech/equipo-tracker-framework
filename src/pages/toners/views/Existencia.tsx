@@ -45,6 +45,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import useTonerImpresora from "../hooks/use-toner-impresora";
 import UpdateToner from "./EditToner";
+import { useToners } from "../hooks/use-toners";
+import { useGlobal } from "@/hooks/use-global";
 
 const ExistenciaToners = () => {
   const {
@@ -73,6 +75,8 @@ const ExistenciaToners = () => {
     selectedTonerId,
     handleOpenEditModal,
   } = useTonerImpresora();
+  const { deleteTonerById } = useToners();
+  const { StatusBadge } = useGlobal();
 
   return (
     <>
@@ -194,10 +198,13 @@ const ExistenciaToners = () => {
                       ([key, visible]) =>
                         visible && (
                           <TableCell key={key}>
-                            {key === "stock" ? (
+                            {key === "estado" ? (
+                              <StatusBadge status={item[key]} />
+                            ) : key === "stock_actual" ? (
                               <div className="flex items-center gap-2">
                                 {item[key]}
-                                {item.stock <= item.alerta && (
+                                {item.stock_actual <=
+                                  item.stock_minimo_alerta && (
                                   <AlertTriangle className="h-4 w-4 text-yellow-500" />
                                 )}
                               </div>
@@ -218,7 +225,11 @@ const ExistenciaToners = () => {
                       >
                         <PencilIcon className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteTonerById(item.id)}
+                      >
                         <XCircle className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -286,11 +297,13 @@ const ExistenciaToners = () => {
         </div>
       </div>
 
-      <UpdateToner
-        open={showEditModal}
-        onOpenChange={setShowEditModal}
-        id={selectedTonerId}
-      />
+      {showEditModal && selectedTonerId && (
+        <UpdateToner
+          open={showEditModal}
+          onOpenChange={setShowEditModal}
+          id={selectedTonerId}
+        />
+      )}
     </>
   );
 };
