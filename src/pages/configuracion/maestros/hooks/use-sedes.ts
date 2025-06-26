@@ -171,7 +171,6 @@ export const useSedes = () => {
   };
 
   const handleOpenEditModal = (id: number) => {
-    console.log("handleOpenEditModal", id);
     setSelectedSedeId(id);
     setShowEditModal(true);
   };
