@@ -22,6 +22,10 @@ export const updateToner = async (id: number, toner: Toner) => {
 };
 
 export const deleteToner = async (id: number) => {
-  const response = await api.delete(`/toners/delete/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(`/toners/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
 };
