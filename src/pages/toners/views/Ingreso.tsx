@@ -1,13 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,18 +8,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ImpresoraForm from "./ImpresoraForm";
 import { Label } from "@/components/ui/label";
 import { useImpresora } from "../hooks/use-impresora";
 import { useToners } from "../hooks/use-toners";
+import { useEstado } from "@/pages/configuracion/maestros/hooks/use-estado";
 
 export default function IngresoToner() {
   const { create, newToner, setNewToner } = useToners();
   const { impresora } = useImpresora();
+  const { estados } = useEstado();
 
   return (
     <>
-      <ImpresoraForm />
       <div className="p-6">
         <Card>
           <CardHeader>
@@ -75,7 +67,7 @@ export default function IngresoToner() {
                           key={impresora.id_impresora}
                           value={impresora.id_impresora.toString()}
                         >
-                          {impresora.modelo}
+                          {impresora.modelo} - {impresora.serial}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -144,6 +136,30 @@ export default function IngresoToner() {
                       })
                     }
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Estado</Label>
+                  <Select
+                    value={newToner.estado || ""}
+                    onValueChange={(value) =>
+                      setNewToner({ ...newToner, estado: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione el estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estados.map((estado) => (
+                        <SelectItem
+                          key={estado.id_estado}
+                          value={estado.nombre_estado}
+                        >
+                          {estado.nombre_estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
