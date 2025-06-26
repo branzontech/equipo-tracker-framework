@@ -10,6 +10,7 @@ const useTonerImpresora = () => {
     toner_id: 0,
     impresora_id: 0,
     toner: {
+      estado: "",
       id_toner: 0,
       modelo: "",
       color: "",
