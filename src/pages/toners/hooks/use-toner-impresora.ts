@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { TonerImpresora } from "../interfaces/toner-impresora";
-import { getTonerImpresora } from "@/api/axios/toner-impresora.api";
+import { getTonerImpresora, getTonerImpresoraById } from "@/api/axios/toner-impresora.api";
 
 const useTonerImpresora = () => {
   const [tonerImpresora, setTonerImpresora] = useState<TonerImpresora[]>([]);
@@ -17,13 +17,15 @@ const useTonerImpresora = () => {
       stock_actual: 0,
       stock_minimo_alerta: 0,
       impresoras: [],
+      toner_impresora: [],
     },
-    impresora: {
+    impresoras: {
       id_impresora: 0,
       nombre: "",
       modelo: "",
       sucursal_id: 0,
       sucursales: {
+        area: null,
         id_sucursal: 0,
         nombre: "",
         sede_id: 0,
@@ -32,14 +34,17 @@ const useTonerImpresora = () => {
         sedes: {
           id_sede: 0,
           nombre: "",
-          usuarios: [],
           estado: null,
-          regional: "",
+          usuario_sede: null,
         },
       },
+      tipo: null,
+      marca_id: 0,
+      marcas: null,
+      estado: null,
+      serial: null,
     },
   });
-
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -47,6 +52,8 @@ const useTonerImpresora = () => {
   const [selectedColor, setSelectedColor] = useState<string>("todos");
   const [selectedSede, setSelectedSede] = useState<string>("todas");
   const itemsPerPage = 5;
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedTonerId, setSelectedTonerId] = useState<number | null>(null);
 
   useEffect(() => {
     const getAllTonerImpresora = async () => {
@@ -54,7 +61,6 @@ const useTonerImpresora = () => {
         const data = await getTonerImpresora();
         setTonerImpresora(data);
 
-        // Normalizar datos para la tabla
         const normalized = data.map((item) => ({
           id: item.toner_id,
           modelo: item.toner.modelo,
@@ -63,7 +69,7 @@ const useTonerImpresora = () => {
           alerta: item.toner.stock_minimo_alerta,
           cantidad: item.toner.cantidad,
           modeloImpresora: item.impresoras.modelo,
-          sede: item.impresoras.sucursales.sedes.nombre,
+          sedes: item.impresoras.sucursales.sedes.nombre,
           sucursal: item.impresoras.sucursales.nombre,
         }));
 
@@ -83,7 +89,7 @@ const useTonerImpresora = () => {
     stock: true,
     alerta: true,
     sucursal: true,
-    sede: true,
+    sedes: true,
     cantidad: true,
   });
 
@@ -112,6 +118,9 @@ const useTonerImpresora = () => {
     }
     return a[sortField]! < b[sortField]! ? 1 : -1;
   });
+
+  const uniqueColors = Array.from(new Set(tonerImpresora.map((item) => item.toner?.color)));
+  const uniqueSedes = Array.from(new Set(tonerImpresora.map((item) => item.impresoras?.sucursales?.sedes?.nombre)));
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -150,7 +159,19 @@ const useTonerImpresora = () => {
     setCurrentPage(1);
   };
 
+  const findInfoTonerImpresora = async (id: number) => {
+    const response = await getTonerImpresoraById(id);
+    setNewTonerImpresora(response);
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedTonerId(id);
+    setShowEditModal(true);
+  };
+
   return {
+    uniqueSedes,
+    uniqueColors,
     newTonerImpresora,
     setNewTonerImpresora,
     searchTerm,
@@ -173,6 +194,11 @@ const useTonerImpresora = () => {
     setVisibleColumns,
     sortField,
     sortDirection,
+    findInfoTonerImpresora,
+    handleOpenEditModal,
+    showEditModal,
+    setShowEditModal,
+    selectedTonerId,
   };
 };
 
