@@ -16,12 +16,14 @@ export const tonerImpresoraModel = {
             stock_minimo_alerta: true,
           },
         },
-        impresoras  : {
+        impresoras: {
           select: {
             id_impresora: true,
             nombre: true,
             modelo: true,
             sucursal_id: true,
+            tipo: true,
+            marcas: true,
             sucursales: {
               select: {
                 id_sucursal: true,
@@ -36,6 +38,18 @@ export const tonerImpresoraModel = {
             },
           },
         },
+      },
+    });
+    return tonerImpresora;
+  },
+  async getInfoByIdToner(id) {
+    const tonerImpresora = await prisma.toner_impresora.findUnique({
+      where: {
+        toner_id: id,
+      },
+      include: {
+        toner: true,
+        impresoras: true,
       },
     });
     return tonerImpresora;
