@@ -7,7 +7,7 @@ export const getImpresora = async () => {
 };
 
 export const getImpresoraById = async (id: number) => {
-  const response = await api.get(`/impresoras/get/${id}`);
+  const response = await api.get(`/impresoras/${id}`);
   return response.data;
 };
 
@@ -32,6 +32,10 @@ export const createImpresora = async (impresora: Impresora) => {
 };
 
 export const deleteImpresora = async (id: number) => {
+  try {
   const response = await api.delete(`/impresoras/delete/${id}`);
   return response.data;
+  } catch (error) {
+    ;
+  }
 };
