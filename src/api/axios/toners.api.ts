@@ -8,7 +8,7 @@ export const getToners = async () => {
 
 export const getTonerById = async (id: number) => {
   const response = await api.get(`/toners/get/${id}`);
-  return response.data.toner;
+  return response.data;
 };
 
 export const createToner = async (toner: Toner) => {
