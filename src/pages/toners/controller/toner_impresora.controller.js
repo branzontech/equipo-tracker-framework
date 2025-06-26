@@ -8,3 +8,12 @@ export const getAll = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getById = async (req, res) => {
+  try {
+    const tonerImpresora = await tonerImpresoraService.getById(req.params.id);
+    res.status(200).json({ tonerImpresora });
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener la toner impresora" });
+  }
+};
