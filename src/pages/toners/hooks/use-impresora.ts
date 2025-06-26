@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { Impresora } from "../interfaces/impresora";
-import { getImpresora, createImpresora } from "@/api/axios/impresora.api";
+import {
+  getImpresora,
+  createImpresora,
+  getImpresoraById,
+  updateImpresora,
+  deleteImpresora,
+} from "@/api/axios/impresora.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export const useImpresora = () => {
   const [impresora, setImpresa] = useState<Impresora[]>([]);
@@ -15,8 +22,13 @@ export const useImpresora = () => {
     serial: "",
     estado: null,
     marcas: null,
+    marca_id: 0,
     tipo: "",
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedImpresoraId, setSelectedImpresoraId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     const getAllImpresora = async () => {
@@ -74,11 +86,82 @@ export const useImpresora = () => {
     }
   };
 
+  const update = async (id: number, impresora: Impresora) => {
+    try {
+      const response = await updateImpresora(id, impresora);
+      if (response.success) {
+        toast.success(
+          response.message || "Impresora actualizada exitosamente",
+          {
+            icon: icons.success,
+          }
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message, {
+        icon: icons.error,
+      });
+    }
+  };
+
+  const getById = async (id: number) => {
+    try {
+      const response = await getImpresoraById(id);
+      setNewImpresora(response);
+    } catch (error) {
+      toast.error(error.message, {
+        icon: icons.error,
+      });
+    }
+  };
+
+  const deleteImpresoraById = async (id: number) => {
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar esta impresora?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteImpresora(id);
+          if (res.success) {
+            toast.success(res.message || "Impresora eliminada exitosamente", {
+              icon: icons.success,
+            });
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message, {
+              icon: icons.error,
+            });
+          }
+        } catch (error) {
+          toast.error(error.message, {
+            icon: icons.error,
+          });
+        }
+      },
+    });
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedImpresoraId(id);
+    setShowEditModal(true);
+  };
+
   return {
     impresora,
     setImpresa,
     newImpresora,
     setNewImpresora,
     create,
+    update,
+    getById,
+    showEditModal,
+    setShowEditModal,
+    handleOpenEditModal,
+    selectedImpresoraId,
+    deleteImpresoraById
   };
 };
