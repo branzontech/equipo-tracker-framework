@@ -15,7 +15,7 @@ router
   .get("/:id", getById)
   .get("/get/:serial", getBySerial)
   .post("/create", createImpresora)
-  .put("/update", update)
+  .put("/update/:id", update)
   .delete("/delete/:id", delete_);
 
 export default router;
