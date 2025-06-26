@@ -12,8 +12,8 @@ export interface Impresora {
   sucursal_id: Sucursal | number;
   sucursales: Sucursal;
   marcas: Marca;
+  marca_id: Marca | number;
   tipo: string;
-
   prestamos?: Prestamo;
   traslados?: Traslado;
 }
