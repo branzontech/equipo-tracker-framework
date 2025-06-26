@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { Toner } from "../interfaces/toners";
-import { createToner, getTonerById, getToners, updateToner } from "@/api/axios/toners.api";
+import {
+  createToner,
+  deleteToner,
+  getTonerById,
+  getToners,
+  updateToner,
+} from "@/api/axios/toners.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export const useToners = () => {
   const [toner, setToner] = useState<Toner[]>([]);
@@ -17,6 +24,7 @@ export const useToners = () => {
     impresoras: [],
     toner_impresora: [],
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getAllToners = async () => {
@@ -93,9 +101,20 @@ export const useToners = () => {
   };
 
   const getById = async (id: number) => {
+    setIsLoading(true);
     try {
       const response = await getTonerById(id);
-      setNewToner(response);
+
+      const cleaned = {
+        ...response,
+        toner_impresora:
+          response.toner_impresora?.map((rel) => ({
+            impresora_id: rel.impresora_id,
+          })) ?? [],
+      };
+
+      setNewToner(cleaned);
+      setIsLoading(false);
     } catch (error) {
       toast.error(error.message, {
         icon: icons.error,
@@ -122,6 +141,32 @@ export const useToners = () => {
     }
   };
 
+  const deleteTonerById = async (id: number) => {
+    ConfirmDialog({
+      title: "¿Está seguro de que desea eliminar esta toner?",
+      message: "Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        try {
+          const res = await deleteToner(id);
+          if (res.success) {
+            toast.success(res.message || "Toner eliminado exitosamente", {
+              icon: icons.success,
+            });
+            setTimeout(() => window.location.reload(), 4500);
+          } else {
+            toast.error(res.message, {
+              icon: icons.error,
+            });
+          }
+        } catch (error) {
+          toast.error(error.message, {
+            icon: icons.error,
+          });
+        }
+      },
+    });
+  };
+
   return {
     toner,
     setToner,
@@ -130,5 +175,8 @@ export const useToners = () => {
     create,
     getById,
     update,
+    deleteTonerById,
+    isLoading,
+    setIsLoading,
   };
 };
