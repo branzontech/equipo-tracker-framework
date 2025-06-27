@@ -51,7 +51,7 @@ export const SearchEquipo = ({
 
           <div className="grid grid-cols-12 gap-4 items-start">
             <div className="col-span-12 md:col-span-3">
-              <Label>Serial del equipo</Label>
+              <Label>N° Serial equipo</Label>
               <div className="relative">
                 <Input
                   placeholder="Ingrese N° serial"
