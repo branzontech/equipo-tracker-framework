@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Toner } from "../interfaces/toners";
 import {
+  createSalidaToner,
   createToner,
   deleteToner,
+  getBySerial,
   getTonerById,
   getToners,
   updateToner,
@@ -10,12 +13,14 @@ import {
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { SalidaToner } from "../interfaces/salidaToner";
 
 export const useToners = () => {
   const [toner, setToner] = useState<Toner[]>([]);
   const [newToner, setNewToner] = useState<Toner>({
     id_toner: 0,
     modelo: "",
+    serial: "",
     color: "",
     estado: "",
     cantidad: 0,
@@ -25,6 +30,19 @@ export const useToners = () => {
     toner_impresora: [],
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [salidaToner, setSalidaToner] = useState<SalidaToner[]>([]);
+  const [newSalidaToner, setNewSalidaToner] = useState<SalidaToner>({
+    id_movimiento: 0,
+    toner_id: 0,
+    cantidad: 0,
+    fecha: new Date(),
+    impresora_destino_id: 0,
+    usuario_id: 0,
+    sucursal_id: 0,
+    observaciones: "",
+  });
+  const [serialToner, setSerialToner] = useState("");
+  const [sugerenciasToner, setSugerenciasToner] = useState<any[]>([]);
 
   useEffect(() => {
     const getAllToners = async () => {
@@ -167,6 +185,39 @@ export const useToners = () => {
     });
   };
 
+  const getTonerBySerial = async (serial: string) => {
+    setSerialToner(serial);
+    if (serial.length >= 3) {
+      try {
+        const response = await getBySerial(serial);
+        setSugerenciasToner(response || null);
+      } catch (error) {
+        toast.error(error.message, { icon: icons.error });
+      }
+    } else {
+      setSugerenciasToner(null);
+    }
+  };
+
+  const createSalida = async (salidaToner: SalidaToner) => {
+    try {
+      const response = await createSalidaToner(salidaToner);
+      if (response.success) {
+        toast.success(response.message || "Salida creada exitosamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Error al crear la salida", {
+        icon: icons.error,
+      });
+    }
+  };
+
   return {
     toner,
     setToner,
@@ -178,5 +229,15 @@ export const useToners = () => {
     deleteTonerById,
     isLoading,
     setIsLoading,
+    salidaToner,
+    setSalidaToner,
+    newSalidaToner,
+    setNewSalidaToner,
+    getTonerBySerial,
+    serialToner,
+    setSerialToner,
+    sugerenciasToner,
+    setSugerenciasToner,
+    createSalida
   };
 };
