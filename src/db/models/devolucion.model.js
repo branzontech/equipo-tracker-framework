@@ -20,8 +20,8 @@ export const devolucionModel = {
     const equiposPrestamo = await prisma.equipos.findMany({
       where: {
         estado_ubicacion: {
-          none: {
-            estado_actual: "Activo",
+          some: {
+            estado_actual: "En Préstamo",
           },
         },
       },
@@ -121,8 +121,8 @@ export const devolucionModel = {
     const equiposTraslado = await prisma.equipos.findMany({
       where: {
         estado_ubicacion: {
-          none: {
-            estado_actual: "Activo",
+          some: {
+            estado_actual: "En Traslado",
           },
         },
       },
