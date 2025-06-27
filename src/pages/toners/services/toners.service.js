@@ -20,6 +20,14 @@ export default class TonersService {
   async delete(id) {
     return tonersModel.delete(id);
   }
+
+  async getBySerial(serial) {
+    return tonersModel.getBySerial(serial);
+  }
+
+  async createSalidaToner(salidaToner) {
+    return tonersModel.createSalidaToner(salidaToner);
+  }
 }
 
 export const tonersService = new TonersService();
