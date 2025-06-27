@@ -21,7 +21,7 @@ import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { usePerfilesAcceso } from "../hooks/use-perfiles-acceso";
 import { Label } from "@/components/ui/label";
-import { formatFecha } from "@/hooks/use-global";
+import { formatFecha, useGlobal } from "@/hooks/use-global";
 import {
   Select,
   SelectContent,
@@ -29,8 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Pencil, Trash } from "lucide-react";
+import { Pencil, Trash, XCircle } from "lucide-react";
 import UpdatePerfil from "./UpdatePerfilAcceso";
+import { useEstado } from "../hooks/use-estado";
 
 const PerfilesAcceso = () => {
   const {
@@ -43,11 +44,11 @@ const PerfilesAcceso = () => {
     showEditModal,
     handleOpenEditModal,
     selectedPerfilId,
+    setShowEditModal,
+    handleDelete,
   } = usePerfilesAcceso();
-
-  function setShowEditModal(open: boolean): void {
-    throw new Error("Function not implemented.");
-  }
+  const { estados } = useEstado();
+  const { StatusBadge } = useGlobal();
 
   return (
     <>
@@ -110,6 +111,33 @@ const PerfilesAcceso = () => {
                     }}
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado</Label>
+                  <Select
+                    value={newPerfilAcceso.estado}
+                    onValueChange={(value) =>
+                      setNewPerfilAcceso({
+                        ...newPerfilAcceso,
+                        estado: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estados.map((estado) => (
+                        <SelectItem
+                          key={estado.id_estado}
+                          value={estado.nombre_estado}
+                        >
+                          {estado.nombre_estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button type="submit" className="w-full">
                   Guardar Perfil
                 </Button>
@@ -124,6 +152,7 @@ const PerfilesAcceso = () => {
               <TableRow>
                 <TableHead>Nombre del Perfil</TableHead>
                 <TableHead>Descripción</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead>Fecha de Creación</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -139,9 +168,19 @@ const PerfilesAcceso = () => {
                       </TableCell>
                       <TableCell>{perfil.descripcion}</TableCell>
                       <TableCell>
+                        {<StatusBadge status={perfil.estado} />}
+                      </TableCell>
+                      <TableCell>
                         {formatFecha(perfil.fecha_creacion)}
                       </TableCell>
                       <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(perfil.id)}
+                        >
+                          <XCircle className="h-5 w-5" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
