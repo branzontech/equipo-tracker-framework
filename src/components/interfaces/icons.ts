@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, Loader2 } from 'lucide-react';
 import React from 'react';
 
 export const icons = {
