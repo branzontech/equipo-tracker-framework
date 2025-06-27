@@ -3,6 +3,24 @@ import { prisma } from "../../../prisma/prismaCliente.js";
 export const tonerImpresoraModel = {
   async getAll() {
     const tonerImpresora = await prisma.toner_impresora.findMany({
+      where: {
+        AND: [
+          {
+            toner: {
+              estado: {
+                not: "Fuera de servicio",
+              },
+            },
+          },
+          {
+            impresoras: {
+              estado: {
+                not: "Fuera de servicio",
+              },
+            },
+          },
+        ],
+      },
       select: {
         toner_id: true,
         impresora_id: true,
@@ -15,6 +33,7 @@ export const tonerImpresoraModel = {
             stock_actual: true,
             stock_minimo_alerta: true,
             estado: true,
+            serial: true,
           },
         },
         impresoras: {
@@ -23,6 +42,7 @@ export const tonerImpresoraModel = {
             nombre: true,
             modelo: true,
             sucursal_id: true,
+            serial: true,
             tipo: true,
             marcas: true,
             sucursales: {
