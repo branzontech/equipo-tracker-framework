@@ -44,7 +44,7 @@ export const impresoraModel = {
     return impresora;
   },
   findBySerial: async (serial) => {
-    const impresora = await prisma.impresoras.findMany({
+    const impresora = await prisma.impresoras.findFirst({
       where: {
         serial: {
           contains: serial,
@@ -71,7 +71,6 @@ export const impresoraModel = {
           },
         },
       },
-      take: 10
     });
     return impresora;
   },
