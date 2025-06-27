@@ -97,7 +97,7 @@ const Proveedores = () => {
                   onChange={(e) =>
                     setNewProveedor({
                       ...newProveedor,
-                      identificacion: e.target.value.replace(/\D/g, ""), // Solo números
+                      identificacion: e.target.value.replace(/\D/g, ""), 
                     })
                   }
                   placeholder={
@@ -257,7 +257,7 @@ const Proveedores = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="hover:bg-slate-100 text-red-600"
+                        className="hover:bg-slate-100"
                       >
                         <XCircle className="h-5 w-5" />
                       </Button>
