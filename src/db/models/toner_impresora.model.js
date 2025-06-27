@@ -4,22 +4,16 @@ export const tonerImpresoraModel = {
   async getAll() {
     const tonerImpresora = await prisma.toner_impresora.findMany({
       where: {
-        AND: [
-          {
-            toner: {
-              estado: {
-                not: "Fuera de servicio",
-              },
-            },
+        toner: {
+          estado: {
+            not: "Fuera de servicio",
           },
-          {
-            impresoras: {
-              estado: {
-                not: "Fuera de servicio",
-              },
-            },
+        },
+        impresoras: {
+          estado: {
+            not: "Fuera de servicio",
           },
-        ],
+        },
       },
       select: {
         toner_id: true,
@@ -61,7 +55,8 @@ export const tonerImpresoraModel = {
         },
       },
     });
-    return tonerImpresora;
+
+    return tonerImpresora.length > 0 ? tonerImpresora : [];
   },
   async getInfoByIdToner(id) {
     const tonerImpresora = await prisma.toner_impresora.findUnique({
