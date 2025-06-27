@@ -43,6 +43,7 @@ export const useActa = () => {
   const [managementSheetOpen, setManagementSheetOpen] = useState(false);
   const [currentActa, setCurrentActa] = useState<Acta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const getActas = async () => {
@@ -52,7 +53,7 @@ export const useActa = () => {
     getActas();
   }, []);
 
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
 
   const handleVerActa = (acta: Acta) => {
     setSelectedActa(acta);
@@ -649,7 +650,16 @@ export const useActa = () => {
   };
 
   const generarYDescargarPDF = async (data: Acta) => {
+    // 1. CLOSE MODEL
+    setManagementSheetOpen(false);
+
+    // 2. Show loading toast
+    toast.loading("Generando PDF...", { id: "pdf-toast" });
+
+    await new Promise((r) => setTimeout(r, 3000));
+
     if (!data || !data.tipo) {
+      toast.dismiss("pdf-toast");
       toast.error("Debe ingresar un acta válida", {
         icon: icons.error,
       });
@@ -679,11 +689,22 @@ export const useActa = () => {
           nombre = "Acta de Salida de Equipos en Condición de Préstamo";
           break;
       }
-      saveAs(blob, nombre + ".pdf");
+      saveAs(blob, `${nombre}.pdf`);
+
+      // 4. Close loading toast
+      toast.dismiss("pdf-toast");
+
+      // 5. Reemplazar el toast con uno de éxito
+      toast.success("PDF generado correctamente", {
+        icon: icons.success,
+      });
     } catch (error) {
+      toast.dismiss("pdf-toast");
       toast.error("Error al generar el PDF" + error, {
         icon: icons.error,
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -733,5 +754,7 @@ export const useActa = () => {
     findEquipoByNroSerie,
     findPerifericoBySerial,
     findImpresoraBySerial,
+    isGenerating,
+    setIsGenerating,
   };
 };
