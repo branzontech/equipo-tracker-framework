@@ -205,21 +205,54 @@ export function VerActaDialog({
               <CardContent className="pt-6">
                 <h3 className="font-semibold flex items-center gap-2 mb-3">
                   <FileX className="h-4 w-4 text-red-500" />
-                  Información de Baja de Equipo
+                  Información de Baja de Activos
                 </h3>
-                <div className="space-y-3">
-                  <div>
-                    <span className="text-sm text-gray-500">
-                      Motivo de baja:
-                    </span>
-                    <p className="font-medium">
-                      {acta.bajas[0].bajas_equipos[0].motivos?.trim() ||
-                        "Sin motivo"}
-                    </p>
-                  </div>
+
+                <div className="space-y-4">
+                  {acta.bajas[0]?.bajas_equipos.length > 0 && (
+                    <div>
+                      <span className="text-sm text-gray-500">
+                        Motivos de baja (Equipos):
+                      </span>
+                      {acta.bajas[0].bajas_equipos.map((item, i) => (
+                        <p key={`equipo-${i}`} className="font-medium">
+                          {item.motivos?.trim() || "Sin motivo"}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {acta.bajas[0]?.bajas_perifericos_directos.length > 0 && (
+                    <div>
+                      <span className="text-sm text-gray-500">
+                        Motivos de baja (Periféricos):
+                      </span>
+                      {acta.bajas[0].bajas_perifericos_directos.map(
+                        (item, i) => (
+                          <p key={`periferico-${i}`} className="font-medium">
+                            {item.motivos?.trim() || "Sin motivo"}
+                          </p>
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  {acta.bajas[0]?.bajas_impresoras.length > 0 && (
+                    <div>
+                      <span className="text-sm text-gray-500">
+                        Motivos de baja (Impresoras):
+                      </span>
+                      {acta.bajas[0].bajas_impresoras.map((item, i) => (
+                        <p key={`impresora-${i}`} className="font-medium">
+                          {item.motivos?.trim() || "Sin motivo"}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
                   {acta.bajas[0]
-                    .usuarios_bajas_responsable_autorizacion_idTousuarios
-                    .nombre && (
+                    ?.usuarios_bajas_responsable_autorizacion_idTousuarios
+                    ?.nombre && (
                     <div>
                       <span className="text-sm text-gray-500">
                         Autorizado por:
