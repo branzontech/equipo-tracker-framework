@@ -47,3 +47,23 @@ export const deleteToner = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getBySerial = async (req, res) => {
+  try {
+    const { serial } = req.params;
+    const toner = await tonersService.getBySerial(serial);
+    res.status(200).json(toner);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener el toner" });
+  }
+};
+
+export const createSalidaToner = async (req, res) => {
+  try {
+    const salidaToner = req.body;
+    const salidaTonerCreated = await tonersService.createSalidaToner(salidaToner);
+    res.status(201).json({ success: true, salidaTonerCreated });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
