@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Delete, Eye, Pencil, PencilIcon, XCircle } from "lucide-react";
-import UpdateImpresora from "./EditImpresora";
+import UpdateImpresora from "./UpdateImpresora";
 import { useGlobal } from "@/hooks/use-global";
 
 export default function ImpresoraForm() {
