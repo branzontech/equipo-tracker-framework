@@ -72,6 +72,7 @@ export const useGlobal = () => {
       marcas: null,
       prestamos: null,
       traslados: null,
+      motivo: "",
     },
   ]);
   const [impresoras, setImpresoras] = useState<Impresora[]>([
@@ -85,6 +86,10 @@ export const useGlobal = () => {
       estado: null,
       marcas: null,
       tipo: "",
+      prestamos: null,
+      traslados: null,
+      motivo: "",
+      marca_id: 0,
     },
   ]);
 
