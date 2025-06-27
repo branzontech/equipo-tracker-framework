@@ -252,34 +252,49 @@ const Salidas = () => {
 
             {newPrestamo.tipo === "PERIFERICO" && (
               <SearchPeriferico
-                onSeleccion={(periferico) =>
-                  setNewPrestamo((prev) => ({
-                    ...prev,
-                    perifericos_directos: [
-                      ...(prev.perifericos_directos || []),
-                      {
-                        id_periferico: periferico,
-                        nombre: "",
-                      },
-                    ],
-                  }))
-                }
+                onSeleccion={(periferico) => {
+                  setNewPrestamo((prev) => {
+                    const yaExiste = prev.perifericos_directos.some(
+                      (p) => p.id_periferico === periferico.id_periferico
+                    );
+                    if (yaExiste) return prev;
+
+                    return {
+                      ...prev,
+                      perifericos_directos: [
+                        ...prev.perifericos_directos,
+                        {
+                          id_periferico: periferico.id_periferico,
+                          nombre: periferico.nombre || "",
+                        },
+                      ],
+                    };
+                  });
+                }}
               />
             )}
 
             {newPrestamo.tipo === "IMPRESORA" && (
               <SearchImpresora
                 onSeleccion={(impresora) =>
-                  setNewPrestamo((prev) => ({
-                    ...prev,
-                    impresoras: [
-                      ...(prev.impresoras || []),
-                      {
-                        id_impresora: impresora,
-                        nombre: "",
-                      },
-                    ],
-                  }))
+                  setNewPrestamo((prev) => {
+                    const yaExiste = prev.impresoras.some(
+                      (i) => i.id_impresora === impresora.id_impresora
+                    );
+                    if (yaExiste) return prev;
+
+                    return {
+                      ...prev,
+                      impresoras: [
+                        ...prev.impresoras,
+                        {
+                          id_impresora: impresora.id_impresora,
+                          nombre: impresora.nombre || "",
+                          motivo: impresora.motivo || "",
+                        },
+                      ],
+                    };
+                  })
                 }
               />
             )}
