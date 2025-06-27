@@ -223,34 +223,49 @@ const Traslados = () => {
 
           {newTraslado.tipo === "PERIFERICO" && (
             <SearchPeriferico
-              onSeleccion={(periferico) =>
-                setNewTraslado((prev) => ({
-                  ...prev,
-                  perifericos_directos: [
-                    ...(prev.perifericos_directos || []),
-                    {
-                      id_periferico: periferico,
-                      nombre: "",
-                    },
-                  ],
-                }))
-              }
+              onSeleccion={(periferico) => {
+                setNewTraslado((prev) => {
+                  const yaExiste = prev.perifericos_directos.some(
+                    (p) => p.id_periferico === periferico.id_periferico
+                  );
+                  if (yaExiste) return prev;
+
+                  return {
+                    ...prev,
+                    perifericos_directos: [
+                      ...prev.perifericos_directos,
+                      {
+                        id_periferico: periferico.id_periferico,
+                        nombre: periferico.nombre || "",
+                      },
+                    ],
+                  };
+                });
+              }}
             />
           )}
 
           {newTraslado.tipo === "IMPRESORA" && (
             <SearchImpresora
               onSeleccion={(impresora) =>
-                setNewTraslado((prev) => ({
-                  ...prev,
-                  impresoras: [
-                    ...(prev.impresoras || []),
-                    {
-                      id_impresora: impresora,
-                      nombre: "",
-                    },
-                  ],
-                }))
+                setNewTraslado((prev) => {
+                  const yaExiste = prev.impresoras.some(
+                    (i) => i.id_impresora === impresora.id_impresora
+                  );
+                  if (yaExiste) return prev;
+
+                  return {
+                    ...prev,
+                    impresoras: [
+                      ...prev.impresoras,
+                      {
+                        id_impresora: impresora.id_impresora,
+                        nombre: impresora.nombre || "",
+                        motivo: impresora.motivo || "",
+                      },
+                    ],
+                  };
+                })
               }
             />
           )}
