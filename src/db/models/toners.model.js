@@ -46,6 +46,7 @@ export const tonersModel = {
         stock_actual: toner.stock_actual,
         stock_minimo_alerta: toner.stock_minimo_alerta,
         serial: toner.serial,
+        estado: toner.estado,
 
         // Relación con impresoras (toner_impresora)
         toner_impresora: {
