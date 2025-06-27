@@ -16,7 +16,7 @@ export interface Perifericos {
   tipo: string;
   equipo_asociado_id: Equipo | number;
   equipos: Equipo | null;
-
+  motivo: string;
   prestamos?: Prestamo;
   traslados?: Traslado;
 }
