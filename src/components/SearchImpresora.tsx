@@ -6,13 +6,27 @@ import { toast } from "sonner";
 import { useGlobal } from "@/hooks/use-global";
 import { icons } from "./interfaces/icons";
 import { Impresora } from "@/pages/toners/interfaces/impresora";
+import { useState } from "react";
+import { Textarea } from "./ui/textarea";
 
 interface SearchImpresoraProps {
-  onSeleccion?: (id_impresora: number) => void;
+  onSeleccion?: (impresora: {
+    id_impresora: number;
+    nombre: string;
+    modelo: string;
+    motivo: string;
+  }) => void;
+  onMotivoChange?: (id_impresora: number, motivo: string) => void;
+  esBaja?: boolean;
 }
 
-export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
+export const SearchImpresora = ({
+  onSeleccion,
+  esBaja = false,
+  onMotivoChange,
+}: SearchImpresoraProps) => {
   const { impresoras, setImpresoras, buscarImpresora } = useGlobal();
+  const [motivos, setMotivos] = useState<string[]>([]);
 
   return (
     <div className="space-y-6">
@@ -45,7 +59,12 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
                 <Input
                   placeholder="Ingrese N° serial"
                   onChange={(e) => {
-                    item.serial = e.target.value;
+                    const nuevos = [...impresoras];
+                    nuevos[index] = {
+                      ...nuevos[index],
+                      serial: e.target.value,
+                    };
+                    setImpresoras(nuevos);
                   }}
                 />
                 <Button
@@ -53,9 +72,6 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
                   size="icon"
                   onClick={async (e: React.FormEvent) => {
                     e.preventDefault();
-
-                    console.log(item.serial);
-
                     if (!item.serial?.trim()) {
                       toast.error("Debe ingresar un número de serie", {
                         icon: icons.error,
@@ -64,18 +80,24 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
                     }
 
                     const data = await buscarImpresora(item.serial);
-                    console.log(data);
 
                     if (data) {
-                      const actualizados = [...impresoras];
-                      actualizados[index] = {
+                      const actualizado = {
                         ...data,
-                        id_impresora: data.id_impresora,
+                        serial: item.serial,
                       };
-                      setImpresoras(actualizados);
+
+                      const nuevos = [...impresoras];
+                      nuevos[index] = actualizado;
+                      setImpresoras(nuevos);
 
                       if (onSeleccion) {
-                        onSeleccion(data.id_impresora);
+                        onSeleccion({
+                          id_impresora: data.id_impresora,
+                          nombre: data.nombre || "",
+                          modelo: data.modelo || "",
+                          motivo: motivos[index] || "",
+                        });
                       }
                     }
                   }}
@@ -88,6 +110,8 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
 
             {item.id_impresora !== 0 && (
               <>
+                {console.log(item)}
+
                 <div className="col-span-12 md:col-span-3">
                   <Label>Serial</Label>
                   <Input value={item.serial || "-"} readOnly />
@@ -100,6 +124,25 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
                   <Label>Modelo</Label>
                   <Input value={item.modelo || "-"} readOnly />
                 </div>
+
+                {esBaja && (
+                  <div className="col-span-12 mt-4">
+                    <Label>Motivo de la baja</Label>
+                    <Textarea
+                      placeholder="Escribe el motivo"
+                      value={motivos[index] || ""}
+                      onChange={(e) => {
+                        const nuevos = [...motivos];
+                        nuevos[index] = e.target.value;
+                        setMotivos(nuevos);
+
+                        if (onMotivoChange) {
+                          onMotivoChange(item.id_impresora, e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -113,6 +156,7 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
         className="mt-2"
         onClick={() => {
           const nuevoImpresora: Impresora = {
+            marca_id: 0,
             id_impresora: 0,
             nombre: "",
             modelo: "",
@@ -122,8 +166,10 @@ export const SearchImpresora = ({ onSeleccion }: SearchImpresoraProps) => {
             estado: null,
             marcas: null,
             tipo: "",
+            motivo: "",
           };
           setImpresoras([...impresoras, nuevoImpresora]);
+          setMotivos([...motivos, ""]);
         }}
       >
         <Plus className="h-4 w-4 mr-2" />
