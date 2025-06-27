@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Delete, Eye, Pencil, PencilIcon } from "lucide-react";
+import { Delete, Eye, Pencil, PencilIcon, XCircle } from "lucide-react";
 import UpdateImpresora from "./EditImpresora";
 import { useGlobal } from "@/hooks/use-global";
 
@@ -244,13 +244,6 @@ export default function ImpresoraForm() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="hover:bg-muted"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
                         className="hover:bg-slate-100"
                         onClick={() => {
                           handleOpenEditModal(imp.id_impresora);
@@ -264,7 +257,7 @@ export default function ImpresoraForm() {
                         className="hover:bg-muted"
                         onClick={() => deleteImpresoraById(imp.id_impresora)}
                       >
-                        <Delete className="w-4 h-4 " />
+                        <XCircle className="w-4 h-4 " />
                       </Button>
                     </TableCell>
                   </TableRow>
