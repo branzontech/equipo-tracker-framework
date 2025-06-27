@@ -1,8 +1,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { format } from "date-fns";
-import {
-  CalendarIcon,
-} from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SearchEquipo } from "@/components/SearchEquipo";
+import { SearchPeriferico } from "@/components/SearchPeriferico";
+import { SearchImpresora } from "@/components/SearchImpresora";
 
 export function BajaEquiposForm() {
   const {
@@ -114,19 +114,26 @@ export function BajaEquiposForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="estado">Estado</Label>
+                <Label htmlFor="tipoTraslado">Tipo de traslado</Label>
                 <Select
-                  disabled
-                  value={newBaja.estado || ""}
+                  value={newBaja.tipo || ""}
                   onValueChange={(value) =>
-                    setNewBaja({ ...newBaja, estado: value })
+                    setNewBaja({
+                      ...newBaja,
+                      tipo: value,
+                      equipos: [],
+                      perifericos_directos: [],
+                      impresoras: [],
+                    })
                   }
                 >
-                  <SelectTrigger id="estado">
-                    <SelectValue placeholder="Seleccione un estado" />
+                  <SelectTrigger id="tipoPrestamo">
+                    <SelectValue placeholder="Seleccione el tipo de traslado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Vigente">Vigente</SelectItem>
+                    <SelectItem value="EQUIPO">Equipo</SelectItem>
+                    <SelectItem value="PERIFERICO">Periférico</SelectItem>
+                    <SelectItem value="IMPRESORA">Impresora</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -137,38 +144,112 @@ export function BajaEquiposForm() {
                 Equipos para dar de baja
               </h2>
 
-              <SearchEquipo
-                esBaja
-                onEquipoEncontrado={(equipo) => {
-                  setNewBaja((prev) => {
-                    const yaExiste = prev.equipos.some(
-                      (e) => e.id_equipo === equipo.id_equipo
-                    );
-                    if (yaExiste) return prev;
+              {newBaja.tipo === "EQUIPO" && (
+                <SearchEquipo
+                  esBaja
+                  onEquipoEncontrado={(equipo) => {
+                    setNewBaja((prev) => {
+                      const yaExiste = prev.equipos.some(
+                        (e) => e.id_equipo === equipo.id_equipo
+                      );
+                      if (yaExiste) return prev;
 
-                    return {
+                      return {
+                        ...prev,
+                        equipos: [
+                          ...prev.equipos,
+                          {
+                            id_equipo: equipo.id_equipo,
+                            motivo: "",
+                          },
+                        ],
+                      };
+                    });
+                  }}
+                  onMotivoChange={(id_equipo, nuevoMotivo) => {
+                    setNewBaja((prev) => ({
                       ...prev,
-                      equipos: [
-                        ...prev.equipos,
-                        {
-                          id_equipo: equipo.id_equipo,
-                          motivo: "",
-                        },
-                      ],
-                    };
-                  });
-                }}
-                onMotivoChange={(id_equipo, nuevoMotivo) => {
-                  setNewBaja((prev) => ({
-                    ...prev,
-                    equipos: prev.equipos.map((e) =>
-                      e.id_equipo === id_equipo
-                        ? { ...e, motivo: nuevoMotivo }
-                        : e
-                    ),
-                  }));
-                }}
-              />
+                      equipos: prev.equipos.map((e) =>
+                        e.id_equipo === id_equipo
+                          ? { ...e, motivo: nuevoMotivo }
+                          : e
+                      ),
+                    }));
+                  }}
+                />
+              )}
+
+              {newBaja.tipo === "PERIFERICO" && (
+                <SearchPeriferico
+                  esBaja
+                  onSeleccion={(periferico) =>
+                    setNewBaja((prev) => {
+                      const yaExiste = prev.perifericos_directos.some(
+                        (p) => p.id_periferico === periferico.id_periferico
+                      );
+
+                      if (yaExiste) return prev;
+
+                      return {
+                        ...prev,
+                        perifericos_directos: [
+                          ...prev.perifericos_directos,
+                          {
+                            id_periferico: periferico.id_periferico,
+                            motivo: "",
+                            nombre: "",
+                          },
+                        ],
+                      };
+                    })
+                  }
+                  onMotivoChange={(id_periferico, nuevoMotivo) => {
+                    setNewBaja((prev) => ({
+                      ...prev,
+                      perifericos_directos: prev.perifericos_directos.map((e) =>
+                        e.id_periferico === id_periferico
+                          ? { ...e, motivo: nuevoMotivo }
+                          : e
+                      ),
+                    }));
+                  }}
+                />
+              )}
+
+              {newBaja.tipo === "IMPRESORA" && (
+                <SearchImpresora
+                  esBaja
+                  onSeleccion={(impresora) =>
+                    setNewBaja((prev) => {
+                      const yaExiste = prev.impresoras.some(
+                        (i) => i.id_impresora === impresora.id_impresora
+                      );
+                      if (yaExiste) return prev;
+                      return {
+                        ...prev,
+                        impresoras: [
+                          ...prev.impresoras,
+                          {
+                            id_impresora: impresora.id_impresora,
+                            nombre: "",
+                            motivo: "",
+                          },
+                        ],
+                      };
+                    })
+                  }
+                  onMotivoChange={(id_impresora, nuevoMotivo) => {
+                    setNewBaja((prev) => ({
+                      ...prev,
+                      impresoras: prev.impresoras.map((e) =>
+                        e.id_impresora === id_impresora
+                          ? { ...e, motivo: nuevoMotivo }
+                          : e
+                      ),
+                    }));
+                  }}
+                />
+              )}
             </div>
 
             <div className="mb-6">
