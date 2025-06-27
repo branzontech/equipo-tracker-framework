@@ -49,6 +49,7 @@ import {
 import { useEquipos } from "../hooks/use-equipos";
 import { getEquiposByNroSerie } from "@/api/axios/equipo.api";
 import { useGlobal } from "@/hooks/use-global";
+import Loading from "@/components/Loading";
 
 const estadisticasMantenimiento = [
   { name: "Preventivos", value: 8 },
@@ -69,13 +70,19 @@ const COLORS = ["#0088FE", "#FF8042"];
 const HojaDeVida = () => {
   const { nroSeries } = useParams();
   const [activeTab, setActiveTab] = useState("informacion");
-  const { navigate, getInfoEquipo, newEquipo } = useEquipos();
+  const { navigate, getInfoEquipo, newEquipo, isLoading, setIsLoading } =
+    useEquipos();
   const { formatFecha, formatPrecio, openFileInNewTab, downloadFile } =
     useGlobal();
 
   useEffect(() => {
-    getInfoEquipo(nroSeries);
-  }, []);
+    const fetchData = async () => {
+      setIsLoading(true);
+      await getInfoEquipo(nroSeries);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [nroSeries]);
 
   const historialEventos = [];
 
@@ -240,667 +247,699 @@ const HojaDeVida = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center gap-4 mb-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/productos/lista")}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <h1 className="text-2xl font-bold text-[#040d50]">
-          Hoja de Vida del Equipo
-        </h1>
-      </div>
+    <>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className="p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/productos/lista")}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-bold text-[#040d50]">
+              Hoja de Vida del Equipo
+            </h1>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Identificación
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
-              {newEquipo.imagen ? (
-                <img
-                  src={newEquipo.imagen}
-                  alt="Equipo"
-                  className="w-30 h-20"
-                />
-              ) : (
-                <div className="w-20 h-20 flex items-center justify-center border rounded-md text-xs text-muted-foreground">
-                  Sin imagen
-                </div>
-              )}
-              <div>
-                <div className="text-2xl font-bold">{newEquipo.nro_serie}</div>
-                <p className="text-xs text-muted-foreground">
-                  {newEquipo.nombre_equipo}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Ubicación Actual
-            </CardTitle>
-            <User className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {newEquipo?.estado_ubicacion?.sucursales?.nombre ??
-                "Sin sucursal"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {newEquipo?.estado_ubicacion?.sucursales?.sedes?.nombre ??
-                "Sin sede"}{" "}
-              -{" "}
-              {newEquipo?.estado_ubicacion?.usuarios?.nombre ??
-                "Sin responsable"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Estado Actual</CardTitle>
-            <Timer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <Badge variant="outline" className="bg-green-500 text-white">
-                {newEquipo.estado_ubicacion?.estado_actual}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Última actualización: {format(new Date(), "PPP", { locale: es })}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-4"
-      >
-        <TabsList>
-          <TabsTrigger value="informacion">Información General</TabsTrigger>
-          <TabsTrigger value="timeline">Línea de Tiempo</TabsTrigger>
-          <TabsTrigger value="estadisticas">Estadísticas</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="informacion" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Detalles del Equipo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      <Monitor className="h-5 w-5 mr-2" /> Información Básica
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">ID:</span>{" "}
-                        {`SQ${newEquipo.id_equipo.toString().padStart(3, "0")}`}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Número de Serie:
-                        </span>{" "}
-                        {newEquipo.nro_serie}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Nombre:
-                        </span>{" "}
-                        {newEquipo.nombre_equipo}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Marca:
-                        </span>{" "}
-                        {newEquipo.marcas?.nombre}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Modelo:
-                        </span>{" "}
-                        {newEquipo.modelo}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Tipo de Activo:
-                        </span>{" "}
-                        {newEquipo.tipo_activo}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Fecha Ingreso:
-                        </span>{" "}
-                        {formatFecha(newEquipo.fecha_registro)}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Tags:
-                        </span>{" "}
-                        {newEquipo.tags?.join(", ") || "Sin tags"}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Observaciones:
-                        </span>{" "}
-                        {newEquipo.observaciones || "Sin observaciones"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      <HardDrive className="h-5 w-5 mr-2" /> Especificaciones
-                      Técnicas
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Procesador:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.procesador}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Memoria RAM:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.memoria_ram}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Almacenamiento:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.almacenamiento}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Tarjeta Gráfica:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.tarjeta_grafica}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Tipo de Disco Duro:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.tipo_discoduro}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Pantalla:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.pantalla}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Sistema Operativo:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.sistema_operativo}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Batería:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.bateria}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Puertos:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.puertos}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Tiene Cargador:
-                        </span>{" "}
-                        {String(newEquipo.especificaciones?.tienecargador) ===
-                        "true"
-                          ? "Sí"
-                          : "No"}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Serial Cargador:
-                        </span>{" "}
-                        {newEquipo.especificaciones?.serialcargador}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      <Shield className="h-5 w-5 mr-2" /> Información de
-                      Seguridad
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Nivel de Acceso:
-                        </span>{" "}
-                        {newEquipo.seguridad?.nivel_acceso}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Software de Seguridad:
-                        </span>{" "}
-                        {newEquipo.seguridad?.software_seguridad}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Cifrado de Disco:
-                        </span>{" "}
-                        {newEquipo.seguridad?.cifrado_disco}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Políticas Aplicadas:
-                        </span>{" "}
-                        {newEquipo.seguridad?.politicas_aplicadas?.join(", ") ||
-                          "Sin políticas aplicadas"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      <DollarSign className="h-5 w-5 mr-2" /> Información de
-                      Adquisición
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Orden de Compra:
-                        </span>{" "}
-                        {newEquipo.adquisicion?.orden_compra}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Fecha de Compra:
-                        </span>{" "}
-                        {formatFecha(newEquipo.adquisicion?.fecha_compra)}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Precio de Compra:
-                        </span>{" "}
-                        $
-                        {formatPrecio(
-                          newEquipo.adquisicion?.precio_compra.toLocaleString()
-                        )}{" "}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Forma de Pago:
-                        </span>{" "}
-                        {newEquipo.adquisicion?.forma_pago}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Plazo de Pago:
-                        </span>{" "}
-                        {newEquipo.adquisicion?.plazo_pago}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Número de Factura:
-                        </span>{" "}
-                        {newEquipo.adquisicion?.numero_factura}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Proveedor:
-                        </span>{" "}
-                        {typeof newEquipo.adquisicion?.proveedores === "object"
-                          ? newEquipo.adquisicion?.proveedores?.nombre
-                          : newEquipo.adquisicion?.proveedores}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Garantia desde:
-                        </span>{" "}
-                        {formatFecha(newEquipo.adquisicion?.inicio_garantia)}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Garantía hasta:
-                        </span>{" "}
-                        {formatFecha(newEquipo.adquisicion?.garantia_fecha_fin)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      <BookOpen className="h-5 w-5 mr-2" /> Información
-                      Administrativa
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Código de Inventario:
-                        </span>{" "}
-                        {newEquipo.administrativa?.codigo_inventario}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Centro de Coste:
-                        </span>{" "}
-                        {newEquipo.administrativa?.centro_coste}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Autorizado Por:
-                        </span>{" "}
-                        {typeof newEquipo.administrativa?.usuarios === "object"
-                          ? newEquipo.administrativa?.usuarios?.nombre
-                          : newEquipo.administrativa?.usuarios}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Fecha de Activación:
-                        </span>
-                        {formatFecha(
-                          newEquipo.administrativa?.fecha_activacion
-                        )}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Estado Contable:
-                        </span>{" "}
-                        {newEquipo.administrativa?.estado_contable}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Valor Actual:
-                        </span>{" "}
-                        $
-                        {formatPrecio(
-                          newEquipo.administrativa?.valor_depreciado
-                        )}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Vida Útil Restante:
-                        </span>{" "}
-                        {newEquipo.administrativa?.vida_util_restante}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      Mantenimientos
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Frecuencia:
-                        </span>{" "}
-                        {newEquipo.mantenimiento?.frecuencia_mantenimiento ||
-                          "No disponible"}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Última Fecha de Mantenimiento:
-                        </span>{" "}
-                        {formatFecha(
-                          newEquipo.mantenimiento?.ultima_fecha_mantenimiento
-                        )}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Proveedor de Servicio:
-                        </span>{" "}
-                        {newEquipo.mantenimiento?.proveedores?.nombre ||
-                          "No disponible"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      <Wifi className="h-5 w-5 mr-2" /> Ubicación Actual
-                    </h3>
-                    <div className="space-y-2 bg-slate-50 p-4 rounded-md">
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Sede:
-                        </span>{" "}
-                        {newEquipo?.estado_ubicacion?.sucursales?.sedes?.nombre}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Tipo de Sucursal:
-                        </span>{" "}
-                        {newEquipo?.estado_ubicacion?.sucursales?.tipo}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Responsable:
-                        </span>{" "}
-                        {newEquipo?.estado_ubicacion?.usuarios?.nombre ??
-                          "Sin usuarios"}
-                      </p>
-                      <p>
-                        <span className="font-medium text-slate-700">
-                          Estado:
-                        </span>{" "}
-                        {newEquipo?.estado_ubicacion?.estado_actual}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
-                      Documentos Relacionados
-                    </h3>
-                    <div className="space-y-2">
-                      {newEquipo.archivosequipo?.length > 0 ? (
-                        <ul className="space-y-2">
-                          {newEquipo.archivosequipo.map((archivo, index) => (
-                            <li
-                              key={index}
-                              className="flex items-center justify-between border rounded-md p-3 bg-white shadow-sm"
-                            >
-                              <div className="flex items-center gap-2 overflow-hidden">
-                                <span className="text-blue-600 font-medium truncate">
-                                  {archivo.nombre_archivo}
-                                </span>
-                              </div>
-
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="slate-100"
-                                onClick={() => {
-                                  openFileInNewTab({
-                                    content: archivo.contenido,
-                                    tipo: archivo.tipo_archivo,
-                                    nombre: archivo.nombre_archivo,
-                                  });
-                                }}
-                              >
-                                <Eye className="h-5 w-5" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="slate-100"
-                                onClick={() => {
-                                  downloadFile({
-                                    content: archivo.contenido,
-                                    tipo: archivo.tipo_archivo,
-                                    nombre: archivo.nombre_archivo,
-                                  });
-                                }}
-                              >
-                                <Download className="h-5 w-5" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="slate-100"
-                              >
-                                <XCircle className="h-5 w-5" />
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-slate-500 text-sm">
-                          No hay archivos adjuntos.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="timeline" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historial del Equipo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative space-y-8">
-                {historialEventos.map((evento, index) => (
-                  <div key={evento.id} className="flex gap-4">
-                    <div className="flex-none">
-                      <div className="bg-background p-2 rounded-full border">
-                        {getIconoEvento(evento.tipo)}
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        {getBadgeEvento(evento.tipo)}
-                        <span className="text-sm text-muted-foreground">
-                          {formatFecha(evento.fecha)}
-                        </span>
-                      </div>
-                      <h4 className="font-semibold">{evento.descripcion}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Responsable: {evento.responsable}
-                      </p>
-                      {evento.detalles && (
-                        <div className="bg-muted p-3 rounded-md text-sm">
-                          {Object.entries(evento.detalles).map(
-                            ([key, value]) => {
-                              if (key === "prioridad") {
-                                return (
-                                  <p
-                                    key={key}
-                                    className="capitalize flex items-center gap-2"
-                                  >
-                                    <span className="font-medium">
-                                      {key.replace(/_/g, " ")}:
-                                    </span>
-                                    {value === "alta" ? (
-                                      <Badge className="bg-red-500 text-white">
-                                        {(value as string).toUpperCase()}
-                                      </Badge>
-                                    ) : (
-                                      <Badge className="bg-yellow-500 text-white">
-                                        {String(value).toUpperCase()}
-                                      </Badge>
-                                    )}
-                                  </p>
-                                );
-                              }
-
-                              return (
-                                <p key={key} className="capitalize">
-                                  <span className="font-medium">
-                                    {key.replace(/_/g, " ")}:
-                                  </span>{" "}
-                                  {Array.isArray(value)
-                                    ? value.join(", ")
-                                    : String(value)}
-                                </p>
-                              );
-                            }
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="estadisticas" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Distribución de Mantenimientos</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Identificación
+                </CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={estadisticasMantenimiento}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {estadisticasMantenimiento.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  {newEquipo.imagen ? (
+                    <img
+                      src={newEquipo.imagen}
+                      alt="Equipo"
+                      className="w-30 h-20"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 flex items-center justify-center border rounded-md text-xs text-muted-foreground">
+                      Sin imagen
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-2xl font-bold">
+                      {newEquipo.nro_serie}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {newEquipo.nombre_equipo}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
             <Card>
-              <CardHeader>
-                <CardTitle>Disponibilidad Mensual</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Ubicación Actual
+                </CardTitle>
+                <User className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={disponibilidadMensual}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="mes" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="disponibilidad" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {newEquipo?.estado_ubicacion?.sucursales?.nombre ??
+                    "Sin sucursal"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {newEquipo?.estado_ubicacion?.sucursales?.sedes?.nombre ??
+                    "Sin sede"}{" "}
+                  -{" "}
+                  {newEquipo?.estado_ubicacion?.usuarios?.nombre ??
+                    "Sin responsable"}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Estado Actual
+                </CardTitle>
+                <Timer className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  <Badge variant="outline" className="bg-green-500 text-white">
+                    {newEquipo.estado_ubicacion?.estado_actual}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Última actualización:{" "}
+                  {format(new Date(), "PPP", { locale: es })}
+                </p>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-4"
+          >
+            <TabsList>
+              <TabsTrigger value="informacion">Información General</TabsTrigger>
+              <TabsTrigger value="timeline">Línea de Tiempo</TabsTrigger>
+              <TabsTrigger value="estadisticas">Estadísticas</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="informacion" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Detalles del Equipo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          <Monitor className="h-5 w-5 mr-2" /> Información
+                          Básica
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              ID:
+                            </span>{" "}
+                            {`SQ${newEquipo.id_equipo
+                              .toString()
+                              .padStart(3, "0")}`}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Número de Serie:
+                            </span>{" "}
+                            {newEquipo.nro_serie}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Nombre:
+                            </span>{" "}
+                            {newEquipo.nombre_equipo}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Marca:
+                            </span>{" "}
+                            {newEquipo.marcas?.nombre}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Modelo:
+                            </span>{" "}
+                            {newEquipo.modelo}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Tipo de Activo:
+                            </span>{" "}
+                            {newEquipo.tipo_activo}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Fecha Ingreso:
+                            </span>{" "}
+                            {formatFecha(newEquipo.fecha_registro)}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Tags:
+                            </span>{" "}
+                            {newEquipo.tags?.join(", ") || "Sin tags"}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Observaciones:
+                            </span>{" "}
+                            {newEquipo.observaciones || "Sin observaciones"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          <HardDrive className="h-5 w-5 mr-2" />{" "}
+                          Especificaciones Técnicas
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Procesador:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.procesador}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Memoria RAM:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.memoria_ram}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Almacenamiento:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.almacenamiento}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Tarjeta Gráfica:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.tarjeta_grafica}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Tipo de Disco Duro:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.tipo_discoduro}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Pantalla:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.pantalla}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Sistema Operativo:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.sistema_operativo}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Batería:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.bateria}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Puertos:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.puertos}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Tiene Cargador:
+                            </span>{" "}
+                            {String(
+                              newEquipo.especificaciones?.tienecargador
+                            ) === "true"
+                              ? "Sí"
+                              : "No"}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Serial Cargador:
+                            </span>{" "}
+                            {newEquipo.especificaciones?.serialcargador}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          <Shield className="h-5 w-5 mr-2" /> Información de
+                          Seguridad
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Nivel de Acceso:
+                            </span>{" "}
+                            {newEquipo.seguridad?.nivel_acceso}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Software de Seguridad:
+                            </span>{" "}
+                            {newEquipo.seguridad?.software_seguridad}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Cifrado de Disco:
+                            </span>{" "}
+                            {newEquipo.seguridad?.cifrado_disco}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Políticas Aplicadas:
+                            </span>{" "}
+                            {newEquipo.seguridad?.politicas_aplicadas?.join(
+                              ", "
+                            ) || "Sin políticas aplicadas"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          <DollarSign className="h-5 w-5 mr-2" /> Información de
+                          Adquisición
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Orden de Compra:
+                            </span>{" "}
+                            {newEquipo.adquisicion?.orden_compra}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Fecha de Compra:
+                            </span>{" "}
+                            {formatFecha(newEquipo.adquisicion?.fecha_compra)}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Precio de Compra:
+                            </span>{" "}
+                            $
+                            {formatPrecio(
+                              newEquipo.adquisicion?.precio_compra.toLocaleString()
+                            )}{" "}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Forma de Pago:
+                            </span>{" "}
+                            {newEquipo.adquisicion?.forma_pago}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Plazo de Pago:
+                            </span>{" "}
+                            {newEquipo.adquisicion?.plazo_pago}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Número de Factura:
+                            </span>{" "}
+                            {newEquipo.adquisicion?.numero_factura}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Proveedor:
+                            </span>{" "}
+                            {typeof newEquipo.adquisicion?.proveedores ===
+                            "object"
+                              ? newEquipo.adquisicion?.proveedores?.nombre
+                              : newEquipo.adquisicion?.proveedores}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Garantia desde:
+                            </span>{" "}
+                            {formatFecha(
+                              newEquipo.adquisicion?.inicio_garantia
+                            )}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Garantía hasta:
+                            </span>{" "}
+                            {formatFecha(
+                              newEquipo.adquisicion?.garantia_fecha_fin
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          <BookOpen className="h-5 w-5 mr-2" /> Información
+                          Administrativa
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Código de Inventario:
+                            </span>{" "}
+                            {newEquipo.administrativa?.codigo_inventario}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Centro de Coste:
+                            </span>{" "}
+                            {newEquipo.administrativa?.centro_coste}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Autorizado Por:
+                            </span>{" "}
+                            {typeof newEquipo.administrativa?.usuarios ===
+                            "object"
+                              ? newEquipo.administrativa?.usuarios?.nombre
+                              : newEquipo.administrativa?.usuarios}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Fecha de Activación:
+                            </span>
+                            {formatFecha(
+                              newEquipo.administrativa?.fecha_activacion
+                            )}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Estado Contable:
+                            </span>{" "}
+                            {newEquipo.administrativa?.estado_contable}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Valor Actual:
+                            </span>{" "}
+                            $
+                            {formatPrecio(
+                              newEquipo.administrativa?.valor_depreciado
+                            )}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Vida Útil Restante:
+                            </span>{" "}
+                            {newEquipo.administrativa?.vida_util_restante}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          Mantenimientos
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Frecuencia:
+                            </span>{" "}
+                            {newEquipo.mantenimiento
+                              ?.frecuencia_mantenimiento || "No disponible"}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Última Fecha de Mantenimiento:
+                            </span>{" "}
+                            {formatFecha(
+                              newEquipo.mantenimiento
+                                ?.ultima_fecha_mantenimiento
+                            )}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Proveedor de Servicio:
+                            </span>{" "}
+                            {newEquipo.mantenimiento?.proveedores?.nombre ||
+                              "No disponible"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          <Wifi className="h-5 w-5 mr-2" /> Ubicación Actual
+                        </h3>
+                        <div className="space-y-2 bg-slate-50 p-4 rounded-md">
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Sede:
+                            </span>{" "}
+                            {
+                              newEquipo?.estado_ubicacion?.sucursales?.sedes
+                                ?.nombre
+                            }
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Tipo de Sucursal:
+                            </span>{" "}
+                            {newEquipo?.estado_ubicacion?.sucursales?.tipo}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Responsable:
+                            </span>{" "}
+                            {newEquipo?.estado_ubicacion?.usuarios?.nombre ??
+                              "Sin usuarios"}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">
+                              Estado:
+                            </span>{" "}
+                            {newEquipo?.estado_ubicacion?.estado_actual}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center text-[#040d50]">
+                          Documentos Relacionados
+                        </h3>
+                        <div className="space-y-2">
+                          {newEquipo.archivosequipo?.length > 0 ? (
+                            <ul className="space-y-2">
+                              {newEquipo.archivosequipo.map(
+                                (archivo, index) => (
+                                  <li
+                                    key={index}
+                                    className="flex items-center justify-between border rounded-md p-3 bg-white shadow-sm"
+                                  >
+                                    <div className="flex items-center gap-2 overflow-hidden">
+                                      <span className="text-blue-600 font-medium truncate">
+                                        {archivo.nombre_archivo}
+                                      </span>
+                                    </div>
+
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="slate-100"
+                                      onClick={() => {
+                                        openFileInNewTab({
+                                          content: archivo.contenido,
+                                          tipo: archivo.tipo_archivo,
+                                          nombre: archivo.nombre_archivo,
+                                        });
+                                      }}
+                                    >
+                                      <Eye className="h-5 w-5" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="slate-100"
+                                      onClick={() => {
+                                        downloadFile({
+                                          content: archivo.contenido,
+                                          tipo: archivo.tipo_archivo,
+                                          nombre: archivo.nombre_archivo,
+                                        });
+                                      }}
+                                    >
+                                      <Download className="h-5 w-5" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="slate-100"
+                                    >
+                                      <XCircle className="h-5 w-5" />
+                                    </Button>
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          ) : (
+                            <p className="text-slate-500 text-sm">
+                              No hay archivos adjuntos.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="timeline" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Historial del Equipo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative space-y-8">
+                    {historialEventos.map((evento, index) => (
+                      <div key={evento.id} className="flex gap-4">
+                        <div className="flex-none">
+                          <div className="bg-background p-2 rounded-full border">
+                            {getIconoEvento(evento.tipo)}
+                          </div>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            {getBadgeEvento(evento.tipo)}
+                            <span className="text-sm text-muted-foreground">
+                              {formatFecha(evento.fecha)}
+                            </span>
+                          </div>
+                          <h4 className="font-semibold">
+                            {evento.descripcion}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Responsable: {evento.responsable}
+                          </p>
+                          {evento.detalles && (
+                            <div className="bg-muted p-3 rounded-md text-sm">
+                              {Object.entries(evento.detalles).map(
+                                ([key, value]) => {
+                                  if (key === "prioridad") {
+                                    return (
+                                      <p
+                                        key={key}
+                                        className="capitalize flex items-center gap-2"
+                                      >
+                                        <span className="font-medium">
+                                          {key.replace(/_/g, " ")}:
+                                        </span>
+                                        {value === "alta" ? (
+                                          <Badge className="bg-red-500 text-white">
+                                            {(value as string).toUpperCase()}
+                                          </Badge>
+                                        ) : (
+                                          <Badge className="bg-yellow-500 text-white">
+                                            {String(value).toUpperCase()}
+                                          </Badge>
+                                        )}
+                                      </p>
+                                    );
+                                  }
+
+                                  return (
+                                    <p key={key} className="capitalize">
+                                      <span className="font-medium">
+                                        {key.replace(/_/g, " ")}:
+                                      </span>{" "}
+                                      {Array.isArray(value)
+                                        ? value.join(", ")
+                                        : String(value)}
+                                    </p>
+                                  );
+                                }
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="estadisticas" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Distribución de Mantenimientos</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={estadisticasMantenimiento}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) =>
+                            `${name} ${(percent * 100).toFixed(0)}%`
+                          }
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {estadisticasMantenimiento.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Disponibilidad Mensual</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={disponibilidadMensual}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="mes" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="disponibilidad" fill="#8884d8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      )}
+    </>
   );
 };
 
