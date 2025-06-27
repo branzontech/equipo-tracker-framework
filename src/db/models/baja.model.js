@@ -66,6 +66,42 @@ export const bajaModel = {
         });
       }
 
+      if (baja.perifericos_directos?.length > 0) {
+        for (const periferico of baja.perifericos_directos) {
+          await prisma.bajas_perifericos_directos.create({
+            data: {
+              baja_id: bajaCreated.id_baja,
+              periferico_id: periferico.id_periferico,
+              motivos: periferico.motivo,
+            },
+          });
+
+          // Actualizar estado del periférico
+          await prisma.perifericos.update({
+            where: { id_periferico: periferico.id_periferico },
+            data: { estado: "Fuera de servicio" },
+          });
+        }
+      }
+
+      if (baja.impresoras?.length > 0) {
+        for (const impresora of baja.impresoras) {
+          await prisma.bajas_impresoras.create({
+            data: {
+              baja_id: bajaCreated.id_baja,
+              impresora_id: impresora.id_impresora,
+              motivos: impresora.motivo,
+            },
+          });
+
+          // Actualizar estado de la impresora
+          await prisma.impresoras.update({
+            where: { id_impresora: impresora.id_impresora },
+            data: { estado: "Fuera de servicio" },
+          });
+        }
+      }
+
       return bajaCreated;
     } catch (error) {
       console.error("Error al crear la baja:", error);
