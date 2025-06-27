@@ -2,6 +2,7 @@ import { TonerImpresora } from "./toner-impresora";
 
 export interface Toner {
   id_toner: number;
+  serial: string;
   modelo: string;
   color: string;
   cantidad: number;
