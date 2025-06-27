@@ -13,6 +13,7 @@ const useTonerImpresora = () => {
       estado: "",
       id_toner: 0,
       modelo: "",
+      serial: "",
       color: "",
       cantidad: 0,
       stock_actual: 0,
@@ -73,6 +74,7 @@ const useTonerImpresora = () => {
           sedes: item.impresoras.sucursales.sedes.nombre,
           sucursal: item.impresoras.sucursales.nombre,
           estado: item.toner.estado,
+          serial: item.toner.serial,
         }));
 
         setNormalizedData(normalized);
@@ -84,10 +86,9 @@ const useTonerImpresora = () => {
     getAllTonerImpresora();
   }, []);
 
-  console.log(normalizedData);
-
   const [visibleColumns, setVisibleColumns] = useState({
     modelo: true,
+    serial: true,
     modeloImpresora: true,
     color: true,
     stock: true,
