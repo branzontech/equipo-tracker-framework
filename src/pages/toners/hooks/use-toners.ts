@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { SalidaToner } from "../interfaces/salidaToner";
+import { useNavigate } from "react-router-dom";
 
 export const useToners = () => {
   const [toner, setToner] = useState<Toner[]>([]);
@@ -22,7 +23,7 @@ export const useToners = () => {
     modelo: "",
     serial: "",
     color: "",
-    estado: "",
+    estado: "Activo",
     cantidad: 0,
     stock_actual: 0,
     stock_minimo_alerta: 0,
@@ -43,6 +44,7 @@ export const useToners = () => {
   });
   const [serialToner, setSerialToner] = useState("");
   const [sugerenciasToner, setSugerenciasToner] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getAllToners = async () => {
@@ -60,6 +62,13 @@ export const useToners = () => {
   const create = async (toner: Toner) => {
     if (!toner.modelo) {
       toast.error("Debe ingresar un modelo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!toner.serial) {
+      toast.error("Debe ingresar un número de serie", {
         icon: icons.error,
       });
       return;
@@ -107,6 +116,7 @@ export const useToners = () => {
           icon: icons.success,
         });
         setTimeout(() => {
+          navigate("/toners/existencia");
           window.location.reload();
         }, 4500);
       }
