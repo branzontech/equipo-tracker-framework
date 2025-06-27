@@ -194,8 +194,8 @@ export const useEquipos = () => {
 
         const sedesConEquipos = new Set(
           response
-            .filter((equipo: any) => equipo.sucursales?.sedes?.id_sede)
-            .map((equipo: any) => equipo.sucursales?.sedes?.id_sede)
+            .filter((equipo: any) => equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede)
+            .map((equipo: any) => equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede)
         );
 
         setSedesConEquiposCount(sedesConEquipos.size);
