@@ -9,19 +9,10 @@ import { useEffect, useState } from "react";
 import { Acta } from "../interfaces/acta";
 import {
   FileText,
-  Grid,
-  LayoutGrid,
-  CheckCircle,
-  XCircle,
   RotateCw,
   Truck,
   Banknote,
-  ArrowUpFromLine,
   FileX,
-  AlertCircle,
-  User,
-  Calendar,
-  Tag,
 } from "lucide-react";
 import {
   Pagination,
@@ -33,7 +24,6 @@ import {
 } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
-import { vi } from "date-fns/locale";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { ActaEntregaPDF } from "../views/ActaEntregaPDF";
@@ -300,6 +290,7 @@ export const useActa = () => {
       tipo?: string;
       accesorios?: string;
       esPerifericoDirecto?: boolean;
+      motivo?: string;
     }[] = [];
 
     if (acta.tipo === "Prestamo") {
@@ -390,7 +381,7 @@ export const useActa = () => {
             serial: impresora.serial || "-",
             nombre: impresora.nombre || "-",
             marca: impresora.marcas?.nombre || "-",
-            tipo: impresora.tipo || "-",
+            activoFijo: impresora.tipo || "-",
             accesorios: "-",
             esPerifericoDirecto: false,
           });
@@ -408,6 +399,34 @@ export const useActa = () => {
             nombre: equipo.nombre_equipo,
             marca: equipo.marcas?.nombre || "-",
             activoFijo: equipo.tipo_activo || "-",
+          });
+        }
+      });
+
+      baja?.bajas_perifericos_directos.forEach((item) => {
+        const periferico = item.perifericos;
+        if (periferico) {
+          equipos.push({
+            serial: periferico.serial || "-",
+            nombre: periferico.nombre || "-",
+            marca: periferico.marcas?.nombre || "-",
+            tipo: periferico.tipo || "-",
+            accesorios: "-",
+            motivo: periferico.motivo || "-",
+          });
+        }
+      });
+
+      baja?.bajas_impresoras.forEach((item) => {
+        const impresora = item.impresoras;
+        if (impresora) {
+          equipos.push({
+            serial: impresora.serial || "-",
+            nombre: impresora.nombre || "-",
+            marca: impresora.marcas?.nombre || "-",
+            activoFijo: impresora.tipo || "-",
+            accesorios: "-",
+            motivo: impresora.motivo || "-",
           });
         }
       });
