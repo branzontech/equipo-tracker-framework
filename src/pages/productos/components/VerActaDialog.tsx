@@ -5,7 +5,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { format } from "date-fns";
 import {
   FileText,
   MapPin,
@@ -13,15 +12,10 @@ import {
   Calendar,
   Info,
   CheckCircle,
-  Tag,
   FileX,
   Clock,
   ArrowUpFromLine,
-  Banknote,
-  Truck,
   RotateCw,
-  DollarSign,
-  Building,
   AlertCircle,
   CheckCircle2,
   XCircle,
