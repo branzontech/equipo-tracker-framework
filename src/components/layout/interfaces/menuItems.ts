@@ -28,6 +28,20 @@ import {
   Building,
   Cog,
   AppWindow,
+  Layers,
+  ToggleLeft,
+  Activity,
+  Truck,
+  Handshake,
+  BadgeInfo,
+  Cpu,
+  LayoutGrid,
+  KeyRound,
+  BadgeCheck,
+  CircleDollarSign,
+  Plug,
+  Folders,
+  MapPin,
 } from "lucide-react";
 
 export const menuItems = [
@@ -129,12 +143,12 @@ export const menuItems = [
           },
           {
             title: "Sucursales",
-            icon: Box,
+            icon: MapPin,
             path: "/configuracion/maestros/sucursales",
           },
-          { title: "Tipos", icon: Tag, path: "/configuracion/maestros/tipos" },
-          { title: "Estados", icon: Tag, path: "/configuracion/maestros/estados" },
-          { title: "Proveedores", icon: Tag, path: "/configuracion/maestros/proveedores" },
+          { title: "Tipos", icon: Layers, path: "/configuracion/maestros/tipos" },
+          { title: "Estados", icon: Activity, path: "/configuracion/maestros/estados" },
+          { title: "Proveedores", icon: Handshake, path: "/configuracion/maestros/proveedores" },
           {
             title: "Marcas",
             icon: Tag,
@@ -142,12 +156,12 @@ export const menuItems = [
           },
           {
             title: "Periféricos",
-            icon: Cable,
+            icon: Plug,
             path: "/configuracion/maestros/perifericos",
           },
           {
             title: "Categorias",
-            icon: Tag,
+            icon: Folders,
             path: "/configuracion/maestros/categorias",
           },
           {
@@ -186,7 +200,7 @@ export const menuItems = [
       },
       {
         title: "Nivel de Acceso",
-        icon: Shield,
+        icon: KeyRound,
         path: "/configuracion/nivel-acceso",
       },
     ],
