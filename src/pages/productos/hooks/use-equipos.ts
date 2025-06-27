@@ -122,6 +122,7 @@ export const useEquipos = () => {
       sedes: null,
       marca_id: 0,
       marcas: null,
+      motivo: "",
     },
     trazabilidad: {
       prestamo_equipos: [],
