@@ -180,7 +180,7 @@ const EditEquipo = () => {
         },
       }),
       ...(tipo === "proveedor_servicio" && {
-            mantenimiento: {
+        mantenimiento: {
           ...prev.mantenimiento,
           proveedor_servicio_id: id,
         },
@@ -369,6 +369,7 @@ const EditEquipo = () => {
 
                         <div className="space-y-2">
                           <ImagenEquipoUploader
+                            value={newEquipo.imagen}
                             onChange={(base64) =>
                               setNewEquipo((prev) => ({
                                 ...prev,
