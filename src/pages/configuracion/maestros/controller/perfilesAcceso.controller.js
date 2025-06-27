@@ -35,3 +35,12 @@ export const updatePerfilesAcceso = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const deletePerfilesAcceso = async (req, res) => {
+  try {
+    const perfilesAcceso = await perfilesAccesoService.detele(req.params.id);
+    res.status(200).json({ perfilesAcceso, success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
