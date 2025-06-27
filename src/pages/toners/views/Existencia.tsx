@@ -200,11 +200,11 @@ const ExistenciaToners = () => {
                           <TableCell key={key}>
                             {key === "estado" ? (
                               <StatusBadge status={item[key]} />
-                            ) : key === "stock_actual" ? (
+                            ) : key === "stock" ? (
                               <div className="flex items-center gap-2">
                                 {item[key]}
-                                {item.stock_actual <=
-                                  item.stock_minimo_alerta && (
+                                {item.stock <=
+                                  item.alerta && (
                                   <AlertTriangle className="h-4 w-4 text-yellow-500" />
                                 )}
                               </div>
@@ -215,9 +215,6 @@ const ExistenciaToners = () => {
                         )
                     )}
                     <TableCell>
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
