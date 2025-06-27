@@ -70,7 +70,6 @@ export const UserModel = {
         estado: true,
         telefono: true,
         firma: true,
-        
       },
       take: 10,
     });
