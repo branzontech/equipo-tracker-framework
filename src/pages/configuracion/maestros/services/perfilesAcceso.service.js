@@ -17,4 +17,8 @@ export const perfilesAccesoService = {
     const perfilesAcceso = await PerfilesAccesoModel.update(id, perfilAcceso);
     return perfilesAcceso;
   },
+  detele: async (id) => {
+    const perfilesAcceso = await PerfilesAccesoModel.delete_(id);
+    return perfilesAcceso;
+  },
 };
