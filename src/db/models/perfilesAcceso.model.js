@@ -7,6 +7,7 @@ export const PerfilesAccesoModel = {
         data: {
           nombre_perfil: data.nombre_perfil,
           descripcion: data.descripcion,
+          estado: data.estado,
         },
       });
     } catch (error) {
@@ -21,6 +22,7 @@ export const PerfilesAccesoModel = {
         nombre_perfil: true,
         descripcion: true,
         fecha_creacion: true,
+        estado: true,
       },
     });
     return perfilesAcceso;
@@ -34,6 +36,7 @@ export const PerfilesAccesoModel = {
         nombre_perfil: true,
         descripcion: true,
         fecha_creacion: true,
+        estado: true,
       },
     });
     return perfilAcceso;
@@ -44,8 +47,23 @@ export const PerfilesAccesoModel = {
       data: {
         nombre_perfil: perfilAcceso.nombre_perfil,
         descripcion: perfilAcceso.descripcion,
+        estado: perfilAcceso.estado,
       },
     });
     return perfilAccesoUpdated;
+  },
+  async delete_(id) {
+    const id_perfil = Number(id);
+    try {
+      const perfilAcceso = await prisma.perfilesacceso.update({
+        where: { id: id_perfil },
+        data: {
+          estado: "Fuera de servicio",
+        },
+      });
+      return perfilAcceso;
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 };
