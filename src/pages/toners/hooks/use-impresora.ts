@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Impresora } from "../interfaces/impresora";
 import {
@@ -6,6 +7,7 @@ import {
   getImpresoraById,
   updateImpresora,
   deleteImpresora,
+  getImpresoraBySerial,
 } from "@/api/axios/impresora.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
@@ -29,6 +31,9 @@ export const useImpresora = () => {
   const [selectedImpresoraId, setSelectedImpresoraId] = useState<number | null>(
     null
   );
+  const [impresoraSerial, setImpresoraSerial] = useState("");
+  const [sugerenciasImpresora, setSugerenciasImpresora] = useState<any[]>([]);
+
 
   useEffect(() => {
     const getAllImpresora = async () => {
@@ -150,6 +155,21 @@ export const useImpresora = () => {
     setShowEditModal(true);
   };
 
+  const handleImpresoraSerialInput = async (serial: string) => {
+    setImpresoraSerial(serial);
+
+    if (serial.length >= 3) {
+      try {
+        const response = await getImpresoraBySerial(serial);
+        setSugerenciasImpresora(response || null);
+      } catch (error) {
+        toast.error(error.message, { icon: icons.error });
+      }
+    } else {
+      setSugerenciasImpresora(null);
+    }
+  };
+
   return {
     impresora,
     setImpresa,
@@ -162,6 +182,11 @@ export const useImpresora = () => {
     setShowEditModal,
     handleOpenEditModal,
     selectedImpresoraId,
-    deleteImpresoraById
+    deleteImpresoraById,
+    handleImpresoraSerialInput,
+    impresoraSerial,
+    setImpresoraSerial,
+    sugerenciasImpresora,
+    setSugerenciasImpresora
   };
 };
