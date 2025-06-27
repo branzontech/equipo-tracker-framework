@@ -62,6 +62,25 @@ export const ActaModel = {
                 },
               },
             },
+            bajas_perifericos_directos: {
+              include: {
+                perifericos: {
+                  include: {
+                    marcas: true,
+                  },
+                },
+              },
+            },
+            bajas_impresoras: {
+              include: {
+                impresoras: {
+                  include: {
+                    sucursales: true,
+                    marcas: true,
+                  },
+                },
+              },
+            },
             usuarios_bajas_responsable_autorizacion_idTousuarios: {
               select: { nombre: true, firma: true },
             },
