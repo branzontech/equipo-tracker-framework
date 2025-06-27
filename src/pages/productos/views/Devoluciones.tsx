@@ -159,7 +159,7 @@ const Devoluciones = () => {
                                 }`
                               }
                             >
-                              {item.nombre}
+                              {item.nombre} - {item.origin}
                             </Combobox.Option>
                           ))
                         )}
