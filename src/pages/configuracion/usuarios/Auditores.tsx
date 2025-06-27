@@ -44,12 +44,23 @@ const Auditores = () => {
                   <TableCell>{responsable.rol}</TableCell>
                   <TableCell>{responsable.telefono ?? "No asignado"}</TableCell>
                   <TableCell>
-                    {responsable.sedes?.nombre ?? "No asignado"}
+                    {responsable.usuario_sede &&
+                    responsable.usuario_sede.length > 0
+                      ? responsable.usuario_sede
+                          .map((us) => us.sedes?.nombre)
+                          .filter(Boolean)
+                          .join(", ")
+                      : "No asignado"}
                   </TableCell>
+
                   <TableCell>
-                    {responsable.sedes?.sucursales
-                      ?.map((suc) => suc.nombre)
-                      .join(", ") ?? "No asignado"}
+                    {responsable.usuario_sede &&
+                    responsable.usuario_sede.length > 0
+                      ? responsable.usuario_sede
+                          .flatMap((us) => us.sedes?.sucursales || [])
+                          .map((suc) => suc.nombre)
+                          .join(", ") || "No asignado"
+                      : "No asignado"}
                   </TableCell>
                 </TableRow>
               ))

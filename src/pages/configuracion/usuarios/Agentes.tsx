@@ -42,12 +42,21 @@ const Agentes = () => {
                   <TableCell>{agente.email}</TableCell>
                   <TableCell>{agente.rol}</TableCell>
                   <TableCell>{agente.telefono ?? "No asignado"}</TableCell>
-                  <TableCell>{agente.sedes?.nombre ?? "No asignado"}</TableCell>
                   <TableCell>
-                    {agente.sedes?.sucursales?.length
-                      ? agente.sedes.sucursales
-                          .map((suc) => suc.nombre)
+                    {agente.usuario_sede && agente.usuario_sede.length > 0
+                      ? agente.usuario_sede
+                          .map((us) => us.sedes?.nombre)
+                          .filter(Boolean)
                           .join(", ")
+                      : "No asignado"}
+                  </TableCell>
+
+                  <TableCell>
+                    {agente.usuario_sede && agente.usuario_sede.length > 0
+                      ? agente.usuario_sede
+                          .flatMap((us) => us.sedes?.sucursales || [])
+                          .map((suc) => suc.nombre)
+                          .join(", ") || "No asignado"
                       : "No asignado"}
                   </TableCell>
                 </TableRow>
