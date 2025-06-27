@@ -7,23 +7,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { UpdateProps } from "../interfaces/props";
 import { usePerfilesAcceso } from "../hooks/use-perfiles-acceso";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEstado } from "../hooks/use-estado";
 
 const UpdatePerfil = ({ open, onOpenChange, id }: UpdateProps) => {
-  const {
-    perfilesAcceso,
-    getById,
-    newPerfilAcceso,
-    setNewPerfilAcceso,
-    update,
-  } = usePerfilesAcceso();
+  const { getById, newPerfilAcceso, setNewPerfilAcceso, update } =
+    usePerfilesAcceso();
+  const { estados } = useEstado();
 
   useEffect(() => {
     if (id !== null) {
@@ -82,6 +84,33 @@ const UpdatePerfil = ({ open, onOpenChange, id }: UpdateProps) => {
                     autoComplete="off"
                     placeholder="Ingrese la descripción del perfil"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado</Label>
+                  <Select
+                    value={newPerfilAcceso.estado || ""}
+                    onValueChange={(value) =>
+                      setNewPerfilAcceso({
+                        ...newPerfilAcceso,
+                        estado: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estados.map((estado) => (
+                        <SelectItem
+                          key={estado.id_estado}
+                          value={estado.nombre_estado}
+                        >
+                          {estado.nombre_estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>
