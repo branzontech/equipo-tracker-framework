@@ -4,6 +4,7 @@ import {
   findAllPerfilesAcceso,
   getByIdPerfilesAcceso,
   updatePerfilesAcceso,
+  deletePerfilesAcceso,
 } from "../../pages/configuracion/maestros/controller/perfilesAcceso.controller.js";
 
 const router = express.Router();
@@ -12,6 +13,7 @@ router
     .post("/create", createPerfilesAcceso)
     .get("/get", findAllPerfilesAcceso)
     .get("/get/:id", getByIdPerfilesAcceso)
-    .put("/update/:id", updatePerfilesAcceso);
+    .put("/update/:id", updatePerfilesAcceso)
+    .delete("/delete/:id", deletePerfilesAcceso)
 
 export default router;
