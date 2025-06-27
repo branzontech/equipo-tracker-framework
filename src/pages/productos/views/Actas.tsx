@@ -45,6 +45,7 @@ import {
 import { Separator } from "@radix-ui/react-select";
 import { Label } from "@/components/ui/label";
 import { useGlobal } from "@/hooks/use-global";
+import Loading from "@/components/Loading";
 
 const Actas = () => {
   const {
@@ -75,6 +76,8 @@ const Actas = () => {
     setManagementSheetOpen,
     handleStatusChange,
     generarYDescargarPDF,
+    isGenerating,
+    setIsGenerating,
   } = useActa();
   const { formatFecha } = useGlobal();
 
@@ -374,153 +377,28 @@ const Actas = () => {
             </div>
 
             <Separator />
-
-            <div className="space-y-4">
-              <h3 className="font-semibold">Cambiar estado</h3>
-              <div className="grid grid-cols-1 gap-2">
-                {currentActa.tipo === "Devolucion" ? (
-                  <>
-                    {estado !== "Cancelada" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusChange(currentActa, "Cancelada")
-                        }
-                      >
-                        <XCircle className="h-4 w-4 text-red-500" />
-                        <Label className="text-[13px]">
-                          Marcar como Cancelada
-                        </Label>
-                      </Button>
-                    )}
-                    {estado !== "Satisfactoria" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusChange(currentActa, "Satisfactoria")
-                        }
-                      >
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        <Label className="text-[13px]">
-                          Marcar como Satisfactoria
-                        </Label>
-                      </Button>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {estado !== "Vigente" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusChange(currentActa, "Vigente")
-                        }
-                      >
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <Label className="text-[13px]">
-                          Marcar como Vigente
-                        </Label>
-                      </Button>
-                    )}
-                    {estado !== "Finalizado" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusChange(currentActa, "Finalizado")
-                        }
-                      >
-                        <CheckCircle className="h-4 w-4 text-gray-500" />
-                        <Label className="text-[13px]">
-                          Marcar como Finalizado
-                        </Label>
-                      </Button>
-                    )}
-                    {/* {estado !== "En proceso" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusChange(currentActa, "En proceso")
-                        }
-                      >
-                        <RotateCw className="h-4 w-4 text-blue-500" />
-                        <Label className="text-[13px]">
-                          Marcar como En Proceso
-                        </Label>
-                      </Button>
-                    )} */}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* {currentActa.tipo === "Prestamo" && estado !== "Vigente" && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <h3 className="font-semibold">
-                    Acciones específicas de préstamo
-                  </h3>
-                  <div className="space-y-2">
-                    {estado === "Pendiente" && (
-                      <Button
-                        className="w-full flex gap-2"
-                        // onClick={() => handleRequestReturn(currentActa)}
-                      >
-                        <AlertCircle className="h-4 w-4" />
-                        Solicitar devolución
-                      </Button>
-                    )}
-
-                    {(estado === "Vigente" ||
-                      estado === "pendiente_devolucion") && (
-                      <Button
-                        variant="secondary"
-                        className="w-full flex gap-2"
-                        // onClick={() => handleProcessReturn(currentActa)}
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                        Procesar devolución
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </>
-            )} */}
-
-            {estado === "En proceso" && (
-              <>
-                <Separator />
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  // onClick={() => handleCancelActa(currentActa)}
-                >
-                  Cancelar acta
-                </Button>
-              </>
-            )}
           </div>
 
-          <SheetFooter className="mt-6">
+          <SheetFooter className="mt-8">
             <Button
               className="w-full"
               onClick={() => handleVerActa(currentActa)}
             >
               Ver todos los detalles
             </Button>
-            {estado === "Pendiente" || estado === "Cancelada" ? null : (
-              <Button
-                className="w-full"
-                onClick={() => generarYDescargarPDF(currentActa)}
-              >
-                Generar PDF
-              </Button>
-            )}
+            <Button
+              className="w-full"
+              onClick={() => generarYDescargarPDF(currentActa)}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <Loading />
+                </>
+              ) : (
+                "Generar PDF"
+              )}
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
