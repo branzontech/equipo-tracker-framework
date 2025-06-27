@@ -17,8 +17,11 @@ export const useBaja = () => {
     responsable_autorizacion_id: 0,
     responsable_solicitud_id: 0,
     equipos: [],
+    tipo: "",
+    perifericos_directos: [],
+    impresoras: [],
   });
-  const { buscarEquipo, saveSign_ } = useGlobal();
+  const { saveSign_ } = useGlobal();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,19 +58,19 @@ export const useBaja = () => {
       return;
     }
 
-    if (!baja.equipos.length) {
-      toast.error("Debe agregar al menos un equipo", {
-        icon: icons.error,
-      });
-      return;
-    }
+    // if (!baja.equipos.length) {
+    //   toast.error("Debe agregar al menos un equipo", {
+    //     icon: icons.error,
+    //   });
+    //   return;
+    // }
 
-    if (allEquiposWithinMotivo) {
-      toast.error("Debe agregar el motivo de la baja a todos los equipos", {
-        icon: icons.error,
-      });
-      return;
-    }
+    // if (allEquiposWithinMotivo) {
+    //   toast.error("Debe agregar el motivo de la baja a todos los equipos", {
+    //     icon: icons.error,
+    //   });
+    //   return;
+    // }
 
     if (equiposWithinMotivo) {
       toast.error("Debe ingresar el motivo de la baja", {
@@ -102,10 +105,10 @@ export const useBaja = () => {
         toast.success("La baja se ha agregado correctamente", {
           icon: icons.success,
         });
-        setTimeout(() => {
-          navigate("/productos/actas");
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   navigate("/productos/actas");
+        //   window.location.reload();
+        // }, 4500);
       } else {
         toast.error("Error al agregar la baja", {
           icon: icons.error,
