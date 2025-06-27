@@ -3,6 +3,11 @@ import { prisma } from "../../../prisma/prismaCliente.js";
 export const impresoraModel = {
   async getAll() {
     const impresoras = await prisma.impresoras.findMany({
+      where: {
+        estado: {
+          not: "Fuera de servicio",
+        },
+      },
       select: {
         id_impresora: true,
         nombre: true,
@@ -39,10 +44,10 @@ export const impresoraModel = {
     return impresora;
   },
   findBySerial: async (serial) => {
-    const impresora = await prisma.impresoras.findFirst({
+    const impresora = await prisma.impresoras.findMany({
       where: {
         serial: {
-          equals: serial,
+          contains: serial,
           mode: "insensitive",
         },
       },
@@ -66,6 +71,7 @@ export const impresoraModel = {
           },
         },
       },
+      take: 10
     });
     return impresora;
   },
