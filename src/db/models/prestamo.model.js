@@ -148,7 +148,7 @@ export const prestamoModel = {
 
           // Actualizar estado de la impresora
           await prisma.impresoras.update({
-            where: { id_impresora: impresora.impresora_id },
+            where: { id_impresora: impresora.id_impresora  },
             data: { estado: "En Préstamo" },
           });
         }
