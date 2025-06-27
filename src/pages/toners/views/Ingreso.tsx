@@ -48,6 +48,19 @@ export default function IngresoToner() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="serie">N° de serie</Label>
+                  <Input
+                    id="serie"
+                    autoComplete="off"
+                    value={newToner.serial || ""}
+                    onChange={(e) => {
+                      setNewToner({ ...newToner, serial: e.target.value });
+                    }}
+                    placeholder="Ingrese el número de serie"
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="modeloImpresora">Modelo de Impresora</Label>
                   <Select
                     value={newToner.impresoras[0]?.toString() || ""}
