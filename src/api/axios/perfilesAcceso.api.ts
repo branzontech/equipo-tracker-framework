@@ -50,3 +50,13 @@ export const updatePerfilesAcceso = async (
     );
   }
 };
+
+export const deletePerfilesAcceso = async (id: number) => {
+  try {
+    const response = await api.delete(`perfiles-acceso/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al eliminar el perfil de acceso:", error);
+    throw new Error("Error al eliminar el perfil de acceso: " + error.message);
+  }
+};
