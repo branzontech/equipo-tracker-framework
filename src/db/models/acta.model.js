@@ -75,7 +75,11 @@ export const ActaModel = {
               include: {
                 impresoras: {
                   include: {
-                    sucursales: true,
+                    sucursales: {
+                      include: {
+                        sedes: true,
+                      },
+                    },
                     marcas: true,
                   },
                 },
