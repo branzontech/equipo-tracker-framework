@@ -51,8 +51,10 @@ export const useDevolucion = () => {
         traslados_directos,
         traslados_impresoras,
       } = await getEquiposEnMovimiento();
+      
 
       const equiposConTipo: EquipoEnMovimientoBase[] = prestamos.map((e) => ({
+        uId: `PRESTAMO-EQUIPO-${e.id_equipo}`,
         id: e.id_equipo,
         tipo: "EQUIPO",
         nombre: e.nombre_equipo,
@@ -63,6 +65,7 @@ export const useDevolucion = () => {
 
       const perifericosConTipo: EquipoEnMovimientoBase[] =
         prestamos_directos.map((p) => ({
+          uId: `PRESTAMO-PERIFERICO-${p.perifericos.id_periferico}`,
           id: p.perifericos.id_periferico,
           tipo: "PERIFERICO",
           nombre: p.perifericos.nombre,
@@ -73,6 +76,7 @@ export const useDevolucion = () => {
 
       const impresorasConTipo: EquipoEnMovimientoBase[] = impresoras.map(
         (i) => ({
+          uId: `PRESTAMO-IMPRESORA-${i.impresoras.id_impresora}`,
           id: i.impresoras.id_impresora,
           tipo: "IMPRESORA",
           nombre: i.impresoras.nombre,
@@ -83,6 +87,7 @@ export const useDevolucion = () => {
       );
 
       const equipoTraslado: EquipoEnMovimientoBase[] = traslados.map((e) => ({
+        uId: `TRASLADO-EQUIPO-${e.id_equipo}`,
         id: e.id_equipo,
         tipo: "EQUIPO",
         nombre: e.nombre_equipo,
@@ -93,6 +98,7 @@ export const useDevolucion = () => {
 
       const perifericosTraslado: EquipoEnMovimientoBase[] =
         traslados_directos.map((p) => ({
+          uId: `TRASLADO-PERIFERICO-${p.perifericos.id_periferico}`,
           id: p.perifericos.id_periferico,
           tipo: "PERIFERICO",
           nombre: p.perifericos.nombre,
@@ -103,6 +109,7 @@ export const useDevolucion = () => {
 
       const impresorasTraslado: EquipoEnMovimientoBase[] = traslados_impresoras.map(
         (i) => ({
+          uId: `TRASLADO-IMPRESORA-${i.impresoras.id_impresora}`,
           id: i.impresoras.id_impresora,
           tipo: "IMPRESORA",
           nombre: i.impresoras.nombre,
