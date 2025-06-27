@@ -83,6 +83,17 @@ const UpdateToner = ({ open, onOpenChange, id }: UpdateProps) => {
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="serial">N° Serie</Label>
+                      <Input
+                        placeholder="N° Serie"
+                        value={newToner.serial}
+                        onChange={(e) =>
+                          setNewToner({ ...newToner, serial: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="modeloImpresora">
                         Modelo de Impresora
                       </Label>
