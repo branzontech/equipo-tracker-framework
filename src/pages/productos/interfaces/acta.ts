@@ -64,6 +64,16 @@ export interface Acta {
       motivos: string | null;
       equipos: Equipo | null;
     }[];
+    bajas_perifericos_directos: {
+      id: number;
+      perifericos: Perifericos | null;
+      motivos: string | null;
+    }[];
+    bajas_impresoras: {
+      id: number;
+      impresoras: Impresora | null;
+      motivos: string | null;
+    }[];
   }[];
 
   traslados: {
