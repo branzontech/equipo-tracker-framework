@@ -7,13 +7,7 @@ import {
 } from "@/api/axios/acta.api";
 import { useEffect, useState } from "react";
 import { Acta } from "../interfaces/acta";
-import {
-  FileText,
-  RotateCw,
-  Truck,
-  Banknote,
-  FileX,
-} from "lucide-react";
+import { FileText, RotateCw, Truck, Banknote, FileX } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -413,6 +407,7 @@ export const useActa = () => {
             tipo: periferico.tipo || "-",
             accesorios: "-",
             motivo: periferico.motivo || "-",
+            esPerifericoDirecto: true,
           });
         }
       });
@@ -474,7 +469,7 @@ export const useActa = () => {
               nombre: impresora.nombre,
               marca: impresora.marcas?.nombre || "-",
               activoFijo: impresora.tipo || "-",
-              accesorios:  "-",
+              accesorios: "-",
             });
           }
         });
