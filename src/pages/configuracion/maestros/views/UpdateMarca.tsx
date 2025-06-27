@@ -7,25 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CheckCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useSedes } from "../hooks/use-sedes";
 import { useEffect } from "react";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { UpdateProps } from "../interfaces/props";
 import { useMarcas } from "../hooks/use-marcas";
