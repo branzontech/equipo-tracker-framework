@@ -44,7 +44,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useTonerImpresora from "../hooks/use-toner-impresora";
-import UpdateToner from "./EditToner";
+import UpdateToner from "./UpdateToner";
 import { useToners } from "../hooks/use-toners";
 import { useGlobal } from "@/hooks/use-global";
 
