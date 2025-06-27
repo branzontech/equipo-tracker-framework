@@ -83,4 +83,10 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
   },
+  imagenTabla: {
+    width: 40,
+    height: 40,
+    objectFit: "cover",
+    margin: 2,
+  },
 });
