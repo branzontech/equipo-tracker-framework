@@ -136,7 +136,7 @@ const Traslados = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bodegaDestino">Sucursal Destino</Label>
+              <Label htmlFor="sucursalDestino">Sucursal Destino</Label>
               <Select
                 onValueChange={(value) => {
                   setNewTraslado((prev) => ({
@@ -145,7 +145,7 @@ const Traslados = () => {
                   }));
                 }}
               >
-                <SelectTrigger id="bodegaDestino">
+                <SelectTrigger id="sucursalDestino">
                   <SelectValue placeholder="Seleccione una sucursal" />
                 </SelectTrigger>
                 <SelectContent>
