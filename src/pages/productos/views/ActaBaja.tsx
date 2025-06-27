@@ -9,12 +9,53 @@ export const ActaBaja = ({ data }) => {
     getFirmas(data);
 
   const baja = data.bajas?.[0];
-  const equipos = (baja?.bajas_equipos || []).map((equipo) => ({
-    serial: equipo.equipos?.nro_serie || "N/A",
-    marca: equipo.equipos?.marcas?.nombre || "N/A",
-    activoFijo: equipo.equipos?.tipo_activo || "N/A",
-    motivo: equipo.motivos || "Sin especificar",
-  }));
+
+  const equipos = [];
+
+  // Equipos
+  baja?.bajas_equipos?.forEach((item) => {
+    const equipo = item.equipos;
+    if (equipo) {
+      equipos.push({
+        categoria: "Equipo",
+        serial: equipo.nro_serie || "-",
+        nombre: equipo.nombre_equipo || "-",
+        marca: equipo.marcas?.nombre || "-",
+        tipo: equipo.tipo_activo || "-",
+        motivo: item.motivos || "-",
+      });
+    }
+  });
+
+  // Periféricos directos
+  baja?.bajas_perifericos_directos?.forEach((item) => {
+    const perif = item.perifericos;
+    if (perif) {
+      equipos.push({
+        categoria: "Periférico",
+        serial: perif.serial || "-",
+        nombre: perif.nombre || "-",
+        marca: perif.marcas?.nombre || "-",
+        tipo: perif.tipo || "-",
+        motivo: perif.motivo || "-",
+      });
+    }
+  });
+
+  // Impresoras
+  baja?.bajas_impresoras?.forEach((item) => {
+    const imp = item.impresoras;
+    if (imp) {
+      equipos.push({
+        categoria: "Impresora",
+        serial: imp.serial || "-",
+        nombre: imp.nombre || "-",
+        marca: imp.marcas?.nombre || "-",
+        tipo: imp.tipo || "-",
+        motivo: item.motivos || "-",
+      });
+    }
+  });
 
   return (
     <Page size="A4" style={styles.page}>
@@ -48,19 +89,19 @@ export const ActaBaja = ({ data }) => {
           </View>
         </View>
 
-        {equipos.map((equipo, i) => (
-          <View style={[styles.tableRow, styles.tableHeader]} key={i}>
+        {equipos.map((item, i) => (
+          <View style={styles.tableRow} key={i}>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.serial}</Text>
+              <Text style={styles.tableCell}>{item.serial}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.marca}</Text>
+              <Text style={styles.tableCell}>{item.marca}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.activoFijo}</Text>
+              <Text style={styles.tableCell}>{item.tipo}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{equipo.motivo}</Text>
+              <Text style={styles.tableCell}>{item.motivo}</Text>
             </View>
           </View>
         ))}
@@ -76,8 +117,18 @@ export const ActaBaja = ({ data }) => {
       <Text style={styles.sectionTitle}>Ubicación de los equipos bajados:</Text>
       <Text style={styles.text}>
         El equipo bajado se encuentra ubicado en la sede{" "}
-        {baja?.bajas_equipos?.[0]?.equipos?.sucursales?.sedes?.regional}, en la
-        sucursal {baja?.bajas_equipos?.[0]?.equipos?.sucursales?.nombre}.
+        {baja?.bajas_equipos?.[0]?.equipos?.sucursales?.sedes?.nombre ||
+          baja?.bajas_perifericos_directos?.[0]?.perifericos?.sucursales?.sedes
+            ?.nombre ||
+          baja?.bajas_impresoras?.[0]?.impresoras?.sucursales?.sedes?.nombre ||
+          "-"}
+        , en la sucursal{" "}
+        {baja?.bajas_equipos?.[0]?.equipos?.sucursales?.nombre ||
+          baja?.bajas_perifericos_directos?.[0]?.perifericos?.sucursales
+            ?.nombre ||
+          baja?.bajas_impresoras?.[0]?.impresoras?.sucursales?.nombre ||
+          "-"}
+        .
       </Text>
 
       <Text style={styles.sectionTitle}>Notas legales:</Text>
