@@ -107,10 +107,10 @@ export const usePrestamo = () => {
         toast.success(response.message || "Prestamo creado exitosamente", {
           icon: icons.success,
         });
-        setTimeout(() => {
-          navigate("/productos/actas");
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   navigate("/productos/actas");
+        //   window.location.reload();
+        // }, 4500);
       }
       return response;
     } catch (error) {
