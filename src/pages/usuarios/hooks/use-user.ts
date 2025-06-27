@@ -16,14 +16,13 @@ export const useUser = () => {
     contraseña: "",
     email: "",
     rol: "",
-    sede_id: 0,
-    sedes: null,
     estado: null,
     firma_entrega: "",
     firma_recibe: "",
     firma: "",
     telefono: "",
     sucursales: null,
+    usuario_sede: null,
   });
   const [count, setCount] = useState(0);
   const [selectedEntregaUser, setSelectedEntregaUser] = useState<Firma | null>(
