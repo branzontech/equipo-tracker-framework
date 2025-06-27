@@ -10,4 +10,15 @@ export interface Baja {
     id_equipo: number;
     motivo: string;
   }[];
+  tipo: string;
+  perifericos_directos: {
+    id_periferico: number;
+    nombre: string;
+    motivo: string;
+  }[];
+  impresoras: {
+    id_impresora: number;
+    nombre: string;
+    motivo: string;
+  }[];
 }
