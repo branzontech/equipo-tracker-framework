@@ -1,12 +1,6 @@
-
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -17,15 +11,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Shield, User, Users, Lock, ListChecks } from "lucide-react";
-import { perfilesAcceso } from "@/pages/configuracion/maestros/interfaces/perfilAcceso";
 import { modulos } from "@/pages/configuracion/usuarios/interfaces/modulos";
 import { usuarios } from "@/pages/configuracion/usuarios/interfaces/usuarios";
+import { usePerfilesAcceso } from "../maestros/hooks/use-perfiles-acceso";
 
 const Permisos = () => {
+  // REAL
+  const { perfilesAcceso } = usePerfilesAcceso();
+
   const [selectedProfile, setSelectedProfile] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
-  const [permisosPerfiles, setPermisosPerfiles] = useState<Record<string, string[]>>({});
-  const [permisosUsuarios, setPermisosUsuarios] = useState<Record<string, string[]>>({});
+  const [permisosPerfiles, setPermisosPerfiles] = useState<
+    Record<string, string[]>
+  >({});
+  const [permisosUsuarios, setPermisosUsuarios] = useState<
+    Record<string, string[]>
+  >({});
   const [activeTab, setActiveTab] = useState("perfiles");
 
   const handleProfilePermissionChange = (modulo: string, permiso: string) => {
@@ -67,7 +68,9 @@ const Permisos = () => {
     }
 
     toast.success(
-      `Permisos de ${activeTab === "perfiles" ? "perfil" : "usuario"} actualizados exitosamente`
+      `Permisos de ${
+        activeTab === "perfiles" ? "perfil" : "usuario"
+      } actualizados exitosamente`
     );
   };
 
@@ -123,10 +126,12 @@ const Permisos = () => {
               </SelectTrigger>
               <SelectContent>
                 {perfilesAcceso.map((perfil) => (
-                  <SelectItem key={perfil.id} value={perfil.id}>
+                  <SelectItem key={perfil.id} value={perfil.id.toString()}>
                     <div className="flex flex-col">
-                      <span>{perfil.nombre}</span>
-                      <span className="text-xs text-gray-500">{perfil.descripcion}</span>
+                      <span>{perfil.nombre_perfil}</span>
+                      <span className="text-xs text-gray-500">
+                        {perfil.descripcion}
+                      </span>
                     </div>
                   </SelectItem>
                 ))}
@@ -168,7 +173,9 @@ const Permisos = () => {
                   <SelectItem key={usuario.id} value={usuario.id}>
                     <div className="flex flex-col">
                       <span>{usuario.nombre}</span>
-                      <span className="text-xs text-gray-500">{usuario.perfil}</span>
+                      <span className="text-xs text-gray-500">
+                        {usuario.perfil}
+                      </span>
                     </div>
                   </SelectItem>
                 ))}
