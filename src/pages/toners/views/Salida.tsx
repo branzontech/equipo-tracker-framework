@@ -1,11 +1,4 @@
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Printer, ArrowUpFromLine } from "lucide-react";
@@ -53,6 +46,10 @@ const SalidaToners = () => {
     sugerencias,
     setSugerencias,
     setNombreUser,
+    userRetira,
+    setUserRetira,
+    sugerenciasRetira,
+    setSugerenciasRetira,
   } = useUser();
 
   const handleUserSelect = (user) => {
@@ -62,6 +59,15 @@ const SalidaToners = () => {
       usuario_id: user.id_usuario,
     }));
     setSugerencias([]);
+  };
+
+  const handleUserRetiraSelect = (user) => {
+    setUserRetira(user.nombre);
+    setNewSalidaToner((prev) => ({
+      ...prev,
+      usuario_id_retira: user.id_usuario,
+    }));
+    setSugerenciasRetira([]);
   };
 
   const handleSerialInput = (toner) => {
@@ -122,9 +128,7 @@ const SalidaToners = () => {
                 suggestions={sugerenciasImpresora}
                 onSelect={handleImpresoraSerial}
                 getKey={(u) => u.id_impresora}
-                getLabel={(u) =>
-                  `${u.serial ?? "Sin serial"} - ${u.nombre ?? "Desconocido"}`
-                }
+                getLabel={(item) => `${item.nombre} - ${item.serial}`}
               />
 
               <div className="space-y-2">
@@ -183,10 +187,21 @@ const SalidaToners = () => {
               </div>
 
               <SearchSelect
+                label="Usuario que retira"
+                placeholder="Ingrese el nombre del usuario"
+                value={userRetira}
+                onInputChange={(val) => handleNombreInput(val, "retira")}
+                suggestions={sugerenciasRetira}
+                onSelect={handleUserRetiraSelect}
+                getKey={(u) => u.id_usuario}
+                getLabel={(u) => u.nombre}
+              />
+
+              <SearchSelect
                 label="Usuario de recepción"
                 placeholder="Ingrese el nombre del usuario"
                 value={nombreInput}
-                onInputChange={handleNombreInput}
+                onInputChange={(val) => handleNombreInput(val, "recepcion")}
                 suggestions={sugerencias}
                 onSelect={handleUserSelect}
                 getKey={(u) => u.id_usuario}
