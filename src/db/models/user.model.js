@@ -12,6 +12,7 @@ export const UserModel = {
         estado: true,
         telefono: true,
         firma: true,
+        perfil_id: true,
         usuario_sede: {
           select: {
             sedes: {
@@ -71,6 +72,7 @@ export const UserModel = {
         estado: true,
         telefono: true,
         firma: true,
+        perfil_id: true,
       },
       take: 10,
     });
@@ -104,6 +106,7 @@ export const UserModel = {
               )
             : null,
           telefono: userData.telefono,
+          perfil_id: userData.perfil_id,
         },
       });
       return newUser;
