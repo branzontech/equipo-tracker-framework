@@ -15,13 +15,13 @@ export const useLogin = () => {
     contraseña: "",
     email: "",
     rol: "",
-    sede_id: 0,
-    sedes: null,
     estado: "",
     sucursales: null,
     firma_entrega: "",
     firma_recibe: "",
     firma: "",
+    usuario_sede: null,
+    telefono: "",
   });
   const [remember, setRemember] = useState(false);
 
