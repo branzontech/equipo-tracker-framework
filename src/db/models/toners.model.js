@@ -153,6 +153,7 @@ export const tonersModel = {
       sucursal_id,
       usuario_id,
       impresora_destino_id,
+      usuario_id_retira,
     } = salidaToner;
 
     try {
@@ -166,8 +167,16 @@ export const tonersModel = {
       }
 
       if (toner.stock_actual < cantidad) {
-        throw new Error("Stock insuficiente para esta salida.");
+        throw new Error("Stock insuficiente para esta salida. Este toner tiene stock de " + toner.stock_actual);
       }
+
+      const asignacion = await prisma.toner_impresora.findFirst({
+        where: {
+          toner_id: toner_id,
+        },
+      });
+
+      const impresoraOrigenId = asignacion?.impresora_id || 0;
 
       // Crear la salida de toner
       const salidaTonerCreated = await prisma.salidatoners.create({
@@ -183,8 +192,14 @@ export const tonersModel = {
           usuarios: {
             connect: { id_usuario: usuario_id },
           },
+          usuarios_salidatoners_usuario_retiro_idTousuarios: {
+            connect: { id_usuario: usuario_id_retira },
+          },
           impresoras: {
             connect: { id_impresora: impresora_destino_id },
+          },
+          impresoras_salidatoners_impresora_origen_idToimpresoras: {
+            connect: { id_impresora: impresoraOrigenId },
           },
         },
       });
@@ -202,7 +217,20 @@ export const tonersModel = {
       return salidaTonerCreated;
     } catch (error) {
       console.error("Error al crear la salida toner:", error);
-      throw new Error("Error al crear la salida toner: " + error.message);
+      throw new Error(error.message);
     }
+  },
+  async findSalidasToner() {
+    const salidasToner = await prisma.salidatoners.findMany({
+      include: {
+        sucursales: true,
+        usuarios: true,
+        impresoras: true,
+        toner: true,
+        usuarios_salidatoners_usuario_retiro_idTousuarios: true,
+        impresoras_salidatoners_impresora_origen_idToimpresoras: true,
+      },
+    });
+    return salidasToner;
   },
 };
