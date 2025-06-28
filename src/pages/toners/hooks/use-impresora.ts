@@ -26,6 +26,7 @@ export const useImpresora = () => {
     marcas: null,
     marca_id: 0,
     tipo: "",
+    motivo: "",
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedImpresoraId, setSelectedImpresoraId] = useState<number | null>(
@@ -174,8 +175,6 @@ export const useImpresora = () => {
       setSugerenciasImpresora(null);
     }
   };
-
-  console.log(sugerenciasImpresora);
 
   return {
     impresora,
