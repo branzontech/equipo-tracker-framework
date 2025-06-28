@@ -1,4 +1,5 @@
 import { prisma } from "../../../prisma/prismaCliente.js";
+import bcrypt from "bcryptjs";
 
 export const UserModel = {
   findAll: async () => {
@@ -84,12 +85,14 @@ export const UserModel = {
     return usersWithFirmaBase64;
   },
   create: async (userData) => {
+    const hashedPassword = await bcrypt.hash(userData.contraseña, 10);
+
     try {
       const newUser = await prisma.usuarios.create({
         data: {
           nombre: userData.nombre,
           email: userData.email,
-          contrase_a: userData.contraseña,
+          contrase_a: hashedPassword,
           rol: userData.rol,
           estado: userData.estado,
           firma: userData.firma
