@@ -13,8 +13,12 @@ export const getTonerById = async (id: number) => {
 };
 
 export const createToner = async (toner: Toner) => {
-  const response = await api.post("/toners/create", toner);
-  return response.data;
+  try {
+    const response = await api.post("/toners/create", toner);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
 };
 
 export const updateToner = async (id: number, toner: Toner) => {
@@ -43,6 +47,15 @@ export const getBySerial = async (serial: string) => {
 export const createSalidaToner = async (salidaToner: SalidaToner) => {
   try {
     const response = await api.post("/toners/createSalidaToner", salidaToner);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message);
+  }
+};
+
+export const getSalidasToner = async () => {
+  try {
+    const response = await api.get("/toners/getSalidasToner");
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message);
