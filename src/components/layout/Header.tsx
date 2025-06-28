@@ -3,7 +3,7 @@ import { BellRing, Settings, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { HeaderProps } from "@/components/layout/interfaces/header";
-// import { RootState } from "../../redux/store"; 
+// import { RootState } from "../../redux/store";
 // import { useSelector } from "react-redux";
 // import { useNavigate } from "react-router-dom";
 
@@ -48,15 +48,6 @@ const Header = ({ className = "" }: HeaderProps) => {
         <button className="hover:bg-gray-100 p-2 rounded-full transition-colors">
           <Settings className="w-5 h-5 text-gray-600" />
         </button>
-      </div> */}
-
-      {/* <div className="flex items-center gap-2">
-        <img
-          src="https://avatars.githubusercontent.com/u/10198937?v=4"
-          alt="Username"
-          className="w-8 h-8 rounded-full"
-        />
-        <span className="font-medium">{user?.nombre}</span>
       </div> */}
     </header>
   );
