@@ -21,6 +21,7 @@ import tiposRoutes from "./routes/tipos.routes.js";
 import estadosRoutes from "./routes/estado.routes.js";
 import proveedorRoutes from "./routes/proveedor.routes.js";
 import perfilesAccesoRoutes from "./routes/perfilesAcceso.routes.js";
+import permisosRoutes from "./routes/permisos.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -48,6 +49,7 @@ const routerApi = (app) => {
   router.use("/estados", estadosRoutes);
   router.use("/proveedores", proveedorRoutes);
   router.use("/perfiles-acceso", perfilesAccesoRoutes);
+  router.use("/permisos", permisosRoutes);
 };
 
 export default routerApi;
