@@ -44,35 +44,40 @@ export const impresoraModel = {
     return impresora;
   },
   findBySerial: async (serial) => {
-    const impresora = await prisma.impresoras.findFirst({
-      where: {
-        serial: {
-          contains: serial,
-          mode: "insensitive",
-        },
-      },
-      select: {
-        id_impresora: true,
-        nombre: true,
-        modelo: true,
-        serial: true,
-        estado: true,
-        sucursal_id: true,
-        sucursales: {
-          select: {
-            id_sucursal: true,
-            nombre: true,
+    try {
+      const impresora = await prisma.impresoras.findFirst({
+        where: {
+          serial: {
+            contains: serial,
+            mode: "insensitive",
           },
         },
-        marcas: {
-          select: {
-            id_marca: true,
-            nombre: true,
+        select: {
+          id_impresora: true,
+          nombre: true,
+          modelo: true,
+          serial: true,
+          estado: true,
+          sucursal_id: true,
+          sucursales: {
+            select: {
+              id_sucursal: true,
+              nombre: true,
+            },
+          },
+          marcas: {
+            select: {
+              id_marca: true,
+              nombre: true,
+            },
           },
         },
-      },
-    });
-    return impresora;
+      });
+      return impresora;
+    } catch (error) {
+      console.error("Error al obtener la impresora:", error);
+      throw new Error("Error al obtener la impresora: " + error.message);
+    }
   },
   async create(impresora) {
     const impresoraCreated = await prisma.impresoras.create({
