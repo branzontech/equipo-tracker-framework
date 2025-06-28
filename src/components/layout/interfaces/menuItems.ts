@@ -42,9 +42,20 @@ import {
   Plug,
   Folders,
   MapPin,
+  UserCircle,
+  Boxes,
+  FilePlus,
+  FileMinus,
+  Repeat,
+  Warehouse,
 } from "lucide-react";
 
 export const menuItems = [
+  {
+    title: "Perfil",
+    icon: UserCircle,
+    path: "/perfil",
+  },
   {
     title: "Dashboard",
     icon: LayoutDashboard,
@@ -146,9 +157,21 @@ export const menuItems = [
             icon: MapPin,
             path: "/configuracion/maestros/sucursales",
           },
-          { title: "Tipos", icon: Layers, path: "/configuracion/maestros/tipos" },
-          { title: "Estados", icon: Activity, path: "/configuracion/maestros/estados" },
-          { title: "Proveedores", icon: Handshake, path: "/configuracion/maestros/proveedores" },
+          {
+            title: "Tipos",
+            icon: Layers,
+            path: "/configuracion/maestros/tipos",
+          },
+          {
+            title: "Estados",
+            icon: Activity,
+            path: "/configuracion/maestros/estados",
+          },
+          {
+            title: "Proveedores",
+            icon: Handshake,
+            path: "/configuracion/maestros/proveedores",
+          },
           {
             title: "Marcas",
             icon: Tag,
@@ -207,12 +230,32 @@ export const menuItems = [
   },
   {
     title: "Toners",
-    icon: Printer,
+    icon: Boxes,
     path: "/toners",
     submenu: [
-      { title: "Impresoras", icon: ArrowDownToLine, path: "/impresoras/ingreso" },
-      { title: "Ingreso", icon: ArrowDownToLine, path: "/toners/ingreso" },
-      { title: "Salida", icon: ArrowUpFromLine, path: "/toners/salida" },
+      {
+        title: "Impresoras",
+        icon: Printer,
+        path: "/impresoras/ingreso",
+      },
+      { title: "Registrar Toner", icon: FilePlus, path: "/toners/ingreso" },
+      {
+        title: "Registrar Salida",
+        icon: FileMinus,
+        path: "/toners/salida",
+      },
+      {
+        title: "Movimientos",
+        icon: Repeat,
+        path: "/toners/movimientos",
+        submenu: [
+          {
+            title: "Historial",
+            icon: ClipboardList,
+            path: "/toners/salidas/lista",
+          },
+        ],
+      },
       { title: "Existencia", icon: Database, path: "/toners/existencia" },
     ],
   },
@@ -221,11 +264,6 @@ export const menuItems = [
     icon: Wrench,
     path: "/mantenimientos",
   },
-  // {
-  //   title: "Hojas de Vida Equipos",
-  //   icon: FileText,
-  //   path: "/hojas-vida",
-  // },
   {
     title: "Trazabilidad Inventario",
     icon: History,
