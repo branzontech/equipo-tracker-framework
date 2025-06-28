@@ -49,40 +49,53 @@ import {
   Repeat,
   Warehouse,
 } from "lucide-react";
+import { MenuItem } from "./MenuItem";
 
-export const menuItems = [
+export const menuItems: MenuItem[] = [
   {
+    id: "perfil",
     title: "Perfil",
     icon: UserCircle,
     path: "/perfil",
   },
   {
+    id: "dashboard",
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/dashboard",
   },
   {
+    id: "productos.lista",
     title: "Lista de Inventario",
     icon: ClipboardList,
     path: "/productos/lista",
   },
   {
+    id: "productos",
     title: "Productos",
     icon: Package,
     path: "/productos",
     submenu: [
-      { title: "Ingreso", icon: ArrowDownToLine, path: "/productos/ingreso" },
       {
+        id: "productos.ingreso",
+        title: "Ingreso",
+        icon: ArrowDownToLine,
+        path: "/productos/ingreso",
+      },
+      {
+        id: "productos.salidas",
         title: "Salidas",
         icon: ArrowUpFromLine,
         path: "/productos/salidas",
         submenu: [
           {
+            id: "productos.salidas.prestamos",
             title: "Préstamos",
             icon: Share2,
             path: "/productos/salidas/prestamos",
           },
           {
+            id: "productos.salidas.traslados",
             title: "Traslados",
             icon: Share2,
             path: "/productos/salidas/traslados",
@@ -90,104 +103,133 @@ export const menuItems = [
         ],
       },
       {
+        id: "productos.devoluciones",
         title: "Devoluciones",
         icon: RotateCcw,
         path: "/productos/devoluciones",
       },
       {
+        id: "productos.baja",
         title: "Baja de Equipos",
         icon: FileOutput,
         path: "/baja-equipos",
       },
-      { title: "Actas Generadas", icon: FileText, path: "/productos/actas" },
+      {
+        id: "productos.actas",
+        title: "Actas Generadas",
+        icon: FileText,
+        path: "/productos/actas",
+      },
     ],
   },
   {
+    id: "contratos",
     title: "Contratos",
     icon: ScrollText,
     path: "/contratos",
     submenu: [
       {
+        id: "contratos.lista",
         title: "Lista de Contratos",
         icon: ClipboardList,
         path: "/contratos/lista",
       },
       {
+        id: "contratos.agregar",
         title: "Agregar Contrato",
         icon: ArrowDownToLine,
         path: "/contratos/agregar",
       },
       {
+        id: "contratos.tipos",
         title: "Tipos de Contratos",
         icon: BookCheck,
         path: "/contratos/tipos",
         submenu: [
           {
+            id: "contratos.tipos.licencias",
             title: "Licencias",
             icon: AppWindow,
             path: "/contratos/tipos/licencias",
           },
           {
+            id: "contratos.tipos.proveedores",
             title: "Proveedores",
             icon: Building,
             path: "/contratos/tipos/proveedores",
           },
-          { title: "Software", icon: Cog, path: "/contratos/tipos/software" },
+          {
+            id: "contratos.tipos.software",
+            title: "Software",
+            icon: Cog,
+            path: "/contratos/tipos/software",
+          },
         ],
       },
     ],
   },
   {
+    id: "configuracion",
     title: "Configuración",
     icon: Settings,
     path: "/configuracion",
     submenu: [
       {
+        id: "configuracion.maestros",
         title: "Maestros",
         icon: FileCog,
         path: "/configuracion/maestros",
         submenu: [
           {
+            id: "configuracion.maestros.sedes",
             title: "Sedes",
             icon: Building2,
             path: "/configuracion/maestros/sedes",
           },
           {
+            id: "configuracion.maestros.sucursales",
             title: "Sucursales",
             icon: MapPin,
             path: "/configuracion/maestros/sucursales",
           },
           {
+            id: "configuracion.maestros.tipos",
             title: "Tipos",
             icon: Layers,
             path: "/configuracion/maestros/tipos",
           },
           {
+            id: "configuracion.maestros.estados",
             title: "Estados",
             icon: Activity,
             path: "/configuracion/maestros/estados",
           },
           {
+            id: "configuracion.maestros.proveedores",
             title: "Proveedores",
             icon: Handshake,
             path: "/configuracion/maestros/proveedores",
           },
           {
+            id: "configuracion.maestros.marcas",
             title: "Marcas",
             icon: Tag,
             path: "/configuracion/maestros/marcas",
           },
           {
+            id: "configuracion.maestros.perifericos",
             title: "Periféricos",
             icon: Plug,
             path: "/configuracion/maestros/perifericos",
           },
           {
+            id: "configuracion.maestros.categorias",
             title: "Categorias",
             icon: Folders,
             path: "/configuracion/maestros/categorias",
           },
           {
+            id: "configuracion.maestros.perfiles-acceso",
             title: "Perfiles de Acceso",
             icon: Shield,
             path: "/configuracion/maestros/perfiles-acceso",
@@ -195,26 +237,31 @@ export const menuItems = [
         ],
       },
       {
+        id: "configuracion.usuarios",
         title: "Usuarios",
         icon: Users,
         path: "/configuracion/usuarios",
         submenu: [
           {
+            id: "configuracion.usuarios.agentes",
             title: "Agentes",
             icon: UserCog,
             path: "/configuracion/usuarios/agentes",
           },
           {
+            id: "configuracion.usuarios.administradores",
             title: "Administradores",
             icon: UserCog,
             path: "/configuracion/usuarios/administradores",
           },
           {
+            id: "configuracion.usuarios.auditores",
             title: "Auditores",
             icon: UserCog,
             path: "/configuracion/usuarios/auditores",
           },
           {
+            id: "configuracion.usuarios.clientes",
             title: "Clientes",
             icon: UserCog,
             path: "/configuracion/usuarios/clientes",
@@ -222,6 +269,7 @@ export const menuItems = [
         ],
       },
       {
+        id: "configuracion.nivel-acceso",
         title: "Nivel de Acceso",
         icon: KeyRound,
         path: "/configuracion/nivel-acceso",
@@ -229,42 +277,59 @@ export const menuItems = [
     ],
   },
   {
+    id: "toners",
     title: "Toners",
     icon: Boxes,
     path: "/toners",
     submenu: [
       {
+        id: "toners.impresoras",
         title: "Impresoras",
         icon: Printer,
         path: "/impresoras/ingreso",
       },
-      { title: "Registrar Toner", icon: FilePlus, path: "/toners/ingreso" },
       {
+        id: "toners.ingreso",
+        title: "Registrar Toner",
+        icon: FilePlus,
+        path: "/toners/ingreso",
+      },
+      {
+        id: "toners.salida",
         title: "Registrar Salida",
         icon: FileMinus,
         path: "/toners/salida",
       },
       {
+        id: "toners.movimientos",
         title: "Movimientos",
         icon: Repeat,
         path: "/toners/movimientos",
         submenu: [
           {
+            id: "toners.movimientos.historial",
             title: "Historial",
             icon: ClipboardList,
             path: "/toners/salidas/lista",
           },
         ],
       },
-      { title: "Existencia", icon: Database, path: "/toners/existencia" },
+      {
+        id: "toners.existencia",
+        title: "Existencia",
+        icon: Database,
+        path: "/toners/existencia",
+      },
     ],
   },
   {
+    id: "mantenimientos",
     title: "Mantenimientos",
     icon: Wrench,
     path: "/mantenimientos",
   },
   {
+    id: "trazabilidad",
     title: "Trazabilidad Inventario",
     icon: History,
     path: "/trazabilidad",
