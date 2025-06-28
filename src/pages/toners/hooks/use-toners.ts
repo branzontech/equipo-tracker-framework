@@ -6,6 +6,7 @@ import {
   createToner,
   deleteToner,
   getBySerial,
+  getSalidasToner,
   getTonerById,
   getToners,
   updateToner,
@@ -41,16 +42,27 @@ export const useToners = () => {
     usuario_id: 0,
     sucursal_id: 0,
     observaciones: "",
+    usuario_id_retira: 0,
+    toner: null,
+    sucursales: null,
+    impresoras: null,
+    usuarios_salidatoners_usuario_retiro_idTousuarios: null,
+    impresoras_salidatoners_impresora_origen_idToimpresoras: null,
+    usuarios: null,
+    impresora_origen_id: 0,
   });
   const [serialToner, setSerialToner] = useState("");
   const [sugerenciasToner, setSugerenciasToner] = useState<any[]>([]);
+  const [detalleSeleccionado, setDetalleSeleccionado] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const getAllToners = async () => {
       try {
         const data = await getToners();
+        const salidasToner = await getSalidasToner();
         setToner(data);
+        setSalidaToner(salidasToner);
       } catch (error) {
         console.log(error);
       }
@@ -217,6 +229,7 @@ export const useToners = () => {
           icon: icons.success,
         });
         setTimeout(() => {
+          navigate("/toners/salidas/lista");
           window.location.reload();
         }, 4500);
       }
@@ -226,6 +239,10 @@ export const useToners = () => {
         icon: icons.error,
       });
     }
+  };
+
+  const handleVerDetalle = (salida) => {
+    setDetalleSeleccionado(salida);
   };
 
   return {
@@ -248,6 +265,9 @@ export const useToners = () => {
     setSerialToner,
     sugerenciasToner,
     setSugerenciasToner,
-    createSalida
+    createSalida,
+    detalleSeleccionado,
+    setDetalleSeleccionado,
+    handleVerDetalle,
   };
 };
