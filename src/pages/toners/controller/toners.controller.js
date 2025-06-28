@@ -5,7 +5,7 @@ export const getAll = async (req, res) => {
     const toners = await tonersService.getAll();
     res.status(200).json(toners);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -14,7 +14,7 @@ export const getById = async (req, res) => {
     const toner = await tonersService.getById(req.params.id);
     res.status(200).json(toner);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -24,7 +24,7 @@ export const createToner = async (req, res) => {
     const tonerCreated = await tonersService.create(toner);
     res.status(201).json({ success: true, tonerCreated });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -34,7 +34,7 @@ export const updateToner = async (req, res) => {
     const updatedToner = await tonersService.update(toner);
     res.status(200).json({ updatedToner, success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -44,7 +44,7 @@ export const deleteToner = async (req, res) => {
     const deletedToner = await tonersService.delete(id);
     res.status(200).json({ deletedToner, success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -64,6 +64,15 @@ export const createSalidaToner = async (req, res) => {
     const salidaTonerCreated = await tonersService.createSalidaToner(salidaToner);
     res.status(201).json({ success: true, salidaTonerCreated });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSalidasToner = async (req, res) => {
+  try {
+    const salidasToner = await tonersService.findSalidasToner();
+    res.status(200).json(salidasToner);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
