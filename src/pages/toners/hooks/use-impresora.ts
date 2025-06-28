@@ -34,7 +34,6 @@ export const useImpresora = () => {
   const [impresoraSerial, setImpresoraSerial] = useState("");
   const [sugerenciasImpresora, setSugerenciasImpresora] = useState<any[]>([]);
 
-
   useEffect(() => {
     const getAllImpresora = async () => {
       try {
@@ -161,7 +160,13 @@ export const useImpresora = () => {
     if (serial.length >= 3) {
       try {
         const response = await getImpresoraBySerial(serial);
-        setSugerenciasImpresora(response || null);
+
+        if (response) {
+          const result = Array.isArray(response) ? response : [response];
+          setSugerenciasImpresora(result);
+        } else {
+          setSugerenciasImpresora([]);
+        }
       } catch (error) {
         toast.error(error.message, { icon: icons.error });
       }
@@ -169,6 +174,8 @@ export const useImpresora = () => {
       setSugerenciasImpresora(null);
     }
   };
+
+  console.log(sugerenciasImpresora);
 
   return {
     impresora,
@@ -187,6 +194,6 @@ export const useImpresora = () => {
     impresoraSerial,
     setImpresoraSerial,
     sugerenciasImpresora,
-    setSugerenciasImpresora
+    setSugerenciasImpresora,
   };
 };
