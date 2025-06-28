@@ -26,6 +26,7 @@ export type Usuario = {
   firma_recibe: string;
   firma: string;
   telefono?: string;
+  perfil_id: number;
 };
 
 export interface Firma extends Usuario {

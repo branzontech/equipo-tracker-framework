@@ -23,6 +23,7 @@ export const useUser = () => {
     telefono: "",
     sucursales: null,
     usuario_sede: null,
+    perfil_id: 0,
   });
   const [count, setCount] = useState(0);
   const [selectedEntregaUser, setSelectedEntregaUser] = useState<Firma | null>(
