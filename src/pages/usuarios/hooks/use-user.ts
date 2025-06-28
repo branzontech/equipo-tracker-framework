@@ -33,6 +33,8 @@ export const useUser = () => {
   );
   const [nombreInput, setNombreUser] = useState("");
   const [sugerencias, setSugerencias] = useState<any[]>([]);
+  const [userRetira, setUserRetira] = useState("");
+  const [sugerenciasRetira, setSugerenciasRetira] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -47,18 +49,42 @@ export const useUser = () => {
     fetchUsers();
   }, []);
 
-  const handleNombreInput = async (name: string) => {
-    setNombreUser(name);
+  const handleNombreInput = async (
+    name: string,
+    tipo: "retira" | "recepcion"
+  ) => {
+    if (tipo === "retira") {
+      setUserRetira(name);
+    } else {
+      setNombreUser(name);
+    }
 
     if (name.length >= 3) {
       try {
         const res = await getUserByName(name);
-        setSugerencias(res);
+
+        const filtrados = res.filter((u) => {
+          if (tipo === "retira" && nombreInput) {
+            return u.nombre !== nombreInput;
+          } else if (tipo === "recepcion" && userRetira) {
+            return u.nombre !== userRetira;
+          }
+          return true;
+        });
+
+        if (tipo === "retira") {
+          setSugerenciasRetira(filtrados);
+        } else {
+          setSugerencias(filtrados);
+        }
       } catch (err) {
         console.error("Error buscando usuarios:", err);
+        if (tipo === "retira") setSugerenciasRetira([]);
+        else setSugerencias([]);
       }
     } else {
-      setSugerencias([]);
+      if (tipo === "retira") setSugerenciasRetira([]);
+      else setSugerencias([]);
     }
   };
 
@@ -153,5 +179,9 @@ export const useUser = () => {
     selectedRecibeUser,
     setSelectedRecibeUser,
     handleSumbit,
+    userRetira,
+    setUserRetira,
+    sugerenciasRetira,
+    setSugerenciasRetira,
   };
 };
