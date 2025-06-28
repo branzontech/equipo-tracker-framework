@@ -28,6 +28,10 @@ export default class TonersService {
   async createSalidaToner(salidaToner) {
     return tonersModel.createSalidaToner(salidaToner);
   }
+
+  async findSalidasToner() {
+    return tonersModel.findSalidasToner();
+  }
 }
 
 export const tonersService = new TonersService();
