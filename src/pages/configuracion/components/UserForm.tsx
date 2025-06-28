@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,8 @@ import SignatureCanvas from "@/components/SignatureCanvas";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { useEstado } from "../maestros/hooks/use-estado";
+import { usePerfilesAcceso } from "../maestros/hooks/use-perfiles-acceso";
+import { useEffect } from "react";
 
 interface UserFormProps {
   isOpen: boolean;
@@ -44,6 +47,21 @@ export const UserForm: React.FC<UserFormProps> = ({
   } = useUser();
   const form = useForm();
   const { estados } = useEstado();
+  const { perfilesAcceso } = usePerfilesAcceso();
+
+  useEffect(() => {
+    const perfil = perfilesAcceso.find(
+      (perfil) => perfil.nombre_perfil === rol
+    );
+
+    if (perfil) {
+      setNewUser((prev) => ({
+        ...prev,
+        perfil_id: perfil.id,
+        rol: perfil.nombre_perfil,
+      }));
+    }
+  }, [rol, perfilesAcceso]);
 
   return (
     <div className="flex justify-between items-center">
@@ -112,12 +130,17 @@ export const UserForm: React.FC<UserFormProps> = ({
                   <Label htmlFor="cargo">Cargo</Label>
                   <Select
                     value={rol}
-                    onValueChange={(value) =>
+                    onValueChange={(value) => {
+                      const perfilSeleccionado = perfilesAcceso.find(
+                        (perfil) => perfil.id === Number(value)
+                      );
+
                       setNewUser({
                         ...newUser,
-                        rol,
-                      })
-                    }
+                        perfil_id: Number(value),
+                        rol: perfilSeleccionado?.nombre_perfil || "",
+                      });
+                    }}
                     disabled
                   >
                     <FormControl>
