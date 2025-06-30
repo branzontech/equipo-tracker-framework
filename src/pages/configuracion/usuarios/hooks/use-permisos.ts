@@ -22,6 +22,9 @@ export const usePermisos = () => {
       toast.success("Permisos asignados correctamente", {
         icon: icons.success,
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
     } else {
       toast.error("No se pudieron asignar los permisos", {
         icon: icons.error,
