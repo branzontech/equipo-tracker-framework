@@ -1,5 +1,4 @@
 import { Navigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
