@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { Shield, User, Users } from "lucide-react";
 import { usePerfilesAcceso } from "../maestros/hooks/use-perfiles-acceso";
 import { usePermisos } from "./hooks/use-permisos";
+import { getPermisosPorPerfil } from "@/api/axios/permisos.api";
+import { Permiso } from "./interfaces/permisos";
 
 const Permisos = () => {
   const { perfilesAcceso } = usePerfilesAcceso();
@@ -23,6 +25,29 @@ const Permisos = () => {
     Record<string, string[]>
   >({});
   const [activeTab, setActiveTab] = useState("perfiles");
+
+  useEffect(() => {
+    const cargarPermisosAsignados = async () => {
+      if (!selectedProfile) {
+        setPermisosPerfiles({});
+        return;
+      }
+
+      const asignados = await getPermisosPorPerfil(Number(selectedProfile));
+
+      const agrupados: Record<string, string[]> = {};
+
+      asignados.forEach((permiso) => {
+        const [modulo] = permiso.nombre_permiso.split(".");
+        if (!agrupados[modulo]) agrupados[modulo] = [];
+        agrupados[modulo].push(permiso.nombre_permiso);
+      });
+
+      setPermisosPerfiles(agrupados);
+    };
+
+    cargarPermisosAsignados().catch(console.error);
+  }, [selectedProfile]);
 
   const handleProfilePermissionChange = (modulo: string, permiso: string) => {
     setPermisosPerfiles((prev) => {
@@ -39,26 +64,44 @@ const Permisos = () => {
   };
 
   const modulosBD = useMemo(() => {
-    const agrupados: Record<
-      string,
-      { nombre: string; permisos: typeof permisos }
-    > = {};
+    type GrupoAccion = { nombre: string; permisos: Permiso[] };
+    type GrupoModulo = {
+      nombre: string;
+      acciones: Permiso[];
+      submodulos: Record<string, GrupoAccion>;
+    };
+
+    const resultado: Record<string, GrupoModulo> = {};
 
     permisos.forEach((permiso) => {
-      const [moduloPrincipal] = permiso.nombre_permiso.split("."); // toma el primer segmento
+      const partes = permiso.nombre_permiso.split(".");
+      const modulo = partes[0];
 
-      if (!agrupados[moduloPrincipal]) {
-        agrupados[moduloPrincipal] = {
-          nombre:
-            moduloPrincipal.charAt(0).toUpperCase() + moduloPrincipal.slice(1),
-          permisos: [],
+      if (!resultado[modulo]) {
+        resultado[modulo] = {
+          nombre: modulo.charAt(0).toUpperCase() + modulo.slice(1),
+          acciones: [],
+          submodulos: {},
         };
       }
 
-      agrupados[moduloPrincipal].permisos.push(permiso);
+      if (partes.length === 1 || partes.length === 2) {
+        // acciones directas (perfil, productos.ver, productos.editar…)
+        resultado[modulo].acciones.push(permiso);
+      } else {
+        // length ≥ 3  →  submódulo
+        const subKey = partes[1]; // siempre existe aquí
+        if (!resultado[modulo].submodulos[subKey]) {
+          resultado[modulo].submodulos[subKey] = {
+            nombre: subKey.charAt(0).toUpperCase() + subKey.slice(1),
+            permisos: [],
+          };
+        }
+        resultado[modulo].submodulos[subKey].permisos.push(permiso);
+      }
     });
 
-    return agrupados;
+    return resultado;
   }, [permisos]);
 
   const guardarPermisos = async () => {
@@ -84,9 +127,7 @@ const Permisos = () => {
 
     try {
       await asignarPermisos(Number(selectedProfile), idsSeleccionados);
-      toast.success("Permisos actualizados correctamente");
     } catch (err) {
-      toast.error("Error al guardar permisos");
       console.error(err);
     }
   };
@@ -136,42 +177,81 @@ const Permisos = () => {
               {Object.entries(modulosBD).map(([moduloKey, modulo]) => (
                 <div
                   key={moduloKey}
-                  className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm"
+                  className="p-4 rounded-lg border bg-card shadow-sm"
                 >
                   <div className="flex items-center gap-2 mb-4">
                     <Shield className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">{modulo.nombre}</h3>
                   </div>
 
-                  <div className="space-y-2">
-                    {" "}
-                    {/* Espaciado vertical entre permisos */}
-                    {modulo.permisos.map((permiso) => (
-                      <div
-                        key={permiso.id}
-                        className="flex items-center space-x-2 py-1"
-                      >
-                        <Checkbox
-                          id={`${moduloKey}-${permiso.id}`}
-                          checked={permisosPerfiles[moduloKey]?.includes(
-                            permiso.nombre_permiso
-                          )}
-                          onCheckedChange={() =>
-                            handleProfilePermissionChange(
-                              moduloKey,
-                              permiso.nombre_permiso
-                            )
-                          }
-                        />
-                        <label
-                          htmlFor={`${moduloKey}-${permiso.id}`}
-                          className="text-sm font-medium leading-none"
+                  {/* Acciones directas del módulo */}
+                  {modulo.acciones.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {modulo.acciones.map((permiso) => (
+                        <div
+                          key={permiso.id}
+                          className="flex items-center space-x-2 py-1"
                         >
-                          {permiso.descripcion}
-                        </label>
+                          <Checkbox
+                            id={`${moduloKey}-${permiso.id}`}
+                            checked={permisosPerfiles[moduloKey]?.includes(
+                              permiso.nombre_permiso
+                            )}
+                            onCheckedChange={() =>
+                              handleProfilePermissionChange(
+                                moduloKey,
+                                permiso.nombre_permiso
+                              )
+                            }
+                          />
+                          <label
+                            htmlFor={`${moduloKey}-${permiso.id}`}
+                            className="text-sm font-medium"
+                          >
+                            {permiso.descripcion}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Submódulos */}
+                  {Object.entries(modulo.submodulos).map(
+                    ([submoduloKey, submodulo]) => (
+                      <div key={submoduloKey} className="mb-4 ml-4">
+                        <h4 className="font-semibold text-sm mb-2">
+                          {submodulo.nombre}
+                        </h4>
+                        <div className="space-y-2">
+                          {submodulo.permisos.map((permiso) => (
+                            <div
+                              key={permiso.id}
+                              className="flex items-center space-x-2 py-1"
+                            >
+                              <Checkbox
+                                id={`${submoduloKey}-${permiso.id}`}
+                                checked={permisosPerfiles[moduloKey]?.includes(
+                                  permiso.nombre_permiso
+                                )}
+                                onCheckedChange={() =>
+                                  handleProfilePermissionChange(
+                                    moduloKey,
+                                    permiso.nombre_permiso
+                                  )
+                                }
+                              />
+                              <label
+                                htmlFor={`${submoduloKey}-${permiso.id}`}
+                                className="text-sm"
+                              >
+                                {permiso.descripcion}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    )
+                  )}
                 </div>
               ))}
             </div>
