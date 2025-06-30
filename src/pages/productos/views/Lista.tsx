@@ -121,7 +121,7 @@ const ListaInventario = () => {
               <TabsTrigger value="perifericos">Periféricos</TabsTrigger>
             </TabsList>
           </div>
-          {activeTab === "inventario" && (
+          {activeTab === "inventario" && tienePermiso("productos.ingreso", user.permisos) && (
             <Button onClick={handleNuevoProducto}>
               <Plus className="h-4 w-4 mr-2" />
               Nuevo Producto
