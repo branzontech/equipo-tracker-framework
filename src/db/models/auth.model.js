@@ -1,5 +1,6 @@
 import { prisma } from "../../../prisma/prismaCliente.js";
 import bcrypt from "bcryptjs";
+import { permisos } from "./permisos.model.js";
 
 export const AuthModel = {
   findByCredentials: async (email, contraseña) => {
@@ -12,13 +13,20 @@ export const AuthModel = {
         throw new Error("Correo electronico o contraseña incorrectos");
       }
 
-      const passwordValid = bcrypt.compare(contraseña, user.contrase_a);
+      const passwordValid = await bcrypt.compare(contraseña, user.contrase_a);
 
       if (!passwordValid) {
         throw new Error("Correo electronico o contraseña incorrectos");
       }
 
-      return user;
+      const permisosPerfil = await permisos.getPermisosPorPerfil(
+        user.perfil_id
+      );
+
+      return {
+        ...user,
+        permisos: permisosPerfil.map((p) => p.nombre_permiso),
+      };
     } catch (error) {
       throw new Error(error.message);
     }
