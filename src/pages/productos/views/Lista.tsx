@@ -60,6 +60,10 @@ import {
 import { useEquipos } from "../hooks/use-equipos";
 import Perifericos from "@/pages/configuracion/maestros/views/Perifericos";
 import { useGlobal } from "@/hooks/use-global";
+import { PERMISOS_PRODUCTOS } from "@/pages/configuracion/usuarios/interfaces/permisos";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { tienePermiso } from "@/utils/permissions";
 
 const ListaInventario = () => {
   const {
@@ -98,6 +102,7 @@ const ListaInventario = () => {
     deleteEquipoById,
   } = useEquipos();
   const { StatusBadge } = useGlobal();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   return (
     <div className="p-8">
@@ -215,7 +220,10 @@ const ListaInventario = () => {
                           <SelectContent>
                             <SelectItem value="todas">Todas</SelectItem>
                             {uniqueCategorias.map((categorias, index) => (
-                              <SelectItem key={index} value={String(categorias)}>
+                              <SelectItem
+                                key={index}
+                                value={String(categorias)}
+                              >
                                 {String(categorias)}
                               </SelectItem>
                             ))}
@@ -430,72 +438,85 @@ const ListaInventario = () => {
                         new Date(b.fecha_registro).getTime() -
                         new Date(a.fecha_registro).getTime()
                     )
-                    .map((item) => (
-                      <TableRow
-                        key={item.id_equipo}
-                        className="hover:bg-slate-50"
-                      >
-                        {sortedColumns.map(
-                          (column) =>
-                            column.isVisible && (
-                              <TableCell
-                                key={`${item.id_equipo}-${column.id}`}
-                                className="py-3"
-                              >
-                                {column.id === "estado_actual" ? (
-                                  <StatusBadge
-                                    status={
-                                      item.estado_ubicacion?.[0]
-                                        ?.estado_actual ?? "Sin estado"
-                                    }
-                                  />
-                                ) : typeof item[
-                                    column.key as keyof typeof item
-                                  ] === "object" &&
-                                  item[column.key as keyof typeof item] !==
-                                    null ? (
-                                  (item[column.key as keyof typeof item] as any)
-                                    .nombre ?? ""
-                                ) : (
-                                  item[column.key as keyof typeof item]
-                                )}
-                              </TableCell>
-                            )
-                        )}
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="hover:bg-slate-100"
-                              onClick={() =>
-                                navigate(`/hojas-vida/${item.nro_serie}`)
-                              }
-                            >
-                              <Eye className="h-4 w-4 text-[#01242c]" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="hover:bg-slate-100"
-                              onClick={() =>
-                                navigate(`/productos/edit/${item.nro_serie}`)
-                              }
-                            >
-                              <Pencil className="h-4 w-4 text-[#01242c]" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="hover:bg-slate-100"
-                              onClick={() => deleteEquipoById(item.id_equipo)}
-                            >
-                              <Delete className="h-4 w-4 text-[#01242c]" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    .map((item) => {
+                      const acciones = [
+                        {
+                          permiso: PERMISOS_PRODUCTOS.ver,
+                          onClick: () =>
+                            navigate(`/hojas-vida/${item.nro_serie}`),
+                          icon: <Eye className="h-4 w-4 text-[#01242c]" />,
+                        },
+                        {
+                          permiso: PERMISOS_PRODUCTOS.editar,
+                          onClick: () =>
+                            navigate(`/productos/edit/${item.nro_serie}`),
+                          icon: <Pencil className="h-4 w-4 text-[#01242c]" />,
+                        },
+                        {
+                          permiso: PERMISOS_PRODUCTOS.eliminar,
+                          onClick: () => deleteEquipoById(item.id_equipo),
+                          icon: <Delete className="h-4 w-4 text-[#01242c]" />,
+                        },
+                      ];
+                      return (
+                        <TableRow
+                          key={item.id_equipo}
+                          className="hover:bg-slate-50"
+                        >
+                          {sortedColumns.map(
+                            (column) =>
+                              column.isVisible && (
+                                <TableCell
+                                  key={`${item.id_equipo}-${column.id}`}
+                                  className="py-3"
+                                >
+                                  {column.id === "estado_actual" ? (
+                                    <StatusBadge
+                                      status={
+                                        item.estado_ubicacion?.[0]
+                                          ?.estado_actual ?? "Sin estado"
+                                      }
+                                    />
+                                  ) : typeof item[
+                                      column.key as keyof typeof item
+                                    ] === "object" &&
+                                    item[column.key as keyof typeof item] !==
+                                      null ? (
+                                    (
+                                      item[
+                                        column.key as keyof typeof item
+                                      ] as any
+                                    ).nombre ?? ""
+                                  ) : (
+                                    item[column.key as keyof typeof item]
+                                  )}
+                                </TableCell>
+                              )
+                          )}
+                          <TableCell className="w-[140px]">
+                            <div className="flex gap-2 min-h-[32px]">
+                              {acciones.map(
+                                (accion, idx) =>
+                                  tienePermiso(
+                                    accion.permiso,
+                                    user.permisos
+                                  ) && (
+                                    <Button
+                                      key={idx}
+                                      variant="ghost"
+                                      size="icon"
+                                      className="hover:bg-slate-100"
+                                      onClick={accion.onClick}
+                                    >
+                                      {accion.icon}
+                                    </Button>
+                                  )
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                 ) : (
                   <TableRow>
                     <TableCell
