@@ -22,6 +22,8 @@ export const useLogin = () => {
     firma: "",
     usuario_sede: null,
     telefono: "",
+    perfil_id: 0,
+    permisos: [],
   });
   const [remember, setRemember] = useState(false);
 
