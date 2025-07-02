@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid, FileText, Download, Search } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid, FileText, Download, Search, MoreVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Tipo para los contratos
@@ -337,16 +338,28 @@ const ContratoCard = ({ contrato, onVerDetalle }: { contrato: Contrato; onVerDet
           </div>
         </div>
       </CardContent>
-      <CardFooter className="pt-0 flex justify-between">{/* ... keep existing code */}
-        <Button variant="outline" size="sm" className="gap-1" onClick={() => onVerDetalle(contrato)}>
-          <Eye size={16} /> Ver
-        </Button>
-        <Button variant="outline" size="sm" className="gap-1">
-          <FileEdit size={16} /> Editar
-        </Button>
-        <Button variant="outline" size="sm" className="gap-1 text-red-500 hover:text-red-700">
-          <FileX size={16} /> Inactivar
-        </Button>
+      <CardFooter className="pt-0 flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">
+            <DropdownMenuItem onClick={() => onVerDetalle(contrato)}>
+              <Eye className="mr-2 h-4 w-4" />
+              Ver
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <FileEdit className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600">
+              <FileX className="mr-2 h-4 w-4" />
+              Inactivar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardFooter>
     </Card>
   );
@@ -406,17 +419,27 @@ const ContratosTable = ({ contratos, onVerDetalle }: { contratos: Contrato[]; on
                 </Badge>
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="gap-1" onClick={() => onVerDetalle(contrato)}>
-                    <Eye size={16} /> Ver
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-1">
-                    <FileEdit size={16} /> Editar
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-1 text-red-500 hover:text-red-700">
-                    <FileX size={16} /> Inactivar
-                  </Button>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-32">
+                    <DropdownMenuItem onClick={() => onVerDetalle(contrato)}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      Ver
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <FileEdit className="mr-2 h-4 w-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-600">
+                      <FileX className="mr-2 h-4 w-4" />
+                      Inactivar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           );
