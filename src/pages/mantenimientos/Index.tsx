@@ -248,7 +248,7 @@ const MantenimientosIndex = () => {
       );
     }
     
-    if (sede) {
+    if (sede && sede !== "todas") {
       filtrados = filtrados.filter(equipo => equipo.sede === sede);
     }
     
@@ -840,7 +840,7 @@ const MantenimientosIndex = () => {
                       <SelectValue placeholder="Seleccionar sede" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todas las sedes</SelectItem>
+                      <SelectItem value="todas">Todas las sedes</SelectItem>
                       {sedesMock.map((sede) => (
                         <SelectItem key={sede.id} value={sede.nombre}>
                           {sede.nombre}
