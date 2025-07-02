@@ -152,7 +152,7 @@ export function BajaEquiposForm() {
     ];
     
     const currentEquipos = form.getValues().equipos || [];
-    const newEquipos = [...currentEquipos, ...mockData];
+    const newEquipos: EquipoType[] = [...currentEquipos, ...mockData];
     
     form.setValue("equipos", newEquipos);
     
