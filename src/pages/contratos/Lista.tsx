@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, FileEdit, FileX } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Tipo para los contratos
@@ -144,8 +145,85 @@ const ContratoCard = ({ contrato }: { contrato: Contrato }) => {
   );
 };
 
+const ContratosTable = ({ contratos }: { contratos: Contrato[] }) => {
+  const getBadgeColor = (estado: string) => {
+    switch (estado) {
+      case 'activo':
+        return 'bg-green-500';
+      case 'inactivo':
+        return 'bg-red-500';
+      case 'pendiente':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const diasRestantes = (fechaFin: string) => {
+    const hoy = new Date();
+    const fin = new Date(fechaFin);
+    const diferencia = fin.getTime() - hoy.getTime();
+    return Math.ceil(diferencia / (1000 * 3600 * 24));
+  };
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nombre</TableHead>
+          <TableHead>Empresa</TableHead>
+          <TableHead>Tipo</TableHead>
+          <TableHead>Fecha Inicio</TableHead>
+          <TableHead>Fecha Fin</TableHead>
+          <TableHead>Vigencia</TableHead>
+          <TableHead>Estado</TableHead>
+          <TableHead>Acciones</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {contratos.map((contrato) => {
+          const restantes = diasRestantes(contrato.fechaFin);
+          return (
+            <TableRow key={contrato.id}>
+              <TableCell className="font-medium">{contrato.nombre}</TableCell>
+              <TableCell>{contrato.empresa}</TableCell>
+              <TableCell className="capitalize">{contrato.tipo}</TableCell>
+              <TableCell>{new Date(contrato.fechaInicio).toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(contrato.fechaFin).toLocaleDateString()}</TableCell>
+              <TableCell>
+                <span className={`${restantes < 30 ? 'text-red-500' : restantes < 90 ? 'text-yellow-500' : 'text-green-500'} font-medium`}>
+                  {restantes > 0 ? `${restantes} días` : 'Vencido'}
+                </span>
+              </TableCell>
+              <TableCell>
+                <Badge className={getBadgeColor(contrato.estado)}>
+                  {contrato.estado.charAt(0).toUpperCase() + contrato.estado.slice(1)}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <Eye size={16} /> Ver
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <FileEdit size={16} /> Editar
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-1 text-red-500 hover:text-red-700">
+                    <FileX size={16} /> Inactivar
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
+};
+
 const ListaContratos = () => {
   const [filtro, setFiltro] = useState('todos');
+  const [vista, setVista] = useState<'table' | 'cards'>('table');
   const navigate = useNavigate();
 
   const contratosFiltrados = filtro === 'todos' 
@@ -160,7 +238,27 @@ const ListaContratos = () => {
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Lista de Contratos</h1>
-        <Button onClick={() => navigate('/contratos/agregar')}>Agregar Contrato</Button>
+        <div className="flex gap-4 items-center">
+          <div className="flex gap-2">
+            <Button
+              variant={vista === 'table' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVista('table')}
+              className="gap-1"
+            >
+              <Grid3X3 size={16} /> Tabla
+            </Button>
+            <Button
+              variant={vista === 'cards' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVista('cards')}
+              className="gap-1"
+            >
+              <LayoutGrid size={16} /> Tarjetas
+            </Button>
+          </div>
+          <Button onClick={() => navigate('/contratos/agregar')}>Agregar Contrato</Button>
+        </div>
       </div>
       
       <Tabs defaultValue="todos" className="w-full mb-6">
@@ -172,17 +270,28 @@ const ListaContratos = () => {
         </TabsList>
       </Tabs>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contratosFiltrados.map(contrato => (
-          <ContratoCard key={contrato.id} contrato={contrato} />
-        ))}
+      {vista === 'table' ? (
+        <div className="mb-6">
+          <ContratosTable contratos={contratosFiltrados} />
+          {contratosFiltrados.length === 0 && (
+            <div className="text-center py-10 text-gray-500">
+              No se encontraron contratos con el filtro seleccionado.
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {contratosFiltrados.map(contrato => (
+            <ContratoCard key={contrato.id} contrato={contrato} />
+          ))}
 
-        {contratosFiltrados.length === 0 && (
-          <div className="col-span-full text-center py-10 text-gray-500">
-            No se encontraron contratos con el filtro seleccionado.
-          </div>
-        )}
-      </div>
+          {contratosFiltrados.length === 0 && (
+            <div className="col-span-full text-center py-10 text-gray-500">
+              No se encontraron contratos con el filtro seleccionado.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
