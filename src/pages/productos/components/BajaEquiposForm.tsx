@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -152,7 +151,15 @@ export function BajaEquiposForm() {
     ];
     
     const currentEquipos = form.getValues().equipos || [];
-    const newEquipos: EquipoType[] = [...currentEquipos, ...mockData];
+    // Filter out incomplete equipos and only keep complete ones
+    const completeEquipos: EquipoType[] = currentEquipos.filter((equipo): equipo is EquipoType => 
+      equipo.serial !== undefined && equipo.serial !== "" &&
+      equipo.activoFijo !== undefined && equipo.activoFijo !== "" &&
+      equipo.motivo !== undefined && equipo.motivo !== "" &&
+      equipo.descripcionEstado !== undefined && equipo.descripcionEstado !== ""
+    );
+    
+    const newEquipos: EquipoType[] = [...completeEquipos, ...mockData];
     
     form.setValue("equipos", newEquipos);
     
