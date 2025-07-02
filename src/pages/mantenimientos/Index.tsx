@@ -125,17 +125,20 @@ const MantenimientosIndex = () => {
   const [busquedaChecklist, setBusquedaChecklist] = useState("");
   const [sedeFilterChecklist, setSedeFilterChecklist] = useState("");
   const [equiposChecklistFiltrados, setEquiposChecklistFiltrados] = useState<Equipo[]>([]);
-  const [itemsChecklist, setItemsChecklist] = useState<{id: string, texto: string, checked: boolean, personalizado: boolean}[]>([
-    { id: "1", texto: "Limpieza de hardware", checked: false, personalizado: false },
-    { id: "2", texto: "Actualización de software", checked: false, personalizado: false },
-    { id: "3", texto: "Verificación de componentes", checked: false, personalizado: false },
-    { id: "4", texto: "Pruebas de rendimiento", checked: false, personalizado: false },
-    { id: "5", texto: "Respaldo de información", checked: false, personalizado: false },
+  const [itemsChecklist, setItemsChecklist] = useState<{id: string, texto: string, tipo: 'checkbox' | 'numeric' | 'text', valor?: string | number, checked?: boolean, personalizado: boolean}[]>([
+    { id: "1", texto: "Limpieza de hardware", tipo: 'checkbox', checked: false, personalizado: false },
+    { id: "2", texto: "Actualización de software", tipo: 'checkbox', checked: false, personalizado: false },
+    { id: "3", texto: "Verificación de componentes", tipo: 'checkbox', checked: false, personalizado: false },
+    { id: "4", texto: "Pruebas de rendimiento", tipo: 'checkbox', checked: false, personalizado: false },
+    { id: "5", texto: "Respaldo de información", tipo: 'checkbox', checked: false, personalizado: false },
   ]);
   const [nuevoItemPersonalizado, setNuevoItemPersonalizado] = useState("");
+  const [tipoNuevoItem, setTipoNuevoItem] = useState<'checkbox' | 'numeric' | 'text'>('checkbox');
   const [calificacionEquipo, setCalificacionEquipo] = useState(0);
   const [observacionesChecklist, setObservacionesChecklist] = useState("");
   const [nombrePlantilla, setNombrePlantilla] = useState("");
+  const [fechaEjecucion] = useState(new Date());
+  const [tecnicoResponsable, setTecnicoResponsable] = useState("");
   
   // Estados para organización de campos
   const [vistaColumnas, setVistaColumnas] = useState<"1" | "2" | "3">("2");
@@ -268,7 +271,15 @@ const MantenimientosIndex = () => {
   const toggleChecklistItem = (id: string) => {
     setItemsChecklist(prev => 
       prev.map(item => 
-        item.id === id ? { ...item, checked: !item.checked } : item
+        item.id === id && item.tipo === 'checkbox' ? { ...item, checked: !item.checked } : item
+      )
+    );
+  };
+
+  const updateItemValue = (id: string, valor: string | number) => {
+    setItemsChecklist(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, valor } : item
       )
     );
   };
@@ -278,7 +289,8 @@ const MantenimientosIndex = () => {
       const nuevoItem = {
         id: Date.now().toString(),
         texto: nuevoItemPersonalizado,
-        checked: false,
+        tipo: tipoNuevoItem,
+        ...(tipoNuevoItem === 'checkbox' ? { checked: false } : { valor: '' }),
         personalizado: true
       };
       setItemsChecklist(prev => [...prev, nuevoItem]);
@@ -313,12 +325,19 @@ const MantenimientosIndex = () => {
       toast.error("Debe seleccionar un equipo");
       return;
     }
+
+    if (!tecnicoResponsable) {
+      toast.error("Debe seleccionar un técnico responsable");
+      return;
+    }
     
     const resultado = {
       equipo: equipoChecklistSeleccionado,
       items: itemsChecklist,
       calificacion: calificacionEquipo,
       observaciones: observacionesChecklist,
+      fechaEjecucion: fechaEjecucion,
+      tecnicoResponsable: tecnicoResponsable,
       fechaCompletado: new Date()
     };
     
@@ -332,6 +351,7 @@ const MantenimientosIndex = () => {
     setSedeFilterChecklist("");
     setCalificacionEquipo(0);
     setObservacionesChecklist("");
+    setTecnicoResponsable("");
   };
 
   return (
@@ -875,14 +895,16 @@ const MantenimientosIndex = () => {
 
               {/* Equipo Seleccionado */}
               {equipoChecklistSeleccionado && (
-                <div className="bg-gray-50 rounded-lg p-4 border">
+                <div className="bg-gray-50 rounded-lg p-4 border space-y-4">
                   <h4 className="font-semibold mb-3 flex items-center">
                     <Building className="h-4 w-4 mr-2" />
-                    Equipo Seleccionado
+                    Información del Mantenimiento
                   </h4>
+                  
+                  {/* Información del Equipo */}
                   <div className="grid sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500">Nombre</p>
+                      <p className="text-gray-500">Equipo</p>
                       <p className="font-medium">{equipoChecklistSeleccionado.nombre}</p>
                     </div>
                     <div>
@@ -894,8 +916,39 @@ const MantenimientosIndex = () => {
                       <p className="font-medium">{equipoChecklistSeleccionado.sede}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Responsable</p>
+                      <p className="text-gray-500">Responsable del Equipo</p>
                       <p className="font-medium">{equipoChecklistSeleccionado.responsable}</p>
+                    </div>
+                  </div>
+
+                  <Separator />
+                  
+                  {/* Información del Mantenimiento */}
+                  <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-500 flex items-center gap-1">
+                        <CalendarIcon className="h-3 w-3" />
+                        Fecha de Ejecución
+                      </p>
+                      <p className="font-medium">{format(fechaEjecucion, "dd/MM/yyyy HH:mm")}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        Técnico Responsable
+                      </p>
+                      <Select value={tecnicoResponsable} onValueChange={setTecnicoResponsable}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Seleccionar técnico" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tecnicosMock.map((tecnico) => (
+                            <SelectItem key={tecnico.id} value={tecnico.nombre}>
+                              {tecnico.nombre} - {tecnico.especialidad}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
@@ -947,7 +1000,17 @@ const MantenimientosIndex = () => {
                         </Select>
                       )}
                       
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
+                        <Select value={tipoNuevoItem} onValueChange={(value: 'checkbox' | 'numeric' | 'text') => setTipoNuevoItem(value)}>
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="checkbox">Checkbox</SelectItem>
+                            <SelectItem value="numeric">Numérico</SelectItem>
+                            <SelectItem value="text">Texto</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <Input
                           placeholder="Agregar campo personalizado..."
                           value={nuevoItemPersonalizado}
@@ -973,31 +1036,59 @@ const MantenimientosIndex = () => {
                         "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                       }`}>
                         {itemsChecklist.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center space-x-2 flex-1">
-                              <Checkbox
-                                checked={item.checked}
-                                onCheckedChange={() => toggleChecklistItem(item.id)}
-                              />
-                              <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
-                                {item.texto}
-                              </span>
-                              {item.personalizado && (
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                  Personalizado
+                          <div key={item.id} className="p-3 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium">{item.texto}</span>
+                                {item.personalizado && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                    Personalizado
+                                  </span>
+                                )}
+                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                  {item.tipo === 'checkbox' ? 'Checkbox' : item.tipo === 'numeric' ? 'Numérico' : 'Texto'}
                                 </span>
+                              </div>
+                              {item.personalizado && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => eliminarItemPersonalizado(item.id)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  ×
+                                </Button>
                               )}
                             </div>
-                            {item.personalizado && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => eliminarItemPersonalizado(item.id)}
-                                className="text-red-500 hover:text-red-700 ml-2"
-                              >
-                                ×
-                              </Button>
+                            
+                            {/* Campo según el tipo */}
+                            {item.tipo === 'checkbox' ? (
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  checked={item.checked || false}
+                                  onCheckedChange={() => toggleChecklistItem(item.id)}
+                                />
+                                <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
+                                  Completado
+                                </span>
+                              </div>
+                            ) : item.tipo === 'numeric' ? (
+                              <Input
+                                type="number"
+                                placeholder="Ingrese valor numérico"
+                                value={item.valor || ''}
+                                onChange={(e) => updateItemValue(item.id, Number(e.target.value))}
+                                className="w-full"
+                              />
+                            ) : (
+                              <Input
+                                type="text"
+                                placeholder="Ingrese texto"
+                                value={item.valor || ''}
+                                onChange={(e) => updateItemValue(item.id, e.target.value)}
+                                className="w-full"
+                              />
                             )}
                           </div>
                         ))}
@@ -1005,32 +1096,62 @@ const MantenimientosIndex = () => {
                     ) : (
                       <div className="space-y-3">
                         {itemsChecklist.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={item.checked}
-                                onCheckedChange={() => toggleChecklistItem(item.id)}
-                              />
-                              <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
-                                {item.texto}
-                              </span>
-                              {item.personalizado && (
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                  Personalizado
+                          <div key={item.id} className="p-3 hover:bg-gray-50 rounded-lg transition-colors border-b last:border-b-0 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium">{item.texto}</span>
+                                {item.personalizado && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                    Personalizado
+                                  </span>
+                                )}
+                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                  {item.tipo === 'checkbox' ? 'Checkbox' : item.tipo === 'numeric' ? 'Numérico' : 'Texto'}
                                 </span>
+                              </div>
+                              {item.personalizado && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => eliminarItemPersonalizado(item.id)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  ×
+                                </Button>
                               )}
                             </div>
-                            {item.personalizado && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => eliminarItemPersonalizado(item.id)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                ×
-                              </Button>
-                            )}
+                            
+                            {/* Campo según el tipo */}
+                            <div className="ml-0">
+                              {item.tipo === 'checkbox' ? (
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    checked={item.checked || false}
+                                    onCheckedChange={() => toggleChecklistItem(item.id)}
+                                  />
+                                  <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
+                                    Completado
+                                  </span>
+                                </div>
+                              ) : item.tipo === 'numeric' ? (
+                                <Input
+                                  type="number"
+                                  placeholder="Ingrese valor numérico"
+                                  value={item.valor || ''}
+                                  onChange={(e) => updateItemValue(item.id, Number(e.target.value))}
+                                  className="w-full max-w-xs"
+                                />
+                              ) : (
+                                <Input
+                                  type="text"
+                                  placeholder="Ingrese texto"
+                                  value={item.valor || ''}
+                                  onChange={(e) => updateItemValue(item.id, e.target.value)}
+                                  className="w-full"
+                                />
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
