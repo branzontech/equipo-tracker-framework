@@ -43,11 +43,19 @@ const equipoSchema = z.object({
   descripcionEstado: z.string().min(1, "La descripción del estado es requerida"),
 });
 
+// Schema for form equipos (can have optional properties for incomplete entries)
+const formEquipoSchema = z.object({
+  serial: z.string().optional(),
+  activoFijo: z.string().optional(),
+  motivo: z.string().optional(),
+  descripcionEstado: z.string().optional(),
+});
+
 const formSchema = z.object({
   fecha: z.date({
     required_error: "La fecha es requerida",
   }),
-  equipos: z.array(equipoSchema).min(1, "Debe agregar al menos un equipo"),
+  equipos: z.array(formEquipoSchema).min(1, "Debe agregar al menos un equipo"),
   observaciones: z.string().optional(),
   autorizadoPor: z.string().min(1, "El nombre de quien autoriza es requerido"),
   autorizadoPorFirma: z.string().min(1, "La firma de autorización es requerida"),
@@ -77,7 +85,7 @@ export function BajaEquiposForm() {
     const currentEquipos = form.getValues().equipos || [];
     form.setValue("equipos", [
       ...currentEquipos, 
-      nuevoEquipo
+      nuevoEquipo as any
     ]);
     
     toast({
@@ -151,17 +159,10 @@ export function BajaEquiposForm() {
     ];
     
     const currentEquipos = form.getValues().equipos || [];
-    // Filter out incomplete equipos and only keep complete ones
-    const completeEquipos: EquipoType[] = currentEquipos.filter((equipo): equipo is EquipoType => 
-      equipo.serial !== undefined && equipo.serial !== "" &&
-      equipo.activoFijo !== undefined && equipo.activoFijo !== "" &&
-      equipo.motivo !== undefined && equipo.motivo !== "" &&
-      equipo.descripcionEstado !== undefined && equipo.descripcionEstado !== ""
-    );
     
-    const newEquipos: EquipoType[] = [...completeEquipos, ...mockData];
+    const newEquipos = [...currentEquipos, ...mockData];
     
-    form.setValue("equipos", newEquipos);
+    form.setValue("equipos", newEquipos as any);
     
     // Update equipos state
     const newEquiposState = [
@@ -309,7 +310,7 @@ export function BajaEquiposForm() {
               
               {/* Table to display equipos */}
               <EquiposTable 
-                equipos={form.getValues().equipos} 
+                equipos={form.getValues().equipos || []} 
                 onDeleteEquipo={eliminarEquipo} 
               />
             </div>

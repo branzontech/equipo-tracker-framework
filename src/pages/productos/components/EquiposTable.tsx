@@ -12,16 +12,24 @@ import {
 
 interface EquiposTableProps {
   equipos: Array<{
-    serial: string;
-    activoFijo: string;
-    motivo: string;
-    descripcionEstado: string;
+    serial?: string;
+    activoFijo?: string;
+    motivo?: string;
+    descripcionEstado?: string;
   }>;
   onDeleteEquipo: (index: number) => void;
 }
 
 export function EquiposTable({ equipos, onDeleteEquipo }: EquiposTableProps) {
-  if (!equipos.length) return null;
+  // Filter to only show complete equipos
+  const completeEquipos = equipos.filter(equipo => 
+    equipo.serial && equipo.serial !== "" &&
+    equipo.activoFijo && equipo.activoFijo !== "" &&
+    equipo.motivo && equipo.motivo !== "" &&
+    equipo.descripcionEstado && equipo.descripcionEstado !== ""
+  );
+  
+  if (!completeEquipos.length) return null;
   
   return (
     <div className="rounded-md border">
@@ -36,7 +44,7 @@ export function EquiposTable({ equipos, onDeleteEquipo }: EquiposTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {equipos.map((equipo, index) => (
+          {completeEquipos.map((equipo, index) => (
             <TableRow key={index}>
               <TableCell>{equipo.serial}</TableCell>
               <TableCell>{equipo.activoFijo}</TableCell>
