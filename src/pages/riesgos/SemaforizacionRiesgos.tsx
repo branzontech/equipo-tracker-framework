@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, AlertCircle, CheckCircle, XCircle, Clock, Grid, List } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Activity, AlertCircle, CheckCircle, XCircle, Clock, Grid, List, Eye, Edit } from "lucide-react";
 
 interface RiesgoSemaforizado {
   id: string;
@@ -158,6 +159,8 @@ export default function SemaforizacionRiesgos() {
   const [riesgos] = useState<RiesgoSemaforizado[]>(mockRiesgos);
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
   const [filtroCategoria, setFiltroCategoria] = useState<string>("todos");
+  const [selectedCelda, setSelectedCelda] = useState<{probabilidad: number, impacto: number, riesgos: RiesgoSemaforizado[]} | null>(null);
+  const [selectedRiesgo, setSelectedRiesgo] = useState<RiesgoSemaforizado | null>(null);
 
   const riesgosFiltrados = riesgos.filter(riesgo => {
     const cumpleEstado = filtroEstado === "todos" || riesgo.estado === filtroEstado;
@@ -349,24 +352,36 @@ export default function SemaforizacionRiesgos() {
                           return (
                             <div 
                               key={`${probabilidad.id}-${impacto.id}`}
-                              className={`${riesgoInfo.color} ${riesgoInfo.textColor} p-3 text-center text-sm font-bold border border-gray-400 min-h-[80px] flex flex-col items-center justify-center relative group`}
+                              className={`${riesgoInfo.color} ${riesgoInfo.textColor} p-3 text-center text-sm font-bold border border-gray-400 min-h-[80px] flex flex-col items-center justify-center relative group cursor-pointer hover:opacity-80 transition-opacity`}
+                              onClick={() => {
+                                if (riesgosEnCelda.length > 0) {
+                                  setSelectedCelda({
+                                    probabilidad: probabilidad.id,
+                                    impacto: impacto.id,
+                                    riesgos: riesgosEnCelda
+                                  });
+                                }
+                              }}
                             >
                               <span className="text-xs mb-1">{riesgoInfo.nivel}</span>
                               {riesgosEnCelda.length > 0 && (
-                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center pointer-events-none">
                                   <span className="bg-white text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                                     {riesgosEnCelda.length}
                                   </span>
                                 </div>
                               )}
                               {riesgosEnCelda.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded shadow-lg p-2 z-10 hidden group-hover:block">
+                                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded shadow-lg p-2 z-10 hidden group-hover:block pointer-events-none">
                                   <div className="space-y-1">
                                     {riesgosEnCelda.map((riesgo) => (
                                       <div key={riesgo.id} className="text-xs text-black">
                                         <span className="font-medium">{riesgo.codigo}:</span> {riesgo.nombre}
                                       </div>
                                     ))}
+                                    <div className="text-xs text-blue-600 font-medium mt-2">
+                                      Click para ver detalles
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -510,6 +525,181 @@ export default function SemaforizacionRiesgos() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog para ver riesgos en una celda de la matriz */}
+      <Dialog open={!!selectedCelda} onOpenChange={() => setSelectedCelda(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Riesgos en Celda de Matriz
+            </DialogTitle>
+            <DialogDescription>
+              {selectedCelda && (
+                <>
+                  Probabilidad: {probabilidadNiveles.find(p => p.id === selectedCelda.probabilidad)?.nombre} | 
+                  Impacto: {impactoNiveles.find(i => i.id === selectedCelda.impacto)?.nombre}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedCelda && (
+            <div className="space-y-4">
+              {selectedCelda.riesgos.map((riesgo) => (
+                <div key={riesgo.id} className="border rounded-lg p-4">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      {obtenerIconoEstado(riesgo.estado)}
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline">{riesgo.codigo}</Badge>
+                          <Badge className={`${obtenerColorEstado(riesgo.estado)} text-white`}>
+                            {riesgo.estado}
+                          </Badge>
+                          <span className="text-lg">{obtenerIconoTendencia(riesgo.tendencia)}</span>
+                        </div>
+                        <h3 className="font-semibold">{riesgo.nombre}</h3>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Nivel de Riesgo</p>
+                      <p className="text-2xl font-bold">{riesgo.nivelRiesgo}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                    <div>
+                      <p className="text-muted-foreground">Categoría:</p>
+                      <Badge variant="secondary">{riesgo.categoria}</Badge>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Responsable:</p>
+                      <p className="font-medium">{riesgo.responsable}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Última Evaluación:</p>
+                      <p className="font-medium">{riesgo.ultimaEvaluacion}</p>
+                    </div>
+                  </div>
+
+                  {riesgo.accionesRequeridas.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Acciones Requeridas:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {riesgo.accionesRequeridas.map((accion, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {accion}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedRiesgo(riesgo)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Ver Detalle
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog para ver detalle de un riesgo específico */}
+      <Dialog open={!!selectedRiesgo} onOpenChange={() => setSelectedRiesgo(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detalle del Riesgo</DialogTitle>
+            <DialogDescription>
+              Información completa del riesgo seleccionado
+            </DialogDescription>
+          </DialogHeader>
+          {selectedRiesgo && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                {obtenerIconoEstado(selectedRiesgo.estado)}
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge variant="outline">{selectedRiesgo.codigo}</Badge>
+                    <Badge className={`${obtenerColorEstado(selectedRiesgo.estado)} text-white`}>
+                      {selectedRiesgo.estado}
+                    </Badge>
+                    <span className="text-lg">{obtenerIconoTendencia(selectedRiesgo.tendencia)}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">{selectedRiesgo.nombre}</h3>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Categoría</p>
+                    <Badge variant="secondary">{selectedRiesgo.categoria}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Responsable</p>
+                    <p className="font-medium">{selectedRiesgo.responsable}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Tendencia</p>
+                    <p className="font-medium flex items-center gap-2">
+                      {selectedRiesgo.tendencia} {obtenerIconoTendencia(selectedRiesgo.tendencia)}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Nivel de Riesgo</p>
+                    <p className="text-3xl font-bold">{selectedRiesgo.nivelRiesgo}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Última Evaluación</p>
+                    <p className="font-medium">{selectedRiesgo.ultimaEvaluacion}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Próxima Revisión</p>
+                    <p className="font-medium">{selectedRiesgo.proximaRevision}</p>
+                  </div>
+                </div>
+              </div>
+
+              {selectedRiesgo.accionesRequeridas.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Acciones Requeridas</p>
+                  <div className="space-y-2">
+                    {selectedRiesgo.accionesRequeridas.map((accion, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <span className="text-sm">{accion}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button variant="outline" onClick={() => setSelectedRiesgo(null)}>
+                  Cerrar
+                </Button>
+                <Button>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar Riesgo
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
