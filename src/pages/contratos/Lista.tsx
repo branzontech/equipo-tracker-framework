@@ -414,9 +414,9 @@ const ListaContratos = () => {
       contrato.empresa.toLowerCase().includes(busqueda.toLowerCase()) ||
       contrato.descripcion.toLowerCase().includes(busqueda.toLowerCase());
     
-    const matchEmpresa = filtroEmpresa === '' || contrato.empresa === filtroEmpresa;
-    const matchTipo = filtroTipo === '' || contrato.tipo === filtroTipo;
-    const matchEstado = filtroEstado === '' || contrato.estado === filtroEstado;
+    const matchEmpresa = filtroEmpresa === '' || filtroEmpresa === 'todas' || contrato.empresa === filtroEmpresa;
+    const matchTipo = filtroTipo === '' || filtroTipo === 'todos' || contrato.tipo === filtroTipo;
+    const matchEstado = filtroEstado === '' || filtroEstado === 'todos' || contrato.estado === filtroEstado;
     
     return matchBusqueda && matchEmpresa && matchTipo && matchEstado;
   });
@@ -492,7 +492,7 @@ const ListaContratos = () => {
                 <SelectValue placeholder="Empresa" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas las empresas</SelectItem>
+                <SelectItem value="todas">Todas las empresas</SelectItem>
                 {empresas.map(empresa => (
                   <SelectItem key={empresa} value={empresa}>{empresa}</SelectItem>
                 ))}
@@ -503,7 +503,7 @@ const ListaContratos = () => {
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos los tipos</SelectItem>
+                <SelectItem value="todos">Todos los tipos</SelectItem>
                 {tipos.map(tipo => (
                   <SelectItem key={tipo} value={tipo} className="capitalize">{tipo}</SelectItem>
                 ))}
@@ -514,7 +514,7 @@ const ListaContratos = () => {
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos los estados</SelectItem>
+                <SelectItem value="todos">Todos los estados</SelectItem>
                 {estados.map(estado => (
                   <SelectItem key={estado} value={estado} className="capitalize">{estado}</SelectItem>
                 ))}
