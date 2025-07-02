@@ -317,32 +317,38 @@ export default function SemaforizacionRiesgos() {
                   <p className="text-sm text-muted-foreground uppercase tracking-wide">IMPACTO O CONSECUENCIAS</p>
                 </div>
                 
-                <div className="overflow-x-auto">
-                  <div className="inline-block min-w-full">
+                <div className="flex justify-center">
+                  <div className="inline-block">
                     {/* Header de impacto */}
                     <div className="grid grid-cols-7 gap-0 mb-0">
-                      <div></div>
+                      <div className="w-32"></div>
                       {impactoNiveles.map((impacto) => (
-                        <div key={impacto.id} className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400">
+                        <div key={impacto.id} className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 min-w-[120px]">
                           {impacto.nombre}
                         </div>
                       ))}
                     </div>
                     
                     {/* Filas de la matriz */}
-                    {probabilidadNiveles.map((probabilidad, probIndex) => (
+                    <div className="grid grid-cols-7 gap-0">
+                      {/* Label vertical de probabilidad */}
+                      <div className="bg-gray-600 text-white border border-gray-400 flex items-center justify-center w-32">
+                        <div className="transform -rotate-90 whitespace-nowrap text-xs font-bold">
+                          PROBABILIDAD DE QUE OCURRA
+                        </div>
+                      </div>
+                      
+                      {/* Columnas vacías para alinear con el header */}
+                      <div className="col-span-6"></div>
+                    </div>
+                    
+                    {/* Filas de datos */}
+                    {probabilidadNiveles.map((probabilidad) => (
                       <div key={probabilidad.id} className="grid grid-cols-7 gap-0">
-                        {/* Label de probabilidad */}
-                        {probIndex === 2 && (
-                          <div className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 row-span-5 flex items-center justify-center writing-mode-vertical-lr rotate-180">
-                            <span className="transform rotate-90 whitespace-nowrap">PROBABILIDAD DE QUE OCURRA</span>
-                          </div>
-                        )}
-                        {probIndex !== 2 && (
-                          <div className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 flex items-center justify-center">
-                            {probabilidad.nombre}
-                          </div>
-                        )}
+                        {/* Label de fila individual */}
+                        <div className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 flex items-center justify-center w-32">
+                          <span className="whitespace-nowrap">{probabilidad.nombre}</span>
+                        </div>
                         
                         {/* Celdas de la matriz */}
                         {impactoNiveles.map((impacto) => {
