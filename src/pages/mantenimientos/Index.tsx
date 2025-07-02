@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, ClipboardList, FileText, Settings, Plus, Search, User, MapPin, UserRound, ClipboardPen, Calendar as CalendarIcon, Clock, Building, Star, Save, BookOpen } from "lucide-react";
+import { Calendar, ClipboardList, FileText, Settings, Plus, Search, User, MapPin, UserRound, ClipboardPen, Calendar as CalendarIcon, Clock, Building, Star, Save, BookOpen, Grid3X3, List, Columns } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -136,6 +136,10 @@ const MantenimientosIndex = () => {
   const [calificacionEquipo, setCalificacionEquipo] = useState(0);
   const [observacionesChecklist, setObservacionesChecklist] = useState("");
   const [nombrePlantilla, setNombrePlantilla] = useState("");
+  
+  // Estados para organización de campos
+  const [vistaColumnas, setVistaColumnas] = useState<"1" | "2" | "3">("2");
+  const [tipoVista, setTipoVista] = useState<"grid" | "list">("grid");
 
   const form = useForm({
     defaultValues: {
@@ -900,60 +904,137 @@ const MantenimientosIndex = () => {
               {/* Lista de Chequeo */}
               {equipoChecklistSeleccionado && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <h4 className="font-semibold flex items-center">
                       <ClipboardList className="h-4 w-4 mr-2" />
                       Lista de Chequeo
                     </h4>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Agregar campo personalizado..."
-                        value={nuevoItemPersonalizado}
-                        onChange={(e) => setNuevoItemPersonalizado(e.target.value)}
-                        className="w-64"
-                      />
-                      <Button
-                        type="button"
-                        onClick={agregarItemPersonalizado}
-                        className="bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                    
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Controles de vista */}
+                      <div className="flex items-center gap-1 border rounded-lg p-1">
+                        <Button
+                          type="button"
+                          variant={tipoVista === "grid" ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setTipoVista("grid")}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Grid3X3 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={tipoVista === "list" ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setTipoVista("list")}
+                          className="h-8 w-8 p-0"
+                        >
+                          <List className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      {/* Selector de columnas (solo para vista grid) */}
+                      {tipoVista === "grid" && (
+                        <Select value={vistaColumnas} onValueChange={(value: "1" | "2" | "3") => setVistaColumnas(value)}>
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 Columna</SelectItem>
+                            <SelectItem value="2">2 Columnas</SelectItem>
+                            <SelectItem value="3">3 Columnas</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Agregar campo personalizado..."
+                          value={nuevoItemPersonalizado}
+                          onChange={(e) => setNuevoItemPersonalizado(e.target.value)}
+                          className="w-64"
+                        />
+                        <Button
+                          type="button"
+                          onClick={agregarItemPersonalizado}
+                          className="bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="border rounded-lg p-4 max-h-60 overflow-y-auto">
-                    <div className="space-y-3">
-                      {itemsChecklist.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={item.checked}
-                              onCheckedChange={() => toggleChecklistItem(item.id)}
-                            />
-                            <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
-                              {item.texto}
-                            </span>
-                            {item.personalizado && (
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                Personalizado
+                  <div className="border rounded-lg p-4 max-h-80 overflow-y-auto">
+                    {tipoVista === "grid" ? (
+                      <div className={`grid gap-3 ${
+                        vistaColumnas === "1" ? "grid-cols-1" :
+                        vistaColumnas === "2" ? "grid-cols-1 sm:grid-cols-2" :
+                        "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                      }`}>
+                        {itemsChecklist.map((item) => (
+                          <div key={item.id} className="flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center space-x-2 flex-1">
+                              <Checkbox
+                                checked={item.checked}
+                                onCheckedChange={() => toggleChecklistItem(item.id)}
+                              />
+                              <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
+                                {item.texto}
                               </span>
+                              {item.personalizado && (
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                  Personalizado
+                                </span>
+                              )}
+                            </div>
+                            {item.personalizado && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => eliminarItemPersonalizado(item.id)}
+                                className="text-red-500 hover:text-red-700 ml-2"
+                              >
+                                ×
+                              </Button>
                             )}
                           </div>
-                          {item.personalizado && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => eliminarItemPersonalizado(item.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              ×
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {itemsChecklist.map((item) => (
+                          <div key={item.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={item.checked}
+                                onCheckedChange={() => toggleChecklistItem(item.id)}
+                              />
+                              <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
+                                {item.texto}
+                              </span>
+                              {item.personalizado && (
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                  Personalizado
+                                </span>
+                              )}
+                            </div>
+                            {item.personalizado && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => eliminarItemPersonalizado(item.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                ×
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Calificación del Equipo */}
