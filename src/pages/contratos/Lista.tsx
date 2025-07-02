@@ -33,6 +33,43 @@ type Contrato = {
   }>;
 };
 
+// Función para obtener el estado de vigencia
+const getEstadoVigencia = (fechaFin: string) => {
+  const hoy = new Date();
+  const fin = new Date(fechaFin);
+  const diferencia = fin.getTime() - hoy.getTime();
+  const diasRestantes = Math.ceil(diferencia / (1000 * 3600 * 24));
+  
+  if (diasRestantes < 0) {
+    return { estado: 'vencido', dias: diasRestantes, color: 'bg-red-500', textColor: 'text-red-500', badge: 'destructive' };
+  } else if (diasRestantes <= 30) {
+    return { estado: 'critico', dias: diasRestantes, color: 'bg-red-500', textColor: 'text-red-500', badge: 'destructive' };
+  } else if (diasRestantes <= 90) {
+    return { estado: 'advertencia', dias: diasRestantes, color: 'bg-yellow-500', textColor: 'text-yellow-500', badge: 'secondary' };
+  } else {
+    return { estado: 'vigente', dias: diasRestantes, color: 'bg-green-500', textColor: 'text-green-500', badge: 'default' };
+  }
+};
+
+// Componente de semaforización
+const SemaforoVigencia = ({ fechaFin, size = 'sm' }: { fechaFin: string; size?: 'sm' | 'md' | 'lg' }) => {
+  const vigencia = getEstadoVigencia(fechaFin);
+  const sizeClasses = {
+    sm: 'w-3 h-3',
+    md: 'w-4 h-4', 
+    lg: 'w-5 h-5'
+  };
+  
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`${sizeClasses[size]} rounded-full ${vigencia.color} flex-shrink-0`} />
+      <span className={`font-medium ${vigencia.textColor}`}>
+        {vigencia.dias < 0 ? 'Vencido' : `${vigencia.dias} días`}
+      </span>
+    </div>
+  );
+};
+
 // Datos de ejemplo
 const contratosEjemplo: Contrato[] = [
   {
@@ -189,9 +226,7 @@ const DetalleContratoModal = ({ contrato, open, onOpenChange }: {
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Vigencia:</span>
-                <span className={`${restantes < 30 ? 'text-red-500' : restantes < 90 ? 'text-yellow-500' : 'text-green-500'} font-medium`}>
-                  {restantes > 0 ? `${restantes} días` : 'Vencido'}
-                </span>
+                <SemaforoVigencia fechaFin={contrato.fechaFin} size="md" />
               </div>
             </div>
           </div>
@@ -296,15 +331,13 @@ const ContratoCard = ({ contrato, onVerDetalle }: { contrato: Contrato; onVerDet
             <span className="font-medium">Fin:</span>
             <span>{new Date(contrato.fechaFin).toLocaleDateString()}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <span className="font-medium">Vigencia:</span>
-            <span className={`${restantes < 30 ? 'text-red-500' : restantes < 90 ? 'text-yellow-500' : 'text-green-500'} font-medium`}>
-              {restantes > 0 ? `${restantes} días` : 'Vencido'}
-            </span>
+            <SemaforoVigencia fechaFin={contrato.fechaFin} size="sm" />
           </div>
         </div>
       </CardContent>
-      <CardFooter className="pt-0 flex justify-between">
+      <CardFooter className="pt-0 flex justify-between">{/* ... keep existing code */}
         <Button variant="outline" size="sm" className="gap-1" onClick={() => onVerDetalle(contrato)}>
           <Eye size={16} /> Ver
         </Button>
@@ -365,9 +398,7 @@ const ContratosTable = ({ contratos, onVerDetalle }: { contratos: Contrato[]; on
               <TableCell>{new Date(contrato.fechaInicio).toLocaleDateString()}</TableCell>
               <TableCell>{new Date(contrato.fechaFin).toLocaleDateString()}</TableCell>
               <TableCell>
-                <span className={`${restantes < 30 ? 'text-red-500' : restantes < 90 ? 'text-yellow-500' : 'text-green-500'} font-medium`}>
-                  {restantes > 0 ? `${restantes} días` : 'Vencido'}
-                </span>
+                <SemaforoVigencia fechaFin={contrato.fechaFin} size="md" />
               </TableCell>
               <TableCell>
                 <Badge className={getBadgeColor(contrato.estado)}>
