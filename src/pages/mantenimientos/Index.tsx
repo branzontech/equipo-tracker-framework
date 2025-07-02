@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, ClipboardList, FileText, Settings, Plus, Search, User, MapPin, UserRound, ClipboardPen, Calendar as CalendarIcon, Clock, Building } from "lucide-react";
+import { Calendar, ClipboardList, FileText, Settings, Plus, Search, User, MapPin, UserRound, ClipboardPen, Calendar as CalendarIcon, Clock, Building, Star, Save, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -113,12 +112,30 @@ const listadoChequeo = [
 const MantenimientosIndex = () => {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isChecklistDialogOpen, setIsChecklistDialogOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [equiposFiltrados, setEquiposFiltrados] = useState<Equipo[]>([]);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo | null>(null);
   const [fechaProgramada, setFechaProgramada] = useState<Date>();
   const [tiempoEstimado, setTiempoEstimado] = useState<string>("1");
   const [currentTab, setCurrentTab] = useState("equipo");
+  
+  // Estados para Lista de Chequeo
+  const [equipoChecklistSeleccionado, setEquipoChecklistSeleccionado] = useState<Equipo | null>(null);
+  const [busquedaChecklist, setBusquedaChecklist] = useState("");
+  const [sedeFilterChecklist, setSedeFilterChecklist] = useState("");
+  const [equiposChecklistFiltrados, setEquiposChecklistFiltrados] = useState<Equipo[]>([]);
+  const [itemsChecklist, setItemsChecklist] = useState<{id: string, texto: string, checked: boolean, personalizado: boolean}[]>([
+    { id: "1", texto: "Limpieza de hardware", checked: false, personalizado: false },
+    { id: "2", texto: "Actualización de software", checked: false, personalizado: false },
+    { id: "3", texto: "Verificación de componentes", checked: false, personalizado: false },
+    { id: "4", texto: "Pruebas de rendimiento", checked: false, personalizado: false },
+    { id: "5", texto: "Respaldo de información", checked: false, personalizado: false },
+  ]);
+  const [nuevoItemPersonalizado, setNuevoItemPersonalizado] = useState("");
+  const [calificacionEquipo, setCalificacionEquipo] = useState(0);
+  const [observacionesChecklist, setObservacionesChecklist] = useState("");
+  const [nombrePlantilla, setNombrePlantilla] = useState("");
 
   const form = useForm({
     defaultValues: {
@@ -208,6 +225,109 @@ const MantenimientosIndex = () => {
     setEquipoSeleccionado(null);
     setBusqueda("");
     setCurrentTab("equipo");
+  };
+
+  const handleSearchChecklist = (value: string) => {
+    setBusquedaChecklist(value);
+    filtrarEquiposChecklist(value, sedeFilterChecklist);
+  };
+
+  const handleSedeFilterChecklist = (sede: string) => {
+    setSedeFilterChecklist(sede);
+    filtrarEquiposChecklist(busquedaChecklist, sede);
+  };
+
+  const filtrarEquiposChecklist = (busqueda: string, sede: string) => {
+    let filtrados = equiposMock;
+    
+    if (busqueda.length > 2) {
+      filtrados = filtrados.filter(
+        (equipo) =>
+          equipo.serial.toLowerCase().includes(busqueda.toLowerCase()) ||
+          equipo.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      );
+    }
+    
+    if (sede) {
+      filtrados = filtrados.filter(equipo => equipo.sede === sede);
+    }
+    
+    setEquiposChecklistFiltrados(filtrados);
+  };
+
+  const selectEquipoChecklist = (equipo: Equipo) => {
+    setEquipoChecklistSeleccionado(equipo);
+    setBusquedaChecklist(equipo.nombre);
+    setEquiposChecklistFiltrados([]);
+  };
+
+  const toggleChecklistItem = (id: string) => {
+    setItemsChecklist(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, checked: !item.checked } : item
+      )
+    );
+  };
+
+  const agregarItemPersonalizado = () => {
+    if (nuevoItemPersonalizado.trim()) {
+      const nuevoItem = {
+        id: Date.now().toString(),
+        texto: nuevoItemPersonalizado,
+        checked: false,
+        personalizado: true
+      };
+      setItemsChecklist(prev => [...prev, nuevoItem]);
+      setNuevoItemPersonalizado("");
+    }
+  };
+
+  const eliminarItemPersonalizado = (id: string) => {
+    setItemsChecklist(prev => prev.filter(item => item.id !== id));
+  };
+
+  const guardarPlantilla = () => {
+    if (!nombrePlantilla.trim()) {
+      toast.error("Debe ingresar un nombre para la plantilla");
+      return;
+    }
+    
+    const plantilla = {
+      nombre: nombrePlantilla,
+      items: itemsChecklist,
+      fechaCreacion: new Date()
+    };
+    
+    // Aquí guardarías la plantilla en localStorage o base de datos
+    console.log("Plantilla guardada:", plantilla);
+    toast.success("Plantilla guardada exitosamente");
+    setNombrePlantilla("");
+  };
+
+  const completarChecklist = () => {
+    if (!equipoChecklistSeleccionado) {
+      toast.error("Debe seleccionar un equipo");
+      return;
+    }
+    
+    const resultado = {
+      equipo: equipoChecklistSeleccionado,
+      items: itemsChecklist,
+      calificacion: calificacionEquipo,
+      observaciones: observacionesChecklist,
+      fechaCompletado: new Date()
+    };
+    
+    console.log("Checklist completado:", resultado);
+    toast.success("Lista de chequeo completada exitosamente");
+    setIsChecklistDialogOpen(false);
+    
+    // Resetear estados
+    setEquipoChecklistSeleccionado(null);
+    setBusquedaChecklist("");
+    setSedeFilterChecklist("");
+    setCalificacionEquipo(0);
+    setObservacionesChecklist("");
   };
 
   return (
@@ -669,6 +789,245 @@ const MantenimientosIndex = () => {
                 </Tabs>
               </form>
             </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Nueva opción: Lista de Chequeo */}
+        <Dialog open={isChecklistDialogOpen} onOpenChange={setIsChecklistDialogOpen}>
+          <DialogTrigger asChild>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-[#bff036] text-[#01242c]">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-[#01242c]">
+                  <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5 text-[#01242c]" />
+                  <span>Lista de Chequeo</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <p className="text-xs sm:text-sm text-[#01242c] opacity-90">
+                  Realizar chequeos de mantenimiento con listas personalizables.
+                </p>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-white">
+            <DialogHeader>
+              <DialogTitle className="text-lg sm:text-xl">Lista de Chequeo de Mantenimiento</DialogTitle>
+              <DialogDescription>
+                Seleccione un equipo y complete la lista de chequeo
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6 mt-4">
+              {/* Búsqueda y Filtros */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Buscar por Serial o Nombre</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Buscar equipo..."
+                      value={busquedaChecklist}
+                      onChange={(e) => handleSearchChecklist(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Filtrar por Sede</Label>
+                  <Select value={sedeFilterChecklist} onValueChange={handleSedeFilterChecklist}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar sede" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todas las sedes</SelectItem>
+                      {sedesMock.map((sede) => (
+                        <SelectItem key={sede.id} value={sede.nombre}>
+                          {sede.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Resultados de Búsqueda */}
+              {equiposChecklistFiltrados.length > 0 && (
+                <div className="border rounded-lg max-h-40 overflow-y-auto">
+                  {equiposChecklistFiltrados.map((equipo) => (
+                    <div
+                      key={equipo.id}
+                      className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                      onClick={() => selectEquipoChecklist(equipo)}
+                    >
+                      <div className="font-medium">{equipo.nombre}</div>
+                      <div className="text-sm text-gray-600">
+                        Serial: {equipo.serial} | Sede: {equipo.sede}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Equipo Seleccionado */}
+              {equipoChecklistSeleccionado && (
+                <div className="bg-gray-50 rounded-lg p-4 border">
+                  <h4 className="font-semibold mb-3 flex items-center">
+                    <Building className="h-4 w-4 mr-2" />
+                    Equipo Seleccionado
+                  </h4>
+                  <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-500">Nombre</p>
+                      <p className="font-medium">{equipoChecklistSeleccionado.nombre}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Serial</p>
+                      <p className="font-medium">{equipoChecklistSeleccionado.serial}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Sede</p>
+                      <p className="font-medium">{equipoChecklistSeleccionado.sede}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Responsable</p>
+                      <p className="font-medium">{equipoChecklistSeleccionado.responsable}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Lista de Chequeo */}
+              {equipoChecklistSeleccionado && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold flex items-center">
+                      <ClipboardList className="h-4 w-4 mr-2" />
+                      Lista de Chequeo
+                    </h4>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Agregar campo personalizado..."
+                        value={nuevoItemPersonalizado}
+                        onChange={(e) => setNuevoItemPersonalizado(e.target.value)}
+                        className="w-64"
+                      />
+                      <Button
+                        type="button"
+                        onClick={agregarItemPersonalizado}
+                        className="bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="border rounded-lg p-4 max-h-60 overflow-y-auto">
+                    <div className="space-y-3">
+                      {itemsChecklist.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={item.checked}
+                              onCheckedChange={() => toggleChecklistItem(item.id)}
+                            />
+                            <span className={`text-sm ${item.checked ? 'line-through text-gray-500' : ''}`}>
+                              {item.texto}
+                            </span>
+                            {item.personalizado && (
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                Personalizado
+                              </span>
+                            )}
+                          </div>
+                          {item.personalizado && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => eliminarItemPersonalizado(item.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              ×
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Calificación del Equipo */}
+                  <div className="space-y-2">
+                    <Label>Calificación del Estado del Equipo</Label>
+                    <div className="flex items-center space-x-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-6 w-6 cursor-pointer ${
+                            star <= calificacionEquipo
+                              ? 'fill-yellow-400 text-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                          onClick={() => setCalificacionEquipo(star)}
+                        />
+                      ))}
+                      <span className="ml-2 text-sm text-gray-600">
+                        ({calificacionEquipo} de 5)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Observaciones */}
+                  <div className="space-y-2">
+                    <Label>Observaciones</Label>
+                    <Textarea
+                      placeholder="Ingrese observaciones adicionales..."
+                      value={observacionesChecklist}
+                      onChange={(e) => setObservacionesChecklist(e.target.value)}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+
+                  {/* Guardar como Plantilla */}
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Nombre de la plantilla..."
+                      value={nombrePlantilla}
+                      onChange={(e) => setNombrePlantilla(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      onClick={guardarPlantilla}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Guardar Plantilla
+                    </Button>
+                  </div>
+
+                  {/* Botones de Acción */}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsChecklistDialogOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={completarChecklist}
+                      className="bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Completar Checklist
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </DialogContent>
         </Dialog>
 
