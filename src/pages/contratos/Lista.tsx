@@ -1,12 +1,14 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid, FileText, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid, FileText, Download, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Tipo para los contratos
@@ -394,23 +396,53 @@ const ContratosTable = ({ contratos, onVerDetalle }: { contratos: Contrato[]; on
 };
 
 const ListaContratos = () => {
-  const [filtro, setFiltro] = useState('todos');
   const [vista, setVista] = useState<'table' | 'cards'>('table');
   const [contratoSeleccionado, setContratoSeleccionado] = useState<Contrato | null>(null);
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroEmpresa, setFiltroEmpresa] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('');
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [itemsPorPagina, setItemsPorPagina] = useState(10);
   const navigate = useNavigate();
 
-  const contratosFiltrados = filtro === 'todos' 
-    ? contratosEjemplo 
-    : contratosEjemplo.filter(c => 
-        filtro === 'activos' ? c.estado === 'activo' :
-        filtro === 'inactivos' ? c.estado === 'inactivo' :
-        filtro === 'pendientes' ? c.estado === 'pendiente' : true
-      );
+  // Filtrar contratos basado en todos los criterios
+  const contratosFiltrados = contratosEjemplo.filter(contrato => {
+    const matchBusqueda = busqueda === '' || 
+      contrato.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      contrato.empresa.toLowerCase().includes(busqueda.toLowerCase()) ||
+      contrato.descripcion.toLowerCase().includes(busqueda.toLowerCase());
+    
+    const matchEmpresa = filtroEmpresa === '' || contrato.empresa === filtroEmpresa;
+    const matchTipo = filtroTipo === '' || contrato.tipo === filtroTipo;
+    const matchEstado = filtroEstado === '' || contrato.estado === filtroEstado;
+    
+    return matchBusqueda && matchEmpresa && matchTipo && matchEstado;
+  });
+
+  // Calcular paginación
+  const totalPaginas = Math.ceil(contratosFiltrados.length / itemsPorPagina);
+  const indiceInicio = (paginaActual - 1) * itemsPorPagina;
+  const indiceFin = indiceInicio + itemsPorPagina;
+  const contratosPaginados = contratosFiltrados.slice(indiceInicio, indiceFin);
+
+  // Obtener valores únicos para filtros
+  const empresas = [...new Set(contratosEjemplo.map(c => c.empresa))];
+  const tipos = [...new Set(contratosEjemplo.map(c => c.tipo))];
+  const estados = [...new Set(contratosEjemplo.map(c => c.estado))];
 
   const handleVerDetalle = (contrato: Contrato) => {
     setContratoSeleccionado(contrato);
     setModalAbierto(true);
+  };
+
+  const handleLimpiarFiltros = () => {
+    setBusqueda('');
+    setFiltroEmpresa('');
+    setFiltroTipo('');
+    setFiltroEstado('');
+    setPaginaActual(1);
   };
 
   return (
@@ -440,18 +472,89 @@ const ListaContratos = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="todos" className="w-full mb-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-md mx-auto">
-          <TabsTrigger value="todos" onClick={() => setFiltro('todos')}>Todos</TabsTrigger>
-          <TabsTrigger value="activos" onClick={() => setFiltro('activos')}>Activos</TabsTrigger>
-          <TabsTrigger value="inactivos" onClick={() => setFiltro('inactivos')}>Inactivos</TabsTrigger>
-          <TabsTrigger value="pendientes" onClick={() => setFiltro('pendientes')}>Pendientes</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Filtros de búsqueda */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Input
+                placeholder="Buscar por nombre, empresa o descripción..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Select value={filtroEmpresa} onValueChange={setFiltroEmpresa}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Empresa" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todas las empresas</SelectItem>
+                {empresas.map(empresa => (
+                  <SelectItem key={empresa} value={empresa}>{empresa}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+              <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todos los tipos</SelectItem>
+                {tipos.map(tipo => (
+                  <SelectItem key={tipo} value={tipo} className="capitalize">{tipo}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+              <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectValue placeholder="Estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todos los estados</SelectItem>
+                {estados.map(estado => (
+                  <SelectItem key={estado} value={estado} className="capitalize">{estado}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={handleLimpiarFiltros}>
+              Limpiar
+            </Button>
+          </div>
+        </div>
+        
+        {/* Configuración de paginación */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Mostrar:</span>
+            <Select value={itemsPorPagina.toString()} onValueChange={(value) => {
+              setItemsPorPagina(Number(value));
+              setPaginaActual(1);
+            }}>
+              <SelectTrigger className="w-20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="30">30</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-gray-600">elementos</span>
+          </div>
+          <div className="text-sm text-gray-600">
+            {contratosFiltrados.length} contrato{contratosFiltrados.length !== 1 ? 's' : ''} encontrado{contratosFiltrados.length !== 1 ? 's' : ''}
+          </div>
+        </div>
+      </div>
 
       {vista === 'table' ? (
         <div className="mb-6">
-          <ContratosTable contratos={contratosFiltrados} onVerDetalle={handleVerDetalle} />
+          <ContratosTable contratos={contratosPaginados} onVerDetalle={handleVerDetalle} />
           {contratosFiltrados.length === 0 && (
             <div className="text-center py-10 text-gray-500">
               No se encontraron contratos con el filtro seleccionado.
@@ -459,8 +562,8 @@ const ListaContratos = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {contratosFiltrados.map(contrato => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {contratosPaginados.map(contrato => (
             <ContratoCard key={contrato.id} contrato={contrato} onVerDetalle={handleVerDetalle} />
           ))}
 
@@ -469,6 +572,41 @@ const ListaContratos = () => {
               No se encontraron contratos con el filtro seleccionado.
             </div>
           )}
+        </div>
+      )}
+
+      {/* Paginación */}
+      {contratosFiltrados.length > 0 && totalPaginas > 1 && (
+        <div className="flex justify-center mt-6">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setPaginaActual(prev => Math.max(prev - 1, 1))}
+                  className={paginaActual === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((pagina) => (
+                <PaginationItem key={pagina}>
+                  <PaginationLink
+                    onClick={() => setPaginaActual(pagina)}
+                    isActive={paginaActual === pagina}
+                    className="cursor-pointer"
+                  >
+                    {pagina}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setPaginaActual(prev => Math.min(prev + 1, totalPaginas))}
+                  className={paginaActual === totalPaginas ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
 
