@@ -1,0 +1,370 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Activity, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react";
+
+interface RiesgoSemaforizado {
+  id: string;
+  codigo: string;
+  nombre: string;
+  categoria: string;
+  nivelRiesgo: number;
+  estado: "Verde" | "Amarillo" | "Rojo" | "Crítico";
+  ultimaEvaluacion: string;
+  proximaRevision: string;
+  responsable: string;
+  accionesRequeridas: string[];
+  tendencia: "Mejorando" | "Estable" | "Empeorando";
+}
+
+const mockRiesgos: RiesgoSemaforizado[] = [
+  {
+    id: "1",
+    codigo: "RG-001",
+    nombre: "Falla en sistemas críticos",
+    categoria: "Operacional",
+    nivelRiesgo: 12,
+    estado: "Rojo",
+    ultimaEvaluacion: "2024-01-15",
+    proximaRevision: "2024-02-15",
+    responsable: "Juan Pérez",
+    accionesRequeridas: ["Implementar redundancia", "Actualizar procedimientos"],
+    tendencia: "Empeorando"
+  },
+  {
+    id: "2",
+    codigo: "RG-002",
+    nombre: "Pérdida de datos confidenciales",
+    categoria: "Tecnológico",
+    nivelRiesgo: 10,
+    estado: "Amarillo",
+    ultimaEvaluacion: "2024-01-10",
+    proximaRevision: "2024-02-10",
+    responsable: "María García",
+    accionesRequeridas: ["Reforzar capacitación", "Actualizar políticas"],
+    tendencia: "Mejorando"
+  },
+  {
+    id: "3",
+    codigo: "RG-003",
+    nombre: "Incumplimiento normativo",
+    categoria: "Cumplimiento",
+    nivelRiesgo: 8,
+    estado: "Amarillo",
+    ultimaEvaluacion: "2024-01-12",
+    proximaRevision: "2024-02-12",
+    responsable: "Carlos López",
+    accionesRequeridas: ["Revisar documentación", "Capacitar personal"],
+    tendencia: "Estable"
+  },
+  {
+    id: "4",
+    codigo: "RG-004",
+    nombre: "Disponibilidad de servicios",
+    categoria: "Operacional",
+    nivelRiesgo: 4,
+    estado: "Verde",
+    ultimaEvaluacion: "2024-01-08",
+    proximaRevision: "2024-03-08",
+    responsable: "Ana Rodríguez",
+    accionesRequeridas: [],
+    tendencia: "Estable"
+  }
+];
+
+const obtenerIconoEstado = (estado: string) => {
+  switch (estado) {
+    case "Verde":
+      return <CheckCircle className="w-5 h-5 text-green-500" />;
+    case "Amarillo":
+      return <AlertCircle className="w-5 h-5 text-yellow-500" />;
+    case "Rojo":
+      return <XCircle className="w-5 h-5 text-red-500" />;
+    case "Crítico":
+      return <XCircle className="w-5 h-5 text-red-700" />;
+    default:
+      return <Clock className="w-5 h-5 text-gray-500" />;
+  }
+};
+
+const obtenerColorEstado = (estado: string) => {
+  switch (estado) {
+    case "Verde":
+      return "bg-green-500";
+    case "Amarillo":
+      return "bg-yellow-500";
+    case "Rojo":
+      return "bg-red-500";
+    case "Crítico":
+      return "bg-red-700";
+    default:
+      return "bg-gray-500";
+  }
+};
+
+const obtenerIconoTendencia = (tendencia: string) => {
+  switch (tendencia) {
+    case "Mejorando":
+      return "↗️";
+    case "Empeorando":
+      return "↘️";
+    case "Estable":
+      return "→";
+    default:
+      return "→";
+  }
+};
+
+export default function SemaforizacionRiesgos() {
+  const [riesgos] = useState<RiesgoSemaforizado[]>(mockRiesgos);
+  const [filtroEstado, setFiltroEstado] = useState<string>("todos");
+  const [filtroCategoria, setFiltroCategoria] = useState<string>("todos");
+
+  const riesgosFiltrados = riesgos.filter(riesgo => {
+    const cumpleEstado = filtroEstado === "todos" || riesgo.estado === filtroEstado;
+    const cumpleCategoria = filtroCategoria === "todos" || riesgo.categoria === filtroCategoria;
+    return cumpleEstado && cumpleCategoria;
+  });
+
+  const estadisticas = {
+    verde: riesgos.filter(r => r.estado === "Verde").length,
+    amarillo: riesgos.filter(r => r.estado === "Amarillo").length,
+    rojo: riesgos.filter(r => r.estado === "Rojo").length,
+    critico: riesgos.filter(r => r.estado === "Crítico").length,
+    total: riesgos.length
+  };
+
+  const categorias = [...new Set(riesgos.map(r => r.categoria))];
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Semaforización de Riesgos</h1>
+          <p className="text-muted-foreground">Monitoreo visual del estado de los riesgos</p>
+        </div>
+      </div>
+
+      {/* Panel de Estadísticas */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div>
+                <p className="text-2xl font-bold">{estadisticas.verde}</p>
+                <p className="text-xs text-muted-foreground">Verde</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <div>
+                <p className="text-2xl font-bold">{estadisticas.amarillo}</p>
+                <p className="text-xs text-muted-foreground">Amarillo</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div>
+                <p className="text-2xl font-bold">{estadisticas.rojo}</p>
+                <p className="text-xs text-muted-foreground">Rojo</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-700 rounded-full"></div>
+              <div>
+                <p className="text-2xl font-bold">{estadisticas.critico}</p>
+                <p className="text-xs text-muted-foreground">Crítico</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+              <div>
+                <p className="text-2xl font-bold">{estadisticas.total}</p>
+                <p className="text-xs text-muted-foreground">Total</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filtros */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Estado del Semáforo</label>
+              <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos los estados" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos los estados</SelectItem>
+                  <SelectItem value="Verde">Verde</SelectItem>
+                  <SelectItem value="Amarillo">Amarillo</SelectItem>
+                  <SelectItem value="Rojo">Rojo</SelectItem>
+                  <SelectItem value="Crítico">Crítico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Categoría</label>
+              <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas las categorías" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todas las categorías</SelectItem>
+                  {categorias.map((categoria) => (
+                    <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Matriz de Semaforización */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="w-5 h-5" />
+            Matriz de Semaforización
+          </CardTitle>
+          <CardDescription>
+            Estado actual de todos los riesgos con indicadores visuales
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {riesgosFiltrados.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No se encontraron riesgos con los filtros aplicados.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {riesgosFiltrados.map((riesgo) => (
+                <div key={riesgo.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      {obtenerIconoEstado(riesgo.estado)}
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline">{riesgo.codigo}</Badge>
+                          <Badge className={`${obtenerColorEstado(riesgo.estado)} text-white`}>
+                            {riesgo.estado}
+                          </Badge>
+                          <span className="text-lg">{obtenerIconoTendencia(riesgo.tendencia)}</span>
+                        </div>
+                        <h3 className="font-semibold">{riesgo.nombre}</h3>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Nivel de Riesgo</p>
+                      <p className="text-2xl font-bold">{riesgo.nivelRiesgo}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Categoría:</p>
+                      <Badge variant="secondary">{riesgo.categoria}</Badge>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Responsable:</p>
+                      <p className="font-medium">{riesgo.responsable}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Última Evaluación:</p>
+                      <p className="font-medium">{riesgo.ultimaEvaluacion}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Próxima Revisión:</p>
+                      <p className="font-medium">{riesgo.proximaRevision}</p>
+                    </div>
+                  </div>
+
+                  {riesgo.accionesRequeridas.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Acciones Requeridas:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {riesgo.accionesRequeridas.map((accion, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {accion}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end mt-4 gap-2">
+                    <Button variant="outline" size="sm">
+                      Ver Detalles
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      Actualizar Estado
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Alertas y Notificaciones */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Alertas y Notificaciones</CardTitle>
+          <CardDescription>
+            Riesgos que requieren atención inmediata
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {riesgos.filter(r => r.estado === "Rojo" || r.estado === "Crítico").map((riesgo) => (
+              <div key={riesgo.id} className="flex items-center gap-3 p-3 border rounded-lg bg-red-50 border-red-200">
+                <AlertCircle className="w-5 h-5 text-red-500" />
+                <div className="flex-1">
+                  <p className="font-medium">{riesgo.nombre} ({riesgo.codigo})</p>
+                  <p className="text-sm text-muted-foreground">
+                    Estado: {riesgo.estado} - Próxima revisión: {riesgo.proximaRevision}
+                  </p>
+                </div>
+                <Button variant="destructive" size="sm">
+                  Revisar
+                </Button>
+              </div>
+            ))}
+            {riesgos.filter(r => r.estado === "Rojo" || r.estado === "Crítico").length === 0 && (
+              <div className="text-center py-4 text-muted-foreground">
+                No hay riesgos críticos que requieran atención inmediata.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

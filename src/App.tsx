@@ -40,6 +40,10 @@ import AgregarContrato from "./pages/contratos/Agregar";
 import ContratosLicencias from "./pages/contratos/tipos/Licencias";
 import ContratosProveedores from "./pages/contratos/tipos/Proveedores";
 import ContratosSoftware from "./pages/contratos/tipos/Software";
+import MatrizRiesgos from "./pages/riesgos/MatrizRiesgos";
+import ClasificacionRiesgos from "./pages/riesgos/ClasificacionRiesgos";
+import SemaforizacionRiesgos from "./pages/riesgos/SemaforizacionRiesgos";
+import SeguimientoRiesgos from "./pages/riesgos/SeguimientoRiesgos";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +104,13 @@ const App = () => {
                         <Route path="/mantenimientos/ejecucion" element={<EjecucionMantenimiento />} />
                         <Route path="/mantenimientos/documentacion" element={<DocumentacionMantenimiento />} />
                         <Route path="/mantenimientos/auditoria" element={<AuditoriaMantenimiento />} />
+                        
+                        {/* Rutas de Gestión de Riesgos */}
+                        <Route path="/riesgos/matriz" element={<MatrizRiesgos />} />
+                        <Route path="/riesgos/clasificacion" element={<ClasificacionRiesgos />} />
+                        <Route path="/riesgos/semaforizacion" element={<SemaforizacionRiesgos />} />
+                        <Route path="/riesgos/seguimiento" element={<SeguimientoRiesgos />} />
+                        
                         <Route path="/hojas-vida" element={<HojaDeVida />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>

@@ -34,7 +34,11 @@ import {
   Building,
   Cog,
   AppWindow,
-  Computer
+  Computer,
+  AlertTriangle,
+  Target,
+  Activity,
+  TrendingUp
 } from "lucide-react";
 
 const menuItems = [
@@ -149,6 +153,17 @@ const menuItems = [
     title: "Mantenimientos",
     icon: Wrench,
     path: "/mantenimientos",
+  },
+  {
+    title: "Gestión de Riesgos",
+    icon: AlertTriangle,
+    path: "/riesgos",
+    submenu: [
+      { title: "Matriz de Riesgos", icon: Target, path: "/riesgos/matriz" },
+      { title: "Clasificación", icon: Tag, path: "/riesgos/clasificacion" },
+      { title: "Semaforización", icon: Activity, path: "/riesgos/semaforizacion" },
+      { title: "Seguimiento", icon: TrendingUp, path: "/riesgos/seguimiento" },
+    ],
   },
   {
     title: "Hojas de Vida Equipos",
