@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Activity, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Activity, AlertCircle, CheckCircle, XCircle, Clock, Grid, List } from "lucide-react";
 
 interface RiesgoSemaforizado {
   id: string;
@@ -115,6 +116,42 @@ const obtenerIconoTendencia = (tendencia: string) => {
     default:
       return "→";
   }
+};
+
+// Definición de la matriz de riesgos
+const probabilidadNiveles = [
+  { id: 5, nombre: "CASI SEGURO", descripcion: "Muy probable" },
+  { id: 4, nombre: "MUY PROBABLE", descripcion: "Muy probable" },
+  { id: 3, nombre: "POSIBLE", descripcion: "Posible" },
+  { id: 2, nombre: "POCO PROBABLE", descripcion: "Poco probable" },
+  { id: 1, nombre: "RARO", descripcion: "Raro" }
+];
+
+const impactoNiveles = [
+  { id: 1, nombre: "INSIGNIFICANTE", descripcion: "Insignificante" },
+  { id: 2, nombre: "MENOR", descripcion: "Menor" },
+  { id: 3, nombre: "MODERADO", descripcion: "Moderado" },
+  { id: 4, nombre: "MAYOR", descripcion: "Mayor" },
+  { id: 5, nombre: "CATASTRÓFICO", descripcion: "Catastrófico" }
+];
+
+const obtenerNivelRiesgoMatriz = (probabilidad: number, impacto: number) => {
+  const valor = probabilidad * impacto;
+  if (valor <= 3) return { nivel: "BAJO", color: "bg-green-500", textColor: "text-black" };
+  if (valor <= 6) return { nivel: "MEDIO", color: "bg-yellow-400", textColor: "text-black" };
+  if (valor <= 12) return { nivel: "ALTO", color: "bg-orange-500", textColor: "text-white" };
+  if (valor <= 20) return { nivel: "ALTO", color: "bg-orange-600", textColor: "text-white" };
+  return { nivel: "MUY ALTO", color: "bg-red-600", textColor: "text-white" };
+};
+
+const obtenerRiesgosEnCelda = (probabilidad: number, impacto: number, riesgos: RiesgoSemaforizado[]) => {
+  return riesgos.filter(riesgo => {
+    // Mapear nivel de riesgo a probabilidad e impacto aproximados
+    const nivel = riesgo.nivelRiesgo;
+    const probAprox = Math.min(5, Math.max(1, Math.ceil(nivel / 5)));
+    const impactoAprox = Math.min(5, Math.max(1, Math.ceil(nivel / 4)));
+    return probAprox === probabilidad && impactoAprox === impacto;
+  });
 };
 
 export default function SemaforizacionRiesgos() {
@@ -246,92 +283,200 @@ export default function SemaforizacionRiesgos() {
         </CardContent>
       </Card>
 
-      {/* Matriz de Semaforización */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="w-5 h-5" />
-            Matriz de Semaforización
-          </CardTitle>
-          <CardDescription>
-            Estado actual de todos los riesgos con indicadores visuales
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {riesgosFiltrados.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No se encontraron riesgos con los filtros aplicados.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {riesgosFiltrados.map((riesgo) => (
-                <div key={riesgo.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      {obtenerIconoEstado(riesgo.estado)}
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline">{riesgo.codigo}</Badge>
-                          <Badge className={`${obtenerColorEstado(riesgo.estado)} text-white`}>
-                            {riesgo.estado}
-                          </Badge>
-                          <span className="text-lg">{obtenerIconoTendencia(riesgo.tendencia)}</span>
+      {/* Vistas de Semaforización */}
+      <Tabs defaultValue="matriz" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="w-5 h-5" />
+              Matriz de Semaforización
+            </CardTitle>
+            <CardDescription>
+              Estado actual de todos los riesgos con indicadores visuales
+            </CardDescription>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="matriz" className="flex items-center gap-2">
+                <Grid className="w-4 h-4" />
+                Vista Matriz
+              </TabsTrigger>
+              <TabsTrigger value="lista" className="flex items-center gap-2">
+                <List className="w-4 h-4" />
+                Vista Lista
+              </TabsTrigger>
+            </TabsList>
+          </CardHeader>
+          <CardContent>
+            <TabsContent value="matriz" className="space-y-6">
+              {/* Matriz Visual de Riesgos */}
+              <div className="space-y-4">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-blue-600 mb-2">Matriz de riesgos</h3>
+                  <p className="text-sm text-muted-foreground uppercase tracking-wide">IMPACTO O CONSECUENCIAS</p>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <div className="inline-block min-w-full">
+                    {/* Header de impacto */}
+                    <div className="grid grid-cols-7 gap-0 mb-0">
+                      <div></div>
+                      {impactoNiveles.map((impacto) => (
+                        <div key={impacto.id} className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400">
+                          {impacto.nombre}
                         </div>
-                        <h3 className="font-semibold">{riesgo.nombre}</h3>
+                      ))}
+                    </div>
+                    
+                    {/* Filas de la matriz */}
+                    {probabilidadNiveles.map((probabilidad, probIndex) => (
+                      <div key={probabilidad.id} className="grid grid-cols-7 gap-0">
+                        {/* Label de probabilidad */}
+                        {probIndex === 2 && (
+                          <div className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 row-span-5 flex items-center justify-center writing-mode-vertical-lr rotate-180">
+                            <span className="transform rotate-90 whitespace-nowrap">PROBABILIDAD DE QUE OCURRA</span>
+                          </div>
+                        )}
+                        {probIndex !== 2 && (
+                          <div className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 flex items-center justify-center">
+                            {probabilidad.nombre}
+                          </div>
+                        )}
+                        
+                        {/* Celdas de la matriz */}
+                        {impactoNiveles.map((impacto) => {
+                          const riesgoInfo = obtenerNivelRiesgoMatriz(probabilidad.id, impacto.id);
+                          const riesgosEnCelda = obtenerRiesgosEnCelda(probabilidad.id, impacto.id, riesgosFiltrados);
+                          
+                          return (
+                            <div 
+                              key={`${probabilidad.id}-${impacto.id}`}
+                              className={`${riesgoInfo.color} ${riesgoInfo.textColor} p-3 text-center text-sm font-bold border border-gray-400 min-h-[80px] flex flex-col items-center justify-center relative group`}
+                            >
+                              <span className="text-xs mb-1">{riesgoInfo.nivel}</span>
+                              {riesgosEnCelda.length > 0 && (
+                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                                  <span className="bg-white text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                    {riesgosEnCelda.length}
+                                  </span>
+                                </div>
+                              )}
+                              {riesgosEnCelda.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded shadow-lg p-2 z-10 hidden group-hover:block">
+                                  <div className="space-y-1">
+                                    {riesgosEnCelda.map((riesgo) => (
+                                      <div key={riesgo.id} className="text-xs text-black">
+                                        <span className="font-medium">{riesgo.codigo}:</span> {riesgo.nombre}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Nivel de Riesgo</p>
-                      <p className="text-2xl font-bold">{riesgo.nivelRiesgo}</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Categoría:</p>
-                      <Badge variant="secondary">{riesgo.categoria}</Badge>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Responsable:</p>
-                      <p className="font-medium">{riesgo.responsable}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Última Evaluación:</p>
-                      <p className="font-medium">{riesgo.ultimaEvaluacion}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Próxima Revisión:</p>
-                      <p className="font-medium">{riesgo.proximaRevision}</p>
-                    </div>
-                  </div>
-
-                  {riesgo.accionesRequeridas.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-sm font-medium text-muted-foreground mb-2">Acciones Requeridas:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {riesgo.accionesRequeridas.map((accion, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {accion}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex justify-end mt-4 gap-2">
-                    <Button variant="outline" size="sm">
-                      Ver Detalles
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Actualizar Estado
-                    </Button>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                
+                {/* Leyenda */}
+                <div className="flex justify-center gap-4 mt-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-green-500"></div>
+                    <span className="text-sm">BAJO</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-yellow-400"></div>
+                    <span className="text-sm">MEDIO</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-orange-500"></div>
+                    <span className="text-sm">ALTO</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-600"></div>
+                    <span className="text-sm">MUY ALTO</span>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="lista" className="space-y-4">
+              {riesgosFiltrados.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No se encontraron riesgos con los filtros aplicados.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {riesgosFiltrados.map((riesgo) => (
+                    <div key={riesgo.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          {obtenerIconoEstado(riesgo.estado)}
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge variant="outline">{riesgo.codigo}</Badge>
+                              <Badge className={`${obtenerColorEstado(riesgo.estado)} text-white`}>
+                                {riesgo.estado}
+                              </Badge>
+                              <span className="text-lg">{obtenerIconoTendencia(riesgo.tendencia)}</span>
+                            </div>
+                            <h3 className="font-semibold">{riesgo.nombre}</h3>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">Nivel de Riesgo</p>
+                          <p className="text-2xl font-bold">{riesgo.nivelRiesgo}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Categoría:</p>
+                          <Badge variant="secondary">{riesgo.categoria}</Badge>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Responsable:</p>
+                          <p className="font-medium">{riesgo.responsable}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Última Evaluación:</p>
+                          <p className="font-medium">{riesgo.ultimaEvaluacion}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Próxima Revisión:</p>
+                          <p className="font-medium">{riesgo.proximaRevision}</p>
+                        </div>
+                      </div>
+
+                      {riesgo.accionesRequeridas.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">Acciones Requeridas:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {riesgo.accionesRequeridas.map((accion, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {accion}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-end mt-4 gap-2">
+                        <Button variant="outline" size="sm">
+                          Ver Detalles
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          Actualizar Estado
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </CardContent>
+        </Card>
+      </Tabs>
 
       {/* Alertas y Notificaciones */}
       <Card>
