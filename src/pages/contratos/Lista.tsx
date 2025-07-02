@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Eye, FileEdit, FileX, Grid3X3, LayoutGrid, FileText, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Tipo para los contratos
@@ -18,6 +19,16 @@ type Contrato = {
   fechaFin: string;
   estado: 'activo' | 'inactivo' | 'pendiente';
   descripcion: string;
+  valor?: string;
+  responsable?: string;
+  telefono?: string;
+  email?: string;
+  documentos?: Array<{
+    id: string;
+    nombre: string;
+    tipo: string;
+    url: string;
+  }>;
 };
 
 // Datos de ejemplo
@@ -30,7 +41,15 @@ const contratosEjemplo: Contrato[] = [
     fechaInicio: '2023-01-01',
     fechaFin: '2024-12-31',
     estado: 'activo',
-    descripcion: 'Licencia para 100 usuarios de Microsoft Office 365'
+    descripcion: 'Licencia para 100 usuarios de Microsoft Office 365',
+    valor: '$25,000',
+    responsable: 'Juan Pérez',
+    telefono: '+57 300 123 4567',
+    email: 'juan.perez@empresa.com',
+    documentos: [
+      { id: '1', nombre: 'Contrato_Microsoft_2023.pdf', tipo: 'PDF', url: '/docs/contrato1.pdf' },
+      { id: '2', nombre: 'Anexo_Licencias.docx', tipo: 'DOCX', url: '/docs/anexo1.docx' }
+    ]
   },
   {
     id: '2',
@@ -40,7 +59,14 @@ const contratosEjemplo: Contrato[] = [
     fechaInicio: '2023-03-15',
     fechaFin: '2024-03-14',
     estado: 'activo',
-    descripcion: 'Mantenimiento preventivo y correctivo para servidores'
+    descripcion: 'Mantenimiento preventivo y correctivo para servidores',
+    valor: '$18,500',
+    responsable: 'María González',
+    telefono: '+57 301 987 6543',
+    email: 'maria.gonzalez@empresa.com',
+    documentos: [
+      { id: '3', nombre: 'Contrato_Dell_Mantenimiento.pdf', tipo: 'PDF', url: '/docs/contrato2.pdf' }
+    ]
   },
   {
     id: '3',
@@ -50,7 +76,15 @@ const contratosEjemplo: Contrato[] = [
     fechaInicio: '2022-05-10',
     fechaFin: '2023-05-09',
     estado: 'inactivo',
-    descripcion: 'Sistema ERP para gestión empresarial'
+    descripcion: 'Sistema ERP para gestión empresarial',
+    valor: '$45,000',
+    responsable: 'Carlos Rodríguez',
+    telefono: '+57 310 456 7890',
+    email: 'carlos.rodriguez@empresa.com',
+    documentos: [
+      { id: '4', nombre: 'Contrato_SAP_ERP.pdf', tipo: 'PDF', url: '/docs/contrato3.pdf' },
+      { id: '5', nombre: 'Manual_Usuario.pdf', tipo: 'PDF', url: '/docs/manual.pdf' }
+    ]
   },
   {
     id: '4',
@@ -60,7 +94,14 @@ const contratosEjemplo: Contrato[] = [
     fechaInicio: '2023-07-01',
     fechaFin: '2024-06-30',
     estado: 'activo',
-    descripcion: 'Soporte técnico 24/7 para infraestructura TI'
+    descripcion: 'Soporte técnico 24/7 para infraestructura TI',
+    valor: '$12,000',
+    responsable: 'Ana Martínez',
+    telefono: '+57 320 111 2233',
+    email: 'ana.martinez@empresa.com',
+    documentos: [
+      { id: '6', nombre: 'Contrato_Soporte_Tecnico.pdf', tipo: 'PDF', url: '/docs/contrato4.pdf' }
+    ]
   },
   {
     id: '5',
@@ -70,11 +111,142 @@ const contratosEjemplo: Contrato[] = [
     fechaInicio: '2023-02-01',
     fechaFin: '2024-01-31',
     estado: 'pendiente',
-    descripcion: 'Protección antivirus para 200 equipos'
+    descripcion: 'Protección antivirus para 200 equipos',
+    valor: '$8,500',
+    responsable: 'Luis Herrera',
+    telefono: '+57 315 998 7766',
+    email: 'luis.herrera@empresa.com',
+    documentos: [
+      { id: '7', nombre: 'Propuesta_Norton.pdf', tipo: 'PDF', url: '/docs/propuesta.pdf' }
+    ]
   },
 ];
 
-const ContratoCard = ({ contrato }: { contrato: Contrato }) => {
+const DetalleContratoModal = ({ contrato, open, onOpenChange }: { 
+  contrato: Contrato | null; 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void; 
+}) => {
+  if (!contrato) return null;
+
+  const diasRestantes = () => {
+    const hoy = new Date();
+    const fin = new Date(contrato.fechaFin);
+    const diferencia = fin.getTime() - hoy.getTime();
+    return Math.ceil(diferencia / (1000 * 3600 * 24));
+  };
+
+  const getBadgeColor = (estado: string) => {
+    switch (estado) {
+      case 'activo':
+        return 'bg-green-500';
+      case 'inactivo':
+        return 'bg-red-500';
+      case 'pendiente':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const restantes = diasRestantes();
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl">{contrato.nombre}</DialogTitle>
+          <DialogDescription>{contrato.empresa}</DialogDescription>
+        </DialogHeader>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Información General</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="font-medium">Estado:</span>
+                <Badge className={getBadgeColor(contrato.estado)}>
+                  {contrato.estado.charAt(0).toUpperCase() + contrato.estado.slice(1)}
+                </Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Tipo:</span>
+                <span className="capitalize">{contrato.tipo}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Valor:</span>
+                <span className="font-semibold text-green-600">{contrato.valor || 'No especificado'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Fecha de Inicio:</span>
+                <span>{new Date(contrato.fechaInicio).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Fecha de Fin:</span>
+                <span>{new Date(contrato.fechaFin).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Vigencia:</span>
+                <span className={`${restantes < 30 ? 'text-red-500' : restantes < 90 ? 'text-yellow-500' : 'text-green-500'} font-medium`}>
+                  {restantes > 0 ? `${restantes} días` : 'Vencido'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Información de Contacto</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="font-medium">Responsable:</span>
+                <span>{contrato.responsable || 'No asignado'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Teléfono:</span>
+                <span>{contrato.telefono || 'No especificado'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Email:</span>
+                <span>{contrato.email || 'No especificado'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">Descripción</h3>
+          <p className="text-gray-700 leading-relaxed">{contrato.descripcion}</p>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">Documentos Adjuntos</h3>
+          {contrato.documentos && contrato.documentos.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {contrato.documentos.map((doc) => (
+                <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+                  <div className="flex items-center gap-3">
+                    <FileText size={20} className="text-blue-600" />
+                    <div>
+                      <p className="font-medium">{doc.nombre}</p>
+                      <p className="text-sm text-gray-500">{doc.tipo}</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <Download size={16} /> Descargar
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No hay documentos adjuntos</p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ContratoCard = ({ contrato, onVerDetalle }: { contrato: Contrato; onVerDetalle: (contrato: Contrato) => void }) => {
   const diasRestantes = () => {
     const hoy = new Date();
     const fin = new Date(contrato.fechaFin);
@@ -131,7 +303,7 @@ const ContratoCard = ({ contrato }: { contrato: Contrato }) => {
         </div>
       </CardContent>
       <CardFooter className="pt-0 flex justify-between">
-        <Button variant="outline" size="sm" className="gap-1">
+        <Button variant="outline" size="sm" className="gap-1" onClick={() => onVerDetalle(contrato)}>
           <Eye size={16} /> Ver
         </Button>
         <Button variant="outline" size="sm" className="gap-1">
@@ -145,7 +317,7 @@ const ContratoCard = ({ contrato }: { contrato: Contrato }) => {
   );
 };
 
-const ContratosTable = ({ contratos }: { contratos: Contrato[] }) => {
+const ContratosTable = ({ contratos, onVerDetalle }: { contratos: Contrato[]; onVerDetalle: (contrato: Contrato) => void }) => {
   const getBadgeColor = (estado: string) => {
     switch (estado) {
       case 'activo':
@@ -202,7 +374,7 @@ const ContratosTable = ({ contratos }: { contratos: Contrato[] }) => {
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="gap-1">
+                  <Button variant="outline" size="sm" className="gap-1" onClick={() => onVerDetalle(contrato)}>
                     <Eye size={16} /> Ver
                   </Button>
                   <Button variant="outline" size="sm" className="gap-1">
@@ -224,6 +396,8 @@ const ContratosTable = ({ contratos }: { contratos: Contrato[] }) => {
 const ListaContratos = () => {
   const [filtro, setFiltro] = useState('todos');
   const [vista, setVista] = useState<'table' | 'cards'>('table');
+  const [contratoSeleccionado, setContratoSeleccionado] = useState<Contrato | null>(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
   const navigate = useNavigate();
 
   const contratosFiltrados = filtro === 'todos' 
@@ -233,6 +407,11 @@ const ListaContratos = () => {
         filtro === 'inactivos' ? c.estado === 'inactivo' :
         filtro === 'pendientes' ? c.estado === 'pendiente' : true
       );
+
+  const handleVerDetalle = (contrato: Contrato) => {
+    setContratoSeleccionado(contrato);
+    setModalAbierto(true);
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -272,7 +451,7 @@ const ListaContratos = () => {
 
       {vista === 'table' ? (
         <div className="mb-6">
-          <ContratosTable contratos={contratosFiltrados} />
+          <ContratosTable contratos={contratosFiltrados} onVerDetalle={handleVerDetalle} />
           {contratosFiltrados.length === 0 && (
             <div className="text-center py-10 text-gray-500">
               No se encontraron contratos con el filtro seleccionado.
@@ -282,7 +461,7 @@ const ListaContratos = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {contratosFiltrados.map(contrato => (
-            <ContratoCard key={contrato.id} contrato={contrato} />
+            <ContratoCard key={contrato.id} contrato={contrato} onVerDetalle={handleVerDetalle} />
           ))}
 
           {contratosFiltrados.length === 0 && (
@@ -292,6 +471,12 @@ const ListaContratos = () => {
           )}
         </div>
       )}
+
+      <DetalleContratoModal 
+        contrato={contratoSeleccionado} 
+        open={modalAbierto} 
+        onOpenChange={setModalAbierto} 
+      />
     </div>
   );
 };
