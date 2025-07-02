@@ -311,111 +311,141 @@ export default function SemaforizacionRiesgos() {
           <CardContent>
             <TabsContent value="matriz" className="space-y-6">
               {/* Matriz Visual de Riesgos */}
-              <div className="space-y-4">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-blue-600 mb-2">Matriz de riesgos</h3>
-                  <p className="text-sm text-muted-foreground uppercase tracking-wide">IMPACTO O CONSECUENCIAS</p>
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h3 className="text-3xl font-bold text-blue-600 mb-2">Matriz de Riesgos</h3>
+                  <p className="text-sm text-muted-foreground uppercase tracking-wider">IMPACTO O CONSECUENCIAS</p>
                 </div>
                 
                 <div className="flex justify-center">
-                  <div className="inline-block">
+                  <div className="inline-block bg-white border border-gray-300 rounded-lg p-4 shadow-lg">
                     {/* Header de impacto */}
-                    <div className="grid grid-cols-7 gap-0 mb-0">
-                      <div className="w-32"></div>
+                    <div className="grid grid-cols-6 gap-0 mb-0">
                       {impactoNiveles.map((impacto) => (
-                        <div key={impacto.id} className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 min-w-[120px]">
-                          {impacto.nombre}
+                        <div key={impacto.id} className="bg-slate-700 text-white p-4 text-center text-xs font-bold border border-slate-600 min-w-[100px] first:rounded-tl-lg last:rounded-tr-lg">
+                          <div className="whitespace-nowrap">{impacto.nombre}</div>
                         </div>
                       ))}
                     </div>
                     
-                    {/* Filas de la matriz */}
-                    <div className="grid grid-cols-7 gap-0">
+                    {/* Contenedor de la matriz con label lateral */}
+                    <div className="relative">
                       {/* Label vertical de probabilidad */}
-                      <div className="bg-gray-600 text-white border border-gray-400 flex items-center justify-center w-32">
-                        <div className="transform -rotate-90 whitespace-nowrap text-xs font-bold">
+                      <div className="absolute -left-16 top-0 bottom-0 flex items-center justify-center w-12">
+                        <div className="transform -rotate-90 whitespace-nowrap text-xs font-bold text-slate-700 bg-slate-100 px-4 py-2 rounded">
                           PROBABILIDAD DE QUE OCURRA
                         </div>
                       </div>
                       
-                      {/* Columnas vacías para alinear con el header */}
-                      <div className="col-span-6"></div>
-                    </div>
-                    
-                    {/* Filas de datos */}
-                    {probabilidadNiveles.map((probabilidad) => (
-                      <div key={probabilidad.id} className="grid grid-cols-7 gap-0">
-                        {/* Label de fila individual */}
-                        <div className="bg-gray-600 text-white p-3 text-center text-xs font-bold border border-gray-400 flex items-center justify-center w-32">
-                          <span className="whitespace-nowrap">{probabilidad.nombre}</span>
-                        </div>
-                        
-                        {/* Celdas de la matriz */}
-                        {impactoNiveles.map((impacto) => {
-                          const riesgoInfo = obtenerNivelRiesgoMatriz(probabilidad.id, impacto.id);
-                          const riesgosEnCelda = obtenerRiesgosEnCelda(probabilidad.id, impacto.id, riesgosFiltrados);
-                          
-                          return (
-                            <div 
-                              key={`${probabilidad.id}-${impacto.id}`}
-                              className={`${riesgoInfo.color} ${riesgoInfo.textColor} p-3 text-center text-sm font-bold border border-gray-400 min-h-[80px] flex flex-col items-center justify-center relative group cursor-pointer hover:opacity-80 transition-opacity`}
-                              onClick={() => {
-                                if (riesgosEnCelda.length > 0) {
-                                  setSelectedCelda({
-                                    probabilidad: probabilidad.id,
-                                    impacto: impacto.id,
-                                    riesgos: riesgosEnCelda
-                                  });
-                                }
-                              }}
-                            >
-                              <span className="text-xs mb-1">{riesgoInfo.nivel}</span>
-                              {riesgosEnCelda.length > 0 && (
-                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center pointer-events-none">
-                                  <span className="bg-white text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-                                    {riesgosEnCelda.length}
-                                  </span>
-                                </div>
-                              )}
-                              {riesgosEnCelda.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded shadow-lg p-2 z-10 hidden group-hover:block pointer-events-none">
-                                  <div className="space-y-1">
-                                    {riesgosEnCelda.map((riesgo) => (
-                                      <div key={riesgo.id} className="text-xs text-black">
-                                        <span className="font-medium">{riesgo.codigo}:</span> {riesgo.nombre}
-                                      </div>
-                                    ))}
-                                    <div className="text-xs text-blue-600 font-medium mt-2">
-                                      Click para ver detalles
+                      {/* Filas de datos */}
+                      <div className="ml-4">
+                        {probabilidadNiveles.map((probabilidad, index) => (
+                          <div key={probabilidad.id} className="grid grid-cols-6 gap-0">
+                            {/* Celdas de la matriz */}
+                            {impactoNiveles.map((impacto, impactoIndex) => {
+                              const riesgoInfo = obtenerNivelRiesgoMatriz(probabilidad.id, impacto.id);
+                              const riesgosEnCelda = obtenerRiesgosEnCelda(probabilidad.id, impacto.id, riesgosFiltrados);
+                              
+                              return (
+                                <div 
+                                  key={`${probabilidad.id}-${impacto.id}`}
+                                  className={`${riesgoInfo.color} ${riesgoInfo.textColor} p-4 text-center text-sm font-bold border border-gray-400 min-h-[80px] flex flex-col items-center justify-center relative group cursor-pointer hover:opacity-90 transition-all duration-200 hover:scale-105 ${
+                                    index === probabilidadNiveles.length - 1 && impactoIndex === 0 ? 'rounded-bl-lg' : ''
+                                  } ${
+                                    index === probabilidadNiveles.length - 1 && impactoIndex === impactoNiveles.length - 1 ? 'rounded-br-lg' : ''
+                                  }`}
+                                  onClick={() => {
+                                    if (riesgosEnCelda.length > 0) {
+                                      setSelectedCelda({
+                                        probabilidad: probabilidad.id,
+                                        impacto: impacto.id,
+                                        riesgos: riesgosEnCelda
+                                      });
+                                    }
+                                  }}
+                                >
+                                  <span className="text-xs mb-1 drop-shadow-sm">{riesgoInfo.nivel}</span>
+                                  {riesgosEnCelda.length > 0 && (
+                                    <div className="absolute top-2 right-2">
+                                      <span className="bg-white text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">
+                                        {riesgosEnCelda.length}
+                                      </span>
                                     </div>
-                                  </div>
+                                  )}
+                                  {riesgosEnCelda.length > 0 && (
+                                    <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded shadow-xl p-3 z-20 hidden group-hover:block pointer-events-none mt-1">
+                                      <div className="space-y-1">
+                                        <div className="text-xs font-bold text-gray-800 border-b pb-1">
+                                          Riesgos en esta celda:
+                                        </div>
+                                        {riesgosEnCelda.slice(0, 3).map((riesgo) => (
+                                          <div key={riesgo.id} className="text-xs text-gray-700">
+                                            <span className="font-medium text-blue-600">{riesgo.codigo}:</span> {riesgo.nombre}
+                                          </div>
+                                        ))}
+                                        {riesgosEnCelda.length > 3 && (
+                                          <div className="text-xs text-gray-500 italic">
+                                            +{riesgosEnCelda.length - 3} más...
+                                          </div>
+                                        )}
+                                        <div className="text-xs text-blue-600 font-medium mt-2 pt-1 border-t">
+                                          🖱️ Click para ver todos
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                              );
+                            })}
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                      
+                      {/* Labels de probabilidad en el lado izquierdo */}
+                      <div className="absolute left-0 top-0">
+                        {probabilidadNiveles.map((probabilidad, index) => (
+                          <div 
+                            key={probabilidad.id} 
+                            className="bg-slate-700 text-white text-center text-xs font-bold border border-slate-600 h-[80px] flex items-center justify-center -ml-4 w-20"
+                            style={{ 
+                              marginTop: index === 0 ? '0' : '0px',
+                              borderRadius: index === 0 ? '8px 0 0 0' : index === probabilidadNiveles.length - 1 ? '0 0 0 8px' : '0'
+                            }}
+                          >
+                            <span className="whitespace-nowrap text-[10px] leading-tight px-1">
+                              {probabilidad.nombre}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                {/* Leyenda */}
-                <div className="flex justify-center gap-4 mt-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500"></div>
-                    <span className="text-sm">BAJO</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-yellow-400"></div>
-                    <span className="text-sm">MEDIO</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-orange-500"></div>
-                    <span className="text-sm">ALTO</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-600"></div>
-                    <span className="text-sm">MUY ALTO</span>
+                {/* Leyenda mejorada */}
+                <div className="flex justify-center">
+                  <div className="bg-gray-50 rounded-lg p-4 border">
+                    <div className="text-center mb-3">
+                      <h4 className="text-sm font-semibold text-gray-700">Niveles de Riesgo</h4>
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-green-500 rounded border"></div>
+                        <span className="text-sm font-medium">BAJO</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-yellow-400 rounded border"></div>
+                        <span className="text-sm font-medium">MEDIO</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-orange-500 rounded border"></div>
+                        <span className="text-sm font-medium">ALTO</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-red-600 rounded border"></div>
+                        <span className="text-sm font-medium">MUY ALTO</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
