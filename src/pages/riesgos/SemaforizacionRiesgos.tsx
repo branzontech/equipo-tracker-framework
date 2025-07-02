@@ -179,105 +179,111 @@ export default function SemaforizacionRiesgos() {
   const categorias = [...new Set(riesgos.map(r => r.categoria))];
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Semaforización de Riesgos</h1>
-          <p className="text-muted-foreground">Monitoreo visual del estado de los riesgos</p>
-        </div>
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Header Section */}
+      <div className="text-center space-y-2">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Semaforización de Riesgos
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Monitoreo visual del estado de los riesgos organizacionales
+        </p>
       </div>
 
-      {/* Panel de Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <div>
-                <p className="text-2xl font-bold">{estadisticas.verde}</p>
-                <p className="text-xs text-muted-foreground">Verde</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div>
-                <p className="text-2xl font-bold">{estadisticas.amarillo}</p>
-                <p className="text-xs text-muted-foreground">Amarillo</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <div>
-                <p className="text-2xl font-bold">{estadisticas.rojo}</p>
-                <p className="text-xs text-muted-foreground">Rojo</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-700 rounded-full"></div>
-              <div>
-                <p className="text-2xl font-bold">{estadisticas.critico}</p>
-                <p className="text-xs text-muted-foreground">Crítico</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-              <div>
-                <p className="text-2xl font-bold">{estadisticas.total}</p>
-                <p className="text-xs text-muted-foreground">Total</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filtros */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
+      {/* Statistics Dashboard */}
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-none shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Resumen Ejecutivo</CardTitle>
+          <CardDescription>Estado actual de la cartera de riesgos</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">Estado del Semáforo</label>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-2xl font-bold text-white">{estadisticas.verde}</span>
+              </div>
+              <div>
+                <p className="font-semibold text-green-700">BAJO</p>
+                <p className="text-xs text-muted-foreground">Riesgos controlados</p>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-2xl font-bold text-white">{estadisticas.amarillo}</span>
+              </div>
+              <div>
+                <p className="font-semibold text-yellow-700">MEDIO</p>
+                <p className="text-xs text-muted-foreground">Requieren atención</p>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-2xl font-bold text-white">{estadisticas.rojo}</span>
+              </div>
+              <div>
+                <p className="font-semibold text-orange-700">ALTO</p>
+                <p className="text-xs text-muted-foreground">Acción inmediata</p>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-2xl font-bold text-white">{estadisticas.critico}</span>
+              </div>
+              <div>
+                <p className="font-semibold text-red-700">CRÍTICO</p>
+                <p className="text-xs text-muted-foreground">Máxima prioridad</p>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-2xl font-bold text-white">{estadisticas.total}</span>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-700">TOTAL</p>
+                <p className="text-xs text-muted-foreground">Riesgos registrados</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Filters Section */}
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="w-5 h-5" />
+            Filtros de Visualización
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">Estado del Semáforo</label>
               <Select value={filtroEstado} onValueChange={setFiltroEstado}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Todos los estados" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todos los estados</SelectItem>
-                  <SelectItem value="Verde">Verde</SelectItem>
-                  <SelectItem value="Amarillo">Amarillo</SelectItem>
-                  <SelectItem value="Rojo">Rojo</SelectItem>
-                  <SelectItem value="Crítico">Crítico</SelectItem>
+                  <SelectItem value="todos">🎯 Todos los estados</SelectItem>
+                  <SelectItem value="Verde">🟢 Verde - Bajo</SelectItem>
+                  <SelectItem value="Amarillo">🟡 Amarillo - Medio</SelectItem>
+                  <SelectItem value="Rojo">🔴 Rojo - Alto</SelectItem>
+                  <SelectItem value="Crítico">🚨 Crítico</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">Categoría</label>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">Categoría de Riesgo</label>
               <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Todas las categorías" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todas las categorías</SelectItem>
+                  <SelectItem value="todos">📋 Todas las categorías</SelectItem>
                   {categorias.map((categoria) => (
-                    <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
+                    <SelectItem key={categoria} value={categoria}>
+                      📁 {categoria}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
