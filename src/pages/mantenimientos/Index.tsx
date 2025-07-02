@@ -135,6 +135,9 @@ const MantenimientosIndex = () => {
   const [nuevoItemPersonalizado, setNuevoItemPersonalizado] = useState("");
   const [tipoNuevoItem, setTipoNuevoItem] = useState<'checkbox' | 'numeric' | 'text'>('checkbox');
   const [calificacionEquipo, setCalificacionEquipo] = useState(0);
+  const [tipoCalificacion, setTipoCalificacion] = useState<'estrellas' | 'escala' | 'categorica'>('estrellas');
+  const [calificacionEscala, setCalificacionEscala] = useState(1);
+  const [calificacionCategorica, setCalificacionCategorica] = useState<'malo' | 'bueno' | 'excelente'>('bueno');
   const [observacionesChecklist, setObservacionesChecklist] = useState("");
   const [nombrePlantilla, setNombrePlantilla] = useState("");
   const [fechaEjecucion] = useState(new Date());
@@ -311,12 +314,13 @@ const MantenimientosIndex = () => {
     const plantilla = {
       nombre: nombrePlantilla,
       items: itemsChecklist,
+      tipoCalificacion: tipoCalificacion,
       fechaCreacion: new Date()
     };
     
     // Aquí guardarías la plantilla en localStorage o base de datos
     console.log("Plantilla guardada:", plantilla);
-    toast.success("Plantilla guardada exitosamente");
+    toast.success(`Plantilla "${nombrePlantilla}" guardada exitosamente`);
     setNombrePlantilla("");
   };
 
@@ -334,7 +338,10 @@ const MantenimientosIndex = () => {
     const resultado = {
       equipo: equipoChecklistSeleccionado,
       items: itemsChecklist,
-      calificacion: calificacionEquipo,
+      tipoCalificacion: tipoCalificacion,
+      calificacion: tipoCalificacion === 'estrellas' ? calificacionEquipo : 
+                   tipoCalificacion === 'escala' ? calificacionEscala : 
+                   calificacionCategorica,
       observaciones: observacionesChecklist,
       fechaEjecucion: fechaEjecucion,
       tecnicoResponsable: tecnicoResponsable,
@@ -350,6 +357,8 @@ const MantenimientosIndex = () => {
     setBusquedaChecklist("");
     setSedeFilterChecklist("");
     setCalificacionEquipo(0);
+    setCalificacionEscala(1);
+    setCalificacionCategorica('bueno');
     setObservacionesChecklist("");
     setTecnicoResponsable("");
   };
@@ -1159,24 +1168,98 @@ const MantenimientosIndex = () => {
                   </div>
 
                   {/* Calificación del Equipo */}
-                  <div className="space-y-2">
-                    <Label>Calificación del Estado del Equipo</Label>
-                    <div className="flex items-center space-x-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`h-6 w-6 cursor-pointer ${
-                            star <= calificacionEquipo
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                          onClick={() => setCalificacionEquipo(star)}
-                        />
-                      ))}
-                      <span className="ml-2 text-sm text-gray-600">
-                        ({calificacionEquipo} de 5)
-                      </span>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Calificación del Estado del Equipo</Label>
+                      <Select value={tipoCalificacion} onValueChange={(value: 'estrellas' | 'escala' | 'categorica') => setTipoCalificacion(value)}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="estrellas">⭐ Estrellas (1-5)</SelectItem>
+                          <SelectItem value="escala">🔢 Escala (1-10)</SelectItem>
+                          <SelectItem value="categorica">📋 Categórica</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
+
+                    {/* Calificación por Estrellas */}
+                    {tipoCalificacion === 'estrellas' && (
+                      <div className="flex items-center space-x-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-6 w-6 cursor-pointer transition-colors ${
+                              star <= calificacionEquipo
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-300 hover:text-yellow-200'
+                            }`}
+                            onClick={() => setCalificacionEquipo(star)}
+                          />
+                        ))}
+                        <span className="ml-2 text-sm text-gray-600">
+                          ({calificacionEquipo} de 5 estrellas)
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Calificación por Escala 1-10 */}
+                    {tipoCalificacion === 'escala' && (
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-red-500 font-medium">1 (Malo)</span>
+                          <div className="flex-1">
+                            <input
+                              type="range"
+                              min="1"
+                              max="10"
+                              value={calificacionEscala}
+                              onChange={(e) => setCalificacionEscala(Number(e.target.value))}
+                              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            />
+                          </div>
+                          <span className="text-sm text-green-500 font-medium">10 (Excelente)</span>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-lg font-bold text-gray-700">
+                            Calificación: {calificacionEscala}/10
+                          </span>
+                          <span className="block text-sm text-gray-500">
+                            {calificacionEscala <= 3 ? 'Malo' : calificacionEscala <= 7 ? 'Regular' : 'Excelente'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Calificación Categórica */}
+                    {tipoCalificacion === 'categorica' && (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-3 gap-2">
+                          {(['malo', 'bueno', 'excelente'] as const).map((categoria) => (
+                            <Button
+                              key={categoria}
+                              type="button"
+                              variant={calificacionCategorica === categoria ? "default" : "outline"}
+                              onClick={() => setCalificacionCategorica(categoria)}
+                              className={`capitalize ${
+                                calificacionCategorica === categoria
+                                  ? categoria === 'malo' 
+                                    ? 'bg-red-500 hover:bg-red-600' 
+                                    : categoria === 'bueno' 
+                                    ? 'bg-yellow-500 hover:bg-yellow-600' 
+                                    : 'bg-green-500 hover:bg-green-600'
+                                  : ''
+                              }`}
+                            >
+                              {categoria === 'malo' ? '😞 Malo' : categoria === 'bueno' ? '😐 Bueno' : '😄 Excelente'}
+                            </Button>
+                          ))}
+                        </div>
+                        <div className="text-center text-sm text-gray-600">
+                          Estado seleccionado: <span className="font-semibold capitalize">{calificacionCategorica}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Observaciones */}
@@ -1191,22 +1274,28 @@ const MantenimientosIndex = () => {
                   </div>
 
                   {/* Guardar como Plantilla */}
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      placeholder="Nombre de la plantilla..."
-                      value={nombrePlantilla}
-                      onChange={(e) => setNombrePlantilla(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      onClick={guardarPlantilla}
-                      variant="outline"
-                      className="flex items-center gap-2"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                      Guardar Plantilla
-                    </Button>
+                  <div className="space-y-2">
+                    <Label>Guardar como Plantilla</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        placeholder="Nombre de la plantilla..."
+                        value={nombrePlantilla}
+                        onChange={(e) => setNombrePlantilla(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={guardarPlantilla}
+                        variant="outline"
+                        className="flex items-center gap-2"
+                      >
+                        <BookOpen className="h-4 w-4" />
+                        Guardar Plantilla
+                      </Button>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      La plantilla guardará los campos personalizados y el tipo de calificación seleccionado
+                    </p>
                   </div>
 
                   {/* Botones de Acción */}
