@@ -4,7 +4,6 @@ import EjecucionMantenimiento from "@/pages/mantenimientos/Ejecucion";
 import DocumentacionMantenimiento from "@/pages/mantenimientos/Documentacion";
 import AuditoriaMantenimiento from "@/pages/mantenimientos/Auditoria";
 import Details from "@/pages/mantenimientos/Details";
-import EditEquipo from "@/pages/productos/views/EditEquipo";
 
 export const mantenimientosNavigation = [
   { path: "/mantenimientos", element: <MantenimientosIndex /> },
