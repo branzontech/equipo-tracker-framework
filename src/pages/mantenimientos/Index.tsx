@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   ClipboardList,
@@ -23,7 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FormControl, FormDescription } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -41,13 +39,14 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEquipos } from "../productos/hooks/use-equipos";
 import { Equipo } from "../productos/interfaces/equipo";
-import { useState } from "react";
 import { useUser } from "../usuarios/hooks/use-user";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
 import { SearchSelect } from "../../components/SearchSelect";
+import { Separator } from "@/components/ui/separator";
+import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
+import { ListaChequeo } from "./ListaChequeo";
 
 const MantenimientosIndex = () => {
-  const navigate = useNavigate();
   const {
     newMante,
     setNewMante,
@@ -63,8 +62,8 @@ const MantenimientosIndex = () => {
     setTecnicoResponsable,
     validEquipo,
     validDetalles,
+    navigate,
   } = useMantenimiento();
-  const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
   const {
     setSelectedRecibeUser,
     handleNombreInput,
@@ -73,6 +72,8 @@ const MantenimientosIndex = () => {
     setSugerencias,
     setNombreUser,
   } = useUser();
+  const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
+  const { sedes } = useSedes();
 
   const selectEquipo = (equipo: Equipo) => {
     setEquipoSeleccionado(equipo);
@@ -104,6 +105,8 @@ const MantenimientosIndex = () => {
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <ListaChequeo />
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-[#bff036] text-[#01242c]">
@@ -205,7 +208,7 @@ const MantenimientosIndex = () => {
                                       <span className="font-semibold">
                                         Marca:
                                       </span>{" "}
-                                      {equipo.marcas}
+                                      {equipo.marcas.nombre}
                                     </span>
                                     <span>
                                       <span className="font-semibold">
@@ -255,7 +258,7 @@ const MantenimientosIndex = () => {
                           <div>
                             <p className="text-gray-500">Marca / Modelo</p>
                             <p className="font-medium">
-                              {equipoSeleccionado.marcas} /{" "}
+                              {equipoSeleccionado.marcas.nombre} /{" "}
                               {equipoSeleccionado.modelo}
                             </p>
                           </div>
@@ -328,37 +331,26 @@ const MantenimientosIndex = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
 
-                  {/* <FormField
-                      control={form.control}
-                      name="sede"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center mb-2">
-                            <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-                            <FormLabel>Sede</FormLabel>
-                          </div>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar sede" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {sedesMock.map((sede) => (
-                                <SelectItem key={sede.id} value={sede.id}>
-                                  {sede.nombre}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    /> */}
+                    <div className="space-y-2">
+                      <Label>Sedes</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar sedes" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sedes.map((sede) => (
+                            <SelectItem
+                              key={sede.id_sede}
+                              value={sede.id_sede.toString()}
+                            >
+                              {sede.nombre}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
 
                   <SearchSelect
                     label="Técnico asignado"
@@ -513,60 +505,9 @@ const MantenimientosIndex = () => {
                         });
                       }}
                     />
-                    {/* <FormDescription className="text-xs">
-                      Incluya instrucciones específicas o recomendaciones para
-                      el mantenimiento
-                    </FormDescription> */}
                   </div>
 
-                  {/* <FormField
-                    control={form.control}
-                    name="itemsChequeo"
-                    render={() => (
-                      <FormItem>
-                        <div className="mb-2 sm:mb-4">
-                          <div className="flex items-center mb-2">
-                            <ClipboardList className="h-4 w-4 mr-2 text-gray-500" />
-                            <FormLabel>Lista de Chequeo</FormLabel>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-gray-50 p-4 rounded-lg border">
-                          {listadoChequeo.map((item) => (
-                            <div
-                              key={item}
-                              className="flex items-start space-x-2"
-                            >
-                              <Checkbox
-                                id={item}
-                                className="mt-0.5"
-                                onCheckedChange={(checked) => {
-                                  const currentItems =
-                                    form.getValues("itemsChequeo");
-                                  if (checked) {
-                                    form.setValue("itemsChequeo", [
-                                      ...currentItems,
-                                      item,
-                                    ]);
-                                  } else {
-                                    form.setValue(
-                                      "itemsChequeo",
-                                      currentItems.filter((i) => i !== item)
-                                    );
-                                  }
-                                }}
-                              />
-                              <label
-                                htmlFor={item}
-                                className="text-xs sm:text-sm font-medium leading-tight"
-                              >
-                                {item}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </FormItem>
-                    )}
-                  /> */}
+                  <Separator />
 
                   <div className="space-y-2">
                     <Label htmlFor="observaciones">

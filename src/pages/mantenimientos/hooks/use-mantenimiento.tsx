@@ -4,7 +4,6 @@ import {
   create,
   getAll,
   getById,
-  getFiles,
   updateStatus,
   uploadFiles,
 } from "@/api/axios/mante.api";
@@ -18,7 +17,6 @@ import {
   Clock,
   AlertCircle,
   Pause,
-  Play,
   Rocket,
   AlertTriangle,
 } from "lucide-react";
@@ -83,6 +81,78 @@ export const useMantenimiento = () => {
   const [tecnicoResponsable, setTecnicoResponsable] = useState(null);
   const [validEquipo, setValidEquipo] = useState(false);
   const [validDetalles, setValidDetalles] = useState(false);
+  const [equipoChecklistSeleccionado, setEquipoChecklistSeleccionado] =
+    useState<Equipo | null>(null);
+  const [busquedaChecklist, setBusquedaChecklist] = useState("");
+  const [sedeFilterChecklist, setSedeFilterChecklist] = useState("");
+  const [equiposChecklistFiltrados, setEquiposChecklistFiltrados] = useState<
+    Equipo[]
+  >([]);
+  const [itemsChecklist, setItemsChecklist] = useState<
+    {
+      id: string;
+      texto: string;
+      tipo: "checkbox" | "numeric" | "text";
+      valor?: string | number;
+      checked?: boolean;
+      personalizado: boolean;
+    }[]
+  >([
+    {
+      id: "1",
+      texto: "Limpieza de hardware",
+      tipo: "checkbox",
+      checked: false,
+      personalizado: false,
+    },
+    {
+      id: "2",
+      texto: "Actualización de software",
+      tipo: "checkbox",
+      checked: false,
+      personalizado: false,
+    },
+    {
+      id: "3",
+      texto: "Verificación de componentes",
+      tipo: "checkbox",
+      checked: false,
+      personalizado: false,
+    },
+    {
+      id: "4",
+      texto: "Pruebas de rendimiento",
+      tipo: "checkbox",
+      checked: false,
+      personalizado: false,
+    },
+    {
+      id: "5",
+      texto: "Respaldo de información",
+      tipo: "checkbox",
+      checked: false,
+      personalizado: false,
+    },
+  ]);
+  const [nuevoItemPersonalizado, setNuevoItemPersonalizado] = useState("");
+  const [tipoNuevoItem, setTipoNuevoItem] = useState<
+    "checkbox" | "numeric" | "text"
+  >("checkbox");
+  const [calificacionEquipo, setCalificacionEquipo] = useState(0);
+  const [tipoCalificacion, setTipoCalificacion] = useState<
+    "estrellas" | "escala" | "categorica"
+  >("estrellas");
+  const [calificacionEscala, setCalificacionEscala] = useState(1);
+  const [calificacionCategorica, setCalificacionCategorica] = useState<
+    "malo" | "bueno" | "excelente"
+  >("bueno");
+  const [observacionesChecklist, setObservacionesChecklist] = useState("");
+  const [nombrePlantilla, setNombrePlantilla] = useState("");
+  const [fechaEjecucion] = useState(new Date());
+  const [vistaColumnas, setVistaColumnas] = useState<"1" | "2" | "3">("2");
+  const [tipoVista, setTipoVista] = useState<"grid" | "list">("grid");
+  const [isChecklistDialogOpen, setIsChecklistDialogOpen] = useState(false);
+  const [itemsChequeo, setItemsChequeo] = useState<string[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -257,12 +327,12 @@ export const useMantenimiento = () => {
 
     const cumpleSede =
       selectedSede === "all" ||
-      mantenimiento.equipos?.sucursales?.sedes?.id_sede?.toString() ===
+      mantenimiento.equipos?.estado_ubicacion?.sucursales?.sedes?.id_sede?.toString() ===
         selectedSede;
 
     const cumpleSucursal =
       selectedSucursal === "all" ||
-      mantenimiento.equipos?.sucursales?.id_sucursal?.toString() ===
+      mantenimiento.equipos?.estado_ubicacion?.sucursales?.id_sucursal?.toString() ===
         selectedSucursal;
 
     return (
@@ -615,7 +685,6 @@ export const useMantenimiento = () => {
     }, 1000);
   };
 
-  // Function to download a file
   const downloadFile = (archivo: {
     content: string;
     tipo: string;
@@ -643,6 +712,135 @@ export const useMantenimiento = () => {
     link.href = URL.createObjectURL(blob);
     link.download = archivo?.nombre; // Set the file name for the download
     link.click(); // Trigger the download by simulating a click on the link
+  };
+
+  const handleSearchChecklist = (value: string) => {
+    setBusquedaChecklist(value);
+    filtrarEquiposChecklist(value, sedeFilterChecklist);
+  };
+
+  const handleSedeFilterChecklist = (sede: string) => {
+    setSedeFilterChecklist(sede);
+    filtrarEquiposChecklist(busquedaChecklist, sede);
+  };
+
+  const filtrarEquiposChecklist = (busqueda: string, sede: string) => {
+    let filtrados = equipo;
+
+    if (busqueda.length > 2) {
+      filtrados = filtrados.filter(
+        (equipo) =>
+          equipo.serial.toLowerCase().includes(busqueda.toLowerCase()) ||
+          equipo.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      );
+    }
+
+    if (sede && sede !== "todas") {
+      filtrados = filtrados.filter((equipo) => equipo.sede === sede);
+    }
+
+    setEquiposChecklistFiltrados(filtrados);
+  };
+
+  const selectEquipoChecklist = (equipo: Equipo) => {
+    setEquipoChecklistSeleccionado(equipo);
+    setBusquedaChecklist(equipo.nombre_equipo);
+    setEquiposChecklistFiltrados([]);
+  };
+
+  const toggleChecklistItem = (id: string) => {
+    setItemsChecklist((prev) =>
+      prev.map((item) =>
+        item.id === id && item.tipo === "checkbox"
+          ? { ...item, checked: !item.checked }
+          : item
+      )
+    );
+  };
+
+  const updateItemValue = (id: string, valor: string | number) => {
+    setItemsChecklist((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, valor } : item))
+    );
+  };
+
+  const agregarItemPersonalizado = () => {
+    if (nuevoItemPersonalizado.trim()) {
+      const nuevoItem = {
+        id: Date.now().toString(),
+        texto: nuevoItemPersonalizado,
+        tipo: tipoNuevoItem,
+        ...(tipoNuevoItem === "checkbox" ? { checked: false } : { valor: "" }),
+        personalizado: true,
+      };
+      setItemsChecklist((prev) => [...prev, nuevoItem]);
+      setNuevoItemPersonalizado("");
+    }
+  };
+
+  const eliminarItemPersonalizado = (id: string) => {
+    setItemsChecklist((prev) => prev.filter((item) => item.id !== id));
+  };
+  
+  const guardarPlantilla = () => {
+    if (!nombrePlantilla.trim()) {
+      toast.error("Debe ingresar un nombre para la plantilla");
+      return;
+    }
+
+    const plantilla = {
+      nombre: nombrePlantilla,
+      items: itemsChecklist,
+      tipoCalificacion: tipoCalificacion,
+      fechaCreacion: new Date(),
+    };
+
+    // Aquí guardarías la plantilla en localStorage o base de datos
+    console.log("Plantilla guardada:", plantilla);
+    toast.success(`Plantilla "${nombrePlantilla}" guardada exitosamente`);
+    setNombrePlantilla("");
+  };
+
+  const completarChecklist = () => {
+    if (!equipoChecklistSeleccionado) {
+      toast.error("Debe seleccionar un equipo");
+      return;
+    }
+
+    if (!tecnicoResponsable) {
+      toast.error("Debe seleccionar un técnico responsable");
+      return;
+    }
+
+    const resultado = {
+      equipo: equipoChecklistSeleccionado,
+      items: itemsChecklist,
+      tipoCalificacion: tipoCalificacion,
+      calificacion:
+        tipoCalificacion === "estrellas"
+          ? calificacionEquipo
+          : tipoCalificacion === "escala"
+          ? calificacionEscala
+          : calificacionCategorica,
+      observaciones: observacionesChecklist,
+      fechaEjecucion: fechaEjecucion,
+      tecnicoResponsable: tecnicoResponsable,
+      fechaCompletado: new Date(),
+    };
+
+    console.log("Checklist completado:", resultado);
+    toast.success("Lista de chequeo completada exitosamente");
+    setIsChecklistDialogOpen(false);
+
+    // Resetear estados
+    setEquipoChecklistSeleccionado(null);
+    setBusquedaChecklist("");
+    setSedeFilterChecklist("");
+    setCalificacionEquipo(0);
+    setCalificacionEscala(1);
+    setCalificacionCategorica("bueno");
+    setObservacionesChecklist("");
+    setTecnicoResponsable("");
   };
 
   return {
@@ -705,5 +903,54 @@ export const useMantenimiento = () => {
     setTecnicoResponsable,
     validEquipo,
     validDetalles,
+    listadoChequeo,
+    navigate,
+
+    // Checklist
+    itemsChequeo,
+    handleSearchChecklist,
+    filtrarEquiposChecklist,
+    selectEquipoChecklist,
+    toggleChecklistItem,
+    updateItemValue,
+    agregarItemPersonalizado,
+    eliminarItemPersonalizado,
+    guardarPlantilla,
+    completarChecklist, 
+    isChecklistDialogOpen,
+    setIsChecklistDialogOpen,
+    equipoChecklistSeleccionado,
+    setEquipoChecklistSeleccionado,
+    busquedaChecklist,
+    sedeFilterChecklist,
+    equiposChecklistFiltrados,
+    setBusquedaChecklist,
+    setSedeFilterChecklist, 
+    setEquiposChecklistFiltrados,
+    handleSedeFilterChecklist,
+    tipoVista,
+    setTipoVista,
+    vistaColumnas,
+    setVistaColumnas,
+    setItemsChequeo,
+    setTipoCalificacion,
+    setTipoNuevoItem,
+    tipoNuevoItem,
+    nuevoItemPersonalizado,
+    setNuevoItemPersonalizado,
+    itemsChecklist,
+    setItemsChecklist,
+    tipoCalificacion,
+    calificacionEquipo,
+    calificacionEscala,
+    calificacionCategorica,
+    observacionesChecklist,
+    nombrePlantilla,
+    fechaEjecucion,
+    setCalificacionCategorica,
+    setCalificacionEscala,
+    setCalificacionEquipo,
+    setObservacionesChecklist,
+    setNombrePlantilla,
   };
 };
