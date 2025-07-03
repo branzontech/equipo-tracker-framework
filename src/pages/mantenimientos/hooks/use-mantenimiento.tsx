@@ -20,6 +20,7 @@ import {
   Rocket,
   AlertTriangle,
 } from "lucide-react";
+import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 
 const listadoChequeo = [
   "Limpieza de hardware",
@@ -154,6 +155,7 @@ export const useMantenimiento = () => {
   const [isChecklistDialogOpen, setIsChecklistDialogOpen] = useState(false);
   const [itemsChequeo, setItemsChequeo] = useState<string[]>([]);
   const navigate = useNavigate();
+  const { equipo } = useEquipos();
 
   useEffect(() => {
     const fetchMantenimientos = async () => {
@@ -730,13 +732,17 @@ export const useMantenimiento = () => {
     if (busqueda.length > 2) {
       filtrados = filtrados.filter(
         (equipo) =>
-          equipo.serial.toLowerCase().includes(busqueda.toLowerCase()) ||
-          equipo.nombre.toLowerCase().includes(busqueda.toLowerCase())
+          equipo.nro_serie.toLowerCase().includes(busqueda.toLowerCase()) ||
+          equipo.nombre_equipo.toLowerCase().includes(busqueda.toLowerCase())
       );
     }
 
     if (sede && sede !== "todas") {
-      filtrados = filtrados.filter((equipo) => equipo.sede === sede);
+      filtrados = filtrados.filter(
+        (equipo) =>
+          equipo?.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede?.toString() ===
+          sede
+      );
     }
 
     setEquiposChecklistFiltrados(filtrados);
@@ -781,7 +787,7 @@ export const useMantenimiento = () => {
   const eliminarItemPersonalizado = (id: string) => {
     setItemsChecklist((prev) => prev.filter((item) => item.id !== id));
   };
-  
+
   const guardarPlantilla = () => {
     if (!nombrePlantilla.trim()) {
       toast.error("Debe ingresar un nombre para la plantilla");
@@ -916,7 +922,7 @@ export const useMantenimiento = () => {
     agregarItemPersonalizado,
     eliminarItemPersonalizado,
     guardarPlantilla,
-    completarChecklist, 
+    completarChecklist,
     isChecklistDialogOpen,
     setIsChecklistDialogOpen,
     equipoChecklistSeleccionado,
@@ -925,7 +931,7 @@ export const useMantenimiento = () => {
     sedeFilterChecklist,
     equiposChecklistFiltrados,
     setBusquedaChecklist,
-    setSedeFilterChecklist, 
+    setSedeFilterChecklist,
     setEquiposChecklistFiltrados,
     handleSedeFilterChecklist,
     tipoVista,
