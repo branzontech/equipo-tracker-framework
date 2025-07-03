@@ -89,26 +89,24 @@ export const manteModel = {
         id_mantenimiento: true,
         equipo_id: true,
         equipos: {
-          select: {
-            nro_serie: true,
-            nombre_equipo: true,
-            modelo: true,
-            sucursales: true,
-            sucursales: {
+          include: {
+            estado_ubicacion: {
               select: {
-                nombre: true,
-                id_sucursal: true,
-                tipo: true,
-                sedes: {
-                  select: {
-                    id_sede: true,
-                    nombre: true,
-                    regional: true,
-                    usuarios: {
-                      select: {
-                        nombre: true,
-                        email: true,
-                        rol: true,
+                sucursales: {
+                  include: {
+                    sedes: {
+                      include: {
+                        usuario_sede: {
+                          include: {
+                            usuarios: {
+                              select: {
+                                nombre: true,
+                                email: true,
+                                rol: true,
+                              },
+                            },
+                          },
+                        },
                       },
                     },
                   },
