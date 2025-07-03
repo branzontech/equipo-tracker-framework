@@ -50,14 +50,14 @@ export interface Equipo {
     procesador: string;
     memoria_ram: string;
     almacenamiento: string;
-    tipo_discoduro?: string; // UEW
+    tipo_discoduro?: string;
     pantalla?: string;
     tarjeta_grafica?: string;
     sistema_operativo?: string;
     bateria?: string;
     puertos?: string;
-    tienecargador?: boolean; // NUE
-    serialcargador?: string; // NUE
+    tienecargador?: boolean; 
+    serialcargador?: string; 
   };
 
   // Seguridad
@@ -78,11 +78,11 @@ export interface Equipo {
     numero_factura: string;
     proveedores: Proveedor;
     proveedor_id: Proveedor | number;
-    inicio_garantia: string; // NUE
-    garantia_fecha_fin: string; // No es nuevo pero debe ir en esta tabla
+    inicio_garantia: string; 
+    garantia_fecha_fin: string; 
   };
 
-  // Estado y Ubicación // UEVA TABLA
+  // Estado y Ubicación
   estado_ubicacion?: {
     estado_actual: string;
     sucursal_id: Sucursal | number;
