@@ -54,4 +54,20 @@ export const permisos = {
 
     return permisos.map((p) => p.permisos);
   },
+
+  async create(data) {
+    return await prisma.permisos.create({
+      data: {
+        nombre_permiso: data.nombre_permiso,
+        descripcion: data.descripcion,
+        ruta_opcional: data.ruta_opcional,
+      },
+    });
+  },
+  async update(id, data) {
+    return await prisma.permisos.update({
+      where: { id: id },
+      data,
+    });
+  },
 };
