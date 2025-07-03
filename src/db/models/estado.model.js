@@ -23,4 +23,30 @@ export const estadoModel = {
       return error;
     }
   },
+  findById: async (id) => {
+    const id_estado = Number(id);
+    const estado = await prisma.estados.findUnique({
+      where: { id_estado: id_estado },
+      select: {
+        id_estado: true,
+        nombre_estado: true,
+      },
+    });
+    return estado;
+  },
+  update: async (id, estado) => {
+    const id_estado = Number(id);
+    try {
+      const updatedEstado = await prisma.estados.update({
+        where: { id_estado },
+        data: {
+          nombre_estado: estado.nombre_estado,
+        },
+      });
+      return updatedEstado;
+    } catch (error) {
+      console.error("❌ Error al actualizar el estado:", error);
+      return error;
+    }
+  },
 };
