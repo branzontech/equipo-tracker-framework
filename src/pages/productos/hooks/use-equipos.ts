@@ -71,6 +71,7 @@ export const useEquipos = () => {
         telefono: "",
         correo: "",
         direccion: "",
+        estado: "",
       },
       inicio_garantia: "",
       garantia_fecha_fin: "",
@@ -143,6 +144,7 @@ export const useEquipos = () => {
         correo: "",
         direccion: "",
         sitio_web: "",
+        estado: "",
       },
     },
   });
@@ -194,8 +196,14 @@ export const useEquipos = () => {
 
         const sedesConEquipos = new Set(
           response
-            .filter((equipo: any) => equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede)
-            .map((equipo: any) => equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede)
+            .filter(
+              (equipo: any) =>
+                equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede
+            )
+            .map(
+              (equipo: any) =>
+                equipo.estado_ubicacion?.[0]?.sucursales?.sedes?.id_sede
+            )
         );
 
         setSedesConEquiposCount(sedesConEquipos.size);
@@ -1027,6 +1035,11 @@ export const useEquipos = () => {
       archivosequipo: nuevosArchivos.map((archivo) => ({
         id_archivo: 0,
         ...archivo,
+        archivo: {
+          content: archivo.contenido,
+          nombre: archivo.nombre_archivo,
+          tipo: archivo.tipo_archivo,
+        },
       })),
     }));
   };
