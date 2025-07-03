@@ -2,73 +2,85 @@ import { prisma } from "../../../prisma/prismaCliente.js";
 
 export const manteModel = {
   async getAll() {
-    const mante = await prisma.mantenimientos.findMany({
-      select: {
-        id_mantenimiento: true,
-        equipo_id: true,
-        equipos: {
-          select: {
-            nombre_equipo: true,
-            sucursales: true,
-            sucursales: {
-              select: {
-                nombre: true,
-                id_sucursal: true,
-                tipo: true,
-                sedes: {
-                  select: {
-                    id_sede: true,
-                    nombre: true,
-                    regional: true,
+    try {
+      const mante = await prisma.mantenimientos.findMany({
+        select: {
+          id_mantenimiento: true,
+          equipo_id: true,
+          equipos: {
+            include: {
+              estado_ubicacion: {
+                select: {
+                  sucursales: {
+                    include: {
+                      sedes: {
+                        include: {
+                          usuario_sede: {
+                            include: {
+                              usuarios: {
+                                select: {
+                                  nombre: true,
+                                  email: true,
+                                  rol: true,
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
                   },
                 },
               },
             },
           },
-        },
-        impresora_id: true,
-        tecnico_id: true,
-        usuarios: {
-          select: {
-            nombre: true,
+          impresora_id: true,
+          tecnico_id: true,
+          usuarios: {
+            select: {
+              nombre: true,
+            },
+          },
+          fecha_programada: true,
+          tipo: true,
+          prioridad: true,
+          descripcion: true,
+          tiempo_estimado: true,
+          recomendaciones: true,
+          observaciones_adi: true,
+          estado: true,
+          progreso: true,
+          archivosmantenimiento: {
+            select: {
+              id_archivo: true,
+              mantenimiento_id: true,
+              nombre_archivo: true,
+              tipo_archivo: true,
+              fecha_subida: true,
+              archivo: true,
+            },
           },
         },
-        fecha_programada: true,
-        tipo: true,
-        prioridad: true,
-        descripcion: true,
-        tiempo_estimado: true,
-        recomendaciones: true,
-        observaciones_adi: true,
-        estado: true,
-        progreso: true,
-        archivosmantenimiento: {
-          select: {
-            id_archivo: true,
-            mantenimiento_id: true,
-            nombre_archivo: true,
-            tipo_archivo: true,
-            fecha_subida: true,
-            archivo: true,
-          },
-        },
-      },
-    });
-    const result = mante.map((m) => ({
-      ...m,
-      archivosmantenimiento: m.archivosmantenimiento.map((a) => ({
-        ...a,
-        archivo: a.archivo
-          ? {
-              content: Buffer.from(a.archivo).toString("base64"),
-              nombre: a.nombre_archivo,
-              tipo: a.tipo_archivo,
-            }
-          : null,
-      })),
-    }));
+      });
+      const result = mante.map((m) => ({
+        ...m,
+        archivosmantenimiento: m.archivosmantenimiento.map((a) => ({
+          ...a,
+          archivo: a.archivo
+            ? {
+                content: Buffer.from(a.archivo).toString("base64"),
+                nombre: a.nombre_archivo,
+                tipo: a.tipo_archivo,
+              }
+            : null,
+        })),
+      }));
 
-    return result;
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw error("Error al obtener mantenimientos", error);
+    }
   },
   async getById(id) {
     const id_mantenimiento = Number(id);
