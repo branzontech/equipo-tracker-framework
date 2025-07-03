@@ -119,22 +119,28 @@ export const SedesModel = {
       }
 
       if (sucursales.length > 0) {
-        await prisma.sucursales.deleteMany({
+        await prisma.sucursales.updateMany({
           where: {
             sede_id: id_sede,
           },
+          data: {
+            estado: "Fuera de servicio",
+          }
         });
       }
 
-      await prisma.usuario_sede.deleteMany({
+      // await prisma.usuario_sede.deleteMany({
+      //   where: {
+      //     id_sede: id_sede,
+      //   },
+      // });
+
+      const deletedSede = await prisma.sedes.update({
         where: {
           id_sede: id_sede,
         },
-      });
-
-      const deletedSede = await prisma.sedes.delete({
-        where: {
-          id_sede: id_sede,
+        data: {
+          estado: "Fuera de servicio",
         },
       });
       return deletedSede;
