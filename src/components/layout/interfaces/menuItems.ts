@@ -48,6 +48,9 @@ import {
   FileMinus,
   Repeat,
   Warehouse,
+  AlertTriangle,
+  Target,
+  TrendingUp,
 } from "lucide-react";
 import { MenuItem } from "./MenuItem";
 
@@ -181,55 +184,55 @@ export const menuItems: MenuItem[] = [
         path: "/configuracion/maestros",
         submenu: [
           {
-            id: "configuracion.maestros.sedes",
+            id: "configuracion.maestros.sedes.listado",
             title: "Sedes",
             icon: Building2,
             path: "/configuracion/maestros/sedes",
           },
           {
-            id: "configuracion.maestros.sucursales",
+            id: "configuracion.maestros.sucursales.listado",
             title: "Sucursales",
             icon: MapPin,
             path: "/configuracion/maestros/sucursales",
           },
           {
-            id: "configuracion.maestros.tipos",
+            id: "configuracion.maestros.tipos.listado",
             title: "Tipos",
             icon: Layers,
             path: "/configuracion/maestros/tipos",
           },
           {
-            id: "configuracion.maestros.estados",
+            id: "configuracion.maestros.estados.listado",
             title: "Estados",
             icon: Activity,
             path: "/configuracion/maestros/estados",
           },
           {
-            id: "configuracion.maestros.proveedores",
+            id: "configuracion.maestros.proveedores.listado",
             title: "Proveedores",
             icon: Handshake,
             path: "/configuracion/maestros/proveedores",
           },
           {
-            id: "configuracion.maestros.marcas",
+            id: "configuracion.maestros.marcas.listado",
             title: "Marcas",
             icon: Tag,
             path: "/configuracion/maestros/marcas",
           },
           {
-            id: "configuracion.maestros.perifericos",
+            id: "configuracion.maestros.perifericos.listado",
             title: "Periféricos",
             icon: Plug,
             path: "/configuracion/maestros/perifericos",
           },
           {
-            id: "configuracion.maestros.categorias",
+            id: "configuracion.maestros.categorias.listado",
             title: "Categorias",
             icon: Folders,
             path: "/configuracion/maestros/categorias",
           },
           {
-            id: "configuracion.maestros.perfiles-acceso",
+            id: "configuracion.maestros.perfiles-acceso.listado",
             title: "Perfiles de Acceso",
             icon: Shield,
             path: "/configuracion/maestros/perfiles-acceso",
@@ -283,7 +286,7 @@ export const menuItems: MenuItem[] = [
     path: "/toners",
     submenu: [
       {
-        id: "toners.impresoras",
+        id: "toners.impresoras.listado",
         title: "Impresoras",
         icon: Printer,
         path: "/impresoras/ingreso",
