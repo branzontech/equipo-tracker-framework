@@ -70,7 +70,7 @@ export const PerifericoModel = {
       where: {
         serial: {
           equals: serial,
-          mode: "insensitive", 
+          mode: "insensitive",
         },
       },
       select: {
@@ -160,9 +160,12 @@ export const PerifericoModel = {
   delete: async (id) => {
     const id_periferico = Number(id);
     try {
-      const deletedPeriferico = await prisma.perifericos.delete({
+      const deletedPeriferico = await prisma.perifericos.update({
         where: {
           id_periferico: id_periferico,
+        },
+        data: {
+          estado: "Fuera de servicio",
         },
       });
       return deletedPeriferico;
