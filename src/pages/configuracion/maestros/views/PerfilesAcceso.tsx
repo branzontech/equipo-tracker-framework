@@ -29,9 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Pencil, Trash, XCircle } from "lucide-react";
+import { Pencil, PencilIcon, Trash, XCircle } from "lucide-react";
 import UpdatePerfil from "./UpdatePerfilAcceso";
 import { useEstado } from "../hooks/use-estado";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { tienePermiso } from "@/utils/permissions";
+import { PERMISOS_PERFILES_ACCESO } from "../../usuarios/interfaces/permisos";
 
 const PerfilesAcceso = () => {
   const {
@@ -49,6 +53,10 @@ const PerfilesAcceso = () => {
   } = usePerfilesAcceso();
   const { estados } = useEstado();
   const { StatusBadge } = useGlobal();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const puedeEditarEliminar =
+    tienePermiso(PERMISOS_PERFILES_ACCESO.edicion, user.permisos) ||
+    tienePermiso(PERMISOS_PERFILES_ACCESO.eliminacion, user.permisos);
 
   return (
     <>
@@ -56,9 +64,11 @@ const PerfilesAcceso = () => {
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Perfiles de Acceso</h2>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button>Nuevo Perfil</Button>
-            </DialogTrigger>
+            {user.permisos.includes(PERMISOS_PERFILES_ACCESO.ingreso) && (
+              <DialogTrigger asChild>
+                <Button>Nuevo Perfil</Button>
+              </DialogTrigger>
+            )}
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Crear Nuevo Perfil de Acceso</DialogTitle>
@@ -154,43 +164,61 @@ const PerfilesAcceso = () => {
                 <TableHead>Descripción</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Fecha de Creación</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                {puedeEditarEliminar && (
+                  <TableHead className="text-right">Acciones</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
               {perfilesAcceso.length > 0 ? (
                 perfilesAcceso
                   .filter((p) => p.nombre_perfil && p.descripcion)
-                  .map((perfil) => (
-                    <TableRow key={perfil.id}>
-                      <TableCell className="font-medium">
-                        {perfil.nombre_perfil}
-                      </TableCell>
-                      <TableCell>{perfil.descripcion}</TableCell>
-                      <TableCell>
-                        {<StatusBadge status={perfil.estado} />}
-                      </TableCell>
-                      <TableCell>
-                        {formatFecha(perfil.fecha_creacion)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(perfil.id)}
-                        >
-                          <XCircle className="h-5 w-5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpenEditModal(perfil.id)}
-                        >
-                          <Pencil className="h-5 w-5" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  .map((perfil) => {
+                    const acciones = [
+                      {
+                        permiso: PERMISOS_PERFILES_ACCESO.edicion,
+                        onClick: () => handleOpenEditModal(perfil.id),
+                        icon: <PencilIcon className="h-5 w-5" />,
+                      },
+                      {
+                        permiso: PERMISOS_PERFILES_ACCESO.eliminacion,
+                        onClick: () => handleDelete(perfil.id),
+                        icon: <XCircle className="h-5 w-5" />,
+                      },
+                    ];
+                    return (
+                      <TableRow key={perfil.id}>
+                        <TableCell className="font-medium">
+                          {perfil.nombre_perfil}
+                        </TableCell>
+                        <TableCell>{perfil.descripcion}</TableCell>
+                        <TableCell>
+                          {<StatusBadge status={perfil.estado} />}
+                        </TableCell>
+                        <TableCell>
+                          {formatFecha(perfil.fecha_creacion)}
+                        </TableCell>
+                        {puedeEditarEliminar && (
+                          <TableCell className="text-right">
+                            {acciones.map(
+                              (accion, idx) =>
+                                tienePermiso(accion.permiso, user.permisos) && (
+                                  <Button
+                                    key={idx}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="hover:bg-slate-100"
+                                    onClick={accion.onClick}
+                                  >
+                                    {accion.icon}
+                                  </Button>
+                                )
+                            )}
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })
               ) : (
                 <TableRow>
                   <TableCell

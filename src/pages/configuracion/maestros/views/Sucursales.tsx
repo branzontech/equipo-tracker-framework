@@ -51,6 +51,10 @@ import { useSucursales } from "../hooks/use-sucursales";
 import UpdateSucursal from "./UpdateSucursal";
 import { useGlobal } from "@/hooks/use-global";
 import { useEstado } from "../hooks/use-estado";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { tienePermiso } from "@/utils/permissions";
+import { PERMISOS_SUCURSALES } from "../../usuarios/interfaces/permisos";
 
 const Ubicaciones = () => {
   const {
@@ -91,130 +95,139 @@ const Ubicaciones = () => {
   const { sedes } = useSedes();
   const { StatusBadge } = useGlobal();
   const { estados } = useEstado();
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const puedeEditarEliminar =
+    tienePermiso(PERMISOS_SUCURSALES.edicion, user.permisos) ||
+    tienePermiso(PERMISOS_SUCURSALES.eliminacion, user.permisos);
 
   return (
     <div className="container mx-auto p-6">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Gestión de Ubicaciones
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="grid gap-4 md:grid-cols-5">
-            <div className="space-y-2">
-              <Label htmlFor="nombre">Nombre</Label>
-              <Input
-                value={newSucursal.nombre}
-                onChange={(e) =>
-                  setNewSucursal({ ...newSucursal, nombre: e.target.value })
-                }
-                placeholder="Ingrese el nombre"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Tipo</Label>
-              <Select
-                value={newSucursal.tipo}
-                onValueChange={(value) =>
-                  setNewSucursal({ ...newSucursal, tipo: value })
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Seleccione el tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Administrativa">Administrativa</SelectItem>
-                  <SelectItem value="Departamento">Departamento</SelectItem>
-                  <SelectItem value="Ubicacion Terciaria">
-                    Ubicacion Terciaria
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="area">Area</Label>
-              <Input
-                value={newSucursal.area}
-                onChange={(e) =>
-                  setNewSucursal({ ...newSucursal, area: e.target.value })
-                }
-                placeholder="Ingrese el area"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sedes">Sedes</Label>
-              <Select
-                value={
-                  newSucursal.sede_id ? newSucursal.sede_id.toString() : ""
-                }
-                onValueChange={(value) =>
-                  setNewSucursal({ ...newSucursal, sede_id: Number(value) })
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Seleccione la sede" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sedes.map((sede) => (
-                    <SelectItem
-                      key={sede.id_sede}
-                      value={sede.id_sede.toString()}
-                    >
-                      {sede.nombre}
+      {tienePermiso(PERMISOS_SUCURSALES.ingreso, user.permisos) && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">
+              Gestión de Ubicaciones
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="grid gap-4 md:grid-cols-5">
+              <div className="space-y-2">
+                <Label htmlFor="nombre">Nombre</Label>
+                <Input
+                  value={newSucursal.nombre}
+                  onChange={(e) =>
+                    setNewSucursal({ ...newSucursal, nombre: e.target.value })
+                  }
+                  placeholder="Ingrese el nombre"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Tipo</Label>
+                <Select
+                  value={newSucursal.tipo}
+                  onValueChange={(value) =>
+                    setNewSucursal({ ...newSucursal, tipo: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Seleccione el tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Administrativa">
+                      Administrativa
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="estado">Estado</Label>
-              <Select
-                value={newSucursal.estado || ""}
-                onValueChange={(value) => {
-                  setNewSucursal({
-                    ...newSucursal,
-                    estado: value,
-                  });
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione el estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  {estados.map((estado) => (
-                    <SelectItem
-                      key={estado.id_estado}
-                      value={estado.id_estado.toString()}
-                    >
-                      {estado.nombre_estado}
+                    <SelectItem value="Departamento">Departamento</SelectItem>
+                    <SelectItem value="Ubicacion Terciaria">
+                      Ubicacion Terciaria
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="flex items-end">
-              <Button
-                type="submit"
-                className="w-full"
-                onClick={(e: React.FormEvent) => {
-                  e.preventDefault();
-                  handleCreateSucursales(newSucursal);
-                }}
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Registrar
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="area">Area</Label>
+                <Input
+                  value={newSucursal.area}
+                  onChange={(e) =>
+                    setNewSucursal({ ...newSucursal, area: e.target.value })
+                  }
+                  placeholder="Ingrese el area"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sedes">Sedes</Label>
+                <Select
+                  value={
+                    newSucursal.sede_id ? newSucursal.sede_id.toString() : ""
+                  }
+                  onValueChange={(value) =>
+                    setNewSucursal({ ...newSucursal, sede_id: Number(value) })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Seleccione la sede" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sedes.map((sede) => (
+                      <SelectItem
+                        key={sede.id_sede}
+                        value={sede.id_sede.toString()}
+                      >
+                        {sede.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="estado">Estado</Label>
+                <Select
+                  value={newSucursal.estado || ""}
+                  onValueChange={(value) => {
+                    setNewSucursal({
+                      ...newSucursal,
+                      estado: value,
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccione el estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {estados.map((estado) => (
+                      <SelectItem
+                        key={estado.id_estado}
+                        value={estado.nombre_estado}
+                      >
+                        {estado.nombre_estado}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  onClick={(e: React.FormEvent) => {
+                    e.preventDefault();
+                    handleCreateSucursales(newSucursal);
+                  }}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Registrar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs
         defaultValue="sucursales"
@@ -456,72 +469,91 @@ const Ubicaciones = () => {
                         </TableHead>
                       )
                   )}
-                  <TableHead className="font-semibold">Acciones</TableHead>
+                  {puedeEditarEliminar && (
+                    <TableHead className="font-semibold">Acciones</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredData.length > 0 ? (
                   [...paginatedData]
                     .sort((a, b) => b.id_sucursal - a.id_sucursal)
-                    .map((item) => (
-                      <TableRow
-                        key={item.id_sucursal}
-                        className="hover:bg-slate-50"
-                      >
-                        {sortedColumns.map(
-                          (column) =>
-                            column.isVisible && (
-                              <TableCell
-                                key={`${item.id_sucursal}-${column.id}`}
-                                className="py-3"
-                              >
-                                {column.id === "estado" ? (
-                                  <StatusBadge
-                                    status={
+                    .map((item) => {
+                      const acciones = [
+                        {
+                          permiso: PERMISOS_SUCURSALES.edicion,
+                          onClick: () => handleOpenEditModal(item.id_sucursal),
+                          icon: <PencilIcon className="h-5 w-5" />,
+                        },
+                        {
+                          permiso: PERMISOS_SUCURSALES.eliminacion,
+                          onClick: () => handleDelete(item.id_sucursal),
+                          icon: <XCircle className="h-5 w-5" />,
+                        },
+                      ];
+
+                      return (
+                        <TableRow
+                          key={item.id_sucursal}
+                          className="hover:bg-slate-50"
+                        >
+                          {sortedColumns.map(
+                            (column) =>
+                              column.isVisible && (
+                                <TableCell
+                                  key={`${item.id_sucursal}-${column.id}`}
+                                  className="py-3"
+                                >
+                                  {column.id === "estado" ? (
+                                    <StatusBadge
+                                      status={
+                                        item[
+                                          column.key as keyof typeof item
+                                        ] as string
+                                      }
+                                    />
+                                  ) : typeof item[
+                                      column.key as keyof typeof item
+                                    ] === "object" &&
+                                    item[column.key as keyof typeof item] !==
+                                      null ? (
+                                    (
                                       item[
                                         column.key as keyof typeof item
-                                      ] as string
-                                    }
-                                  />
-                                ) : typeof item[
-                                    column.key as keyof typeof item
-                                  ] === "object" &&
-                                  item[column.key as keyof typeof item] !==
-                                    null ? (
-                                  (item[column.key as keyof typeof item] as any)
-                                    .descripcion ?? ""
-                                ) : (
-                                  item[column.key as keyof typeof item]
+                                      ] as any
+                                    ).descripcion ?? ""
+                                  ) : (
+                                    item[column.key as keyof typeof item]
+                                  )}
+                                </TableCell>
+                              )
+                          )}
+                          {puedeEditarEliminar && (
+                            <TableCell>
+                              <div className="flex gap-2">
+                                {acciones.map(
+                                  (accion, idx) =>
+                                    tienePermiso(
+                                      accion.permiso,
+                                      user.permisos
+                                    ) && (
+                                      <Button
+                                        key={idx}
+                                        variant="ghost"
+                                        size="icon"
+                                        className="hover:bg-slate-100"
+                                        onClick={accion.onClick}
+                                      >
+                                        {accion.icon}
+                                      </Button>
+                                    )
                                 )}
-                              </TableCell>
-                            )
-                        )}
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="slate-100"
-                              onClick={() => {
-                                handleOpenEditModal(item.id_sucursal);
-                              }}
-                            >
-                              <PencilIcon className="h-5 w-5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="slate-100"
-                              onClick={() => {
-                                handleDelete(item.id_sucursal);
-                              }}
-                            >
-                              <XCircle className="h-5 w-5" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                              </div>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      );
+                    })
                 ) : (
                   <TableRow>
                     <TableCell
