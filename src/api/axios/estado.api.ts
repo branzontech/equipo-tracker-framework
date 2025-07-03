@@ -14,3 +14,17 @@ export const createEstado = async (estado: Estados) => {
     throw new Error(error.response?.response?.message);
   }
 };
+
+export const getEstadoById = async (id: number) => {
+  const response = await api.get(`/estados/get/${id}`);
+  return response.data;
+};
+
+export const updateEstado = async (id: number, estado: Estados) => {
+  try {
+    const response = await api.put(`/estados/update/${id}`, estado);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.response?.message);
+  }
+};
