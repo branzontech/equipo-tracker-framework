@@ -8,4 +8,5 @@ export interface Proveedor {
   correo?: string;
   direccion?: string;
   sitio_web?: string;
+  estado: string;
 }
