@@ -16,6 +16,9 @@ export const useMarcas = () => {
   const [newMarca, setNewMarca] = useState<Marca>({
     id_marca: 0,
     nombre: "",
+    telefono: "",
+    sitioweb: "",
+    estado: "Activo",
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedMarcaId, setSelectedMarcaId] = useState<number | null>(null);

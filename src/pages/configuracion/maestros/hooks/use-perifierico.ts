@@ -26,6 +26,7 @@ export const usePeriferico = () => {
     sedes: null,
     marca_id: 0,
     marcas: null,
+    motivo: "",
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedPerifericoId, setSelectedPerifericoId] = useState<
@@ -124,13 +125,19 @@ export const usePeriferico = () => {
         try {
           const res = await deletePeriferico(id);
           if (res.success) {
-            toast.success(res.message || "Periferico eliminado exitosamente");
+            toast.success(res.message || "Periferico eliminado exitosamente", {
+              icon: icons.success,
+            });
             setTimeout(() => window.location.reload(), 4500);
           } else {
-            toast.error(res.message || "No se pudo eliminar el periferico");
+            toast.error(res.message || "No se pudo eliminar el periferico", {
+              icon: icons.error,
+            });
           }
         } catch (error: any) {
-          toast.error(error.message || "Error al eliminar el periferico");
+          toast.error(error.message || "Error al eliminar el periferico", {
+            icon: icons.error,
+          });
         }
       },
     });

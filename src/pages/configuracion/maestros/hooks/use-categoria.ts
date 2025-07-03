@@ -16,6 +16,7 @@ export const useCategoria = () => {
   const [newCategoria, setNewCategoria] = useState<Categoria>({
     id_categoria: 0,
     nombre: "",
+    estado: "Activo",
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(
