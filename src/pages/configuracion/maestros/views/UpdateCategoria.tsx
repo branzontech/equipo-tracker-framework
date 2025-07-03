@@ -13,9 +13,19 @@ import { useEffect } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { UpdateProps } from "../interfaces/props";
 import { useCategoria } from "../hooks/use-categoria";
+import { useEstado } from "../hooks/use-estado";
+import { useGlobal } from "@/hooks/use-global";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const UpdateCategoria = ({ open, onOpenChange, id }: UpdateProps) => {
   const { getById, newCategoria, setNewCategoria, update } = useCategoria();
+  const { estados } = useEstado();
 
   useEffect(() => {
     if (id !== null) {
@@ -51,6 +61,33 @@ const UpdateCategoria = ({ open, onOpenChange, id }: UpdateProps) => {
                     placeholder="Ingrese el nombre"
                     required
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado</Label>
+                  <Select
+                    value={newCategoria.estado || ""}
+                    onValueChange={(value) => {
+                      setNewCategoria({
+                        ...newCategoria,
+                        estado: value,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione el estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estados.map((estado) => (
+                        <SelectItem
+                          key={estado.id_estado}
+                          value={estado.nombre_estado}
+                        >
+                          {estado.nombre_estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>
