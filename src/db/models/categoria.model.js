@@ -6,6 +6,7 @@ export const CategoriaModel = {
       select: {
         id_categoria: true,
         nombre: true,
+        estado: true,
       },
     });
     return categorias;
@@ -18,6 +19,7 @@ export const CategoriaModel = {
       select: {
         id_categoria: true,
         nombre: true,
+        estado: true,
       },
     });
     return categoria;
@@ -27,6 +29,7 @@ export const CategoriaModel = {
     const categoriaCreated = await prisma.categorias.create({
       data: {
         nombre: categoria.nombre,
+        estado: categoria.estado,
       },
     });
     return categoriaCreated;
@@ -39,6 +42,7 @@ export const CategoriaModel = {
         where: { id_categoria },
         data: {
           nombre: categoria.nombre,
+          estado: categoria.estado,
         },
       });
       return updatedCategoria;
@@ -57,14 +61,17 @@ export const CategoriaModel = {
         },
       });
 
-      if (equiposRelacionados) {
+      if (equiposRelacionados.length > 0) {
         throw new Error(
           "No se puede eliminar la categoria porque está asociada a uno o más equipos."
         );
       }
-      const deletedCategoria = await prisma.categorias.delete({
+      const deletedCategoria = await prisma.categorias.update({
         where: {
           id_categoria: id_categoria,
+        },
+        data: {
+          estado: "Fuera de servicio",
         },
       });
       return deletedCategoria;
