@@ -12,4 +12,11 @@ export const permisosService = {
   async getPermisosPorPerfil(perfilId) {
     return await permisos.getPermisosPorPerfil(perfilId);
   },
+
+  async create(data) {
+    return await permisos.create(data);
+  },
+  async update(id, data) {
+    return await permisos.update(id, data);
+  },
 };
