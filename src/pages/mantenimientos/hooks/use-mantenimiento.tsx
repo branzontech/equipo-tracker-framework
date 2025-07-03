@@ -49,12 +49,11 @@ export const useMantenimiento = () => {
     tipo: "",
     prioridad: "",
     descripcion: "",
-    tiempo_estimado: 0,
+    tiempo_estimado: null,
     recomendaciones: "",
     observaciones_adi: "",
     estado: "Pendiente",
     progreso: 0,
-
     archivosmantenimiento: [],
   });
   const [currentTab, setCurrentTab] = useState("equipo");
@@ -849,6 +848,14 @@ export const useMantenimiento = () => {
     setTecnicoResponsable("");
   };
 
+  const toggleItem = (item: string, checked: boolean) => {
+    if (checked) {
+      setItemsChequeo((prev) => [...prev, item]);
+    } else {
+      setItemsChequeo((prev) => prev.filter((i) => i !== item));
+    }
+  };
+
   return {
     downloadFile,
     openFileInNewTab,
@@ -958,5 +965,6 @@ export const useMantenimiento = () => {
     setCalificacionEquipo,
     setObservacionesChecklist,
     setNombrePlantilla,
+    toggleItem
   };
 };
