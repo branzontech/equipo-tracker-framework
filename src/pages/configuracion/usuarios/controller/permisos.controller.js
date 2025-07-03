@@ -31,3 +31,31 @@ export const getPermisosPorPerfil = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const createPermiso = async (req, res) => {
+  try {
+    const { nombre_permiso, descripcion, ruta_opcional } = req.body;
+    const resultado = await permisosService.create({
+      nombre_permiso,
+      descripcion,
+      ruta_opcional,
+    });
+    res.status(200).json({ resultado, success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updatePermiso = async (req, res) => {
+  try {
+    const { id, nombre_permiso, descripcion, ruta_opcional } = req.body;
+    const resultado = await permisosService.update(id, {
+      nombre_permiso,
+      descripcion,
+      ruta_opcional,
+    });
+    res.status(200).json({ resultado, success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
