@@ -50,16 +50,18 @@ export const sucursalesModel = {
   delete: async (id) => {
     const id_sucursal = Number(id);
     try {
-      // verificar si hay equipos asociados a esta sucursal
-      const equiposRelacionados = await prisma.equipos.findMany({
+      // Verificar si hay equipos asociados a esta sucursal en estado_ubicacion
+      const equiposRelacionados = await prisma.estado_ubicacion.findFirst({
         where: {
           sucursal_id: id_sucursal,
+          // Opcional: solo los registros activos o actuales
+          // estado: 'activo' o vigente: true, etc., si manejas eso
         },
       });
 
-      if (equiposRelacionados) {
+      if (equiposRelacionados.length > 0) {
         throw new Error(
-          "No se puede eliminar la sucursal porque está asociada a uno o más equipos."
+          "No se puede eliminar la sucursal porque hay equipos asociados a través de su ubicación."
         );
       }
 
@@ -70,18 +72,23 @@ export const sucursalesModel = {
         },
       });
 
-      if (impresorasRelacionadas) {
+      if (impresorasRelacionadas.length > 0) {
         throw new Error(
           "No se puede eliminar la sucursal porque está asociada a una o más impresoras."
         );
       }
-      const deleted = await prisma.sucursales.delete({
+
+      const deleted = await prisma.sucursales.update({
         where: {
           id_sucursal: id_sucursal,
+        },
+        data: {
+          estado: "Fuera de servicio",
         },
       });
       return deleted;
     } catch (error) {
+      console.log(error);
       throw new Error(error.message);
     }
   },
