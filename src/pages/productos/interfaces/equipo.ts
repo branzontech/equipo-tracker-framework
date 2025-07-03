@@ -16,7 +16,7 @@ export interface Equipo {
   nro_serie: string;
   modelo: string;
   marca_id: Marca | number;
-  marcas: Marca | null;
+  marcas: string | null;
   categoria_id: Categoria | number;
   categorias: Categoria | null;
   tipo_activo: string;
