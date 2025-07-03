@@ -19,4 +19,22 @@ export const estadoService = {
       return error;
     }
   },
+  async getById(id) {
+    try {
+      const estado = await estadoModel.findById(id);
+      return estado;
+    } catch (error) {
+      console.error("❌ Error al obtener el estado:", error);
+      return error;
+    }
+  },
+  async update(id, estado) {
+    try {
+      const nuevoEstado = await estadoModel.update(id, estado);
+      return nuevoEstado;
+    } catch (error) {
+      console.error("❌ Error al actualizar el estado:", error);
+      return error;
+    }
+  },
 };
