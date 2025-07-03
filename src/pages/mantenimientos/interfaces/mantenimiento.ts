@@ -13,7 +13,7 @@ export interface Mantenimiento {
   tipo: string;
   prioridad: string;
   descripcion: string;
-  tiempo_estimado: number;
+  tiempo_estimado: number | null;
   recomendaciones: string;
   observaciones_adi: string;
   estado: string;
