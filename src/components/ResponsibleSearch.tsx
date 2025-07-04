@@ -70,7 +70,7 @@ const ResponsibleSearch = ({
   const mappedUsers: ResponsiblePerson[] = users.map((u) => ({
     id: u.id_usuario.toString(),
     name: u.nombre,
-    department: u.sedes?.nombre || "Sin sede",
+    department: u.usuario_sede?.[0]?.sedes?.nombre || "Sin sede",
     position: u.rol,
     firma_entrega: u.firma_entrega,
     firma_recibe: u.firma_recibe,
