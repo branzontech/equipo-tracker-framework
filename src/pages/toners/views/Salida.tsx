@@ -19,6 +19,8 @@ import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { SearchToner } from "./SearchToner";
 import { useImpresora } from "../hooks/use-impresora";
 import { SearchImpresora } from "./SearchImpresora";
+import ResponsibleSearch from "@/components/ResponsibleSearch";
+import SignatureCanvas from "@/components/SignatureCanvas";
 
 const SalidaToners = () => {
   const {
@@ -30,6 +32,8 @@ const SalidaToners = () => {
     sugerenciasToner,
     setSugerenciasToner,
     createSalida,
+    responsableRetiraInput,
+    setResponsableRecibeInput,
   } = useToners();
   const {
     handleImpresoraSerialInput,
@@ -50,6 +54,12 @@ const SalidaToners = () => {
     setUserRetira,
     sugerenciasRetira,
     setSugerenciasRetira,
+    newUser,
+    users,
+    selectedEntregaUser,
+    setSelectedEntregaUser,
+    selectedRecibeUser,
+    setSelectedRecibeUser,
   } = useUser();
 
   const handleUserSelect = (user) => {
@@ -87,6 +97,13 @@ const SalidaToners = () => {
     }));
     setSugerenciasImpresora([]);
   };
+
+  const selectedRetiraId = selectedEntregaUser?.id_usuario;
+  const selectedRecibeId = selectedRecibeUser?.id_usuario;
+
+  const retiraUsuarios = users.filter((u) => u.id_usuario !== selectedRecibeId);
+
+  const recibeUsuarios = users.filter((u) => u.id_usuario !== selectedRetiraId);
 
   return (
     <div className="p-8">
@@ -186,7 +203,7 @@ const SalidaToners = () => {
                 />
               </div>
 
-              <SearchSelect
+              {/* <SearchSelect
                 label="Usuario que retira"
                 placeholder="Ingrese el nombre del usuario"
                 value={userRetira}
@@ -195,8 +212,75 @@ const SalidaToners = () => {
                 onSelect={handleUserRetiraSelect}
                 getKey={(u) => u.id_usuario}
                 getLabel={(u) => u.nombre}
+              /> */}
+
+              <ResponsibleSearch
+                name="responsableRetira"
+                label="Responsable que retira"
+                users={retiraUsuarios}
+                onSelect={(person) => {
+                  const user = users.find(
+                    (u) => u.id_usuario === Number(person.id)
+                  );
+                  if (user) {
+                    setSelectedEntregaUser({
+                      ...user,
+                      firma: user.firma || "",
+                    });
+                  } else {
+                    setSelectedEntregaUser(null);
+                  }
+                  setNewSalidaToner((prev) => ({
+                    ...prev,
+                    responsable_salida_id: Number(person.id),
+                  }));
+                }}
+                onClear={() => {
+                  setSelectedEntregaUser(null);
+                  setNewSalidaToner((prev) => ({
+                    ...prev,
+                    responsable_salida_id: null,
+                  }));
+                }}
               />
 
+              <ResponsibleSearch
+                name="responsableRecibe"
+                label="Responsable de Recepción"
+                users={recibeUsuarios}
+                value={responsableRetiraInput}
+                onSelect={(person) => {
+                  const user = users.find(
+                    (u) => u.id_usuario === Number(person.id)
+                  );
+                  if (user) {
+                    setSelectedRecibeUser({
+                      ...user,
+                      firma: user.firma || "",
+                    });
+                    setResponsableRecibeInput({
+                      id: user.id_usuario.toString(),
+                      label: user.nombre,
+                    });
+                  } else {
+                    setSelectedRecibeUser(null);
+                    setResponsableRecibeInput(null);
+                  }
+                  setNewSalidaToner((prev) => ({
+                    ...prev,
+                    responsable_entrada_id: Number(person.id),
+                  }));
+                }}
+                onClear={() => {
+                  setSelectedRecibeUser(null);
+                  setResponsableRecibeInput(null);
+                  setNewSalidaToner((prev) => ({
+                    ...prev,
+                    responsable_entrada_id: null,
+                  }));
+                }}
+              />
+              {/* 
               <SearchSelect
                 label="Usuario de recepción"
                 placeholder="Ingrese el nombre del usuario"
@@ -206,8 +290,41 @@ const SalidaToners = () => {
                 onSelect={handleUserSelect}
                 getKey={(u) => u.id_usuario}
                 getLabel={(u) => u.nombre}
-              />
-            </div>
+              /> */}
+
+                <div className="space-y-2">
+                  <Label htmlFor="firmaEntrega">Firma de quien retira</Label>
+                  <SignatureCanvas
+                    value={selectedEntregaUser?.firma || ""}
+                    onChange={(value: string) => {
+                      newUser.firma_entrega = value;
+                      if (selectedEntregaUser) {
+                        setSelectedEntregaUser({
+                          ...selectedEntregaUser,
+                          firma: value,
+                        });
+                      }
+                    }}
+                    readOnly={!!selectedEntregaUser?.firma}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="firmaRecibe">Firma de quien recibe</Label>
+                  <SignatureCanvas
+                    value={selectedRecibeUser?.firma || ""}
+                    onChange={(value: string) => {
+                      newUser.firma = value;
+                      if (selectedRecibeUser) {
+                        setSelectedRecibeUser({
+                          ...selectedRecibeUser,
+                          firma: value,
+                        });
+                      }
+                    }}
+                    readOnly={!!selectedRecibeUser?.firma}
+                  />
+                </div>
+              </div>
 
             <Button type="submit" className="w-full md:w-auto">
               <ArrowUpFromLine className="mr-2 h-4 w-4" />
