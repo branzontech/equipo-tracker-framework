@@ -33,7 +33,7 @@ const SalidaToners = () => {
     setSugerenciasToner,
     createSalida,
     responsableRetiraInput,
-    setResponsableRecibeInput,
+    setResponsableRetiraInput,
   } = useToners();
   const {
     handleImpresoraSerialInput,
@@ -258,13 +258,13 @@ const SalidaToners = () => {
                       ...user,
                       firma: user.firma || "",
                     });
-                    setResponsableRecibeInput({
+                    setResponsableRetiraInput({
                       id: user.id_usuario.toString(),
                       label: user.nombre,
                     });
                   } else {
                     setSelectedRecibeUser(null);
-                    setResponsableRecibeInput(null);
+                    setResponsableRetiraInput(null);
                   }
                   setNewSalidaToner((prev) => ({
                     ...prev,
@@ -273,7 +273,7 @@ const SalidaToners = () => {
                 }}
                 onClear={() => {
                   setSelectedRecibeUser(null);
-                  setResponsableRecibeInput(null);
+                  setResponsableRetiraInput(null);
                   setNewSalidaToner((prev) => ({
                     ...prev,
                     responsable_entrada_id: null,
