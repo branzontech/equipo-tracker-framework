@@ -11,8 +11,6 @@ import { useToners } from "../hooks/use-toners";
 import { formatFecha } from "@/hooks/use-global";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
 import { VerSalidaTonerDialog } from "./DetallesSalida";
 
 export const ListadoSalidasToner = () => {
