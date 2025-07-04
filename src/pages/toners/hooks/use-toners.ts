@@ -54,7 +54,7 @@ export const useToners = () => {
   const [serialToner, setSerialToner] = useState("");
   const [sugerenciasToner, setSugerenciasToner] = useState<any[]>([]);
   const [detalleSeleccionado, setDetalleSeleccionado] = useState(null);
-  const [responsableRetiraInput, setResponsableRecibeInput] = useState(null);
+  const [responsableRetiraInput, setResponsableRetiraInput] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -271,6 +271,6 @@ export const useToners = () => {
     setDetalleSeleccionado,
     handleVerDetalle,
     responsableRetiraInput,
-    setResponsableRecibeInput,
+    setResponsableRetiraInput,
   };
 };
