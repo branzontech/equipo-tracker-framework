@@ -351,17 +351,16 @@ const Actas = () => {
                   <p className="font-medium">{usuario}</p>
                 </div>
 
-                {currentActa.tipo === "Prestamo" &&
-                  currentActa.prestamos[0].fecha_retorno && (
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Fecha de devolución
-                      </p>
-                      <p className="font-medium">
-                        {formatFecha(currentActa.prestamos[0].fecha_retorno)}
-                      </p>
-                    </div>
-                  )}
+                {currentActa.tipo === "Prestamo" && (
+                  <div>
+                    <p className="text-sm text-gray-500">Fecha de devolución</p>
+                    <p className="font-medium">
+                      {currentActa.prestamos[0].fecha_retorno
+                        ? formatFecha(currentActa.prestamos[0].fecha_retorno)
+                        : "INDEFINIDO"}
+                    </p>
+                  </div>
+                )}
 
                 {currentActa.tipo === "Traslado" &&
                   currentActa.traslados[0].sucursales.sedes.regional && (
