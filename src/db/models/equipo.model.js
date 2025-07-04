@@ -339,6 +339,28 @@ export const equipoModel = {
         },
       });
 
+      await prisma.archivosequipo.deleteMany({
+        where: { equipo_id: equipoId },
+      });
+
+      for (const archivo of data.archivosequipo) {
+        await prisma.archivosequipo.create({
+          data: {
+            nombre_archivo: archivo.nombre_archivo,
+            tipo_archivo: archivo.tipo_archivo,
+            contenido: Buffer.from(
+              archivo.contenido.includes(",")
+                ? archivo.contenido.split(",")[1]
+                : archivo.contenido,
+              "base64"
+            ),
+            equipos: {
+              connect: { id_equipo: equipoId },
+            },
+          },
+        });
+      }
+
       return updatedEquipo;
     } catch (error) {
       console.error("Error actualizando el equipo:", error);
