@@ -167,7 +167,10 @@ export const tonersModel = {
       }
 
       if (toner.stock_actual < cantidad) {
-        throw new Error("Stock insuficiente para esta salida. Este toner tiene stock de " + toner.stock_actual);
+        throw new Error(
+          "Stock insuficiente para esta salida. Este toner tiene stock de " +
+            toner.stock_actual
+        );
       }
 
       const asignacion = await prisma.toner_impresora.findFirst({
@@ -231,6 +234,35 @@ export const tonersModel = {
         impresoras_salidatoners_impresora_origen_idToimpresoras: true,
       },
     });
-    return salidasToner;
+
+    const toBase64 = (firma) => {
+      if (!firma || typeof firma !== "object") return null;
+      const bytes = new Uint8Array(Object.values(firma));
+      return `data:image/png;base64,${Buffer.from(bytes).toString("base64")}`;
+    };
+
+    const salidas = salidasToner.map((salida) => {
+      const salidaEntrega = {
+        ...salida,
+        usuarios_salidatoners_usuario_retiro_idTousuarios:
+          salida.usuarios_salidatoners_usuario_retiro_idTousuarios
+            ? {
+                ...salida.usuarios_salidatoners_usuario_retiro_idTousuarios,
+                firma: toBase64(
+                  salida.usuarios_salidatoners_usuario_retiro_idTousuarios.firma
+                ),
+              }
+            : null,
+        usuarios: salida.usuarios
+          ? {
+              ...salida.usuarios,
+              firma: toBase64(salida.usuarios.firma),
+            }
+          : null,
+      };
+      return salidaEntrega;
+    });
+
+    return salidas;
   },
 };
