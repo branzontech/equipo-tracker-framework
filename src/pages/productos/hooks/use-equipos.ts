@@ -714,10 +714,10 @@ export const useEquipos = () => {
         toast.success(response.message || "Equipo actualizdo exitosamente", {
           icon: icons.success,
         });
-        setTimeout(() => {
-          navigate("/productos/lista");
-          window.location.reload();
-        }, 4500);
+        // setTimeout(() => {
+        //   navigate("/productos/lista");
+        //   window.location.reload();
+        // }, 4500);
       } else {
         toast.error(response.message || "Error al actualizar el equipo", {
           icon: icons.error,

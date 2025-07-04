@@ -53,12 +53,12 @@ export const usePrestamo = () => {
       return;
     }
 
-    if (!prestamo.fecha_retorno) {
-      toast.error("Debe ingresar una fecha de retorno", {
-        icon: icons.error,
-      });
-      return;
-    }
+    // if (!prestamo.fecha_retorno) {
+    //   toast.error("Debe ingresar una fecha de retorno", {
+    //     icon: icons.error,
+    //   });
+    //   return;
+    // }
 
     if (!nombreInput) {
       toast.error("Debe ingresar un nombre de usuario", {
@@ -107,10 +107,10 @@ export const usePrestamo = () => {
         toast.success(response.message || "Prestamo creado exitosamente", {
           icon: icons.success,
         });
-        // setTimeout(() => {
-        //   navigate("/productos/actas");
-        //   window.location.reload();
-        // }, 4500);
+        setTimeout(() => {
+          navigate("/productos/actas");
+          window.location.reload();
+        }, 4500);
       }
       return response;
     } catch (error) {
