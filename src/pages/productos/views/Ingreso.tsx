@@ -1177,7 +1177,46 @@ const IngresoProducto = () => {
 
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="border border-dashed border-gray-300 rounded-xl p-6 bg-slate-50 relative">
+                    <div
+                      className="border border-dashed border-gray-300 rounded-xl p-6 bg-slate-50 relative"
+                      onDragOver={(e) => e.preventDefault()} 
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        const files = Array.from(e.dataTransfer.files || []);
+
+                        const archivosConvertidos = await Promise.all(
+                          files.map(
+                            (file) =>
+                              new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                  resolve({
+                                    nombre_archivo: file.name,
+                                    tipo_archivo: file.type,
+                                    contenido: reader.result as string,
+                                  });
+                                };
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              })
+                          )
+                        );
+
+                        const nuevosArchivos = archivosConvertidos as {
+                          nombre_archivo: string;
+                          tipo_archivo: string;
+                          contenido: string;
+                        }[];
+
+                        setNewEquipo((prev) => ({
+                          ...prev,
+                          archivosequipo: [
+                            ...(prev.archivosequipo || []),
+                            ...nuevosArchivos,
+                          ],
+                        }));
+                      }}
+                    >
                       <div className="flex flex-col items-center justify-center gap-3 text-center">
                         <Paperclip className="h-8 w-8 text-slate-400" />
                         <p className="text-sm text-slate-600">
@@ -1566,33 +1605,6 @@ const IngresoProducto = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Documentacion Relacionada */}
-              {/* <Card className="max-w-full">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-semibold text-[#040d50]">
-                    Documentación Relacionada
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="files">Archivos del Equipo</Label>
-                      <Input
-                        type="file"
-                        placeholder="Seleccionar manual de usuario"
-                        value={newEquipo.documentacion}
-                        onChange={(e) => {
-                          setNewEquipo({
-                            ...newEquipo,
-                            documentacion: e.target.files
-                          });
-                        }}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card> */}
 
               {/* Campos Personalizables */}
               <Card className="max-w-full">

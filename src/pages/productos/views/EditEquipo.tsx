@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, FileText, Paperclip, X } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -1237,6 +1237,157 @@ const EditEquipo = () => {
                     </CardContent>
                   </Card>
 
+                  <Card className="max-w-full">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg font-semibold text-[#040d50]">
+                        Documentación Relacionada
+                      </CardTitle>
+                    </CardHeader>
+
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div
+                          className="border border-dashed border-gray-300 rounded-xl p-6 bg-slate-50 relative"
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={async (e) => {
+                            e.preventDefault();
+                            const files = Array.from(
+                              e.dataTransfer.files || []
+                            );
+
+                            const archivosConvertidos = await Promise.all(
+                              files.map(
+                                (file) =>
+                                  new Promise((resolve, reject) => {
+                                    const reader = new FileReader();
+                                    reader.onload = () => {
+                                      resolve({
+                                        nombre_archivo: file.name,
+                                        tipo_archivo: file.type,
+                                        contenido: reader.result as string,
+                                      });
+                                    };
+                                    reader.onerror = reject;
+                                    reader.readAsDataURL(file);
+                                  })
+                              )
+                            );
+
+                            const nuevosArchivos = archivosConvertidos as {
+                              nombre_archivo: string;
+                              tipo_archivo: string;
+                              contenido: string;
+                            }[];
+
+                            setNewEquipo((prev) => ({
+                              ...prev,
+                              archivosequipo: [
+                                ...(prev.archivosequipo || []),
+                                ...nuevosArchivos,
+                              ],
+                            }));
+                          }}
+                        >
+                          <div className="flex flex-col items-center justify-center gap-3 text-center">
+                            <Paperclip className="h-8 w-8 text-slate-400" />
+                            <p className="text-sm text-slate-600">
+                              Arrastra y suelta archivos aquí o
+                              <label
+                                htmlFor="archivosEquipo"
+                                className="text-blue-600 cursor-pointer font-semibold ml-1"
+                              >
+                                haz clic para seleccionarlos
+                              </label>
+                            </p>
+
+                            <Input
+                              id="archivosEquipo"
+                              type="file"
+                              multiple
+                              accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const files = Array.from(e.target.files || []);
+
+                                const archivosConvertidos = await Promise.all(
+                                  files.map(
+                                    (file) =>
+                                      new Promise((resolve, reject) => {
+                                        const reader = new FileReader();
+                                        reader.onload = () => {
+                                          resolve({
+                                            nombre_archivo: file.name,
+                                            tipo_archivo: file.type,
+                                            contenido: reader.result as string,
+                                          });
+                                        };
+                                        reader.onerror = reject;
+                                        reader.readAsDataURL(file);
+                                      })
+                                  )
+                                );
+
+                                const nuevosArchivos = archivosConvertidos as {
+                                  nombre_archivo: string;
+                                  tipo_archivo: string;
+                                  contenido: string;
+                                }[];
+
+                                setNewEquipo((prev) => ({
+                                  ...prev,
+                                  archivosequipo: [
+                                    ...(prev.archivosequipo || []),
+                                    ...nuevosArchivos,
+                                  ],
+                                }));
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {newEquipo.archivosequipo?.length > 0 && (
+                          <div className="space-y-2">
+                            <Label className="text-sm">
+                              Archivos seleccionados
+                            </Label>
+
+                            {newEquipo.archivosequipo.map((file, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between border rounded-md p-3 bg-white"
+                              >
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                  <FileText className="h-4 w-4 text-blue-500" />
+                                  <span className="text-sm truncate">
+                                    {file.nombre_archivo}
+                                  </span>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => {
+                                    const nuevos =
+                                      newEquipo.archivosequipo!.filter(
+                                        (_, i) => i !== index
+                                      );
+                                    setNewEquipo((prev) => ({
+                                      ...prev,
+                                      archivosequipo: nuevos,
+                                    }));
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* seguridad */}
                   <Card className="max-w-full">
                     <CardHeader className="pb-4">
@@ -1612,8 +1763,6 @@ const EditEquipo = () => {
                                   .filter(Boolean)
                               : newEquipo.tags,
                         };
-
-                        console.log(equipoFormateado);
 
                         update(equipoFormateado);
                       }}
