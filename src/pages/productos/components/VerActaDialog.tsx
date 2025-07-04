@@ -134,7 +134,7 @@ export function VerActaDialog({
           )}
 
           {/* Información específica según tipo */}
-          {acta.tipo === "Prestamo" && acta.prestamos[0].fecha_retorno && (
+          {acta.tipo === "Prestamo" &&  (
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold flex items-center gap-2 mb-3">
@@ -147,11 +147,13 @@ export function VerActaDialog({
                       Fecha de devolución programada:
                     </span>
                     <p className="font-medium">
-                      {formatFecha(
-                        typeof acta.prestamos[0].fecha_retorno === "string"
-                          ? acta.prestamos[0].fecha_retorno
-                          : acta.prestamos[0].fecha_retorno.toISOString()
-                      )}
+                      {acta.prestamos[0].fecha_retorno
+                        ? formatFecha(
+                            typeof acta.prestamos[0].fecha_retorno === "string"
+                              ? acta.prestamos[0].fecha_retorno
+                              : acta.prestamos[0].fecha_retorno.toISOString()
+                          )
+                        : "INDEFINIDO"}
                     </p>
                   </div>
                 </div>
