@@ -39,8 +39,6 @@ import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
 
 export const ListaChequeo = () => {
   const {
-    setTecnicoResponsable,
-    tecnicoResponsable,
     handleSearchChecklist,
     selectEquipoChecklist,
     toggleChecklistItem,
@@ -58,7 +56,7 @@ export const ListaChequeo = () => {
     handleSedeFilterChecklist,
     tipoVista,
     setTipoVista,
-    vistaColumnas,  
+    vistaColumnas,
     setVistaColumnas,
     setTipoCalificacion,
     setTipoNuevoItem,
@@ -79,7 +77,6 @@ export const ListaChequeo = () => {
     setObservacionesChecklist,
     setNombrePlantilla,
   } = useMantenimiento();
-
   const { sedes } = useSedes();
 
   return (
@@ -102,7 +99,8 @@ export const ListaChequeo = () => {
           </CardContent>
         </Card>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-white">
+
+      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] flex flex-col p-4 sm:p-6 bg-white">
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">
             Lista de Chequeo de Mantenimiento
@@ -112,10 +110,11 @@ export const ListaChequeo = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
-          {/* Búsqueda y Filtros */}
+        {/* Contenido scrollable */}
+        <div className="flex-1 overflow-y-auto space-y-6 mt-4">
+          {/* Filtros */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label>Buscar por Serial o Nombre</Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -128,7 +127,7 @@ export const ListaChequeo = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label>Filtrar por Sede</Label>
               <Select
                 value={sedeFilterChecklist}
@@ -140,7 +139,10 @@ export const ListaChequeo = () => {
                 <SelectContent>
                   <SelectItem value="todas">Todas las sedes</SelectItem>
                   {sedes.map((sede) => (
-                    <SelectItem key={sede.id_sede} value={sede.nombre}>
+                    <SelectItem
+                      key={sede.id_sede}
+                      value={sede.id_sede.toString()}
+                    >
                       {sede.nombre}
                     </SelectItem>
                   ))}
@@ -149,9 +151,9 @@ export const ListaChequeo = () => {
             </div>
           </div>
 
-          {/* Resultados de Búsqueda */}
+          {/* Lista de equipos */}
           {equiposChecklistFiltrados.length > 0 && (
-            <div className="border rounded-lg max-h-40 overflow-y-auto">
+            <div className="border rounded-lg max-h-64 overflow-y-auto">
               {equiposChecklistFiltrados.map((equipo) => (
                 <div
                   key={equipo.id_equipo}
@@ -160,15 +162,14 @@ export const ListaChequeo = () => {
                 >
                   <div className="font-medium">{equipo.nombre_equipo}</div>
                   <div className="text-sm text-gray-600">
-                    Serial: {equipo.nro_serie} | Sede:{" "}
-                    {equipo?.estado_ubicacion?.sucursales?.sedes?.nombre}
+                    Serial: {equipo.nro_serie} | Sede: {equipo?.sedes}
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Equipo Seleccionado */}
+          {/* Detalle del equipo seleccionado */}
           {equipoChecklistSeleccionado && (
             <div className="bg-gray-50 rounded-lg p-4 border space-y-4">
               <h4 className="font-semibold mb-3 flex items-center">
@@ -176,7 +177,6 @@ export const ListaChequeo = () => {
                 Información del Mantenimiento
               </h4>
 
-              {/* Información del Equipo */}
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500">Equipo</p>
@@ -193,18 +193,15 @@ export const ListaChequeo = () => {
                 <div>
                   <p className="text-gray-500">Sede</p>
                   <p className="font-medium">
-                    {
-                      equipoChecklistSeleccionado?.estado_ubicacion?.sucursales
-                        ?.sedes?.nombre
-                    }
+                    {equipoChecklistSeleccionado?.sedes}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-500">Responsable del Equipo</p>
                   <p className="font-medium">
                     {
-                      equipoChecklistSeleccionado?.estado_ubicacion?.usuarios
-                        ?.nombre
+                      equipoChecklistSeleccionado?.estado_ubicacion?.[0]
+                        ?.usuarios?.nombre
                     }
                   </p>
                 </div>
@@ -212,7 +209,6 @@ export const ListaChequeo = () => {
 
               <Separator />
 
-              {/* Información del Mantenimiento */}
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500 flex items-center gap-1">
@@ -223,27 +219,26 @@ export const ListaChequeo = () => {
                     {format(fechaEjecucion, "dd/MM/yyyy HH:mm")}
                   </p>
                 </div>
-                <div>
-                  <p className="text-gray-500 flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    Técnico Responsable
-                  </p>
-                  <Select
-                    value={tecnicoResponsable}
-                    onValueChange={setTecnicoResponsable}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Seleccionar técnico" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tecnicosMock.map((tecnico) => (
-                        <SelectItem key={tecnico.id} value={tecnico.nombre}>
-                          {tecnico.nombre} - {tecnico.especialidad}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+
+                {/* FUTURO: Técnico responsable */}
+                {/* <div>
+              <p className="text-gray-500 flex items-center gap-1">
+                <User className="h-3 w-3" />
+                Técnico Responsable
+              </p>
+              <Select value={tecnicoResponsable} onValueChange={setTecnicoResponsable}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Seleccionar técnico" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tecnicosMock.map((tecnico) => (
+                    <SelectItem key={tecnico.id} value={tecnico.nombre}>
+                      {tecnico.nombre} - {tecnico.especialidad}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div> */}
               </div>
             </div>
           )}

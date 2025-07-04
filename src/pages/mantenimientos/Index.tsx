@@ -45,6 +45,7 @@ import { SearchSelect } from "../../components/SearchSelect";
 import { Separator } from "@/components/ui/separator";
 import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
 import { ListaChequeo } from "./ListaChequeo";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const MantenimientosIndex = () => {
   const {
@@ -63,6 +64,9 @@ const MantenimientosIndex = () => {
     validEquipo,
     validDetalles,
     navigate,
+    listadoChequeo,
+    itemsChequeo,
+    toggleItem,
   } = useMantenimiento();
   const {
     setSelectedRecibeUser,
@@ -71,6 +75,7 @@ const MantenimientosIndex = () => {
     sugerencias,
     setSugerencias,
     setNombreUser,
+    users,
   } = useUser();
   const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
   const { sedes } = useSedes();
@@ -105,8 +110,6 @@ const MantenimientosIndex = () => {
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        <ListaChequeo />
-
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-[#bff036] text-[#01242c]">
@@ -208,7 +211,7 @@ const MantenimientosIndex = () => {
                                       <span className="font-semibold">
                                         Marca:
                                       </span>{" "}
-                                      {equipo.marcas.nombre}
+                                      {equipo.marcas}
                                     </span>
                                     <span>
                                       <span className="font-semibold">
@@ -258,18 +261,28 @@ const MantenimientosIndex = () => {
                           <div>
                             <p className="text-gray-500">Marca / Modelo</p>
                             <p className="font-medium">
-                              {equipoSeleccionado.marcas.nombre} /{" "}
+                              {equipoSeleccionado.marcas} /{" "}
                               {equipoSeleccionado.modelo}
                             </p>
                           </div>
-                          {/* <div>
+                          <div>
                             <p className="text-gray-500">Responsable</p>
-                            <p className="font-medium">{equipoSeleccionado.responsable}</p>
-                          </div> */}
-                          {/* <div>
+                            <p className="font-medium">
+                              {
+                                equipoSeleccionado?.estado_ubicacion?.[0]
+                                  ?.usuarios?.nombre
+                              }
+                            </p>
+                          </div>
+                          <div>
                             <p className="text-gray-500">Área</p>
-                            <p className="font-medium">{equipoSeleccionado.area}</p>
-                          </div> */}
+                            <p className="font-medium">
+                              {
+                                equipoSeleccionado?.estado_ubicacion?.[0]
+                                  ?.sucursales?.area
+                              }
+                            </p>
+                          </div>
                           <div>
                             <p className="text-gray-500">Sede</p>
                             <p className="font-medium">
@@ -363,8 +376,8 @@ const MantenimientosIndex = () => {
                     getKey={(u) => u.id_usuario}
                     getLabel={(u) => u.nombre}
                   />
-
-                  {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2 col-span-2">
                       <Label htmlFor="tecnico">Técnico asignado</Label>
                       <Select
@@ -373,7 +386,12 @@ const MantenimientosIndex = () => {
                             ? newMante.tecnico_id.toString()
                             : ""
                         }
-                          onValueChange={(value) => setNewMante({ ...newMante, tecnico_id: Number(value) })}
+                        onValueChange={(value) =>
+                          setNewMante({
+                            ...newMante,
+                            tecnico_id: Number(value),
+                          })
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar técnico" />
@@ -469,7 +487,11 @@ const MantenimientosIndex = () => {
                         <Label>Tiempo estimado (horas)</Label>
                       </div>
                       <Select
-                        value={newMante.tiempo_estimado.toString()}
+                        value={
+                          newMante.tiempo_estimado != null
+                            ? newMante.tiempo_estimado.toString()
+                            : ""
+                        }
                         onValueChange={(value) =>
                           setNewMante({
                             ...newMante,
@@ -505,6 +527,38 @@ const MantenimientosIndex = () => {
                         });
                       }}
                     />
+                  </div>
+
+                  <div>
+                    <div className="mb-2 sm:mb-4">
+                      <div className="flex items-center mb-2">
+                        <ClipboardList className="h-4 w-4 mr-2 text-gray-500" />
+                        <Label className="text-base font-medium">
+                          Lista de Chequeo
+                        </Label>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-gray-50 p-4 rounded-lg border">
+                      {listadoChequeo.map((item) => (
+                        <div key={item} className="flex items-start space-x-2">
+                          <Checkbox
+                            id={item}
+                            className="mt-0.5"
+                            checked={itemsChequeo.includes(item)}
+                            onCheckedChange={(checked) =>
+                              toggleItem(item, !!checked)
+                            }
+                          />
+                          <Label
+                            htmlFor={item}
+                            className="text-xs sm:text-sm font-medium leading-tight"
+                          >
+                            {item}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <Separator />
@@ -547,6 +601,8 @@ const MantenimientosIndex = () => {
             </form>
           </DialogContent>
         </Dialog>
+
+        <ListaChequeo />
 
         <Card
           className="hover:shadow-lg transition-shadow cursor-pointer bg-[#bff036]"
