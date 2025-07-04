@@ -64,7 +64,9 @@ export const prestamoModel = {
       const nuevoPrestamo = await prisma.prestamos.create({
         data: {
           fecha_salida: new Date(prestamo.fecha_salida),
-          fecha_retorno: new Date(prestamo.fecha_retorno),
+          fecha_retorno: prestamo.fecha_retorno
+            ? new Date(prestamo.fecha_retorno)
+            : null,
           descripcion: prestamo.descripcion,
           estado: prestamo.estado,
           actas: { connect: { id_acta: nuevaActa.id_acta } },
@@ -125,13 +127,13 @@ export const prestamoModel = {
           await prisma.prestamo_perifericos_directos.create({
             data: {
               prestamo_id: nuevoPrestamo.id_prestamo,
-              periferico_id: periferico.id_periferico, 
+              periferico_id: periferico.id_periferico,
             },
           });
 
           // Actualizar estado del periférico
           await prisma.perifericos.update({
-            where: { id_periferico: periferico.id_periferico }, 
+            where: { id_periferico: periferico.id_periferico },
             data: { estado: "En Préstamo" },
           });
         }
@@ -148,7 +150,7 @@ export const prestamoModel = {
 
           // Actualizar estado de la impresora
           await prisma.impresoras.update({
-            where: { id_impresora: impresora.id_impresora  },
+            where: { id_impresora: impresora.id_impresora },
             data: { estado: "En Préstamo" },
           });
         }
