@@ -9,7 +9,7 @@ export const SearchSelect = ({
   onSelect,
   getKey = (item) => item.id,
   getLabel = (item) => item.nombre,
-  placeholder = "Ingrese un valor",
+  placeholder = "Ingrese el nombre del tecnico",
 }) => {
   return (
     <div className="space-y-2 relative">
