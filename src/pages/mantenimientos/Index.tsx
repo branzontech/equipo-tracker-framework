@@ -46,6 +46,10 @@ import { Separator } from "@/components/ui/separator";
 import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
 import { ListaChequeo } from "./ListaChequeo";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useChecklist } from "../configuracion/checklist/hooks/use-checklist";
+import { ListaChequeoSimple } from "../configuracion/checklist/views/CheckListSimple";
+import { useState } from "react";
+import { Checklist } from "../configuracion/checklist/interface/checklist";
 
 const MantenimientosIndex = () => {
   const {
@@ -66,6 +70,7 @@ const MantenimientosIndex = () => {
     navigate,
     listadoChequeo,
     itemsChequeo,
+    setItemsChequeo,
     toggleItem,
   } = useMantenimiento();
   const {
@@ -79,6 +84,15 @@ const MantenimientosIndex = () => {
   } = useUser();
   const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
   const { sedes } = useSedes();
+  const { checklist } = useChecklist();
+  const [plantillaSeleccionada, setPlantillaSeleccionada] =
+    useState<Checklist | null>(null);
+
+
+  const handleChangePlantilla = (plantilla: Checklist | null) => {
+    setPlantillaSeleccionada(plantilla);
+    setItemsChequeo([]); 
+  };
 
   const selectEquipo = (equipo: Equipo) => {
     setEquipoSeleccionado(equipo);
@@ -376,40 +390,7 @@ const MantenimientosIndex = () => {
                     getKey={(u) => u.id_usuario}
                     getLabel={(u) => u.nombre}
                   />
-                  {/* 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2 col-span-2">
-                      <Label htmlFor="tecnico">Técnico asignado</Label>
-                      <Select
-                        value={
-                          newMante.tecnico_id
-                            ? newMante.tecnico_id.toString()
-                            : ""
-                        }
-                        onValueChange={(value) =>
-                          setNewMante({
-                            ...newMante,
-                            tecnico_id: Number(value),
-                          })
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar técnico" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users.map((tecnico) => (
-                            <SelectItem
-                              key={tecnico.id_usuario}
-                              value={tecnico.id_usuario.toString()}
-                            >
-                              {tecnico.nombre} - {tecnico.rol}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div> */}
-
+                  
                   <div className="space-y-2">
                     <Label htmlFor="descripcion">
                       Descripción del mantenimiento
@@ -529,37 +510,13 @@ const MantenimientosIndex = () => {
                     />
                   </div>
 
-                  <div>
-                    <div className="mb-2 sm:mb-4">
-                      <div className="flex items-center mb-2">
-                        <ClipboardList className="h-4 w-4 mr-2 text-gray-500" />
-                        <Label className="text-base font-medium">
-                          Lista de Chequeo
-                        </Label>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-gray-50 p-4 rounded-lg border">
-                      {listadoChequeo.map((item) => (
-                        <div key={item} className="flex items-start space-x-2">
-                          <Checkbox
-                            id={item}
-                            className="mt-0.5"
-                            checked={itemsChequeo.includes(item)}
-                            onCheckedChange={(checked) =>
-                              toggleItem(item, !!checked)
-                            }
-                          />
-                          <Label
-                            htmlFor={item}
-                            className="text-xs sm:text-sm font-medium leading-tight"
-                          >
-                            {item}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <ListaChequeoSimple
+                    checklist={checklist}
+                    plantillaSeleccionada={plantillaSeleccionada}
+                    onChangePlantilla={handleChangePlantilla}
+                    itemsSeleccionados={itemsChequeo}
+                    onToggleItem={toggleItem}
+                  />
 
                   <Separator />
 
