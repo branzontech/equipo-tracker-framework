@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
-import { BellRing, Settings, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { HeaderProps } from "@/components/layout/interfaces/header";
-// import { RootState } from "../../redux/store";
-// import { useSelector } from "react-redux";
-// import { useNavigate } from "react-router-dom";
 
 const Header = ({ className = "" }: HeaderProps) => {
-  // const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
-  // const user = useSelector((state: RootState) => state.auth.user);
-
-  // useEffect(() => {
-  //   if (!user) navigate("/login");
-  // }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
