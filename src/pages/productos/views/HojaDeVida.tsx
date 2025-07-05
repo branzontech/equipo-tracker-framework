@@ -29,6 +29,7 @@ import {
   Download,
   Eye,
   XCircle,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -177,6 +178,20 @@ const HojaDeVida = () => {
     });
   });
 
+  // Historial 
+  newEquipo.trazabilidad.historial?.forEach((historial) => {
+    historialEventos.push({
+      id: `historial-${historial.id_historial}`,
+      tipo: historial.evento,
+      fecha: historial.fecha_evento,
+      descripcion: "Modificación del Equipo",
+      responsable: historial.usuarios?.nombre || "-",
+      detalles: {
+        descripcion: historial.descripcion || "-",
+      }
+    });
+  });
+
   const getIconoEvento = (tipo: string) => {
     switch (tipo) {
       case "ingreso":
@@ -192,6 +207,8 @@ const HojaDeVida = () => {
         return <Repeat className="h-6 w-6 text-purple-500" />;
       case "devolucion":
         return <CheckCircle2 className="h-6 w-6 text-rose-500" />;
+      case "Actualización":
+        return <Pencil className="h-6 w-6 text-red-500" />;
       default:
         return <Info className="h-6 w-6 text-muted-foreground" />;
     }
@@ -239,6 +256,12 @@ const HojaDeVida = () => {
         return (
           <Badge variant="outline" className="bg-rose-500 text-white">
             Devolución
+          </Badge>
+        );
+      case "Actualización":
+        return (
+          <Badge variant="outline" className="bg-red-500 text-white">
+            Actualización
           </Badge>
         );
       default:
