@@ -1,6 +1,55 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../prisma/prismaCliente.js";
 
+async function registrarCambios({
+  viejo,
+  nuevo,
+  campos,
+  equipoId,
+  usuarioId,
+  tabla,
+}) {
+  for (const campo of campos) {
+    let nuevoValor = nuevo[campo];
+    let viejoValor = viejo ? viejo[campo] : null;
+
+    if (viejoValor === undefined && nuevoValor !== undefined) continue;
+    if (viejoValor === null && nuevoValor !== null) continue;
+
+    if (viejoValor instanceof Date)
+      viejoValor = viejoValor.toISOString().split("T")[0];
+    if (nuevoValor instanceof Date)
+      nuevoValor = nuevoValor.toISOString().split("T")[0];
+
+    if (
+      typeof viejoValor === "object" &&
+      viejoValor !== null &&
+      "toString" in viejoValor
+    )
+      viejoValor = viejoValor.toString();
+    if (
+      typeof nuevoValor === "object" &&
+      nuevoValor !== null &&
+      "toString" in nuevoValor
+    )
+      nuevoValor = nuevoValor.toString();
+
+    if (nuevoValor !== undefined && nuevoValor !== viejoValor) {
+      await prisma.historial_equipo.create({
+        data: {
+          equipo_id: equipoId,
+          evento: "Actualización",
+          fecha_evento: new Date(),
+          descripcion: `Se modificó '${campo}' en '${tabla}' de '${
+            viejoValor ?? "N/A"
+          }' a '${nuevoValor ?? "N/A"}'.`,
+          usuario_id: usuarioId,
+        },
+      });
+    }
+  }
+}
+
 export const equipoModel = {
   async create(data) {
     const categoriaId = Number(data.categoria_id);
@@ -169,12 +218,24 @@ export const equipoModel = {
     const equipoId = Number(data.id_equipo);
     const categoriaId = Number(data.categoria_id);
     const marcaId = Number(data.marca_id);
+    const usuarioId = Number(data.usuario_id);
 
     if ([categoriaId, marcaId, equipoId].some(isNaN)) {
       throw new Error("ID de categoría, marca, sucursal o equipo inválido.");
     }
 
     try {
+      const equipoAntes = await prisma.equipos.findUnique({
+        where: { id_equipo: equipoId },
+        include: {
+          especificaciones: true,
+          seguridad: true,
+          adquisicion: true,
+          administrativa: true,
+          estado_ubicacion: true,
+        },
+      });
+
       const updatedEquipo = await prisma.equipos.update({
         where: { id_equipo: equipoId },
         data: {
@@ -339,6 +400,118 @@ export const equipoModel = {
         },
       });
 
+      const nuevoTags = Array.isArray(data.tags)
+        ? data.tags.join(", ")
+        : data.tags;
+
+      await registrarCambios({
+        viejo: equipoAntes,
+        nuevo: {
+          ...data,
+          tags: nuevoTags,
+        },
+        campos: [
+          "nombre_equipo",
+          "nro_serie",
+          "estado_actual",
+          "modelo",
+          "tipo_activo",
+          "observaciones",
+          "tags",
+        ],
+        equipoId,
+        usuarioId,
+        tabla: "equipos",
+      });
+
+      // Comparar especificaciones
+      await registrarCambios({
+        viejo: equipoAntes.especificaciones,
+        nuevo: data.especificaciones,
+        campos: [
+          "procesador",
+          "memoria_ram",
+          "almacenamiento",
+          "tarjeta_grafica",
+          "pantalla",
+          "sistema_operativo",
+          "bateria",
+          "tienecargador",
+          "serialcargador",
+          "tipo_discoduro",
+          "puertos",
+        ],
+        equipoId,
+        usuarioId,
+        tabla: "especificaciones",
+      });
+
+      // Comparar seguridad
+      await registrarCambios({
+        viejo: equipoAntes.seguridad,
+        nuevo: data.seguridad,
+        campos: [
+          "nivel_acceso",
+          "software_seguridad",
+          "cifrado_disco",
+          "politicas_aplicadas",
+        ],
+        equipoId,
+        usuarioId,
+        tabla: "seguridad",
+      });
+
+      // Comparar adquisicion
+      await registrarCambios({
+        viejo: equipoAntes.adquisicion,
+        nuevo: data.adquisicion,
+        campos: [
+          "orden_compra",
+          "fecha_compra",
+          "precio_compra",
+          "forma_pago",
+          "plazo_pago",
+          "numero_factura",
+          "inicio_garantia",
+          "garantia_fecha_fin",
+        ],
+        equipoId,
+        usuarioId,
+        tabla: "adquisicion",
+      });
+
+      // Comparar administrativa
+      await registrarCambios({
+        viejo: equipoAntes.administrativa,
+        nuevo: data.administrativa,
+        campos: [
+          "codigo_inventario",
+          "centro_coste",
+          "fecha_activacion",
+          "estado_contable",
+          "valor_depreciado",
+          "vida_util_restante",
+        ],
+        equipoId,
+        usuarioId,
+        tabla: "administrativa",
+      });
+
+      // Comparar estado_ubicacion
+      await registrarCambios({
+        viejo: equipoAntes.estado_ubicacion,
+        nuevo: data.estado_ubicacion,
+        campos: [
+          "estado_actual",
+          "departamento",
+          "disponibilidad",
+          "condicion_fisica",
+        ],
+        equipoId,
+        usuarioId,
+        tabla: "estado_ubicacion",
+      });
+
       await prisma.archivosequipo.deleteMany({
         where: { equipo_id: equipoId },
       });
@@ -418,44 +591,46 @@ export const equipoModel = {
     return equiposWithImageBase64;
   },
   async findById(nro_serie) {
-    const equipo = await prisma.equipos.findUnique({
-      where: { nro_serie },
-      include: {
-        proveedores: true,
-        marcas: true,
-        categorias: true,
-        especificaciones: true,
-        seguridad: true,
-        adquisicion: {
-          include: {
-            proveedores: true,
-          },
-        },
-        administrativa: {
-          include: {
-            usuarios: true,
-          },
-        },
-        perifericos: true,
-        estado_ubicacion: {
-          include: {
-            usuarios: {
-              select: {
-                id_usuario: true,
-                nombre: true,
-              },
+    try {
+      const equipo = await prisma.equipos.findUnique({
+        where: { nro_serie },
+        include: {
+          proveedores: true,
+          marcas: true,
+          categorias: true,
+          especificaciones: true,
+          seguridad: true,
+          adquisicion: {
+            include: {
+              proveedores: true,
             },
-            sucursales: {
-              include: {
-                sedes: true,
-                sedes: {
-                  include: {
-                    usuario_sede: {
-                      select: {
-                        id_usuario: true,
-                        usuarios: {
-                          select: {
-                            nombre: true,
+          },
+          administrativa: {
+            include: {
+              usuarios: true,
+            },
+          },
+          perifericos: true,
+          estado_ubicacion: {
+            include: {
+              usuarios: {
+                select: {
+                  id_usuario: true,
+                  nombre: true,
+                },
+              },
+              sucursales: {
+                include: {
+                  sedes: true,
+                  sedes: {
+                    include: {
+                      usuario_sede: {
+                        select: {
+                          id_usuario: true,
+                          usuarios: {
+                            select: {
+                              nombre: true,
+                            },
                           },
                         },
                       },
@@ -465,37 +640,41 @@ export const equipoModel = {
               },
             },
           },
+          archivosequipo: true,
         },
-        archivosequipo: true,
-      },
-    });
+      });
 
-    if (!equipo) {
-      throw new Error("No se encontró el equipo.");
+      if (!equipo) {
+        throw new Error("No se encontró el equipo.");
+      }
+
+      const archivosequipo = equipo.archivosequipo?.map((archivo) => ({
+        ...archivo,
+        contenido: `data:${archivo.tipo_archivo};base64,${Buffer.from(
+          archivo.contenido
+        ).toString("base64")}`,
+      }));
+
+      const imagen = equipo.imagen;
+      const isBase64 =
+        typeof imagen === "string" &&
+        imagen.startsWith("data:image/png;base64,");
+
+      const equipoWithImageBase64 = {
+        ...equipo,
+        imagen: imagen
+          ? isBase64
+            ? imagen
+            : `data:image/png;base64,${Buffer.from(imagen).toString("base64")}`
+          : null,
+        archivosequipo: archivosequipo,
+      };
+
+      return equipoWithImageBase64;
+    } catch (error) {
+      console.error("Error al obtener el equipo:", error);
+      throw new Error("Error al obtener el equipo.");
     }
-
-    const archivosequipo = equipo.archivosequipo?.map((archivo) => ({
-      ...archivo,
-      contenido: `data:${archivo.tipo_archivo};base64,${Buffer.from(
-        archivo.contenido
-      ).toString("base64")}`,
-    }));
-
-    const imagen = equipo.imagen;
-    const isBase64 =
-      typeof imagen === "string" && imagen.startsWith("data:image/png;base64,");
-
-    const equipoWithImageBase64 = {
-      ...equipo,
-      imagen: imagen
-        ? isBase64
-          ? imagen
-          : `data:image/png;base64,${Buffer.from(imagen).toString("base64")}`
-        : null,
-      archivosequipo: archivosequipo,
-    };
-
-    return equipoWithImageBase64;
   },
   async delete_(id) {
     const equipo_id = Number(id);
@@ -585,6 +764,14 @@ export const equipoModel = {
               },
             },
           },
+          historial_equipo: {
+            include: {
+              usuarios: {
+                select: { id_usuario: true, nombre: true },
+              },
+            },
+            orderBy: { fecha_evento: "desc" },
+          },
         },
       });
 
@@ -652,6 +839,7 @@ export const equipoModel = {
       return {
         ...equipo,
         devoluciones,
+        historial: equipo.historial_equipo,
       };
     } catch (error) {
       console.error("Error en getTrazabilidadByEquipoId:", error);
