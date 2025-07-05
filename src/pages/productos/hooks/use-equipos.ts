@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { getUserByName } from "@/api/axios/user.api";
+import Cookies from "js-cookie";
 
 export const useEquipos = () => {
   const [equipo, setEquipo] = useState<Equipo[]>([]);
@@ -38,6 +39,7 @@ export const useEquipos = () => {
     tags: [],
     imagen: "",
     motivo: "",
+    usuario_id: "",
     especificaciones: {
       procesador: "",
       memoria_ram: "",
@@ -703,21 +705,24 @@ export const useEquipos = () => {
       }
     }
 
+    const userId = Cookies.get("userId");
+
     try {
       const dataSend = {
         ...data,
         fecha_registro: new Date(data.fecha_registro).toISOString(),
+        usuario_id: userId,
       };
 
       const response = await updateEquipo(dataSend);
       if (response.success) {
-        toast.success(response.message || "Equipo actualizdo exitosamente", {
+        toast.success(response.message || "Equipo actualizado exitosamente", {
           icon: icons.success,
         });
-        // setTimeout(() => {
-        //   navigate("/productos/lista");
-        //   window.location.reload();
-        // }, 4500);
+        setTimeout(() => {
+          navigate("/productos/lista");
+          window.location.reload();
+        }, 4500);
       } else {
         toast.error(response.message || "Error al actualizar el equipo", {
           icon: icons.error,
@@ -793,7 +798,6 @@ export const useEquipos = () => {
     const trazabilidad = await getTrazabilidadByEquipoId(response.id_equipo);
     const seguridadRaw = response.seguridad?.[0] || {};
 
-    // Normaliza tags: de string a string[]
     const tagsProcesadas =
       typeof response.tags === "string"
         ? response.tags.split(",").map((tag) => tag.trim())

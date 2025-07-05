@@ -9,6 +9,17 @@ import { Mantenimiento } from "@/pages/mantenimientos/interfaces/mantenimiento";
 import { Devolucion } from "./devoluciones";
 import { Proveedor } from "@/pages/configuracion/maestros/interfaces/proveedor";
 
+export interface HistorialEquipo {
+  id_historial: number;
+  evento: string;
+  fecha_evento: string;
+  descripcion: string;
+  usuarios: {
+    id_usuario: number;
+    nombre: string;
+  };
+}
+
 export interface Equipo {
   sedes: string;
   id_equipo: number;
@@ -25,6 +36,7 @@ export interface Equipo {
   tags: string[];
   motivo: string;
   imagen: string;
+  usuario_id: string;
 
   prestamo_equipos?: {
     prestamos: Prestamo;
@@ -43,6 +55,7 @@ export interface Equipo {
     }[];
     mantenimientos?: Mantenimiento[];
     devoluciones?: Devolucion[];
+    historial?: HistorialEquipo[];
   };
 
   // Información Técnica
@@ -56,8 +69,8 @@ export interface Equipo {
     sistema_operativo?: string;
     bateria?: string;
     puertos?: string;
-    tienecargador?: boolean; 
-    serialcargador?: string; 
+    tienecargador?: boolean;
+    serialcargador?: string;
   };
 
   // Seguridad
@@ -78,8 +91,8 @@ export interface Equipo {
     numero_factura: string;
     proveedores: Proveedor;
     proveedor_id: Proveedor | number;
-    inicio_garantia: string; 
-    garantia_fecha_fin: string; 
+    inicio_garantia: string;
+    garantia_fecha_fin: string;
   };
 
   // Estado y Ubicación
@@ -123,7 +136,7 @@ export interface Equipo {
       content: string;
       nombre: string;
       tipo: string;
-    }
+    };
   }[];
 
   perifericos: Perifericos | null;
