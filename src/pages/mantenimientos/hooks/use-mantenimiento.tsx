@@ -97,43 +97,8 @@ export const useMantenimiento = () => {
       checked?: boolean;
       personalizado: boolean;
     }[]
-  >([
-    {
-      id: "1",
-      texto: "Limpieza de hardware",
-      tipo: "checkbox",
-      checked: false,
-      personalizado: false,
-    },
-    {
-      id: "2",
-      texto: "Actualización de software",
-      tipo: "checkbox",
-      checked: false,
-      personalizado: false,
-    },
-    {
-      id: "3",
-      texto: "Verificación de componentes",
-      tipo: "checkbox",
-      checked: false,
-      personalizado: false,
-    },
-    {
-      id: "4",
-      texto: "Pruebas de rendimiento",
-      tipo: "checkbox",
-      checked: false,
-      personalizado: false,
-    },
-    {
-      id: "5",
-      texto: "Respaldo de información",
-      tipo: "checkbox",
-      checked: false,
-      personalizado: false,
-    },
-  ]);
+  >([]);
+
   const [nuevoItemPersonalizado, setNuevoItemPersonalizado] = useState("");
   const [tipoNuevoItem, setTipoNuevoItem] = useState<
     "checkbox" | "numeric" | "text"
@@ -965,6 +930,6 @@ export const useMantenimiento = () => {
     setCalificacionEquipo,
     setObservacionesChecklist,
     setNombrePlantilla,
-    toggleItem
+    toggleItem,
   };
 };
