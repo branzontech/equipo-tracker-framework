@@ -22,6 +22,7 @@ import estadosRoutes from "./routes/estado.routes.js";
 import proveedorRoutes from "./routes/proveedor.routes.js";
 import perfilesAccesoRoutes from "./routes/perfilesAcceso.routes.js";
 import permisosRoutes from "./routes/permisos.routes.js";
+import checklistRoutes from "./routes/checklist.routes.js";
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -50,6 +51,7 @@ const routerApi = (app) => {
   router.use("/proveedores", proveedorRoutes);
   router.use("/perfiles-acceso", perfilesAccesoRoutes);
   router.use("/permisos", permisosRoutes);
+  router.use("/checklist", checklistRoutes);
 };
 
 export default routerApi;
