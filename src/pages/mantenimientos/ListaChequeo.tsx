@@ -36,8 +36,15 @@ import { useMantenimiento } from "./hooks/use-mantenimiento";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
+import { SearchSelect } from "@/components/SearchSelect";
+import { useUser } from "../usuarios/hooks/use-user";
+import React, { useState } from "react";
+import { ChecklistItem } from "../configuracion/checklist/views/CheckListItem";
+import { useChecklist } from "../configuracion/checklist/hooks/use-checklist";
 
 export const ListaChequeo = () => {
+  const [modoPlantilla, setModoPlantilla] = useState(true);
+
   const {
     handleSearchChecklist,
     selectEquipoChecklist,
@@ -76,8 +83,40 @@ export const ListaChequeo = () => {
     setCalificacionEquipo,
     setObservacionesChecklist,
     setNombrePlantilla,
+    setTecnicoResponsable,
+    setNewMante,
+    setItemsChecklist,
   } = useMantenimiento();
-  const { sedes } = useSedes();
+  const { create, checklist, newCheckList, setNewCheckList } = useChecklist();
+
+  const camposPorTipo: Record<"EQUIPO" | "PERIFERICO" | "IMPRESORA", string[]> =
+    {
+      EQUIPO: [
+        "Limpieza de hardware",
+        "Actualización de Software",
+        "Verificación de Componentes",
+        "Pruebas de rendimiento",
+        "Respaldo de información",
+      ],
+      PERIFERICO: ["Conectividad", "Integridad física", "Compatibilidad"],
+      IMPRESORA: ["Tóner", "Cabezal", "Papel atascado"],
+    };
+
+  function generarItemsChecklist(campos: string[]): {
+    id: string;
+    texto: string;
+    tipo: "checkbox" | "numeric" | "text";
+    checked: boolean;
+    personalizado: boolean;
+  }[] {
+    return campos.map((texto, index) => ({
+      id: (index + 1).toString(),
+      texto,
+      tipo: "checkbox", // ya toma el tipo correcto
+      checked: false,
+      personalizado: false,
+    }));
+  }
 
   return (
     <Dialog
@@ -110,150 +149,47 @@ export const ListaChequeo = () => {
           </DialogDescription>
         </DialogHeader>
 
-        {/* Contenido scrollable */}
         <div className="flex-1 overflow-y-auto space-y-6 mt-4">
-          {/* Filtros */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label>Buscar por Serial o Nombre</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar equipo..."
-                  value={busquedaChecklist}
-                  onChange={(e) => handleSearchChecklist(e.target.value)}
-                  className="pl-10"
-                />
+          <div className="space-y-4 border rounded-lg p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 space-y-2">
+                <Label>Tipo de Equipo</Label>
+                <Select
+                  value={newCheckList.tipo_equipo || ""}
+                  onValueChange={(
+                    value: "EQUIPO" | "PERIFERICO" | "IMPRESORA"
+                  ) => {
+                    const nuevosCampos = camposPorTipo[value];
+                    setNewCheckList({
+                      ...newCheckList,
+                      tipo_equipo: value,
+                      campos: nuevosCampos,
+                    });
+                    setItemsChecklist(generarItemsChecklist(nuevosCampos));
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Seleccionar tipo de equipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EQUIPO">Equipo</SelectItem>
+                    <SelectItem value="PERIFERICO">Periférico</SelectItem>
+                    <SelectItem value="IMPRESORA">Impresora</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label>Filtrar por Sede</Label>
-              <Select
-                value={sedeFilterChecklist}
-                onValueChange={handleSedeFilterChecklist}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar sede" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todas">Todas las sedes</SelectItem>
-                  {sedes.map((sede) => (
-                    <SelectItem
-                      key={sede.id_sede}
-                      value={sede.id_sede.toString()}
-                    >
-                      {sede.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
-          {/* Lista de equipos */}
-          {equiposChecklistFiltrados.length > 0 && (
-            <div className="border rounded-lg max-h-64 overflow-y-auto">
-              {equiposChecklistFiltrados.map((equipo) => (
-                <div
-                  key={equipo.id_equipo}
-                  className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
-                  onClick={() => selectEquipoChecklist(equipo)}
-                >
-                  <div className="font-medium">{equipo.nombre_equipo}</div>
-                  <div className="text-sm text-gray-600">
-                    Serial: {equipo.nro_serie} | Sede: {equipo?.sedes}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Detalle del equipo seleccionado */}
-          {equipoChecklistSeleccionado && (
-            <div className="bg-gray-50 rounded-lg p-4 border space-y-4">
-              <h4 className="font-semibold mb-3 flex items-center">
-                <Building className="h-4 w-4 mr-2" />
-                Información del Mantenimiento
+          <div className="space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h4 className="font-semibold flex items-center">
+                <ClipboardList className="h-4 w-4 mr-2" />
+                Lista de Chequeo
               </h4>
 
-              <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Equipo</p>
-                  <p className="font-medium">
-                    {equipoChecklistSeleccionado.nombre_equipo}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Serial</p>
-                  <p className="font-medium">
-                    {equipoChecklistSeleccionado.nro_serie}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Sede</p>
-                  <p className="font-medium">
-                    {equipoChecklistSeleccionado?.sedes}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Responsable del Equipo</p>
-                  <p className="font-medium">
-                    {
-                      equipoChecklistSeleccionado?.estado_ubicacion?.[0]
-                        ?.usuarios?.nombre
-                    }
-                  </p>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500 flex items-center gap-1">
-                    <CalendarIcon className="h-3 w-3" />
-                    Fecha de Ejecución
-                  </p>
-                  <p className="font-medium">
-                    {format(fechaEjecucion, "dd/MM/yyyy HH:mm")}
-                  </p>
-                </div>
-
-                {/* FUTURO: Técnico responsable */}
-                {/* <div>
-              <p className="text-gray-500 flex items-center gap-1">
-                <User className="h-3 w-3" />
-                Técnico Responsable
-              </p>
-              <Select value={tecnicoResponsable} onValueChange={setTecnicoResponsable}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Seleccionar técnico" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tecnicosMock.map((tecnico) => (
-                    <SelectItem key={tecnico.id} value={tecnico.nombre}>
-                      {tecnico.nombre} - {tecnico.especialidad}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div> */}
-              </div>
-            </div>
-          )}
-
-          {/* Lista de Chequeo */}
-          {equipoChecklistSeleccionado && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <h4 className="font-semibold flex items-center">
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  Lista de Chequeo
-                </h4>
-
+              {modoPlantilla && (
                 <div className="flex items-center gap-2 flex-wrap">
-                  {/* Controles de vista */}
                   <div className="flex items-center gap-1 border rounded-lg p-1">
                     <Button
                       type="button"
@@ -275,7 +211,6 @@ export const ListaChequeo = () => {
                     </Button>
                   </div>
 
-                  {/* Selector de columnas (solo para vista grid) */}
                   {tipoVista === "grid" && (
                     <Select
                       value={vistaColumnas}
@@ -327,331 +262,68 @@ export const ListaChequeo = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div className="border rounded-lg p-4 max-h-80 overflow-y-auto">
-                {tipoVista === "grid" ? (
-                  <div
-                    className={`grid gap-3 ${
-                      vistaColumnas === "1"
-                        ? "grid-cols-1"
-                        : vistaColumnas === "2"
-                        ? "grid-cols-1 sm:grid-cols-2"
-                        : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                    }`}
-                  >
-                    {itemsChecklist.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium">
-                              {item.texto}
-                            </span>
-                            {item.personalizado && (
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                Personalizado
-                              </span>
-                            )}
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                              {item.tipo === "checkbox"
-                                ? "Checkbox"
-                                : item.tipo === "numeric"
-                                ? "Numérico"
-                                : "Texto"}
-                            </span>
-                          </div>
-                          {item.personalizado && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => eliminarItemPersonalizado(item.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              ×
-                            </Button>
-                          )}
-                        </div>
-
-                        {/* Campo según el tipo */}
-                        {item.tipo === "checkbox" ? (
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={item.checked || false}
-                              onCheckedChange={() =>
-                                toggleChecklistItem(item.id)
-                              }
-                            />
-                            <span
-                              className={`text-sm ${
-                                item.checked ? "line-through text-gray-500" : ""
-                              }`}
-                            >
-                              Completado
-                            </span>
-                          </div>
-                        ) : item.tipo === "numeric" ? (
-                          <Input
-                            type="number"
-                            placeholder="Ingrese valor numérico"
-                            value={item.valor || ""}
-                            onChange={(e) =>
-                              updateItemValue(item.id, Number(e.target.value))
-                            }
-                            className="w-full"
-                          />
-                        ) : (
-                          <Input
-                            type="text"
-                            placeholder="Ingrese texto"
-                            value={item.valor || ""}
-                            onChange={(e) =>
-                              updateItemValue(item.id, e.target.value)
-                            }
-                            className="w-full"
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {itemsChecklist.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3 hover:bg-gray-50 rounded-lg transition-colors border-b last:border-b-0 space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium">
-                              {item.texto}
-                            </span>
-                            {item.personalizado && (
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                Personalizado
-                              </span>
-                            )}
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                              {item.tipo === "checkbox"
-                                ? "Checkbox"
-                                : item.tipo === "numeric"
-                                ? "Numérico"
-                                : "Texto"}
-                            </span>
-                          </div>
-                          {item.personalizado && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => eliminarItemPersonalizado(item.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              ×
-                            </Button>
-                          )}
-                        </div>
-
-                        {/* Campo según el tipo */}
-                        <div className="ml-0">
-                          {item.tipo === "checkbox" ? (
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={item.checked || false}
-                                onCheckedChange={() =>
-                                  toggleChecklistItem(item.id)
-                                }
-                              />
-                              <span
-                                className={`text-sm ${
-                                  item.checked
-                                    ? "line-through text-gray-500"
-                                    : ""
-                                }`}
-                              >
-                                Completado
-                              </span>
-                            </div>
-                          ) : item.tipo === "numeric" ? (
-                            <Input
-                              type="number"
-                              placeholder="Ingrese valor numérico"
-                              value={item.valor || ""}
-                              onChange={(e) =>
-                                updateItemValue(item.id, Number(e.target.value))
-                              }
-                              className="w-full max-w-xs"
-                            />
-                          ) : (
-                            <Input
-                              type="text"
-                              placeholder="Ingrese texto"
-                              value={item.valor || ""}
-                              onChange={(e) =>
-                                updateItemValue(item.id, e.target.value)
-                              }
-                              className="w-full"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Calificación del Equipo */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label>Calificación del Estado del Equipo</Label>
-                  <Select
-                    value={tipoCalificacion}
-                    onValueChange={(
-                      value: "estrellas" | "escala" | "categorica"
-                    ) => setTipoCalificacion(value)}
-                  >
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="estrellas">
-                        ⭐ Estrellas (1-5)
-                      </SelectItem>
-                      <SelectItem value="escala">🔢 Escala (1-10)</SelectItem>
-                      <SelectItem value="categorica">📋 Categórica</SelectItem>
-                    </SelectContent>
-                  </Select>
+            <div className="border rounded-lg p-4 max-h-80 overflow-y-auto">
+              {tipoVista === "grid" ? (
+                <div
+                  className={`grid gap-3 ${
+                    vistaColumnas === "1"
+                      ? "grid-cols-1"
+                      : vistaColumnas === "2"
+                      ? "grid-cols-1 sm:grid-cols-2"
+                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                  }`}
+                >
+                  {itemsChecklist.map((item) => (
+                    <ChecklistItem
+                      key={item.id}
+                      item={item}
+                      eliminarItemPersonalizado={eliminarItemPersonalizado}
+                      toggleChecklistItem={toggleChecklistItem}
+                      updateItemValue={updateItemValue}
+                      modoPlantilla={modoPlantilla}
+                    />
+                  ))}
                 </div>
+              ) : (
+                <div className="space-y-3">
+                  {itemsChecklist.map((item) => (
+                    <ChecklistItem
+                      key={item.id}
+                      item={item}
+                      eliminarItemPersonalizado={eliminarItemPersonalizado}
+                      toggleChecklistItem={toggleChecklistItem}
+                      updateItemValue={updateItemValue}
+                      modoPlantilla={modoPlantilla}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
 
-                {/* Calificación por Estrellas */}
-                {tipoCalificacion === "estrellas" && (
-                  <div className="flex items-center space-x-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`h-6 w-6 cursor-pointer transition-colors ${
-                          star <= calificacionEquipo
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300 hover:text-yellow-200"
-                        }`}
-                        onClick={() => setCalificacionEquipo(star)}
-                      />
-                    ))}
-                    <span className="ml-2 text-sm text-gray-600">
-                      ({calificacionEquipo} de 5 estrellas)
-                    </span>
-                  </div>
-                )}
-
-                {/* Calificación por Escala 1-10 */}
-                {tipoCalificacion === "escala" && (
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-red-500 font-medium">
-                        1 (Malo)
-                      </span>
-                      <div className="flex-1">
-                        <input
-                          type="range"
-                          min="1"
-                          max="10"
-                          value={calificacionEscala}
-                          onChange={(e) =>
-                            setCalificacionEscala(Number(e.target.value))
-                          }
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                        />
-                      </div>
-                      <span className="text-sm text-green-500 font-medium">
-                        10 (Excelente)
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-lg font-bold text-gray-700">
-                        Calificación: {calificacionEscala}/10
-                      </span>
-                      <span className="block text-sm text-gray-500">
-                        {calificacionEscala <= 3
-                          ? "Malo"
-                          : calificacionEscala <= 7
-                          ? "Regular"
-                          : "Excelente"}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Calificación Categórica */}
-                {tipoCalificacion === "categorica" && (
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-3 gap-2">
-                      {(["malo", "bueno", "excelente"] as const).map(
-                        (categoria) => (
-                          <Button
-                            key={categoria}
-                            type="button"
-                            variant={
-                              calificacionCategorica === categoria
-                                ? "default"
-                                : "outline"
-                            }
-                            onClick={() => setCalificacionCategorica(categoria)}
-                            className={`capitalize ${
-                              calificacionCategorica === categoria
-                                ? categoria === "malo"
-                                  ? "bg-red-500 hover:bg-red-600"
-                                  : categoria === "bueno"
-                                  ? "bg-yellow-500 hover:bg-yellow-600"
-                                  : "bg-green-500 hover:bg-green-600"
-                                : ""
-                            }`}
-                          >
-                            {categoria === "malo"
-                              ? "😞 Malo"
-                              : categoria === "bueno"
-                              ? "😐 Bueno"
-                              : "😄 Excelente"}
-                          </Button>
-                        )
-                      )}
-                    </div>
-                    <div className="text-center text-sm text-gray-600">
-                      Estado seleccionado:{" "}
-                      <span className="font-semibold capitalize">
-                        {calificacionCategorica}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Observaciones */}
-              <div className="space-y-2">
-                <Label>Observaciones</Label>
-                <Textarea
-                  placeholder="Ingrese observaciones adicionales..."
-                  value={observacionesChecklist}
-                  onChange={(e) => setObservacionesChecklist(e.target.value)}
-                  className="min-h-[80px]"
-                />
-              </div>
-
-              {/* Guardar como Plantilla */}
+            {modoPlantilla && (
               <div className="space-y-2">
                 <Label>Guardar como Plantilla</Label>
                 <div className="flex items-center space-x-2">
                   <Input
                     placeholder="Nombre de la plantilla..."
-                    value={nombrePlantilla}
-                    onChange={(e) => setNombrePlantilla(e.target.value)}
+                    value={newCheckList.nombre}
+                    onChange={(e) =>
+                      setNewCheckList({
+                        ...newCheckList,
+                        nombre: e.target.value,
+                      })
+                    }
                     className="flex-1"
                   />
                   <Button
                     type="button"
-                    onClick={guardarPlantilla}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      create(newCheckList);
+                    }}
                     variant="outline"
                     className="flex items-center gap-2"
                   >
@@ -664,27 +336,8 @@ export const ListaChequeo = () => {
                   calificación seleccionado
                 </p>
               </div>
-
-              {/* Botones de Acción */}
-              <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsChecklistDialogOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="button"
-                  onClick={completarChecklist}
-                  className="bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Completar Checklist
-                </Button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
