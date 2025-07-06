@@ -55,6 +55,9 @@ export const useMantenimiento = () => {
     estado: "Pendiente",
     progreso: 0,
     archivosmantenimiento: [],
+    checklist_campos: [],
+    plantilla_id: null,
+    checklist_plantillas: [],
   });
   const [currentTab, setCurrentTab] = useState("equipo");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -231,6 +234,7 @@ export const useMantenimiento = () => {
   };
 
   const onSubmit = async (data: Mantenimiento) => {
+    console.log("onSubmit", data);
     try {
       const response = await create(data);
       if (response.success) {
