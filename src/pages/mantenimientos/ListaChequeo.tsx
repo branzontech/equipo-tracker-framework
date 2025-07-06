@@ -1,15 +1,9 @@
 import {
   ClipboardList,
   Plus,
-  Search,
-  Calendar as CalendarIcon,
-  Building,
-  User,
   Grid3X3,
   List,
-  Star,
   BookOpen,
-  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -31,13 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
-import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useSedes } from "../configuracion/maestros/hooks/use-sedes";
-import { SearchSelect } from "@/components/SearchSelect";
-import { useUser } from "../usuarios/hooks/use-user";
 import React, { useState } from "react";
 import { ChecklistItem } from "../configuracion/checklist/views/CheckListItem";
 import { useChecklist } from "../configuracion/checklist/hooks/use-checklist";
@@ -46,48 +33,24 @@ export const ListaChequeo = () => {
   const [modoPlantilla, setModoPlantilla] = useState(true);
 
   const {
-    handleSearchChecklist,
-    selectEquipoChecklist,
     toggleChecklistItem,
     updateItemValue,
     agregarItemPersonalizado,
     eliminarItemPersonalizado,
-    guardarPlantilla,
-    completarChecklist,
     isChecklistDialogOpen,
     setIsChecklistDialogOpen,
-    equipoChecklistSeleccionado,
-    busquedaChecklist,
-    sedeFilterChecklist,
-    equiposChecklistFiltrados,
-    handleSedeFilterChecklist,
     tipoVista,
     setTipoVista,
     vistaColumnas,
     setVistaColumnas,
-    setTipoCalificacion,
     setTipoNuevoItem,
     tipoNuevoItem,
     nuevoItemPersonalizado,
     setNuevoItemPersonalizado,
     itemsChecklist,
-    tipoCalificacion,
-    calificacionEquipo,
-    calificacionEscala,
-    calificacionCategorica,
-    observacionesChecklist,
-    nombrePlantilla,
-    fechaEjecucion,
-    setCalificacionCategorica,
-    setCalificacionEscala,
-    setCalificacionEquipo,
-    setObservacionesChecklist,
-    setNombrePlantilla,
-    setTecnicoResponsable,
-    setNewMante,
     setItemsChecklist,
   } = useMantenimiento();
-  const { create, checklist, newCheckList, setNewCheckList } = useChecklist();
+  const { create, newCheckList, setNewCheckList } = useChecklist();
 
   const camposPorTipo: Record<"EQUIPO" | "PERIFERICO" | "IMPRESORA", string[]> =
     {
@@ -112,7 +75,7 @@ export const ListaChequeo = () => {
     return campos.map((texto, index) => ({
       id: (index + 1).toString(),
       texto,
-      tipo: "checkbox", // ya toma el tipo correcto
+      tipo: "checkbox",
       checked: false,
       personalizado: false,
     }));
