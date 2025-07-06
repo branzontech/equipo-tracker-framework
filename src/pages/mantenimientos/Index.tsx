@@ -153,7 +153,12 @@ const MantenimientosIndex = () => {
               className="space-y-4 sm:space-y-6 mt-4"
               onSubmit={(e: React.FormEvent) => {
                 e.preventDefault();
-                onSubmit(newMante);
+                const mantenimiento = {
+                  ...newMante,
+                  checklist_campos: itemsChequeo,
+                  plantilla_id: plantillaSeleccionada?.id_plantilla,
+                };
+                onSubmit(mantenimiento);
               }}
             >
               <Tabs
