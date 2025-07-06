@@ -79,7 +79,7 @@ const EjecucionMantenimiento = () => {
                     key={sede.id_sede}
                     value={sede.id_sede.toString()}
                   >
-                    {sede.nombre} - {sede.regional}
+                    {sede.nombre}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -90,10 +90,10 @@ const EjecucionMantenimiento = () => {
               onValueChange={setSelectedSucursal}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Filtrar por Bodega" />
+                <SelectValue placeholder="Filtrar por Sucursal" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las Bodegas</SelectItem>
+                <SelectItem value="all">Todas las Sucursales</SelectItem>
                 {sucursales.map((sucursale) => (
                   <SelectItem
                     key={sucursale.id_sucursal}
@@ -116,7 +116,7 @@ const EjecucionMantenimiento = () => {
                 <TableHead className="text-[#040d50]">Equipo</TableHead>
                 <TableHead className="text-[#040d50]">Tipo</TableHead>
                 <TableHead className="text-[#040d50]">Sede</TableHead>
-                <TableHead className="text-[#040d50]">Bodega</TableHead>
+                <TableHead className="text-[#040d50]">Sucursal</TableHead>
                 <TableHead className="text-[#040d50]">Fecha Inicio</TableHead>
                 <TableHead className="text-[#040d50]">Técnico</TableHead>
                 <TableHead className="text-[#040d50]">Estado</TableHead>
@@ -139,45 +139,53 @@ const EjecucionMantenimiento = () => {
                 </TableRow>
               ) : (
                 [...mantenimientosFiltrados]
-                .sort(
-                  (a, b) =>
-                    new Date(b.fecha_programada).getTime() -
-                    new Date(a.fecha_programada).getTime()
-                )
-                .map((mantenimiento) => (
-                  <TableRow key={mantenimiento.id_mantenimiento}>
-                    <TableCell className="font-medium">
-                      {mantenimiento.equipos?.nombre_equipo || "—"}
-                    </TableCell>
-                    <TableCell>{mantenimiento.tipo}</TableCell>
-                    <TableCell>
-                      {mantenimiento.equipos?.sucursales?.sedes?.nombre || "—"}
-                    </TableCell>
-                    <TableCell>
-                      {mantenimiento.equipos?.sucursales?.nombre || "—"}
-                    </TableCell>
-                    <TableCell>
-                      {formatFecha(mantenimiento.fecha_programada)}
-                    </TableCell>
-                    <TableCell>
-                      {mantenimiento.usuarios?.nombre || "—"}
-                    </TableCell>
-                    <TableCell>
-                      {getEstadoBadge(mantenimiento.estado)}
-                    </TableCell>
-                    <TableCell>{getProgresoBar(mantenimiento.progreso)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-[#040d50]"
-                        onClick={() => navigate(`/mantenimientos/detalles/${mantenimiento.id_mantenimiento}`)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
+                  .sort(
+                    (a, b) =>
+                      new Date(b.fecha_programada).getTime() -
+                      new Date(a.fecha_programada).getTime()
+                  )
+                  .map((mantenimiento) => (
+                    <TableRow key={mantenimiento.id_mantenimiento}>
+                      <TableCell className="font-medium">
+                        {mantenimiento.equipos?.nombre_equipo || "—"}
+                      </TableCell>
+                      <TableCell>{mantenimiento.tipo}</TableCell>
+                      <TableCell>
+                        {mantenimiento.equipos?.estado_ubicacion?.[0]
+                          ?.sucursales?.sedes?.nombre || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {mantenimiento.equipos?.estado_ubicacion?.[0]
+                          ?.sucursales?.nombre || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {formatFecha(mantenimiento.fecha_programada)}
+                      </TableCell>
+                      <TableCell>
+                        {mantenimiento.usuarios?.nombre || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {getEstadoBadge(mantenimiento.estado)}
+                      </TableCell>
+                      <TableCell>
+                        {getProgresoBar(mantenimiento.progreso)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-[#040d50]"
+                          onClick={() =>
+                            navigate(
+                              `/mantenimientos/detalles/${mantenimiento.id_mantenimiento}`
+                            )
+                          }
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
               )}
             </TableBody>
           </Table>
