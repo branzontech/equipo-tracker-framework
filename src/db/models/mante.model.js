@@ -111,6 +111,13 @@ export const manteModel = {
                     },
                   },
                 },
+                usuarios: {
+                  select: {
+                    nombre: true,
+                    rol: true,
+                    id_usuario: true,
+                  },
+                },
               },
             },
           },
@@ -133,6 +140,26 @@ export const manteModel = {
         observaciones_adi: true,
         estado: true,
         progreso: true,
+        checklist_campos: true,
+        checklist_plantillas: {
+          select: {
+            id_plantilla: true,
+            nombre: true,
+            tipo_equipo: true,
+            tipo_calificacion: true,
+            campos: true,
+            creado_por: true,
+            fecha_creacion: true,
+            usuarios: {
+              select: {
+                id_usuario: true,
+                nombre: true,
+                email: true,
+                rol: true,
+              },
+            },
+          },
+        },
       },
       where: {
         id_mantenimiento: id_mantenimiento,
@@ -141,48 +168,60 @@ export const manteModel = {
     return mante;
   },
   async create(data) {
-    const mante = await prisma.mantenimientos.create({
-      data: {
-        equipo_id:
-          data.id_equipo && data.id_equipo > 0 ? data.id_equipo : undefined,
-        id_impresora:
-          data.id_impresora && data.id_impresora > 0
-            ? data.id_impresora
-            : undefined,
-        tecnico_id: data.tecnico_id,
-        fecha_programada: data.fecha_programada,
-        tipo: data.tipo,
-        prioridad: data.prioridad,
-        descripcion: data.descripcion,
-        tiempo_estimado: data.tiempo_estimado,
-        recomendaciones: data.recomendaciones,
-        observaciones_adi: data.observaciones_adi,
-        estado: data.estado,
-        progreso: data.progreso,
-      },
-    });
-
-    // ✅ Actualizar estado del equipo
-    if (data.id_equipo && data.id_equipo > 0) {
-      await prisma.equipos.update({
-        where: { id_equipo: data.id_equipo },
-        data: { estado_actual: "En mantenimiento" },
+    try {
+      const mante = await prisma.mantenimientos.create({
+        data: {
+          equipo_id:
+            data.id_equipo && data.id_equipo > 0 ? data.id_equipo : undefined,
+          impresora_id:
+            data.id_impresora && data.id_impresora > 0
+              ? data.id_impresora
+              : undefined,
+          tecnico_id: data.tecnico_id,
+          fecha_programada: data.fecha_programada,
+          tipo: data.tipo,
+          prioridad: data.prioridad,
+          descripcion: data.descripcion,
+          tiempo_estimado: data.tiempo_estimado,
+          recomendaciones: data.recomendaciones,
+          observaciones_adi: data.observaciones_adi,
+          estado: data.estado,
+          progreso: data.progreso,
+          checklist_campos: data.checklist_campos,
+          plantilla_id:
+            data.plantilla_id && data.plantilla_id > 0
+              ? data.plantilla_id
+              : undefined,
+        },
       });
 
-      await prisma.perifericos.updateMany({
-        where: { equipo_asociado_id: data.id_equipo },
-        data: { estado: "En mantenimiento" },
-      });
+      // ✅ Actualizar estado del equipo
+      if (data.id_equipo && data.id_equipo > 0) {
+        await prisma.estado_ubicacion.updateMany({
+          where: { equipo_id: data.id_equipo },
+          data: {
+            estado_actual: "En mantenimiento",
+          },
+        });
+
+        await prisma.perifericos.updateMany({
+          where: { equipo_asociado_id: data.id_equipo },
+          data: { estado: "En mantenimiento" },
+        });
+      }
+
+      // ✅ Actualizar estado de la impresora
+      if (data.id_impresora && data.id_impresora > 0) {
+        await prisma.impresoras.update({
+          where: { id_impresora: data.id_impresora },
+          data: { estado_actual: "En mantenimiento" },
+        });
+      }
+      return mante;
+    } catch (error) {
+      console.log(error);
+      throw error("Error al crear mantenimiento", error);
     }
-
-    // ✅ Actualizar estado de la impresora
-    if (data.id_impresora && data.id_impresora > 0) {
-      await prisma.impresoras.update({
-        where: { id_impresora: data.id_impresora },
-        data: { estado_actual: "En mantenimiento" },
-      });
-    }
-    return mante;
   },
   async updateStatus(id, status) {
     const id_mantenimiento = Number(id);
