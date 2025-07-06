@@ -1,3 +1,4 @@
+import { Checklist } from "@/pages/configuracion/checklist/interface/checklist";
 import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
 import { Equipo } from "@/pages/productos/interfaces/equipo";
 
@@ -18,6 +19,9 @@ export interface Mantenimiento {
   observaciones_adi: string;
   estado: string;
   progreso: number;
+  plantilla_id: number;
+  checklist_plantillas: Checklist;
+  checklist_campos: string[];
 
   archivosmantenimiento: {
     id_archivo: number;
