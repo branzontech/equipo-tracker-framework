@@ -291,12 +291,8 @@ export const manteModel = {
       plantillaId,
       tecnicoId,
       respuestas,
-      calificacion,
-      observaciones,
       fechaRealizacion,
     } = data;
-
-    console.log("saveResponse", data);
 
     try {
       const existingResponse = await prisma.checklist_respuestas.findFirst({
@@ -310,8 +306,6 @@ export const manteModel = {
           data: {
             plantilla_id: plantillaId,
             respuestas,
-            calificacion,
-            observaciones,
             fecha_realizacion: fechaRealizacion ?? new Date(),
           },
         });
@@ -328,6 +322,72 @@ export const manteModel = {
           fecha_realizacion: fechaRealizacion ?? new Date(),
         },
       });
+    } catch (error) {
+      console.error("Error al guardar el response:", error);
+      throw new Error("Error al guardar el response");
+    }
+  },
+  async finalizeChecklistResponse(data) {
+    const { mantenimientoId, observaciones, calificacion, fechaRealizacion } =
+      data;
+
+    try {
+      const existingResponse = await prisma.checklist_respuestas.findFirst({
+        where: { mantenimiento_id: mantenimientoId },
+        orderBy: { fecha_realizacion: "desc" },
+      });
+
+      if (!existingResponse) {
+        throw new Error(
+          "No existe una respuesta previa para este mantenimiento"
+        );
+      }
+
+      const updateResponse = await prisma.checklist_respuestas.update({
+        where: { id_respuesta: existingResponse.id_respuesta },
+        data: {
+          observaciones,
+          calificacion,
+          fecha_realizacion: fechaRealizacion ?? new Date(),
+        },
+      });
+
+      const mante = await prisma.mantenimientos.findUnique({
+        where: { id_mantenimiento: mantenimientoId },
+        include: {
+          equipos: true,
+          checklist_plantillas: true,
+        },
+      });
+
+      if (!mante?.equipos) {
+        throw new Error("No se encontró el equipo del mantenimiento");
+      }
+
+      // Lógica adaptable por tipo de calificación
+      let nuevoEstado = "Activo";
+
+      const tipo = mante.checklist_plantillas?.tipo_calificacion;
+
+      if (tipo === "ESTRELLAS") {
+        if (calificacion <= 2) nuevoEstado = "Fuera de servicio";
+      } else if (tipo === "ESCALA") {
+        if (calificacion <= 3) nuevoEstado = "Fuera de servicio";
+      } else if (tipo === "CATEGORIA") {
+        if (calificacion === 1) nuevoEstado = "Fuera de servicio";
+      }
+
+      await prisma.estado_ubicacion.updateMany({
+        where: { equipo_id: mante.equipos.id_equipo },
+        data: { estado_actual: nuevoEstado },
+      });
+
+      await prisma.mantenimientos.update({
+        where: { id_mantenimiento: mantenimientoId },
+        data: { estado: "Finalizado", fecha_realizada: new Date() },
+      });
+
+      return updateResponse;
     } catch (error) {
       console.error("Error al guardar el response:", error);
       throw new Error("Error al guardar el response");
