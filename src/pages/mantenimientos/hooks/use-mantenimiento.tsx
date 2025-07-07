@@ -57,7 +57,7 @@ export const useMantenimiento = () => {
     archivosmantenimiento: [],
     checklist_campos: [],
     plantilla_id: null,
-    checklist_plantillas: [],
+    checklist_plantillas: null,
   });
   const [currentTab, setCurrentTab] = useState("equipo");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -140,7 +140,7 @@ export const useMantenimiento = () => {
           fechaProgramada.getUTCFullYear() === hoy.getUTCFullYear();
 
         if (esHoy && mantenimiento.estado === "Pendiente") {
-          updateStatus(mantenimiento.id_mantenimiento, "iniciado");
+          updateStatus(mantenimiento.id_mantenimiento, "Iniciado");
         }
 
         const yaPaso = fechaProgramada < hoy;
@@ -521,7 +521,7 @@ export const useMantenimiento = () => {
             Pausado
           </Badge>
         );
-      case "finalizado":
+      case "Finalizado":
         return (
           <Badge
             variant="outline"
@@ -531,7 +531,7 @@ export const useMantenimiento = () => {
             Finalizado
           </Badge>
         );
-      case "iniciado":
+      case "Iniciado":
         return (
           <Badge
             variant="outline"
@@ -769,7 +769,6 @@ export const useMantenimiento = () => {
       fechaCreacion: new Date(),
     };
 
-    // Aquí guardarías la plantilla en localStorage o base de datos
     console.log("Plantilla guardada:", plantilla);
     toast.success(`Plantilla "${nombrePlantilla}" guardada exitosamente`);
     setNombrePlantilla("");
@@ -825,7 +824,27 @@ export const useMantenimiento = () => {
     }
   };
 
+  const uniqueResponsables = Array.from(
+    new Set(mantenimientos.map((item) => item.usuarios?.nombre).filter(Boolean))
+  );
+
+  const uniqueEstados = Array.from(
+    new Set(mantenimientos.map((item) => item.estado).filter(Boolean))
+  );
+
+  const filteredMantenimientos = mantenimientos.filter((mantenimiento) => {
+    const fecha = new Date(mantenimiento.fecha_programada);
+
+    const cumpleDesde = !filtroFechaDesde || fecha >= filtroFechaDesde;
+    const cumpleHasta = !filtroFechaHasta || fecha <= filtroFechaHasta;
+
+    return cumpleDesde && cumpleHasta;
+  });
+
   return {
+    filteredMantenimientos,
+    uniqueResponsables,
+    uniqueEstados,
     downloadFile,
     openFileInNewTab,
     upload,
