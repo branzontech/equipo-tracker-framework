@@ -5,7 +5,6 @@ import {
   Calendar as CalendarIcon,
   FileText,
   Paperclip,
-  Upload,
   X,
 } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
@@ -14,7 +13,6 @@ import {
   Form,
   FormControl,
   FormDescription,
-  FormLabel,
 } from "@/components/ui/form";
 import {
   Select,
@@ -42,7 +40,7 @@ import { useTipos } from "@/pages/configuracion/maestros/hooks/use-tipos";
 import { useEstado } from "@/pages/configuracion/maestros/hooks/use-estado";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SearchSelect } from "@/components/SearchSelect";
 import { useUser } from "@/pages/usuarios/hooks/use-user";
 import { useProveedor } from "@/pages/configuracion/maestros/hooks/use-proveedor";
@@ -64,8 +62,6 @@ const IngresoProducto = () => {
     handleResponsable,
     sugerenciasResponsable,
     setSugerenciasResponsable,
-    archivosEquipo,
-    handleArchivosChange,
   } = useEquipos();
   const {
     handleNombreInput,
