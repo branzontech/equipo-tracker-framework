@@ -22,4 +22,13 @@ export const manteService = {
   async delete(id) {
     return await manteModel.delete(id);
   },
+  async actualizarProgreso(id, progreso) {
+    return await manteModel.actualizarProgreso(id, progreso);
+  },
+  async saveResponse(id, respuestas) {
+    return await manteModel.saveResponse(id, respuestas);
+  },
+  async getCheckListResponses(id) {
+    return await manteModel.getCheckListResponses(id);
+  },
 };
