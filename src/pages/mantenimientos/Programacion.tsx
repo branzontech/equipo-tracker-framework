@@ -2,12 +2,8 @@
 import {
   Calendar,
   ChevronLeft,
-  Plus,
   Filter,
   Search,
-  ListFilter,
-  CheckSquare,
-  Square,
   GripVertical,
   X,
   Search as SearchIcon,
@@ -30,42 +26,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useForm } from "react-hook-form";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
+import { useGlobal } from "@/hooks/use-global";
+import { Label } from "@/components/ui/label";
 
 const ProgramacionMantenimiento = () => {
   const {
@@ -94,8 +69,12 @@ const ProgramacionMantenimiento = () => {
     setFiltroFechaHasta,
     tipoMantenimiento,
     setTipoMantenimiento,
+    uniqueResponsables,
+    uniqueEstados,
+    filteredMantenimientos
   } = useMantenimiento();
   const navigate = useNavigate();
+  const { formatFecha } = useGlobal();
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -149,15 +128,6 @@ const ProgramacionMantenimiento = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filtros Avanzados
             </Button>
-
-            <Button
-              variant="default"
-              onClick={handleSearch}
-              className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]"
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Buscar
-            </Button>
           </div>
 
           <Collapsible
@@ -165,49 +135,46 @@ const ProgramacionMantenimiento = () => {
             onOpenChange={setShowAdvancedFilters}
           >
             <CollapsibleContent className="pt-3 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div>
-                  <FormLabel>Responsable</FormLabel>
+                  <Label>Responsable</Label>
                   <Select
-                    value={filtroResponsable}
+                    value={filtroResponsable || ""}
                     onValueChange={setFiltroResponsable}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Filtrar por responsable" />
+                      <SelectValue placeholder="Seleccione un responsable" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="Juan Pérez">Juan Pérez</SelectItem>
-                      <SelectItem value="María López">María López</SelectItem>
-                      <SelectItem value="Carlos Gómez">Carlos Gómez</SelectItem>
-                      <SelectItem value="Ana Martínez">Ana Martínez</SelectItem>
-                      <SelectItem value="Pedro Sánchez">
-                        Pedro Sánchez
-                      </SelectItem>
+                      <SelectItem value="all">Todos</SelectItem>{" "}
+                      {uniqueResponsables.map((responsable) => (
+                        <SelectItem key={responsable} value={responsable}>
+                          {responsable}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <FormLabel>Estado</FormLabel>
+                  <Label>Estado</Label>
                   <Select value={filtroEstado} onValueChange={setFiltroEstado}>
                     <SelectTrigger>
                       <SelectValue placeholder="Filtrar por estado" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="Pendiente">Pendiente</SelectItem>
-                      <SelectItem value="Programado">Programado</SelectItem>
-                      <SelectItem value="En Progreso">En Progreso</SelectItem>
-                      <SelectItem value="Completado">Completado</SelectItem>
+                      <SelectItem value="all">Todos</SelectItem>{" "}
+                      {uniqueEstados.map((estado) => (
+                        <SelectItem key={estado} value={estado}>
+                          {estado}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <FormLabel>Fecha desde</FormLabel>
+                  <Label>Fecha desde</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -233,7 +200,7 @@ const ProgramacionMantenimiento = () => {
                 </div>
 
                 <div>
-                  <FormLabel>Fecha hasta</FormLabel>
+                  <Label>Fecha hasta</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -842,9 +809,7 @@ const ProgramacionMantenimiento = () => {
                                 column.accessor === "fecha_programada" &&
                                 typeof value === "string"
                               ) {
-                                content = new Date(value).toLocaleDateString(
-                                  "es-CO"
-                                );
+                                content = formatFecha(value);
                               } else {
                                 content = value;
                               }
