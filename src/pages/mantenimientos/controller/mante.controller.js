@@ -80,14 +80,7 @@ export const actualizarProgreso = async (req, res) => {
 
 export const saveResponse = async (req, res) => {
   const { id } = req.params;
-  const {
-    plantillaId,
-    tecnicoId,
-    respuestas,
-    calificacion,
-    observaciones,
-    fechaRealizacion,
-  } = req.body;
+  const { plantillaId, tecnicoId, respuestas, fechaRealizacion } = req.body;
 
   try {
     const mante = await manteService.saveResponse({
@@ -95,8 +88,6 @@ export const saveResponse = async (req, res) => {
       plantillaId,
       tecnicoId,
       respuestas,
-      calificacion,
-      observaciones,
       fechaRealizacion: fechaRealizacion
         ? new Date(fechaRealizacion)
         : undefined,
@@ -116,5 +107,22 @@ export const getCheckListResponses = async (req, res) => {
     res.status(200).json(responses);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener las respuestas" });
+  }
+};
+
+export const finalizeChecklistResponse = async (req, res) => {
+  const { id } = req.params;
+  const { observaciones, calificacion, fechaRealizacion } = req.body;
+  try {
+    const mante = await manteService.finalizeChecklistResponse({
+      mantenimientoId: Number(id),
+      observaciones,
+      calificacion,
+      fechaRealizacion,
+    });
+
+    res.status(200).json({ success: true, mante });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
