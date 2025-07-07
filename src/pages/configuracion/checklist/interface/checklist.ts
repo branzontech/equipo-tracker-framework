@@ -10,3 +10,13 @@ export interface Checklist {
     nombre: string;
   };
 }
+
+export interface ChecklistRespuestaData {
+  mantenimientoId: number;
+  plantillaId?: number;
+  tecnicoId?: number;
+  respuestas: Record<string, boolean>;
+  calificacion?: number;
+  observaciones?: string;
+  fechaRealizacion?: Date;
+}
