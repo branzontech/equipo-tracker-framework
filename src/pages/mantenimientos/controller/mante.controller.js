@@ -66,3 +66,55 @@ export const delete_ = async (req, res) => {
     res.status(500).json({ error: "Error al eliminar la mantenimiento" });
   }
 };
+
+export const actualizarProgreso = async (req, res) => {
+  const { id } = req.params;
+  const { progreso } = req.body;
+  try {
+    const mante = await manteService.actualizarProgreso(id, progreso);
+    res.status(200).json({ success: true, mante });
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar el progreso" });
+  }
+};
+
+export const saveResponse = async (req, res) => {
+  const { id } = req.params;
+  const {
+    plantillaId,
+    tecnicoId,
+    respuestas,
+    calificacion,
+    observaciones,
+    fechaRealizacion,
+  } = req.body;
+
+  try {
+    const mante = await manteService.saveResponse({
+      mantenimientoId: Number(id),
+      plantillaId,
+      tecnicoId,
+      respuestas,
+      calificacion,
+      observaciones,
+      fechaRealizacion: fechaRealizacion
+        ? new Date(fechaRealizacion)
+        : undefined,
+    });
+
+    res.status(200).json({ success: true, mante });
+  } catch (error) {
+    console.error("Error al guardar el response:", error);
+    res.status(500).json({ error: "Error al guardar el response" });
+  }
+};
+
+export const getCheckListResponses = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const responses = await manteService.getCheckListResponses(id);
+    res.status(200).json(responses);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener las respuestas" });
+  }
+};
