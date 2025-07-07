@@ -11,6 +11,7 @@ import {
   actualizarProgreso,
   saveResponse,
   getCheckListResponses,
+  finalizeChecklistResponse
 } from "../../pages/mantenimientos/controller/mante.controller.js";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -25,6 +26,7 @@ router
   .delete("/delete/:id", delete_)
   .put("/actualizar-progreso/:id", actualizarProgreso)
   .put("/save-response/:id", saveResponse)
-  .get("/get-checklist-responses/:id", getCheckListResponses);
+  .get("/get-checklist-responses/:id", getCheckListResponses)
+  .put("/finalize-checklist-response/:id", finalizeChecklistResponse);
 
 export default router;

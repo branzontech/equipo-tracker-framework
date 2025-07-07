@@ -31,4 +31,7 @@ export const manteService = {
   async getCheckListResponses(id) {
     return await manteModel.getCheckListResponses(id);
   },
+  async finalizeChecklistResponse(data) {
+    return await manteModel.finalizeChecklistResponse(data);
+  },
 };
