@@ -4,13 +4,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMantenimiento } from "./hooks/use-mantenimiento";
 import {
-  Calendar,
   User,
   ClipboardList,
   Upload,
   Loader,
-  Activity,
-  MapPin,
   ArrowLeft,
   Paperclip,
   FileText,
@@ -21,30 +18,20 @@ import {
   Clock,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useGlobal } from "@/hooks/use-global";
-import { ListaChequeo } from "./ListaChequeo";
-import { format } from "date-fns";
-import { actualizarProgreso, getCheckListResponses, saveResponse } from "@/api/axios/mante.api";
+import {
+  actualizarProgreso,
+  getCheckListResponses,
+  saveResponse,
+} from "@/api/axios/mante.api";
+import { Textarea } from "@/components/ui/textarea";
+import { useChecklist } from "../configuracion/checklist/hooks/use-checklist";
+import { toast } from "sonner";
+import { icons } from "@/components/interfaces/icons";
 
 const Labels = ({ icon: Icon, text }: { icon: any; text: string }) => (
   <h3 className="flex items-center gap-2 font-semibold text-lg text-gray-800">
@@ -59,36 +46,43 @@ const MantenimientoDetalle = () => {
     newMante,
     getInfoById,
     setNewMante,
-    update,
     upload,
-    tipoCalificacion,
-    setTipoCalificacion,
-    calificacionEquipo,
-    setCalificacionEquipo,
-    calificacionEscala,
-    setCalificacionEscala,
     calificacionCategorica,
     setCalificacionCategorica,
     getEstadoBadge,
   } = useMantenimiento();
+  const {
+    checklistData,
+    setChecklistData,
+    finalizarChecklist,
+    checklistCompleted,
+    setChecklistCompleted,
+  } = useChecklist();
   const { formatFecha } = useGlobal();
   const navigate = useNavigate();
-  const [newEstado, setNewEstado] = useState("");
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await getInfoById(id); 
+        await getInfoById(id);
 
-        const response = await getCheckListResponses(id); 
-        console.log("response", response);
+        const response = await getCheckListResponses(id);
         if (response?.length > 0 && response[0]?.respuestas) {
           const seleccionados = Object.entries(response[0].respuestas)
-            .filter(([campo, completado]) => completado)
+            .filter(([, completado]) => completado)
             .map(([campo]) => campo);
 
-          setCheckedItems(seleccionados); // Actualiza los checkboxes completados
+          setCheckedItems(seleccionados);
+
+          const { observaciones, calificacion } = response[0];
+          setChecklistData({
+            ...checklistData,
+            observaciones: observaciones ?? "",
+            calificacion: calificacion ?? null,
+          });
+
+          setChecklistCompleted(Boolean(calificacion));
         }
       } catch (error) {
         console.error("Error cargando datos del mantenimiento:", error);
@@ -136,13 +130,31 @@ const MantenimientoDetalle = () => {
         plantillaId: newMante.checklist_plantillas?.id_plantilla,
         tecnicoId: newMante.tecnico_id,
         respuestas,
-        calificacion: null,
-        observaciones: "",
       });
 
       return nuevosSeleccionados;
     });
   };
+
+  const completeChecklist = () => {
+    if (checklistData.calificacion === undefined) {
+      toast.error("Debe seleccionar una calificación antes de finalizar.", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    finalizarChecklist(
+      checklistData.calificacion,
+      checklistData.observaciones ?? "",
+      new Date(),
+      newMante.id_mantenimiento
+    );
+  };
+
+  const isChecklistCompleto =
+    (newMante?.checklist_campos?.length ?? 0) > 0 &&
+    newMante.checklist_campos.some((campo) => checkedItems.includes(campo));
 
   return (
     <>
@@ -257,118 +269,6 @@ const MantenimientoDetalle = () => {
                 <p className="font-medium">{getEstadoBadge(newMante.estado)}</p>
               </div>
             </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <Label className="text-base font-medium">
-                Calificación del Estado del Equipo
-              </Label>
-
-              {/* Calificación por Estrellas */}
-              {newMante.checklist_plantillas?.tipo_calificacion ===
-                "ESTRELLAS" && (
-                <div className="flex items-center space-x-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`h-6 w-6 cursor-pointer transition-colors ${
-                        star <= calificacionEquipo
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300 hover:text-yellow-200"
-                      }`}
-                      onClick={() => setCalificacionEquipo(star)}
-                    />
-                  ))}
-                  <span className="ml-2 text-sm text-gray-600">
-                    ({calificacionEquipo} de 5 estrellas)
-                  </span>
-                </div>
-              )}
-
-              {/* Calificación por Escala 1-10 */}
-              {newMante.checklist_plantillas?.tipo_calificacion ===
-                "ESCALA" && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-red-500 font-medium">
-                      1 (Malo)
-                    </span>
-                    <div className="flex-1">
-                      <input
-                        type="range"
-                        min="1"
-                        max="10"
-                        value={calificacionEscala}
-                        onChange={(e) =>
-                          setCalificacionEscala(Number(e.target.value))
-                        }
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                      />
-                    </div>
-                    <span className="text-sm text-green-500 font-medium">
-                      10 (Excelente)
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-lg font-bold text-gray-700">
-                      Calificación: {calificacionEscala}/10
-                    </span>
-                    <span className="block text-sm text-gray-500">
-                      {calificacionEscala <= 3
-                        ? "Malo"
-                        : calificacionEscala <= 7
-                        ? "Regular"
-                        : "Excelente"}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Calificación Categórica */}
-              {newMante.checklist_plantillas?.tipo_calificacion ===
-                "CATEGORIA" && (
-                <div className="space-y-2">
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["malo", "bueno", "excelente"] as const).map(
-                      (categoria) => (
-                        <Button
-                          key={categoria}
-                          type="button"
-                          variant={
-                            calificacionCategorica === categoria
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() => setCalificacionCategorica(categoria)}
-                          className={`capitalize ${
-                            calificacionCategorica === categoria
-                              ? categoria === "malo"
-                                ? "bg-red-500 hover:bg-red-600"
-                                : categoria === "bueno"
-                                ? "bg-yellow-500 hover:bg-yellow-600"
-                                : "bg-green-500 hover:bg-green-600"
-                              : ""
-                          }`}
-                        >
-                          {categoria === "malo"
-                            ? "😞 Malo"
-                            : categoria === "bueno"
-                            ? "😐 Bueno"
-                            : "😄 Excelente"}
-                        </Button>
-                      )
-                    )}
-                  </div>
-                  <div className="text-center text-sm text-gray-600">
-                    Estado seleccionado:{" "}
-                    <span className="font-semibold capitalize">
-                      {calificacionCategorica}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
           <Separator />
@@ -399,14 +299,17 @@ const MantenimientoDetalle = () => {
 
           <Separator />
 
-          <section className="space-y-4">
-            <Labels icon={ClipboardList} text="Checklist registrado" />
+          <section className="space-y-4 rounded-lg border bg-gray-50 p-6">
+            <Labels
+              icon={ClipboardList}
+              text={`Checklist de la plantilla - ${newMante.checklist_plantillas?.nombre}`}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {newMante?.checklist_campos?.map((campo, index) => (
                 <div
                   key={index}
-                  className="rounded-lg border p-4 space-y-2 bg-white shadow-sm"
+                  className="rounded-md border bg-white p-4 space-y-2 shadow-sm"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{campo}</span>
@@ -416,7 +319,11 @@ const MantenimientoDetalle = () => {
                     <input
                       type="checkbox"
                       checked={checkedItems.includes(campo)}
-                      onChange={() => toggleChecklistItem(campo)}
+                      onChange={() => {
+                        if (checklistCompleted) return;
+                        toggleChecklistItem(campo);
+                      }}
+                      disabled={checklistCompleted}
                     />
                     <span
                       className={`text-sm ${
@@ -431,144 +338,301 @@ const MantenimientoDetalle = () => {
                 </div>
               ))}
             </div>
-          </section>
 
-          <Separator />
-
-          <div className="flex flex-wrap justify-end gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Loader className="w-4 h-4" />
-                  Actualizar Estado
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Actualizar Estado</DialogTitle>
-                  <DialogDescription>
-                    Selecciona un nuevo estado para este mantenimiento.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <Select
-                  value={newEstado}
-                  onValueChange={(value) => setNewEstado(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pendiente">Pendiente</SelectItem>
-                    <SelectItem value="en_proceso">En proceso</SelectItem>
-                    <SelectItem value="finalizado">Finalizado</SelectItem>
-                    <SelectItem value="cancelado">Cancelado</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <div className="flex justify-end mt-4">
-                  <Button
-                    disabled={!newEstado}
-                    onClick={() => {
-                      setNewMante({ ...newMante, estado: newEstado });
-                      update(newMante.id_mantenimiento, newEstado);
-                    }}
-                  >
-                    Guardar
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <section className="space-y-4">
-            <Label className="text-base font-medium">Adjuntar documentos</Label>
-            <div className="border border-dashed border-gray-300 rounded-xl p-6 bg-slate-50 relative">
-              <div className="flex flex-col items-center justify-center gap-3 text-center">
-                <Paperclip className="h-8 w-8 text-slate-400" />
-                <p className="text-sm text-slate-600">
-                  Arrastra y suelta archivos aquí o
-                  <label
-                    htmlFor="documentos"
-                    className="text-blue-600 cursor-pointer font-semibold ml-1"
-                  >
-                    haz clic para seleccionarlos
-                  </label>
-                </p>
-                <Input
-                  id="documentos"
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
-                  className="hidden"
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []).map(
-                      (file) => ({
-                        ...file,
-                        nombre_archivo: file.name,
-                        tipo_archivo: file.type,
-                      })
-                    );
-                    if (files.length > 0) {
-                      setNewMante((prev) => ({
+            {isChecklistCompleto && (
+              <div className="mt-6 space-y-6">
+                <div className="space-y-2">
+                  <Label>Observaciones</Label>
+                  <Textarea
+                    placeholder="Ingrese observaciones adicionales..."
+                    value={checklistData.observaciones}
+                    onChange={(e) =>
+                      setChecklistData((prev) => ({
                         ...prev,
-                        archivosmantenimiento: files,
-                      }));
+                        observaciones: e.target.value,
+                      }))
                     }
-                  }}
-                />
-              </div>
-            </div>
-            {newMante.archivosmantenimiento?.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <Label className="text-sm">Archivos seleccionados</Label>
+                    className="min-h-[80px]"
+                    readOnly={checklistCompleted}
+                  />
+                </div>
 
-                {newMante.archivosmantenimiento.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between border rounded-md p-3 bg-white"
-                  >
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <FileText className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm truncate">
-                        {file.nombre_archivo}
+                <div className="space-y-4">
+                  <Label>Calificación del Estado del Equipo</Label>
+                  {newMante.checklist_plantillas?.tipo_calificacion ===
+                    "ESTRELLAS" && (
+                    <div className="flex items-center space-x-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-6 w-6 cursor-pointer transition-colors ${
+                            star <= (checklistData.calificacion ?? 0)
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300 hover:text-yellow-200"
+                          }${
+                            !checklistCompleted
+                              ? "cursor-pointer hover:text-yellow-200"
+                              : "cursor-not-allowed"
+                          }`}
+                          onClick={() =>
+                            setChecklistData((prev) => ({
+                              ...prev,
+                              calificacion: star,
+                            }))
+                          }
+                        />
+                      ))}
+                      <span className="ml-2 text-sm text-gray-600">
+                        ({checklistData.calificacion ?? 0} de 5 estrellas)
                       </span>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => {
-                        const newFiles = newMante.archivosmantenimiento.filter(
-                          (_, i) => i !== index
-                        );
-                        setNewMante((prev) => ({
-                          ...prev,
-                          archivosmantenimiento: newFiles,
-                        }));
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  onClick={() =>
-                    upload(
-                      newMante.id_mantenimiento,
-                      newMante.archivosmantenimiento
-                    )
-                  }
-                  className="mt-10 w-full"
-                >
-                  <Upload className="w-4 h-4" />
-                  Subir Archivos
-                </Button>
+                  )}
+                  {/* Calificación por Escala 1-10 */}
+                  {newMante.checklist_plantillas?.tipo_calificacion ===
+                    "ESCALA" && (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-red-500 font-medium">
+                          1 (Malo)
+                        </span>
+                        <div className="flex-1">
+                          <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={checklistData.calificacion ?? 1}
+                            onChange={(e) =>
+                              setChecklistData((prev) => ({
+                                ...prev,
+                                calificacion: Number(e.target.value),
+                              }))
+                            }
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            disabled={checklistCompleted}
+                          />
+                        </div>
+                        <span className="text-sm text-green-500 font-medium">
+                          10 (Excelente)
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-lg font-bold text-gray-700">
+                          Calificación: {checklistData.calificacion ?? 1}/10
+                        </span>
+                        <span className="block text-sm text-gray-500">
+                          {(checklistData.calificacion ?? 1) <= 3
+                            ? "Malo"
+                            : (checklistData.calificacion ?? 1) <= 7
+                            ? "Regular"
+                            : "Excelente"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {newMante.checklist_plantillas?.tipo_calificacion ===
+                    "CATEGORIA" && (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        {(["malo", "bueno", "excelente"] as const).map(
+                          (categoria, index) => (
+                            <Button
+                              key={categoria}
+                              type="button"
+                              variant={
+                                calificacionCategorica === categoria
+                                  ? "default"
+                                  : "outline"
+                              }
+                              onClick={() => {
+                                if (checklistCompleted) return;
+                                setCalificacionCategorica(categoria);
+                                setChecklistData((prev) => ({
+                                  ...prev,
+                                  calificacion: index + 1,
+                                }));
+                              }}
+                              disabled={checklistCompleted}
+                              className={`capitalize ${
+                                calificacionCategorica === categoria
+                                  ? categoria === "malo"
+                                    ? "bg-red-500 hover:bg-red-600"
+                                    : categoria === "bueno"
+                                    ? "bg-yellow-500 hover:bg-yellow-600"
+                                    : "bg-green-500 hover:bg-green-600"
+                                  : ""
+                              }`}
+                            >
+                              {categoria === "malo"
+                                ? "😞 Malo"
+                                : categoria === "bueno"
+                                ? "😐 Bueno"
+                                : "😄 Excelente"}
+                            </Button>
+                          )
+                        )}
+                      </div>
+                      <div className="text-center text-sm text-gray-600">
+                        Estado seleccionado:{" "}
+                        <span className="font-semibold capitalize">
+                          {calificacionCategorica}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-right">
+                  <Button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      completeChecklist();
+                    }}
+                    disabled={checklistCompleted || !isChecklistCompleto}
+                  >
+                    Guardar checklist
+                  </Button>
+                </div>
               </div>
             )}
           </section>
+
+          {!checklistCompleted && (
+            <>
+              <Separator />
+              <section className="space-y-4">
+                <Label className="text-base font-medium">
+                  Adjuntar documentos
+                </Label>
+                <div
+                  className="border border-dashed border-gray-300 rounded-xl p-6 bg-slate-50 relative"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    const files = Array.from(e.dataTransfer.files || []);
+
+                    const archivosConvertidos = await Promise.all(
+                      files.map(
+                        (file) =>
+                          new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              resolve({
+                                nombre_archivo: file.name,
+                                tipo_archivo: file.type,
+                                contenido: reader.result as string,
+                              });
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                          })
+                      )
+                    );
+
+                    const nuevosArchivos = archivosConvertidos as {
+                      nombre_archivo: string;
+                      tipo_archivo: string;
+                      contenido: string;
+                    }[];
+
+                    setNewMante((prev) => ({
+                      ...prev,
+                      archivosmantenimiento: [
+                        ...(prev.archivosmantenimiento || []),
+                        ...nuevosArchivos,
+                      ],
+                    }));
+                  }}
+                >
+                  <div className="flex flex-col items-center justify-center gap-3 text-center">
+                    <Paperclip className="h-8 w-8 text-slate-400" />
+                    <p className="text-sm text-slate-600">
+                      Arrastra y suelta archivos aquí o
+                      <label
+                        htmlFor="documentos"
+                        className="text-blue-600 cursor-pointer font-semibold ml-1"
+                      >
+                        haz clic para seleccionarlos
+                      </label>
+                    </p>
+                    <Input
+                      id="documentos"
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []).map(
+                          (file) => ({
+                            ...file,
+                            nombre_archivo: file.name,
+                            tipo_archivo: file.type,
+                          })
+                        );
+                        if (files.length > 0) {
+                          setNewMante((prev) => ({
+                            ...prev,
+                            archivosmantenimiento: files,
+                          }));
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                {newMante.archivosmantenimiento?.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <Label className="text-sm">Archivos seleccionados</Label>
+
+                    {newMante.archivosmantenimiento.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between border rounded-md p-3 bg-white"
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <FileText className="h-4 w-4 text-blue-500" />
+                          <span className="text-sm truncate">
+                            {file.nombre_archivo}
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => {
+                            const newFiles =
+                              newMante.archivosmantenimiento.filter(
+                                (_, i) => i !== index
+                              );
+                            setNewMante((prev) => ({
+                              ...prev,
+                              archivosmantenimiento: newFiles,
+                            }));
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        upload(
+                          newMante.id_mantenimiento,
+                          newMante.archivosmantenimiento
+                        )
+                      }
+                      className="mt-10 w-full"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Subir Archivos
+                    </Button>
+                  </div>
+                )}
+              </section>
+            </>
+          )}
         </CardContent>
       </Card>
     </>
