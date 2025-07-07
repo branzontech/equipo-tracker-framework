@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Checklist } from "../interface/checklist";
+import { Checklist, ChecklistRespuestaData } from "../interface/checklist";
 import { createChecklist, getChecklist } from "@/api/axios/checklist.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import Cookies from "js-cookie";
+import { finalizeChecklistResponse } from "@/api/axios/mante.api";
 
 export const useChecklist = () => {
   const [checklist, setChecklist] = useState<Checklist[]>([]);
@@ -11,7 +12,7 @@ export const useChecklist = () => {
     id_plantilla: 0,
     nombre: "",
     tipo_equipo: "",
-    tipo_calificacion: "ESTRELLAS",
+    tipo_calificacion: undefined,
     campos: [],
     creado_por: "",
     usuarios: {
@@ -19,6 +20,16 @@ export const useChecklist = () => {
       nombre: "",
     },
   });
+  const [checklistData, setChecklistData] = useState<ChecklistRespuestaData>({
+    mantenimientoId: 0,
+    plantillaId: 0,
+    tecnicoId: 0,
+    respuestas: {},
+    calificacion: undefined,
+    observaciones: "",
+    fechaRealizacion: undefined,
+  });
+  const [checklistCompleted, setChecklistCompleted] = useState(false);
 
   useEffect(() => {
     const fetchChecklist = async () => {
@@ -51,10 +62,44 @@ export const useChecklist = () => {
     }
   };
 
+  const finalizarChecklist = async (
+    calificacion: number,
+    observaciones: string,
+    fechaRealizacion: Date,
+    mantenimientoId: number
+  ) => {
+    const data = {
+      mantenimientoId,
+      observaciones,
+      calificacion,
+      fechaRealizacion,
+    };
+
+    const res = await finalizeChecklistResponse(data);
+
+    if (res.success) {
+      toast.success("Checklist finalizada correctamente", {
+        icon: icons.success,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    } else {
+      toast.error("Error al guardar la respuesta", {
+        icon: icons.error,
+      });
+    }
+  };
+
   return {
     checklist,
     newCheckList,
     setNewCheckList,
     create,
+    checklistData,
+    setChecklistData,
+    finalizarChecklist,
+    checklistCompleted,
+    setChecklistCompleted,
   };
 };
