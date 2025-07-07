@@ -4,6 +4,7 @@ import {
   Grid3X3,
   List,
   BookOpen,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,7 +51,13 @@ export const ListaChequeo = () => {
     itemsChecklist,
     setItemsChecklist,
   } = useMantenimiento();
-  const { create, newCheckList, setNewCheckList } = useChecklist();
+  const {
+    create,
+    newCheckList,
+    setNewCheckList,
+    checklistData,
+    setChecklistData,
+  } = useChecklist();
 
   const camposPorTipo: Record<"EQUIPO" | "PERIFERICO" | "IMPRESORA", string[]> =
     {
@@ -267,38 +274,190 @@ export const ListaChequeo = () => {
             </div>
 
             {modoPlantilla && (
-              <div className="space-y-2">
-                <Label>Guardar como Plantilla</Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Nombre de la plantilla..."
-                    value={newCheckList.nombre}
-                    onChange={(e) =>
+              <>
+                <div className="flex-1 space-y-2">
+                  <Label>Tipo de Calificación</Label>
+                  <Select
+                    value={newCheckList.tipo_calificacion || ""}
+                    onValueChange={(
+                      value: "ESTRELLAS" | "ESCALA" | "CATEGORIA"
+                    ) =>
                       setNewCheckList({
                         ...newCheckList,
-                        nombre: e.target.value,
+                        tipo_calificacion: value,
                       })
                     }
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    onClick={(e: React.MouseEvent) => {
-                      e.preventDefault();
-                      create(newCheckList);
-                    }}
-                    variant="outline"
-                    className="flex items-center gap-2"
                   >
-                    <BookOpen className="h-4 w-4" />
-                    Guardar Plantilla
-                  </Button>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Seleccionar tipo de calificación" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ESTRELLAS">Estrellas</SelectItem>
+                      <SelectItem value="ESCALA">Escala 1-10</SelectItem>
+                      <SelectItem value="CATEGORIA">Categoría</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <p className="text-xs text-gray-500">
-                  La plantilla guardará los campos personalizados y el tipo de
-                  calificación seleccionado
-                </p>
-              </div>
+                
+                <div className="space-y-4">
+                  <Label>Calificación del Estado del Equipo</Label>
+
+                  {newCheckList.tipo_calificacion === "ESTRELLAS" && (
+                    <div className="flex items-center space-x-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-6 w-6 cursor-pointer transition-colors ${
+                            star <= (checklistData.calificacion ?? 0)
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300 hover:text-yellow-200"
+                          }`}
+                          onClick={() =>
+                            setChecklistData((prev) => ({
+                              ...prev,
+                              calificacion: star,
+                            }))
+                          }
+                        />
+                      ))}
+                      <span className="ml-2 text-sm text-gray-600">
+                        ({checklistData.calificacion ?? 0} de 5 estrellas)
+                      </span>
+                    </div>
+                  )}
+
+                  {newCheckList.tipo_calificacion === "ESCALA" && (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-red-500 font-medium">
+                          1 (Malo)
+                        </span>
+                        <div className="flex-1">
+                          <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={checklistData.calificacion ?? 1}
+                            onChange={(e) =>
+                              setChecklistData((prev) => ({
+                                ...prev,
+                                calificacion: Number(e.target.value),
+                              }))
+                            }
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                        </div>
+                        <span className="text-sm text-green-500 font-medium">
+                          10 (Excelente)
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-lg font-bold text-gray-700">
+                          Calificación: {checklistData.calificacion ?? 1}/10
+                        </span>
+                        <span className="block text-sm text-gray-500">
+                          {(checklistData.calificacion ?? 1) <= 3
+                            ? "Malo"
+                            : (checklistData.calificacion ?? 1) <= 7
+                            ? "Regular"
+                            : "Excelente"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {newCheckList.tipo_calificacion === "CATEGORIA" && (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        {(["malo", "bueno", "excelente"] as const).map(
+                          (categoria, index) => (
+                            <Button
+                              key={categoria}
+                              type="button"
+                              variant={
+                                checklistData.calificacion === index + 1
+                                  ? "default"
+                                  : "outline"
+                              }
+                              onClick={() =>
+                                setChecklistData((prev) => ({
+                                  ...prev,
+                                  calificacion: index + 1, // 1: malo, 2: bueno, 3: excelente
+                                }))
+                              }
+                              className={`capitalize ${
+                                checklistData.calificacion === index + 1
+                                  ? categoria === "malo"
+                                    ? "bg-red-500 hover:bg-red-600"
+                                    : categoria === "bueno"
+                                    ? "bg-yellow-500 hover:bg-yellow-600"
+                                    : "bg-green-500 hover:bg-green-600"
+                                  : ""
+                              }`}
+                            >
+                              {categoria === "malo"
+                                ? "😞 Malo"
+                                : categoria === "bueno"
+                                ? "😐 Bueno"
+                                : "😄 Excelente"}
+                            </Button>
+                          )
+                        )}
+                      </div>
+                      <div className="text-center text-sm text-gray-600">
+                        Estado seleccionado:{" "}
+                        <span className="font-semibold capitalize">
+                          {(() => {
+                            switch (checklistData.calificacion) {
+                              case 1:
+                                return "Malo";
+                              case 2:
+                                return "Bueno";
+                              case 3:
+                                return "Excelente";
+                              default:
+                                return "No seleccionado";
+                            }
+                          })()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Guardar como Plantilla</Label>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Nombre de la plantilla..."
+                      value={newCheckList.nombre}
+                      onChange={(e) =>
+                        setNewCheckList({
+                          ...newCheckList,
+                          nombre: e.target.value,
+                        })
+                      }
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                        create(newCheckList);
+                      }}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Guardar Plantilla
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    La plantilla guardará los campos personalizados y el tipo de
+                    calificación seleccionado
+                  </p>
+                </div>
+              </>
             )}
           </div>
         </div>
