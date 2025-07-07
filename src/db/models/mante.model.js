@@ -270,4 +270,81 @@ export const manteModel = {
     });
     return mante;
   },
+  async actualizarProgreso(id, progreso) {
+    const id_mantenimiento = Number(id);
+
+    try {
+      const mante = await prisma.mantenimientos.update({
+        where: { id_mantenimiento },
+        data: { progreso },
+      });
+
+      return mante;
+    } catch (error) {
+      console.error("Error al actualizar progreso:", error);
+      throw new Error("Error al actualizar progreso");
+    }
+  },
+  async saveResponse(data) {
+    const {
+      mantenimientoId,
+      plantillaId,
+      tecnicoId,
+      respuestas,
+      calificacion,
+      observaciones,
+      fechaRealizacion,
+    } = data;
+
+    console.log("saveResponse", data);
+
+    try {
+      const existingResponse = await prisma.checklist_respuestas.findFirst({
+        where: { mantenimiento_id: mantenimientoId },
+        orderBy: { fecha_realizacion: "desc" },
+      });
+
+      if (existingResponse) {
+        return await prisma.checklist_respuestas.update({
+          where: { id_respuesta: existingResponse.id_respuesta },
+          data: {
+            plantilla_id: plantillaId,
+            respuestas,
+            calificacion,
+            observaciones,
+            fecha_realizacion: fechaRealizacion ?? new Date(),
+          },
+        });
+      }
+
+      return await prisma.checklist_respuestas.create({
+        data: {
+          mantenimiento_id: mantenimientoId,
+          plantilla_id: plantillaId,
+          tecnico_id: tecnicoId,
+          respuestas,
+          calificacion,
+          observaciones,
+          fecha_realizacion: fechaRealizacion ?? new Date(),
+        },
+      });
+    } catch (error) {
+      console.error("Error al guardar el response:", error);
+      throw new Error("Error al guardar el response");
+    }
+  },
+  async getCheckListResponses(id) {
+    const id_mantenimiento = Number(id);
+    try {
+      const responses = await prisma.checklist_respuestas.findMany({
+        where: { mantenimiento_id: id_mantenimiento },
+        orderBy: { fecha_realizacion: "desc" },
+      });
+
+      return responses;
+    } catch (error) {
+      console.error("Error al obtener las respuestas:", error);
+      throw new Error("Error al obtener las respuestas");
+    }
+  },
 };
