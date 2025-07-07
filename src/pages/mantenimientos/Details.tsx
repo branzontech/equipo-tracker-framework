@@ -44,6 +44,7 @@ import { Label } from "@/components/ui/label";
 import { useGlobal } from "@/hooks/use-global";
 import { ListaChequeo } from "./ListaChequeo";
 import { format } from "date-fns";
+import { actualizarProgreso, getCheckListResponses, saveResponse } from "@/api/axios/mante.api";
 
 const Labels = ({ icon: Icon, text }: { icon: any; text: string }) => (
   <h3 className="flex items-center gap-2 font-semibold text-lg text-gray-800">
@@ -76,8 +77,26 @@ const MantenimientoDetalle = () => {
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
 
   useEffect(() => {
-    getInfoById(id);
-  }, []);
+    const fetchData = async () => {
+      try {
+        await getInfoById(id); 
+
+        const response = await getCheckListResponses(id); 
+        console.log("response", response);
+        if (response?.length > 0 && response[0]?.respuestas) {
+          const seleccionados = Object.entries(response[0].respuestas)
+            .filter(([campo, completado]) => completado)
+            .map(([campo]) => campo);
+
+          setCheckedItems(seleccionados); // Actualiza los checkboxes completados
+        }
+      } catch (error) {
+        console.error("Error cargando datos del mantenimiento:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   if (!newMante?.id_mantenimiento) {
     return (
@@ -89,11 +108,40 @@ const MantenimientoDetalle = () => {
   }
 
   const toggleChecklistItem = (campo: string) => {
-    setCheckedItems((prev) =>
-      prev.includes(campo)
+    setCheckedItems((prev) => {
+      const nuevosSeleccionados = prev.includes(campo)
         ? prev.filter((item) => item !== campo)
-        : [...prev, campo]
-    );
+        : [...prev, campo];
+
+      // Calcular el progreso
+      const totalCampos = newMante?.checklist_campos?.length || 0;
+      const progreso =
+        totalCampos === 0
+          ? 0
+          : Math.round((nuevosSeleccionados.length / totalCampos) * 100);
+
+      // Llamar a la API para actualizar el progreso
+      actualizarProgreso(newMante.id_mantenimiento, progreso);
+
+      // Guardar el response
+      // Construir el JSON de respuestas
+      const respuestas: Record<string, boolean> = {};
+      newMante?.checklist_campos?.forEach((campo) => {
+        respuestas[campo] = nuevosSeleccionados.includes(campo);
+      });
+
+      // Guardar las respuestas completas
+      saveResponse({
+        mantenimientoId: newMante.id_mantenimiento,
+        plantillaId: newMante.checklist_plantillas?.id_plantilla,
+        tecnicoId: newMante.tecnico_id,
+        respuestas,
+        calificacion: null,
+        observaciones: "",
+      });
+
+      return nuevosSeleccionados;
+    });
   };
 
   return (
@@ -354,23 +402,32 @@ const MantenimientoDetalle = () => {
           <section className="space-y-4">
             <Labels icon={ClipboardList} text="Checklist registrado" />
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {newMante?.checklist_campos?.map((campo, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={checkedItems.includes(campo)}
-                    onChange={() => toggleChecklistItem(campo)}
-                  />
-                  <span
-                    className={`text-sm ${
-                      checkedItems.includes(campo)
-                        ? "line-through text-gray-500"
-                        : ""
-                    }`}
-                  >
-                    {campo}
-                  </span>
+                <div
+                  key={index}
+                  className="rounded-lg border p-4 space-y-2 bg-white shadow-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{campo}</span>
+                    <span className="text-xs text-gray-400">Checkbox</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={checkedItems.includes(campo)}
+                      onChange={() => toggleChecklistItem(campo)}
+                    />
+                    <span
+                      className={`text-sm ${
+                        checkedItems.includes(campo)
+                          ? "line-through text-gray-500"
+                          : ""
+                      }`}
+                    >
+                      Completado
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
