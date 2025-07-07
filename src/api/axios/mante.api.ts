@@ -113,3 +113,22 @@ export const getCheckListResponses = async (id: string) => {
     throw new Error(error?.response?.data?.message);
   }
 };
+
+export const finalizeChecklistResponse = async (data: ChecklistRespuestaData) => {
+  try {
+    const response = await api.put(
+      `/mantenimientos/finalize-checklist-response/${data.mantenimientoId}`,
+      {
+        observaciones: data.observaciones,
+        calificacion: data.calificacion,
+        fechaRealizacion: data.fechaRealizacion,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al guardar el response:", error);
+    throw new Error(
+      error?.response?.data?.message || "Error al guardar el response"
+    );
+  }
+};
