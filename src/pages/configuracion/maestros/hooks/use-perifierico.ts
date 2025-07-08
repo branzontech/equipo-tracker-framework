@@ -22,8 +22,8 @@ export const usePeriferico = () => {
     equipo_asociado_id: 0,
     equipos: null,
     serial: "",
-    id_sede: 0,
-    sedes: null,
+    id_sucursal: 0,
+    sucursales: null,
     marca_id: 0,
     marcas: null,
     motivo: "",
@@ -71,8 +71,8 @@ export const usePeriferico = () => {
       return;
     }
 
-    if (!periferico.id_sede) {
-      toast.error("Debe seleccionar una sede", {
+    if (!periferico.id_sucursal) {
+      toast.error("Debe seleccionar una sucursal", {
         icon: icons.error,
       });
       return;
@@ -84,13 +84,6 @@ export const usePeriferico = () => {
       });
       return;
     }
-
-    // if (!periferico.equipo_asociado_id) {
-    //   toast.error("Debe seleccionar un equipo", {
-    //     icon: icons.error,
-    //   });
-    //   return;
-    // }
 
     if (periferico.estado === undefined || periferico.estado === null) {
       toast.error("Debe seleccionar un estado", {
