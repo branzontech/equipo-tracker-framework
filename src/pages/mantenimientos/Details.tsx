@@ -184,50 +184,72 @@ const MantenimientoDetalle = () => {
             </h4>
 
             {/* Información del Equipo */}
-            <div className="grid sm:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500">Equipo</p>
-                <p className="font-medium">
-                  {newMante?.equipos?.nombre_equipo}
+            <div className="space-y-2">
+              <p className="font-semibold text-[#01242c] mb-2">
+                Equipos Asociados
+              </p>
+              {newMante?.mantenimiento_detalle?.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-gray-500">
+                        <th className="p-2">Nombre</th>
+                        <th className="p-2">Serial</th>
+                        <th className="p-2">Sede</th>
+                        <th className="p-2">Sucursal</th>
+                        <th className="p-2">Responsable</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {newMante.mantenimiento_detalle.map((detalle, index) => {
+                        const nombre =
+                          detalle.equipos?.nombre_equipo ||
+                          detalle.impresora?.nombre ||
+                          detalle.perifericos?.nombre ||
+                          "—";
+
+                        const serial =
+                          detalle.equipos?.nro_serie ||
+                          detalle.impresora?.serial ||
+                          detalle.perifericos?.serial ||
+                          "—";
+
+                        const sede =
+                          detalle.equipos?.estado_ubicacion?.[0]?.sucursales
+                            ?.sedes?.nombre ||
+                          detalle.impresora?.sucursales?.sedes?.nombre ||
+                          detalle.perifericos?.sucursales?.sedes?.nombre ||
+                          "—";
+
+                        const sucursal =
+                          detalle.equipos?.estado_ubicacion?.[0]?.sucursales
+                            ?.nombre ||
+                          detalle.impresora?.sucursales?.nombre ||
+                          detalle.perifericos?.sucursales?.nombre ||
+                          "—";
+
+                        const responsable =
+                          detalle.equipos?.estado_ubicacion?.[0]?.usuarios
+                            ?.nombre || "No aplica";
+
+                        return (
+                          <tr key={index} className="border-t">
+                            <td className="p-2">{nombre}</td>
+                            <td className="p-2">{serial}</td>
+                            <td className="p-2">{sede}</td>
+                            <td className="p-2">{sucursal}</td>
+                            <td className="p-2">{responsable}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">
+                  No hay equipos asignados.
                 </p>
-              </div>
-              <div>
-                <p className="text-gray-500">Serial</p>
-                <p className="font-medium">{newMante?.equipos?.nro_serie}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Sede</p>
-                <p className="font-medium">
-                  {
-                    newMante?.equipos?.estado_ubicacion?.[0]?.sucursales?.sedes
-                      ?.nombre
-                  }
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500">Responsable del Equipo</p>
-                <p className="font-medium">
-                  {newMante?.equipos?.estado_ubicacion?.[0]?.usuarios?.nombre}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500">Sucursal</p>
-                <p>
-                  {newMante.equipos?.estado_ubicacion?.[0]?.sucursales
-                    ?.nombre ?? "No disponible"}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500">Responsable de la sede</p>
-                <p>
-                  {newMante.equipos?.estado_ubicacion?.[0]?.sucursales?.sedes
-                    ?.usuario_sede?.length > 0
-                    ? newMante.equipos?.estado_ubicacion?.[0]?.sucursales?.sedes?.usuario_sede
-                        .map((u) => u.usuarios?.nombre)
-                        .join(", ")
-                    : "Sin responsables asignados"}
-                </p>
-              </div>
+              )}
             </div>
 
             <Separator />
@@ -261,7 +283,7 @@ const MantenimientoDetalle = () => {
                   Tiempo estimado
                 </p>
                 <p className="font-medium">
-                  {newMante.tiempo_estimado ?? "No especificado"} horas
+                  {newMante.tiempo_estimado ?? "No especificado"} hora(s)
                 </p>
               </div>
               <div>
@@ -374,12 +396,13 @@ const MantenimientoDetalle = () => {
                               ? "cursor-pointer hover:text-yellow-200"
                               : "cursor-not-allowed"
                           }`}
-                          onClick={() =>
+                          onClick={() => {
+                            if (checklistCompleted) return;
                             setChecklistData((prev) => ({
                               ...prev,
                               calificacion: star,
-                            }))
-                          }
+                            }));
+                          }}
                         />
                       ))}
                       <span className="ml-2 text-sm text-gray-600">
@@ -429,7 +452,6 @@ const MantenimientoDetalle = () => {
                       </div>
                     </div>
                   )}
-
                   {newMante.checklist_plantillas?.tipo_calificacion ===
                     "CATEGORIA" && (
                     <div className="space-y-2">
