@@ -30,6 +30,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { tienePermiso } from "@/utils/permissions";
 import { PERMISOS_PERIFERICOS } from "../../usuarios/interfaces/permisos";
+import { useSucursales } from "../hooks/use-sucursales";
 
 const Perifericos = () => {
   const {
@@ -47,7 +48,7 @@ const Perifericos = () => {
   const { equipo } = useEquipos();
   const { estados } = useEstado();
   const { marcas } = useMarcas();
-  const { sedes } = useSedes();
+  const { sucursales } = useSucursales();
   const { tipos } = useTipos();
   const user = useSelector((state: RootState) => state.auth.user);
   const puedeEditarEliminar =
@@ -125,17 +126,17 @@ const Perifericos = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="id_sede">Sede</Label>
+                <Label htmlFor="id_sucursal">Sucursal</Label>
                 <Select
                   value={
-                    newPeriferico.id_sede
-                      ? newPeriferico.id_sede.toString()
+                    newPeriferico.id_sucursal
+                      ? newPeriferico.id_sucursal.toString()
                       : ""
                   }
                   onValueChange={(value: string) =>
                     setNewPeriferico({
                       ...newPeriferico,
-                      id_sede: Number(value),
+                      id_sucursal: Number(value),
                     })
                   }
                 >
@@ -143,12 +144,12 @@ const Perifericos = () => {
                     <SelectValue placeholder="Seleccione la sede" />
                   </SelectTrigger>
                   <SelectContent>
-                    {sedes.map((sede) => (
+                    {sucursales.map((sucursal) => (
                       <SelectItem
-                        key={sede.id_sede}
-                        value={sede.id_sede.toString()}
+                        key={sucursal.id_sucursal}
+                        value={sucursal.id_sucursal.toString()}
                       >
-                        {sede.nombre}
+                        {sucursal.nombre}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -271,7 +272,7 @@ const Perifericos = () => {
                 <TableHead>Nombre</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Marca</TableHead>
-                <TableHead>Sede</TableHead>
+                <TableHead>Sucursal</TableHead>
                 <TableHead>Equipo Asociado</TableHead>
                 <TableHead>Estado</TableHead>
                 {puedeEditarEliminar && (
@@ -304,7 +305,7 @@ const Perifericos = () => {
                       <TableCell>{periferico.nombre}</TableCell>
                       <TableCell>{periferico.tipo}</TableCell>
                       <TableCell>{periferico.marcas?.nombre}</TableCell>
-                      <TableCell>{periferico.sedes?.nombre}</TableCell>
+                      <TableCell>{periferico.sucursales?.nombre}</TableCell>
                       <TableCell>
                         {periferico.equipos?.nombre_equipo ?? "No asignado"}
                       </TableCell>
