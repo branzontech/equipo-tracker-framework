@@ -1,12 +1,18 @@
 import { Checklist } from "@/pages/configuracion/checklist/interface/checklist";
+import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferico";
 import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
 import { Equipo } from "@/pages/productos/interfaces/equipo";
+import { Impresora } from "@/pages/toners/interfaces/impresora";
 
 export interface Mantenimiento {
   id_mantenimiento: number;
-  id_equipo: number;
-  equipos: Equipo | null;
-  id_impresora: number;
+
+  mantenimiento_detalle: {
+    equipos: Equipo | null;
+    impresora: Impresora | null;
+    perifericos: Perifericos | null;
+  }[];
+
   tecnico_id: number;
   usuarios: Usuario | null;
   fecha_programada: Date | string;
