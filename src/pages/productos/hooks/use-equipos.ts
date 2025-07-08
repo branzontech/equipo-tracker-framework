@@ -130,7 +130,9 @@ export const useEquipos = () => {
     trazabilidad: {
       prestamo_equipos: [],
       traslados_equipos: [],
-      mantenimientos: [],
+      mantenimiento_detalle: [],
+      devoluciones: [],
+      historial: [],
     },
     mantenimiento: {
       frecuencia_mantenimiento: "",

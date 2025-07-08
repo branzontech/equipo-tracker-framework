@@ -53,7 +53,9 @@ export interface Equipo {
     traslados_equipos?: {
       traslados: Traslado;
     }[];
-    mantenimientos?: Mantenimiento[];
+    mantenimiento_detalle?: {
+      mantenimientos: Mantenimiento;
+    }[];
     devoluciones?: Devolucion[];
     historial?: HistorialEquipo[];
   };
