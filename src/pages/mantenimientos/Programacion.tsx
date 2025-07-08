@@ -53,7 +53,6 @@ const ProgramacionMantenimiento = () => {
     handleColumnDragEnd,
     mainTableColumns,
     resetFilters,
-    handleSearch,
     searchQuery,
     setSearchQuery,
     isSearching,
@@ -71,7 +70,6 @@ const ProgramacionMantenimiento = () => {
     setTipoMantenimiento,
     uniqueResponsables,
     uniqueEstados,
-    filteredMantenimientos
   } = useMantenimiento();
   const navigate = useNavigate();
   const { formatFecha } = useGlobal();
@@ -257,386 +255,6 @@ const ProgramacionMantenimiento = () => {
           )}
         </div>
       </div>
-      {/* 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f]">
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Mantenimiento
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-            <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl text-[#01242c]">Programar Nuevo Mantenimiento</DialogTitle>
-              <DialogDescription className="text-sm sm:text-base">
-                Complete los detalles para programar un nuevo mantenimiento.
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <Tabs defaultValue="general" className="w-full">
-                  <TabsList className="w-full grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-0">
-                    <TabsTrigger value="general" className="text-sm sm:text-base">Información General</TabsTrigger>
-                    <TabsTrigger value="equipos" className="text-sm sm:text-base">Equipos</TabsTrigger>
-                    <TabsTrigger value="detalles" className="text-sm sm:text-base">Detalles Adicionales</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="general" className="space-y-4 mt-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="sede"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm sm:text-base">Sede</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccione la sede" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="sede1">Sede 1</SelectItem>
-                                <SelectItem value="sede2">Sede 2</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="bodega"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm sm:text-base">Bodega</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccione la bodega" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="bodega1">Bodega 1</SelectItem>
-                                <SelectItem value="bodega2">Bodega 2</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="tipoRegistro"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm sm:text-base">Tipo de Registro</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccione el tipo de registro" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="individual">Individual</SelectItem>
-                                <SelectItem value="masivo">Masivo</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="tipo"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm sm:text-base">Tipo de Mantenimiento</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccione el tipo" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="preventivo">Preventivo</SelectItem>
-                                <SelectItem value="correctivo">Correctivo</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="periodicidad"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm sm:text-base">Periodicidad</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccione la periodicidad" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="mensual">Mensual</SelectItem>
-                                <SelectItem value="trimestral">Trimestral</SelectItem>
-                                <SelectItem value="anual">Anual</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="equipos" className="space-y-4 mt-4">
-                    <div className="space-y-4">
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1">
-                          <FormLabel className="text-sm sm:text-base">Búsqueda</FormLabel>
-                          <div className="relative">
-                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              placeholder="Buscar equipos..."
-                              className="pl-8"
-                              value={busqueda}
-                              onChange={(e) => setBusqueda(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <div className="w-full sm:w-[200px]">
-                          <FormLabel className="text-sm sm:text-base">Sede</FormLabel>
-                          <Select value={filtroSede} onValueChange={setFiltroSede}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Filtrar por sede" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">Todas</SelectItem>
-                              <SelectItem value="Sede 1">Sede 1</SelectItem>
-                              <SelectItem value="Sede 2">Sede 2</SelectItem>
-                              <SelectItem value="Sede 3">Sede 3</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="w-full sm:w-[200px]">
-                          <FormLabel className="text-sm sm:text-base">Área</FormLabel>
-                          <Select value={filtroArea} onValueChange={setFiltroArea}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Filtrar por área" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">Todas</SelectItem>
-                              <SelectItem value="Sistemas">Sistemas</SelectItem>
-                              <SelectItem value="Administración">Administración</SelectItem>
-                              <SelectItem value="Ventas">Ventas</SelectItem>
-                              <SelectItem value="Recursos Humanos">Recursos Humanos</SelectItem>
-                              <SelectItem value="IT">IT</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="w-full sm:w-[200px]">
-                          <FormLabel className="text-sm sm:text-base">Tipo</FormLabel>
-                          <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Filtrar por tipo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">Todos</SelectItem>
-                              <SelectItem value="Laptop">Laptop</SelectItem>
-                              <SelectItem value="Desktop">Desktop</SelectItem>
-                              <SelectItem value="Impresora">Impresora</SelectItem>
-                              <SelectItem value="Monitor">Monitor</SelectItem>
-                              <SelectItem value="Servidor">Servidor</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-                      <div className="border rounded-md overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              {equipoTableColumns
-                                .sort((a, b) => a.order - b.order)
-                                .filter(col => col.isVisible)
-                                .map((column) => (
-                                  <TableHead 
-                                    key={column.id}
-                                    className={column.className}
-                                    draggable={column.id !== "checkbox" && column.id !== "grip"}
-                                    columnId={column.id}
-                                    onDragStart={(e) => handleColumnDragStart(e, column.id)}
-                                    onDragOver={handleColumnDragOver}
-                                    onDragEnter={(e) => handleColumnDragEnter(e, column.id)}
-                                    onDragLeave={handleColumnDragLeave}
-                                    onDrop={(e) => handleColumnDrop(e, column.id, false)}
-                                    onDragEnd={handleColumnDragEnd}
-                                  >
-                                    {column.id === "checkbox" ? (
-                                      <Checkbox
-                                        checked={selectAll}
-                                        onCheckedChange={handleSelectAll}
-                                      />
-                                    ) : column.id === "grip" ? (
-                                      <div></div>
-                                    ) : (
-                                      <div className="flex items-center gap-2">
-                                        {column.id !== "checkbox" && column.id !== "grip" && (
-                                          <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                        )}
-                                        {column.label}
-                                      </div>
-                                    )}
-                                  </TableHead>
-                                ))}
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {equiposFiltrados.length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={equipoTableColumns.filter(col => col.isVisible).length} className="text-center text-muted-foreground">
-                                  No se encontraron equipos con los filtros seleccionados
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              equiposFiltrados.map((equipo) => (
-                                <TableRow key={equipo.id}>
-                                  {equipoTableColumns
-                                    .sort((a, b) => a.order - b.order)
-                                    .filter(col => col.isVisible)
-                                    .map((column) => {
-                                      if (column.id === "checkbox") {
-                                        return (
-                                          <TableCell key={`${equipo.id}-${column.id}`}>
-                                            <Checkbox
-                                              checked={selectedEquipos.includes(equipo.id)}
-                                              onCheckedChange={() => handleSelectEquipo(equipo.id)}
-                                            />
-                                          </TableCell>
-                                        );
-                                      } else if (column.id === "grip") {
-                                        return (
-                                          <TableCell key={`${equipo.id}-${column.id}`}>
-                                            <GripVertical className="h-4 w-4 text-gray-400" />
-                                          </TableCell>
-                                        );
-                                      } else if (column.id === "nombre") {
-                                        return (
-                                          <TableCell key={`${equipo.id}-${column.id}`} className="font-medium">
-                                            <div>{equipo.nombre}</div>
-                                            <div className="text-xs text-gray-500 sm:hidden">
-                                              {equipo.tipo} - {equipo.sede} - {equipo.area}
-                                            </div>
-                                          </TableCell>
-                                        );
-                                      } else {
-                                        return (
-                                          <TableCell key={`${equipo.id}-${column.id}`} className={column.className}>
-                                            {equipo[column.accessor as keyof typeof equipo]}
-                                          </TableCell>
-                                        );
-                                      }
-                                    })}
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {selectedEquipos.length} equipos seleccionados
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="detalles" className="space-y-4 mt-4">
-                    <FormField
-                      control={form.control}
-                      name="fechaInicio"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm sm:text-base">Fecha de Inicio</FormLabel>
-                          <FormControl>
-                            <div className="overflow-x-auto">
-                              <CalendarComponent
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                locale={es}
-                                className="rounded-md border w-full sm:w-auto"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="responsable"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm sm:text-base">Responsable</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nombre del responsable" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="descripcion"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm sm:text-base">Descripción</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Detalles del mantenimiento"
-                              className="min-h-[100px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TabsContent>
-                </Tabs>
-
-                <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                    className="w-full sm:w-auto order-2 sm:order-1"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="w-full sm:w-auto bg-[#bff036] text-[#01242c] hover:bg-[#a8d72f] order-1 sm:order-2"
-                  >
-                    Programar Mantenimiento
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div> */}
 
       <Card>
         <CardContent className="p-0">
@@ -697,137 +315,132 @@ const ProgramacionMantenimiento = () => {
                         new Date(b.fecha_programada).getTime() -
                         new Date(a.fecha_programada).getTime()
                     )
-                    .map((mantenimiento) => (
-                      <TableRow key={mantenimiento.id_mantenimiento}>
-                        {mainTableColumns
-                          .sort((a, b) => a.order - b.order)
-                          .filter((col) => col.isVisible)
-                          .map((column) => {
-                            const key = `${mantenimiento.id_mantenimiento}-${column.id}`;
+                    .map((mantenimiento) => {
+                      return (
+                        <TableRow key={mantenimiento.id_mantenimiento}>
+                          {mainTableColumns
+                            .sort((a, b) => a.order - b.order)
+                            .filter((col) => col.isVisible)
+                            .map((column) => {
+                              const key = `${mantenimiento.id_mantenimiento}-${column.id}`;
 
-                            if (column.id === "grip") {
-                              return (
-                                <TableCell
-                                  key={key}
-                                  className={column.className}
-                                >
-                                  <GripVertical className="h-4 w-4 text-gray-400" />
-                                </TableCell>
-                              );
-                            }
-
-                            if (column.id === "equipo_id") {
-                              return (
-                                <TableCell key={key} className="font-medium">
-                                  <div>
-                                    {mantenimiento.equipos?.nombre_equipo ||
-                                      "—"}
-                                  </div>
-                                  <div className="text-xs text-gray-500 sm:hidden">
-                                    {mantenimiento.tipo} ·{" "}
-                                    {typeof mantenimiento.fecha_programada ===
-                                    "string"
-                                      ? new Date(
-                                          mantenimiento.fecha_programada
-                                        ).toLocaleDateString("es-CO", {
-                                          year: "numeric",
-                                          month: "long",
-                                          day: "numeric",
-                                        })
-                                      : mantenimiento.fecha_programada.toLocaleDateString(
-                                          "es-CO",
-                                          {
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                          }
-                                        )}
-                                  </div>
-                                </TableCell>
-                              );
-                            }
-
-                            if (column.id === "estado") {
-                              return (
-                                <TableCell
-                                  key={key}
-                                  className={column.className}
-                                >
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs ${
-                                      mantenimiento.estado === "Pendiente"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-blue-100 text-blue-800"
-                                    }`}
+                              if (column.id === "grip") {
+                                return (
+                                  <TableCell
+                                    key={key}
+                                    className={column.className}
                                   >
-                                    {mantenimiento.estado}
-                                  </span>
-                                </TableCell>
-                              );
-                            }
-
-                            if (column.id === "acciones") {
-                              return (
-                                <TableCell key={key}>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      toast.info(
-                                        `Ver detalles de ${
-                                          mantenimiento.equipos
-                                            ?.nombre_equipo || "equipo"
-                                        }`
-                                      )
-                                    }
-                                  >
-                                    Ver
-                                  </Button>
-                                </TableCell>
-                              );
-                            }
-
-                            if (column.accessor) {
-                              const value =
-                                mantenimiento[
-                                  column.accessor as keyof typeof mantenimiento
-                                ];
-
-                              let content: React.ReactNode;
-
-                              if (value === null || value === undefined) {
-                                content = "—";
-                              } else if (typeof value === "object") {
-                                if ("nombre" in value) {
-                                  content = (value as any).nombre;
-                                } else if (value instanceof Date) {
-                                  content = value.toLocaleDateString("es-CO");
-                                } else {
-                                  content = JSON.stringify(value);
-                                }
-                              } else if (
-                                column.accessor === "fecha_programada" &&
-                                typeof value === "string"
-                              ) {
-                                content = formatFecha(value);
-                              } else {
-                                content = value;
+                                    <GripVertical className="h-4 w-4 text-gray-400" />
+                                  </TableCell>
+                                );
                               }
 
-                              return (
-                                <TableCell
-                                  key={key}
-                                  className={column.className}
-                                >
-                                  {content}
-                                </TableCell>
-                              );
-                            }
+                              if (column.id === "equipo_id") {
+                                const nombresActivos =
+                                  mantenimiento.mantenimiento_detalle
+                                    ?.map((detalle) => {
+                                      if (detalle.equipos)
+                                        return detalle.equipos.nombre_equipo;
+                                      if (detalle.impresora)
+                                        return detalle.impresora.nombre;
+                                      if (detalle.perifericos)
+                                        return detalle.perifericos.nombre;
+                                      return null;
+                                    })
+                                    .filter(Boolean)
+                                    .join(", ") || "—";
 
-                            return <TableCell key={key}></TableCell>;
-                          })}
-                      </TableRow>
-                    ))
+                                return (
+                                  <TableCell key={key} className="font-medium">
+                                    {nombresActivos}
+                                  </TableCell>
+                                );
+                              }
+
+                              if (column.id === "estado") {
+                                return (
+                                  <TableCell
+                                    key={key}
+                                    className={column.className}
+                                  >
+                                    <span
+                                      className={`px-2 py-1 rounded-full text-xs ${
+                                        mantenimiento.estado === "Pendiente"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-blue-100 text-blue-800"
+                                      }`}
+                                    >
+                                      {mantenimiento.estado}
+                                    </span>
+                                  </TableCell>
+                                );
+                              }
+
+                              if (column.id === "acciones") {
+                                return (
+                                  <TableCell key={key}>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        toast.info(
+                                          `Ver detalles de ${
+                                            mantenimiento
+                                              .mantenimiento_detalle?.[0]
+                                              ?.equipos?.nombre_equipo ||
+                                            "equipo"
+                                          }`
+                                        )
+                                      }
+                                    >
+                                      Ver
+                                    </Button>
+                                  </TableCell>
+                                );
+                              }
+
+                              if (column.accessor) {
+                                const value =
+                                  mantenimiento[
+                                    column.accessor as keyof typeof mantenimiento
+                                  ];
+
+                                let content: React.ReactNode;
+
+                                if (value === null || value === undefined) {
+                                  content = "—";
+                                } else if (typeof value === "object") {
+                                  if ("nombre" in value) {
+                                    content = (value as any).nombre;
+                                  } else if (value instanceof Date) {
+                                    content = value.toLocaleDateString("es-CO");
+                                  } else {
+                                    content = JSON.stringify(value);
+                                  }
+                                } else if (
+                                  column.accessor === "fecha_programada" &&
+                                  typeof value === "string"
+                                ) {
+                                  content = formatFecha(value);
+                                } else {
+                                  content = value;
+                                }
+
+                                return (
+                                  <TableCell
+                                    key={key}
+                                    className={column.className}
+                                  >
+                                    {content}
+                                  </TableCell>
+                                );
+                              }
+
+                              return <TableCell key={key}></TableCell>;
+                            })}
+                        </TableRow>
+                      );
+                    })
                 )}
               </TableBody>
             </Table>
