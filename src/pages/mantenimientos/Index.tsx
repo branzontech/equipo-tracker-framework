@@ -48,8 +48,12 @@ import { ListaChequeo } from "./ListaChequeo";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useChecklist } from "../configuracion/checklist/hooks/use-checklist";
 import { ListaChequeoSimple } from "../configuracion/checklist/views/CheckListSimple";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checklist } from "../configuracion/checklist/interface/checklist";
+import { useImpresora } from "../toners/hooks/use-impresora";
+import { usePeriferico } from "../configuracion/maestros/hooks/use-perifierico";
+import { Impresora } from "../toners/interfaces/impresora";
+import { Perifericos } from "../configuracion/maestros/interfaces/periferico";
 
 const MantenimientosIndex = () => {
   const {
@@ -61,14 +65,13 @@ const MantenimientosIndex = () => {
     nextTab,
     previousTab,
     handleTabChange,
-    equipoSeleccionado,
-    setEquipoSeleccionado,
+    equiposSeleccionados,
+    setEquiposSeleccionados,
     onSubmit,
     setTecnicoResponsable,
     validEquipo,
     validDetalles,
     navigate,
-    listadoChequeo,
     itemsChequeo,
     setItemsChequeo,
     toggleItem,
@@ -83,22 +86,69 @@ const MantenimientosIndex = () => {
     users,
   } = useUser();
   const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
+  const { impresora } = useImpresora();
+  const { perifericos } = usePeriferico();
   const { sedes } = useSedes();
   const { checklist } = useChecklist();
   const [plantillaSeleccionada, setPlantillaSeleccionada] =
     useState<Checklist | null>(null);
 
+  const [modoSeleccion, setModoSeleccion] = useState("");
+  const [sedeFilter, setSedeFilter] = useState("");
+  const [equiposPorSede, setEquiposPorSede] = useState([]);
+
+  useEffect(() => {
+    const allEquipos = equipo
+      .filter(
+        (e) => e.estado_ubicacion?.[0]?.estado_actual !== "En mantenimiento"
+      )
+      .map((e) => ({
+        id: e.id_equipo,
+        nombre: e.nombre_equipo,
+        serial: e.nro_serie,
+
+        sede: e.estado_ubicacion?.[0]?.sucursales?.sedes?.nombre || "Sin sede",
+        tipo: "equipo",
+      }));
+
+    const allImpresoras = impresora
+      .filter((i) => i.estado !== "En mantenimiento")
+      .map((i) => ({
+        id: i.id_impresora,
+        nombre: i.nombre,
+        serial: i.serial,
+        sede: i.sucursales?.sedes?.nombre || "Sin sede",
+        tipo: "impresora",
+      }));
+
+    const allPerifericos = perifericos
+      .filter((p) => p.estado !== "En mantenimiento")
+      .map((p) => ({
+        id: p.id_periferico,
+        nombre: p.nombre,
+        serial: p.serial,
+        sede: p.sucursales?.sedes?.nombre || "Sin sede",
+        tipo: "periferico",
+      }));
+
+    setEquiposPorSede([...allEquipos, ...allImpresoras, ...allPerifericos]);
+  }, [equipo, impresora, perifericos]);
 
   const handleChangePlantilla = (plantilla: Checklist | null) => {
     setPlantillaSeleccionada(plantilla);
-    setItemsChequeo([]); 
+    setItemsChequeo([]);
   };
 
   const selectEquipo = (equipo: Equipo) => {
-    setEquipoSeleccionado(equipo);
-    setNewMante((prev) => ({ ...prev, id_equipo: equipo.id_equipo }));
+    setNewMante((prev) => ({
+      ...prev,
+      mantenimiento_detalle: [
+        ...prev.mantenimiento_detalle,
+        { equipos: equipo, impresora: null },
+      ],
+    }));
+
     setNewEquipo((prev) => ({ ...prev, nro_serie: "" }));
-    setEquipo([]);
   };
 
   const handleUserSelect = (user) => {
@@ -115,6 +165,74 @@ const MantenimientosIndex = () => {
       tecnico_id: user.id_usuario,
     }));
     setSugerencias([]);
+  };
+
+  const idsSeleccionadosEquipos = newMante.mantenimiento_detalle
+    .map((d) => d.equipos?.id_equipo)
+    .filter(Boolean);
+
+  const equiposFiltrados = equipo.filter(
+    (eq) =>
+      `${eq.nombre_equipo} ${eq.nro_serie}`
+        .toLowerCase()
+        .includes(newEquipo.nro_serie.toLowerCase()) &&
+      !idsSeleccionadosEquipos.includes(eq.id_equipo)
+  );
+
+  const equiposFiltradosPorSede = equiposPorSede.filter(
+    (item) =>
+      sedeFilter === "todas" ||
+      item.sede ===
+        sedes.find((s) => s.id_sede.toString() === sedeFilter)?.nombre
+  );
+
+  const toggleSeleccionEquipo = (item) => {
+    const existe = equiposSeleccionados.some(
+      (eq) => eq.tipo === item.tipo && eq.id === item.id
+    );
+
+    if (existe) {
+      setEquiposSeleccionados((prev) =>
+        prev.filter((eq) => !(eq.tipo === item.tipo && eq.id === item.id))
+      );
+      setNewMante((prev) => ({
+        ...prev,
+        mantenimiento_detalle: prev.mantenimiento_detalle.filter((detalle) => {
+          if (item.tipo === "equipo")
+            return detalle.equipos?.id_equipo !== item.id;
+          if (item.tipo === "impresora")
+            return detalle.impresora?.id_impresora !== item.id;
+          if (item.tipo === "periferico")
+            return detalle.perifericos?.id_periferico !== item.id;
+          return true;
+        }),
+      }));
+    } else {
+      setEquiposSeleccionados((prev) => [...prev, item]);
+
+      setNewMante((prev) => {
+        const updated = {
+          ...prev,
+          mantenimiento_detalle: [
+            ...prev.mantenimiento_detalle,
+            {
+              equipos: item.tipo === "equipo" ? { id_equipo: item.id } : null,
+              impresora:
+                item.tipo === "impresora" ? { id_impresora: item.id } : null,
+              perifericos:
+                item.tipo === "periferico" ? { id_periferico: item.id } : null,
+            },
+          ],
+        };
+
+        console.log(
+          "Nuevo mantenimiento_detalle:",
+          updated.mantenimiento_detalle
+        );
+
+        return updated;
+      });
+    }
   };
 
   return (
@@ -179,138 +297,232 @@ const MantenimientosIndex = () => {
 
                 <TabsContent value="equipo" className="space-y-4 mt-4">
                   <div className="space-y-4">
-                    <div className="relative">
-                      <div className="flex items-center mb-2">
-                        <UserRound className="h-4 w-4 mr-2 text-gray-500" />
-                        <Label className="text-sm sm:text-base font-medium">
-                          Buscar Equipo
-                        </Label>
+                    <div className="relative space-y-4">
+                      <div className="space-y-1">
+                        <Label>Modo de selección</Label>
+                        <Select onValueChange={(v) => setModoSeleccion(v)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar modo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sedes">Por Sede</SelectItem>
+                            <SelectItem value="equipos">Por Equipo</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          placeholder="Buscar por nombre o serial"
-                          value={newEquipo.nro_serie}
-                          onChange={(e) =>
-                            setNewEquipo({
-                              ...newEquipo,
-                              nro_serie: e.target.value,
-                            })
-                          }
-                          className="w-full pl-10 mt-1"
-                        />
-                      </div>
-                      {newEquipo.nro_serie.trim() !== "" &&
-                        equipo.length > 0 && (
-                          <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
-                            {equipo.map((equipo) => (
-                              <div
-                                key={equipo.id_equipo}
-                                className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
-                                onClick={() => selectEquipo(equipo)}
-                              >
-                                <div className="font-medium text-sm sm:text-base">
-                                  {equipo.nombre_equipo}
+
+                      {/* Si elige por sede */}
+                      {modoSeleccion === "sedes" && (
+                        <>
+                          <div className="space-y-2">
+                            <Label>Filtrar por sede</Label>
+                            <Select
+                              value={sedeFilter}
+                              onValueChange={setSedeFilter}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar sede" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="todas">
+                                  Todas las sedes
+                                </SelectItem>
+                                {sedes.map((sede) => (
+                                  <SelectItem
+                                    key={sede.id_sede}
+                                    value={sede.id_sede.toString()}
+                                  >
+                                    {sede.nombre}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {equiposFiltradosPorSede.length > 0 ? (
+                            <div className="border rounded-lg max-h-52 overflow-y-auto divide-y">
+                              {equiposFiltradosPorSede.map((item) => (
+                                <div
+                                  key={`${item.tipo}-${item.id}`}
+                                  className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={equiposSeleccionados.some(
+                                      (eq) =>
+                                        eq.tipo === item.tipo &&
+                                        eq.id === item.id
+                                    )}
+                                    onChange={() => toggleSeleccionEquipo(item)}
+                                    className="mr-3"
+                                  />
+                                  <div>
+                                    <div className="font-medium">
+                                      {item.tipo === "equipo"
+                                        ? "Equipo"
+                                        : item.tipo === "impresora"
+                                        ? "Impresora"
+                                        : "Periférico"}
+                                      : {item.nombre}
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                      Serial: {item.serial} | Sede: {item.sede}
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <span>
-                                      <span className="font-semibold">
-                                        Serial:
-                                      </span>{" "}
-                                      {equipo.nro_serie}
-                                    </span>
-                                    <span>
-                                      <span className="font-semibold">
-                                        Tipo de activo:
-                                      </span>{" "}
-                                      {equipo.tipo_activo}
-                                    </span>
-                                    <span>
-                                      <span className="font-semibold">
-                                        Marca:
-                                      </span>{" "}
-                                      {equipo.marcas}
-                                    </span>
-                                    <span>
-                                      <span className="font-semibold">
-                                        Modelo:
-                                      </span>{" "}
-                                      {equipo.modelo}
-                                    </span>
-                                    <span>
-                                      <span className="font-semibold">
-                                        Sede:
-                                      </span>{" "}
-                                      {equipo.sedes}
-                                    </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              No hay resultados para esta sede.
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      {/* Si elige por equipo */}
+                      {modoSeleccion === "equipos" && (
+                        <>
+                          <div className="flex items-center mb-2">
+                            <UserRound className="h-4 w-4 mr-2 text-gray-500" />
+                            <Label className="text-sm sm:text-base font-medium">
+                              Buscar Equipo
+                            </Label>
+                          </div>
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              placeholder="Buscar por número de serie o nombre"
+                              value={newEquipo.nro_serie}
+                              onChange={(e) =>
+                                setNewEquipo({
+                                  ...newEquipo,
+                                  nro_serie: e.target.value,
+                                })
+                              }
+                              className="w-full pl-10 mt-1"
+                            />
+                          </div>
+
+                          {newEquipo.nro_serie.trim() !== "" &&
+                            equiposFiltrados.length > 0 && (
+                              <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                                {equiposFiltrados.map((equipo) => (
+                                  <div
+                                    key={equipo.id_equipo}
+                                    className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                                    onClick={() => selectEquipo(equipo)}
+                                  >
+                                    <div className="font-medium text-sm sm:text-base">
+                                      {equipo.nombre_equipo}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <span>
+                                          <span className="font-semibold">
+                                            Serial:
+                                          </span>{" "}
+                                          {equipo.nro_serie}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Tipo de activo:
+                                          </span>{" "}
+                                          {equipo.tipo_activo}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Marca:
+                                          </span>{" "}
+                                          {equipo.marcas}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Modelo:
+                                          </span>{" "}
+                                          {equipo.modelo}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Sede:
+                                          </span>{" "}
+                                          {equipo.sedes}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                        </>
+                      )}
+                    </div>
+
+                    {modoSeleccion === "equipos" &&
+                      newMante.mantenimiento_detalle.length > 0 && (
+                        <div className="space-y-4">
+                          {newMante.mantenimiento_detalle.map(
+                            (detalle, index) => (
+                              <div
+                                key={detalle.equipos?.id_equipo || index}
+                                className="bg-gray-50 rounded-lg p-4 border space-y-3"
+                              >
+                                <h4 className="font-semibold text-sm sm:text-base flex items-center">
+                                  <UserRound className="h-4 w-4 mr-2 text-gray-500" />
+                                  Equipo Seleccionado
+                                </h4>
+                                <div className="grid sm:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <p className="text-gray-500">Nombre</p>
+                                    <p className="font-medium">
+                                      {detalle.equipos?.nombre_equipo}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Serial</p>
+                                    <p className="font-medium">
+                                      {detalle.equipos?.nro_serie}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">
+                                      Marca / Modelo
+                                    </p>
+                                    <p className="font-medium">
+                                      {detalle.equipos?.marcas} /{" "}
+                                      {detalle.equipos?.modelo}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Responsable</p>
+                                    <p className="font-medium">
+                                      {
+                                        detalle.equipos?.estado_ubicacion?.[0]
+                                          ?.usuarios?.nombre
+                                      }
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Área</p>
+                                    <p className="font-medium">
+                                      {
+                                        detalle.equipos?.estado_ubicacion?.[0]
+                                          ?.sucursales?.area
+                                      }
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Sede</p>
+                                    <p className="font-medium">
+                                      {detalle.equipos?.sedes}
+                                    </p>
                                   </div>
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-
-                    {equipoSeleccionado && (
-                      <div className="bg-gray-50 rounded-lg p-4 border space-y-3">
-                        <h4 className="font-semibold text-sm sm:text-base flex items-center">
-                          <UserRound className="h-4 w-4 mr-2 text-gray-500" />
-                          Equipo Seleccionado
-                        </h4>
-                        <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-500">Nombre</p>
-                            <p className="font-medium">
-                              {equipoSeleccionado.nombre_equipo}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Serial</p>
-                            <p className="font-medium">
-                              {equipoSeleccionado.nro_serie}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Tipo de activo</p>
-                            <p className="font-medium">
-                              {equipoSeleccionado.tipo_activo}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Marca / Modelo</p>
-                            <p className="font-medium">
-                              {equipoSeleccionado.marcas} /{" "}
-                              {equipoSeleccionado.modelo}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Responsable</p>
-                            <p className="font-medium">
-                              {
-                                equipoSeleccionado?.estado_ubicacion?.[0]
-                                  ?.usuarios?.nombre
-                              }
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Área</p>
-                            <p className="font-medium">
-                              {
-                                equipoSeleccionado?.estado_ubicacion?.[0]
-                                  ?.sucursales?.area
-                              }
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Sede</p>
-                            <p className="font-medium">
-                              {equipoSeleccionado.sedes}
-                            </p>
-                          </div>
+                            )
+                          )}
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     <div className="flex justify-end">
                       <Button
@@ -363,25 +575,6 @@ const MantenimientosIndex = () => {
                         </SelectContent>
                       </Select>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label>Sedes</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar sedes" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {sedes.map((sede) => (
-                            <SelectItem
-                              key={sede.id_sede}
-                              value={sede.id_sede.toString()}
-                            >
-                              {sede.nombre}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
                   </div>
 
                   <SearchSelect
@@ -395,7 +588,7 @@ const MantenimientosIndex = () => {
                     getKey={(u) => u.id_usuario}
                     getLabel={(u) => u.nombre}
                   />
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="descripcion">
                       Descripción del mantenimiento
