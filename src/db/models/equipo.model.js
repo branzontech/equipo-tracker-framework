@@ -757,13 +757,18 @@ export const equipoModel = {
               },
             },
           },
-          mantenimientos: {
+          mantenimiento_detalle: {
             include: {
-              usuarios: {
-                select: { nombre: true },
+              mantenimientos: {
+                include: {
+                  usuarios: {
+                    select: { nombre: true },
+                  },
+                },
               },
             },
           },
+
           historial_equipo: {
             include: {
               usuarios: {
