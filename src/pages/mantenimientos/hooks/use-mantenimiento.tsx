@@ -22,26 +22,10 @@ import {
 } from "lucide-react";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
 
-const listadoChequeo = [
-  "Limpieza de hardware",
-  "Actualización de software",
-  "Verificación de componentes",
-  "Pruebas de rendimiento",
-  "Respaldo de información",
-  "Limpieza de ventiladores",
-  "Verificación de temperatura",
-  "Revisión de batería",
-  "Actualización de drivers",
-  "Desfragmentación de disco",
-];
-
 export const useMantenimiento = () => {
   const [mantenimientos, setMantenimientos] = useState<Mantenimiento[]>([]);
   const [newMante, setNewMante] = useState<Mantenimiento>({
     id_mantenimiento: 0,
-    id_equipo: 0,
-    equipos: null,
-    id_impresora: 0,
     tecnico_id: 0,
     usuarios: null,
     fecha_programada: null,
@@ -58,12 +42,14 @@ export const useMantenimiento = () => {
     checklist_campos: [],
     plantilla_id: null,
     checklist_plantillas: null,
+    mantenimiento_detalle: [],
   });
   const [currentTab, setCurrentTab] = useState("equipo");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo | null>(
-    null
-  );
+  const [equiposSeleccionados, setEquiposSeleccionados] = useState<
+    { tipo: "equipo" | "impresora" | "periferico"; id: number }[]
+  >([]);
+
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -160,8 +146,17 @@ export const useMantenimiento = () => {
 
   const camposPorTab = {
     equipo: [
-      { valor: newMante.id_equipo, mensaje: "Debe seleccionar un equipo" },
+      {
+        valor: newMante.mantenimiento_detalle.some(
+          (detalle) =>
+            detalle.equipos?.id_equipo ||
+            detalle.impresora?.id_impresora ||
+            detalle.perifericos?.id_periferico
+        ),
+        mensaje: "Debe agregar al menos un equipo, impresora o periférico",
+      },
     ],
+
     detalles: [
       {
         valor: newMante.tipo,
@@ -234,7 +229,6 @@ export const useMantenimiento = () => {
   };
 
   const onSubmit = async (data: Mantenimiento) => {
-    console.log("onSubmit", data);
     try {
       const response = await create(data);
       if (response.success) {
@@ -256,7 +250,7 @@ export const useMantenimiento = () => {
     const cumpleBusqueda =
       !searchTerm ||
       mantenimiento.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mantenimiento.equipos.nombre_equipo
+      mantenimiento.mantenimiento_detalle?.[0]?.equipos.nombre_equipo
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
       mantenimiento.usuarios.nombre
@@ -272,7 +266,7 @@ export const useMantenimiento = () => {
 
     const cumpleSearch =
       !searchQuery ||
-      mantenimiento.equipos.nombre_equipo
+      mantenimiento.mantenimiento_detalle?.[0]?.equipos?.nombre_equipo
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
       mantenimiento.usuarios.nombre
@@ -297,12 +291,12 @@ export const useMantenimiento = () => {
 
     const cumpleSede =
       selectedSede === "all" ||
-      mantenimiento.equipos?.estado_ubicacion?.sucursales?.sedes?.id_sede?.toString() ===
+      mantenimiento.mantenimiento_detalle?.[0]?.equipos?.estado_ubicacion?.sucursales?.sedes?.id_sede?.toString() ===
         selectedSede;
 
     const cumpleSucursal =
       selectedSucursal === "all" ||
-      mantenimiento.equipos?.estado_ubicacion?.sucursales?.id_sucursal?.toString() ===
+      mantenimiento.mantenimiento_detalle?.[0]?.equipos?.estado_ubicacion?.sucursales?.id_sucursal?.toString() ===
         selectedSucursal;
 
     return (
@@ -336,7 +330,7 @@ export const useMantenimiento = () => {
   const [mainTableColumns, setMainTableColumns] = useState<TableColumn[]>([
     {
       id: "equipo_id",
-      label: "Equipo",
+      label: "Equipo(s)",
       accessor: "equipo_id",
       isVisible: true,
       order: 1,
@@ -861,8 +855,8 @@ export const useMantenimiento = () => {
     nextTab,
     previousTab,
     handleTabChange,
-    equipoSeleccionado,
-    setEquipoSeleccionado,
+    equiposSeleccionados,
+    setEquiposSeleccionados,
     onSubmit,
     mantenimientosFiltrados,
     handleColumnDragStart,
@@ -904,7 +898,6 @@ export const useMantenimiento = () => {
     setTecnicoResponsable,
     validEquipo,
     validDetalles,
-    listadoChequeo,
     navigate,
 
     // Checklist
