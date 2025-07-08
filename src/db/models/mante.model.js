@@ -6,40 +6,9 @@ export const manteModel = {
       const mante = await prisma.mantenimientos.findMany({
         select: {
           id_mantenimiento: true,
-          equipo_id: true,
-          equipos: {
-            include: {
-              estado_ubicacion: {
-                select: {
-                  sucursales: {
-                    include: {
-                      sedes: {
-                        include: {
-                          usuario_sede: {
-                            include: {
-                              usuarios: {
-                                select: {
-                                  nombre: true,
-                                  email: true,
-                                  rol: true,
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          impresora_id: true,
           tecnico_id: true,
           usuarios: {
-            select: {
-              nombre: true,
-            },
+            select: { nombre: true },
           },
           fecha_programada: true,
           tipo: true,
@@ -60,8 +29,66 @@ export const manteModel = {
               archivo: true,
             },
           },
+          mantenimiento_detalle: {
+            include: {
+              equipos: {
+                include: {
+                  estado_ubicacion: {
+                    select: {
+                      sucursales: {
+                        include: {
+                          sedes: {
+                            include: {
+                              usuario_sede: {
+                                include: {
+                                  usuarios: {
+                                    select: {
+                                      nombre: true,
+                                      email: true,
+                                      rol: true,
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              impresoras: {
+                include: {
+                  sucursales: {
+                    include: {
+                      sedes: {
+                        select: {
+                          nombre: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              perifericos: {
+                include: {
+                  sucursales: {
+                    include: {
+                      sedes: {
+                        select: {
+                          nombre: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       });
+
       const result = mante.map((m) => ({
         ...m,
         archivosmantenimiento: m.archivosmantenimiento.map((a) => ({
@@ -79,7 +106,7 @@ export const manteModel = {
       return result;
     } catch (error) {
       console.log(error);
-      throw error("Error al obtener mantenimientos", error);
+      throw new Error("Error al obtener mantenimientos");
     }
   },
   async getById(id) {
@@ -87,42 +114,6 @@ export const manteModel = {
     const mante = await prisma.mantenimientos.findUnique({
       select: {
         id_mantenimiento: true,
-        equipo_id: true,
-        equipos: {
-          include: {
-            estado_ubicacion: {
-              select: {
-                sucursales: {
-                  include: {
-                    sedes: {
-                      include: {
-                        usuario_sede: {
-                          include: {
-                            usuarios: {
-                              select: {
-                                nombre: true,
-                                email: true,
-                                rol: true,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-                usuarios: {
-                  select: {
-                    nombre: true,
-                    rol: true,
-                    id_usuario: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        impresora_id: true,
         tecnico_id: true,
         usuarios: {
           select: {
@@ -160,10 +151,72 @@ export const manteModel = {
             },
           },
         },
+        mantenimiento_detalle: {
+          include: {
+            equipos: {
+              include: {
+                estado_ubicacion: {
+                  include: {
+                    sucursales: {
+                      include: {
+                        sedes: {
+                          include: {
+                            usuario_sede: {
+                              include: {
+                                usuarios: {
+                                  select: {
+                                    nombre: true,
+                                    email: true,
+                                    rol: true,
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                    usuarios: {
+                      select: {
+                        nombre: true,
+                        rol: true,
+                        id_usuario: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            impresoras: {
+              include: {
+                sucursales: {
+                  include: {
+                    sedes: {
+                      select: {
+                        nombre: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            perifericos: {
+              include: {
+                sucursales: {
+                  include: {
+                    sedes: {
+                      select: {
+                        nombre: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      where: {
-        id_mantenimiento: id_mantenimiento,
-      },
+      where: { id_mantenimiento },
     });
     return mante;
   },
@@ -171,12 +224,6 @@ export const manteModel = {
     try {
       const mante = await prisma.mantenimientos.create({
         data: {
-          equipo_id:
-            data.id_equipo && data.id_equipo > 0 ? data.id_equipo : undefined,
-          impresora_id:
-            data.id_impresora && data.id_impresora > 0
-              ? data.id_impresora
-              : undefined,
           tecnico_id: data.tecnico_id,
           fecha_programada: data.fecha_programada,
           tipo: data.tipo,
@@ -195,32 +242,72 @@ export const manteModel = {
         },
       });
 
-      // ✅ Actualizar estado del equipo
-      if (data.id_equipo && data.id_equipo > 0) {
-        await prisma.estado_ubicacion.updateMany({
-          where: { equipo_id: data.id_equipo },
-          data: {
-            estado_actual: "En mantenimiento",
-          },
-        });
+      // 👉 Registrar detalle de equipos
+      if (data.mantenimiento_detalle && data.mantenimiento_detalle.length > 0) {
+        for (const detalle of data.mantenimiento_detalle) {
+          if (detalle.equipos) {
+            await prisma.mantenimiento_detalle.create({
+              data: {
+                mantenimientos: {
+                  connect: { id_mantenimiento: mante.id_mantenimiento },
+                },
+                equipos: { connect: { id_equipo: detalle.equipos.id_equipo } },
+              },
+            });
 
-        await prisma.perifericos.updateMany({
-          where: { equipo_asociado_id: data.id_equipo },
-          data: { estado: "En mantenimiento" },
-        });
+            await prisma.estado_ubicacion.updateMany({
+              where: { equipo_id: detalle.equipos.id_equipo },
+              data: { estado_actual: "En mantenimiento" },
+            });
+
+            await prisma.perifericos.updateMany({
+              where: { equipo_asociado_id: detalle.equipos.id_equipo },
+              data: { estado: "En mantenimiento" },
+            });
+          }
+
+          if (detalle.impresora) {
+            await prisma.mantenimiento_detalle.create({
+              data: {
+                mantenimientos: {
+                  connect: { id_mantenimiento: mante.id_mantenimiento },
+                },
+                impresoras: {
+                  connect: { id_impresora: detalle.impresora.id_impresora },
+                },
+              },
+            });
+
+            await prisma.impresoras.update({
+              where: { id_impresora: detalle.impresora.id_impresora },
+              data: { estado_actual: "En mantenimiento" },
+            });
+          }
+
+          if (detalle.perifericos) {
+            await prisma.mantenimiento_detalle.create({
+              data: {
+                mantenimientos: {
+                  connect: { id_mantenimiento: mante.id_mantenimiento },
+                },
+                perifericos: {
+                  connect: { id_periferico: detalle.perifericos.id_periferico },
+                },
+              },
+            });
+
+            await prisma.perifericos.update({
+              where: { id_periferico: detalle.perifericos.id_periferico },
+              data: { estado: "En mantenimiento" },
+            });
+          }
+        }
       }
 
-      // ✅ Actualizar estado de la impresora
-      if (data.id_impresora && data.id_impresora > 0) {
-        await prisma.impresoras.update({
-          where: { id_impresora: data.id_impresora },
-          data: { estado_actual: "En mantenimiento" },
-        });
-      }
       return mante;
     } catch (error) {
       console.log(error);
-      throw error("Error al crear mantenimiento", error);
+      throw new Error("Error al crear mantenimiento");
     }
   },
   async updateStatus(id, status) {
@@ -261,14 +348,6 @@ export const manteModel = {
   async getFiles() {
     const files = await prisma.archivosmantenimiento.findMany();
     return files;
-  },
-  async delete(id) {
-    const mante = await prisma.mantenimientos.delete({
-      where: {
-        id: id,
-      },
-    });
-    return mante;
   },
   async actualizarProgreso(id, progreso) {
     const id_mantenimiento = Number(id);
@@ -317,8 +396,6 @@ export const manteModel = {
           plantilla_id: plantillaId,
           tecnico_id: tecnicoId,
           respuestas,
-          calificacion,
-          observaciones,
           fecha_realizacion: fechaRealizacion ?? new Date(),
         },
       });
@@ -355,13 +432,19 @@ export const manteModel = {
       const mante = await prisma.mantenimientos.findUnique({
         where: { id_mantenimiento: mantenimientoId },
         include: {
-          equipos: true,
+          mantenimiento_detalle: {
+            include: {
+              equipos: true,
+              impresoras: true,
+              perifericos: true,
+            },
+          },
           checklist_plantillas: true,
         },
       });
 
-      if (!mante?.equipos) {
-        throw new Error("No se encontró el equipo del mantenimiento");
+      if (!mante || mante.mantenimiento_detalle.length === 0) {
+        throw new Error("No se encontró ningún detalle del mantenimiento");
       }
 
       // Lógica adaptable por tipo de calificación
@@ -377,10 +460,29 @@ export const manteModel = {
         if (calificacion === 1) nuevoEstado = "Fuera de servicio";
       }
 
-      await prisma.estado_ubicacion.updateMany({
-        where: { equipo_id: mante.equipos.id_equipo },
-        data: { estado_actual: nuevoEstado },
-      });
+      // Actualizar estado según el tipo de cada detalle
+      for (const detalle of mante.mantenimiento_detalle) {
+        if (detalle.equipos) {
+          await prisma.estado_ubicacion.updateMany({
+            where: { equipo_id: detalle.equipos.id_equipo },
+            data: { estado_actual: nuevoEstado },
+          });
+        }
+
+        if (detalle.impresora) {
+          await prisma.impresoras.update({
+            where: { id_impresora: detalle.impresora.id_impresora },
+            data: { estado_actual: nuevoEstado },
+          });
+        }
+
+        if (detalle.perifericos) {
+          await prisma.perifericos.update({
+            where: { id_periferico: detalle.perifericos.id_periferico },
+            data: { estado: nuevoEstado },
+          });
+        }
+      }
 
       await prisma.mantenimientos.update({
         where: { id_mantenimiento: mantenimientoId },
