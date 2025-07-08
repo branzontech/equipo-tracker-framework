@@ -42,6 +42,27 @@ export const useChecklist = () => {
   const create = async (data: Checklist) => {
     const UserId = Cookies.get("userId");
 
+    if (!data.tipo_equipo) {
+      toast.error("Debe seleccionar un tipo de equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.tipo_calificacion) {
+      toast.error("Debe seleccionar un tipo de calificación", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.nombre) {
+      toast.error("Debe ingresar un nombre para la plantilla", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     const dataSend = {
       ...data,
       creado_por: UserId,
