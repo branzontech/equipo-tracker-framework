@@ -102,7 +102,10 @@ const HojaDeVida = () => {
   });
 
   // Mantenimientos
-  newEquipo.trazabilidad.mantenimientos?.forEach((mant) => {
+  newEquipo.trazabilidad.mantenimiento_detalle?.forEach((detalle) => {
+    const mant = detalle.mantenimientos;
+    if (!mant) return;
+
     historialEventos.push({
       id: `mant-${mant.id_mantenimiento}`,
       tipo: `mantenimiento_${mant.tipo?.toLowerCase()}`,
@@ -178,7 +181,7 @@ const HojaDeVida = () => {
     });
   });
 
-  // Historial 
+  // Historial
   newEquipo.trazabilidad.historial?.forEach((historial) => {
     historialEventos.push({
       id: `historial-${historial.id_historial}`,
@@ -188,7 +191,7 @@ const HojaDeVida = () => {
       responsable: historial.usuarios?.nombre || "-",
       detalles: {
         descripcion: historial.descripcion || "-",
-      }
+      },
     });
   });
 
@@ -839,69 +842,75 @@ const HojaDeVida = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="relative space-y-8">
-                    {historialEventos.map((evento, index) => (
-                      <div key={evento.id} className="flex gap-4">
-                        <div className="flex-none">
-                          <div className="bg-background p-2 rounded-full border">
-                            {getIconoEvento(evento.tipo)}
+                    {[...historialEventos]
+                      .sort(
+                        (a, b) =>
+                          new Date(b.fecha).getTime() -
+                          new Date(a.fecha).getTime()
+                      )
+                      .map((evento, index) => (
+                        <div key={evento.id} className="flex gap-4">
+                          <div className="flex-none">
+                            <div className="bg-background p-2 rounded-full border">
+                              {getIconoEvento(evento.tipo)}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-2">
-                            {getBadgeEvento(evento.tipo)}
-                            <span className="text-sm text-muted-foreground">
-                              {formatFecha(evento.fecha)}
-                            </span>
-                          </div>
-                          <h4 className="font-semibold">
-                            {evento.descripcion}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            Responsable: {evento.responsable}
-                          </p>
-                          {evento.detalles && (
-                            <div className="bg-muted p-3 rounded-md text-sm">
-                              {Object.entries(evento.detalles).map(
-                                ([key, value]) => {
-                                  if (key === "prioridad") {
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              {getBadgeEvento(evento.tipo)}
+                              <span className="text-sm text-muted-foreground">
+                                {formatFecha(evento.fecha)}
+                              </span>
+                            </div>
+                            <h4 className="font-semibold">
+                              {evento.descripcion}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Responsable: {evento.responsable}
+                            </p>
+                            {evento.detalles && (
+                              <div className="bg-muted p-3 rounded-md text-sm">
+                                {Object.entries(evento.detalles).map(
+                                  ([key, value]) => {
+                                    if (key === "prioridad") {
+                                      return (
+                                        <p
+                                          key={key}
+                                          className="capitalize flex items-center gap-2"
+                                        >
+                                          <span className="font-medium">
+                                            {key.replace(/_/g, " ")}:
+                                          </span>
+                                          {value === "alta" ? (
+                                            <Badge className="bg-red-500 text-white">
+                                              {(value as string).toUpperCase()}
+                                            </Badge>
+                                          ) : (
+                                            <Badge className="bg-yellow-500 text-white">
+                                              {String(value).toUpperCase()}
+                                            </Badge>
+                                          )}
+                                        </p>
+                                      );
+                                    }
+
                                     return (
-                                      <p
-                                        key={key}
-                                        className="capitalize flex items-center gap-2"
-                                      >
+                                      <p key={key} className="capitalize">
                                         <span className="font-medium">
                                           {key.replace(/_/g, " ")}:
-                                        </span>
-                                        {value === "alta" ? (
-                                          <Badge className="bg-red-500 text-white">
-                                            {(value as string).toUpperCase()}
-                                          </Badge>
-                                        ) : (
-                                          <Badge className="bg-yellow-500 text-white">
-                                            {String(value).toUpperCase()}
-                                          </Badge>
-                                        )}
+                                        </span>{" "}
+                                        {Array.isArray(value)
+                                          ? value.join(", ")
+                                          : String(value)}
                                       </p>
                                     );
                                   }
-
-                                  return (
-                                    <p key={key} className="capitalize">
-                                      <span className="font-medium">
-                                        {key.replace(/_/g, " ")}:
-                                      </span>{" "}
-                                      {Array.isArray(value)
-                                        ? value.join(", ")
-                                        : String(value)}
-                                    </p>
-                                  );
-                                }
-                              )}
-                            </div>
-                          )}
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </CardContent>
               </Card>
