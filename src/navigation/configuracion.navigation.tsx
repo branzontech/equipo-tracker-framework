@@ -14,21 +14,10 @@ import Clientes from "@/pages/configuracion/usuarios/Clientes";
 import Tipos from "@/pages/configuracion/maestros/views/Tipos";
 import Estados from "@/pages/configuracion/maestros/views/Estado";
 import Proveedores from "@/pages/configuracion/maestros/views/Proveedores";
+import { PlantillasCheckList } from "@/pages/configuracion/maestros/views/PlantillasCheckList";
 
 export const configuracionNavigation = [
   { path: "/configuracion/maestros/sedes", element: <Sedes /> },
-  {
-    path: "/configuracion/maestros/update-sede/:id",
-    element: (
-      <UpdateSede
-        open={false}
-        onOpenChange={function (open: boolean): void {
-          throw new Error("Function not implemented.");
-        }}
-        id={0}
-      />
-    ),
-  },
   { path: "/configuracion/maestros/sucursales", element: <Ubicaciones /> },
   { path: "/configuracion/maestros/bodegas", element: <Bodegas /> },
   { path: "/configuracion/maestros/marcas", element: <Marcas /> },
@@ -42,8 +31,12 @@ export const configuracionNavigation = [
     element: <PerfilesAcceso />,
   },
   { path: "/configuracion/usuarios/agentes", element: <Agentes /> },
-  { path: "/configuracion/usuarios/administradores", element: <Administradores /> },
+  {
+    path: "/configuracion/usuarios/administradores",
+    element: <Administradores />,
+  },
   { path: "/configuracion/usuarios/auditores", element: <Auditores /> },
   { path: "/configuracion/usuarios/clientes", element: <Clientes /> },
   { path: "/configuracion/nivel-acceso", element: <Permisos /> },
+  { path: "/configuracion/maestros/checkslist", element: <PlantillasCheckList /> },
 ];
