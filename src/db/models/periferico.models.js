@@ -9,11 +9,14 @@ export const PerifericoModel = {
         estado: true,
         tipo: true,
         serial: true,
-        id_sede: true,
-        sedes: {
-          select: {
-            id_sede: true,
-            nombre: true,
+        id_sucursal: true,
+        sucursales: {
+          include: {
+            sedes: {
+              select: {
+                nombre: true,
+              },
+            },
           },
         },
         marca_id: true,
@@ -46,11 +49,14 @@ export const PerifericoModel = {
         tipo: true,
         equipo_asociado_id: true,
         serial: true,
-        id_sede: true,
-        sedes: {
-          select: {
-            id_sede: true,
-            nombre: true,
+        id_sucursal: true,
+        sucursales: {
+          include: {
+            sedes: {
+              select: {
+                nombre: true,
+              },
+            },
           },
         },
         marca_id: true,
@@ -80,11 +86,14 @@ export const PerifericoModel = {
         tipo: true,
         equipo_asociado_id: true,
         serial: true,
-        id_sede: true,
-        sedes: {
-          select: {
-            id_sede: true,
-            nombre: true,
+        id_sucursal: true,
+        sucursales: {
+          include: {
+            sedes: {
+              select: {
+                nombre: true,
+              },
+            },
           },
         },
         marca_id: true,
@@ -100,29 +109,34 @@ export const PerifericoModel = {
   },
 
   create: async (periferico) => {
-    const perifericoCreated = await prisma.perifericos.create({
-      data: {
-        nombre: periferico.nombre,
-        estado: periferico.estado,
-        tipo: periferico.tipo,
-        equipo_asociado_id:
-          periferico.equipo_asociado_id && periferico.equipo_asociado_id > 0
-            ? periferico.equipo_asociado_id
-            : undefined,
-        serial: periferico.serial,
-        sedes: {
-          connect: {
-            id_sede: periferico.id_sede,
+    try {
+      const perifericoCreated = await prisma.perifericos.create({
+        data: {
+          nombre: periferico.nombre,
+          estado: periferico.estado,
+          tipo: periferico.tipo,
+          equipo_asociado_id:
+            periferico.equipo_asociado_id && periferico.equipo_asociado_id > 0
+              ? periferico.equipo_asociado_id
+              : undefined,
+          serial: periferico.serial,
+          sucursales: {
+            connect: {
+              id_sucursal: periferico.id_sucursal,
+            },
+          },
+          marcas: {
+            connect: {
+              id_marca: periferico.marca_id,
+            },
           },
         },
-        marcas: {
-          connect: {
-            id_marca: periferico.marca_id,
-          },
-        },
-      },
-    });
-    return perifericoCreated;
+      });
+      return perifericoCreated;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al crear periferico: " + error.message);
+    }
   },
 
   update: async (id, periferico) => {
@@ -139,9 +153,9 @@ export const PerifericoModel = {
               ? periferico.equipo_asociado_id
               : undefined,
           serial: periferico.serial,
-          sedes: {
+          sucursales: {
             connect: {
-              id_sede: periferico.id_sede,
+              id_sucursal: periferico.id_sucursal,
             },
           },
           marcas: {
