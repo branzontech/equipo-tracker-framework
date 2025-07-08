@@ -25,7 +25,7 @@ export const update = async (req, res) => {
     estado,
     equipo_asociado_id,
     serial,
-    id_sede,
+    id_sucursal,
     marca_id,
   } = req.body;
 
@@ -35,7 +35,7 @@ export const update = async (req, res) => {
     estado,
     equipo_asociado_id,
     serial,
-    id_sede,
+    id_sucursal,
     marca_id,
   });
 
@@ -49,7 +49,7 @@ export const create = async (req, res) => {
     estado,
     equipo_asociado_id,
     serial,
-    id_sede,
+    id_sucursal,
     marca_id,
   } = req.body;
 
@@ -59,7 +59,7 @@ export const create = async (req, res) => {
     estado,
     equipo_asociado_id,
     serial,
-    id_sede,
+    id_sucursal,
     marca_id,
   });
 
