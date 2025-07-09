@@ -13,7 +13,7 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
 function Calendar({
   className,
   classNames,
-  showOutsideDays = true,
+  showOutsideDays = false,
   onDayClick,
   ...props
 }: CalendarProps) {
@@ -28,7 +28,7 @@ function Calendar({
   );
   
   // Create separate props objects based on the calendar mode
-  let modeSpecificProps: Record<string, any> = {};
+  const modeSpecificProps: Record<string, any> = {};
   
   // Only add onSelect if we have onDayClick and we're in single mode
   if ((props.mode === "single" || !props.mode) && onDayClick) {
