@@ -9,7 +9,7 @@ export interface Mantenimiento {
 
   mantenimiento_detalle: {
     equipos: Equipo | null;
-    impresora: Impresora | null;
+    impresoras: Impresora | null;
     perifericos: Perifericos | null;
   }[];
 
