@@ -37,15 +37,38 @@ export const PlantillasCheckList = () => {
                 <span className="font-medium text-sm">
                   Tipo de Calificación: {plantilla.tipo_calificacion}
                 </span>
+
                 {plantilla.tipo_calificacion === "ESTRELLAS" ? (
                   <div className="flex space-x-1 text-yellow-400">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-yellow-400" />
                     ))}
                   </div>
+                ) : plantilla.tipo_calificacion === "ESCALA" ? (
+                  <div className="text-sm text-gray-600">
+                    <p>Escala de 1 a 10</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                      <div
+                        className="bg-green-400 h-2 rounded-full"
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+                  </div>
+                ) : plantilla.tipo_calificacion === "CATEGORIA" ? (
+                  <div className="flex gap-2">
+                    <span className="px-2 py-1 rounded-full bg-red-100 text-red-600 text-xs">
+                      Malo
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-600 text-xs">
+                      Bueno
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-green-100 text-green-600 text-xs">
+                      Excelente
+                    </span>
+                  </div>
                 ) : (
                   <span className="text-sm capitalize text-gray-600">
-                    {plantilla.tipo_calificacion.toLowerCase()}
+                    {plantilla.tipo_calificacion}
                   </span>
                 )}
               </div>
