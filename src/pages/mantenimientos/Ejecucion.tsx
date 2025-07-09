@@ -151,8 +151,8 @@ const EjecucionMantenimiento = () => {
                           ?.map((detalle) => {
                             if (detalle.equipos)
                               return detalle.equipos.nombre_equipo;
-                            if (detalle.impresora)
-                              return detalle.impresora.nombre;
+                            if (detalle.impresoras)
+                              return detalle.impresoras.nombre;
                             if (detalle.perifericos)
                               return detalle.perifericos.nombre;
                             return null;
@@ -165,7 +165,7 @@ const EjecucionMantenimiento = () => {
                         {mantenimiento.mantenimiento_detalle?.[0]?.equipos
                           ?.estado_ubicacion?.[0]?.sucursales?.sedes?.nombre ||
                           mantenimiento.mantenimiento_detalle?.[0]
-                            ?.impresora?.[0]?.sucursales?.sedes?.nombre ||
+                            ?.impresoras?.sucursales?.sedes?.nombre ||
                           mantenimiento.mantenimiento_detalle?.[0]?.perifericos
                             ?.sucursales?.sedes?.nombre ||
                           "—"}
@@ -175,7 +175,7 @@ const EjecucionMantenimiento = () => {
                         {mantenimiento.mantenimiento_detalle?.[0]?.equipos
                           ?.estado_ubicacion?.[0]?.sucursales?.nombre ||
                           mantenimiento.mantenimiento_detalle?.[0]
-                            ?.impresora?.[0]?.sucursales?.nombre ||
+                            ?.impresoras?.sucursales?.nombre ||
                           mantenimiento.mantenimiento_detalle?.[0]?.perifericos
                             ?.sucursales?.nombre ||
                           "—"}
