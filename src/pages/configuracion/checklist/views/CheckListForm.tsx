@@ -209,6 +209,7 @@ export const CheckListForm = () => {
                     toggleChecklistItem={toggleChecklistItem}
                     updateItemValue={updateItemValue}
                     modoPlantilla={modoPlantilla}
+                    isUpdate={false}
                   />
                 ))}
               </div>
@@ -222,6 +223,7 @@ export const CheckListForm = () => {
                     toggleChecklistItem={toggleChecklistItem}
                     updateItemValue={updateItemValue}
                     modoPlantilla={modoPlantilla}
+                    isUpdate={false}
                   />
                 ))}
               </div>

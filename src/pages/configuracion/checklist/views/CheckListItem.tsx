@@ -4,6 +4,7 @@ export function ChecklistItem({
   toggleChecklistItem,
   updateItemValue,
   modoPlantilla,
+  isUpdate,
 }) {
   return (
     <div className="p-3 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow space-y-2">
@@ -24,7 +25,7 @@ export function ChecklistItem({
           </span>
         </div>
 
-        {modoPlantilla && item.personalizado && (
+        {(modoPlantilla && item.personalizado) || isUpdate ? (
           <button
             type="button"
             onClick={() => eliminarItemPersonalizado(item.id)}
@@ -32,7 +33,7 @@ export function ChecklistItem({
           >
             ×
           </button>
-        )}
+        ) : null}
       </div>
 
       {/* Campo */}

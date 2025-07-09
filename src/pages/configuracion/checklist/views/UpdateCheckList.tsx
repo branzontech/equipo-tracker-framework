@@ -244,6 +244,7 @@ export const UpdateCheckList = ({ open, onOpenChange, id }: UpdateProps) => {
                         toggleChecklistItem={toggleChecklistItem}
                         updateItemValue={updateItemValue}
                         modoPlantilla={modoPlantilla}
+                        isUpdate={true}
                       />
                     ))}
                   </div>
@@ -257,6 +258,7 @@ export const UpdateCheckList = ({ open, onOpenChange, id }: UpdateProps) => {
                         toggleChecklistItem={toggleChecklistItem}
                         updateItemValue={updateItemValue}
                         modoPlantilla={modoPlantilla}
+                        isUpdate={true}
                       />
                     ))}
                   </div>
