@@ -68,15 +68,21 @@ export const useChecklist = () => {
       creado_por: UserId,
     };
 
-    const res = await createChecklist(dataSend);
-    if (res.success) {
-      toast.success("Plantilla creada correctamente", {
-        icon: icons.success,
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, 4500);
-    } else {
+    try {
+      const res = await createChecklist(dataSend);
+      if (res.success) {  
+        toast.success("Plantilla creada correctamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      } else {
+        toast.error("Error al crear la plantilla", {
+          icon: icons.error,
+        });
+      }
+    } catch (error) {
       toast.error("Error al crear la plantilla", {
         icon: icons.error,
       });
