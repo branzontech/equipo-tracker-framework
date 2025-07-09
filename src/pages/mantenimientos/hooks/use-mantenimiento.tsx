@@ -109,6 +109,12 @@ export const useMantenimiento = () => {
   const [itemsChequeo, setItemsChequeo] = useState<string[]>([]);
   const navigate = useNavigate();
   const { equipo } = useEquipos();
+  const [mantenimientosData, setMantenimientosData] = useState([
+    { name: "Al día", value: 0, color: "#4ade80" },
+    { name: "Próximos", value: 0, color: "#fbbf24" },
+    { name: "Vencidos", value: 0, color: "#f87171" },
+  ]);
+  const [countAtrasados, setCountAtrasados] = useState(0);
 
   useEffect(() => {
     const fetchMantenimientos = async () => {
@@ -117,6 +123,10 @@ export const useMantenimiento = () => {
       // verificar que la fecha del mantenimeinto sea igual a la de hoy
       // y actulizar el estado
       const hoy = new Date();
+      let alDia = 0;
+      let próximos = 0;
+      let vencidos = 0;
+
       mantenimientos.forEach((mantenimiento) => {
         const fechaProgramada = new Date(mantenimiento.fecha_programada);
 
@@ -137,7 +147,25 @@ export const useMantenimiento = () => {
         if (yaPaso && noFinalizado) {
           updateStatus(mantenimiento.id_mantenimiento, "Atrasado");
         }
+
+        if (
+          mantenimiento.estado === "Iniciado" ||
+          mantenimiento.estado === "Finalizado"
+        ) {
+          alDia++;
+        } else if (mantenimiento.estado === "Pendiente") {
+          próximos++;
+        } else if (mantenimiento.estado === "Atrasado") {
+          vencidos++;
+          setCountAtrasados((prev) => prev + 1);
+        }
       });
+
+      setMantenimientosData([
+        { name: "Al día", value: alDia, color: "#4ade80" },
+        { name: "Próximos", value: próximos, color: "#fbbf24" },
+        { name: "Vencidos", value: vencidos, color: "#f87171" },
+      ]);
 
       setMantenimientos(mantenimientos);
     };
@@ -947,5 +975,7 @@ export const useMantenimiento = () => {
     setObservacionesChecklist,
     setNombrePlantilla,
     toggleItem,
+    mantenimientosData,
+    countAtrasados
   };
 };
