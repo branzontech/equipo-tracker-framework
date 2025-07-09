@@ -204,27 +204,27 @@ const MantenimientoDetalle = () => {
                       {newMante.mantenimiento_detalle.map((detalle, index) => {
                         const nombre =
                           detalle.equipos?.nombre_equipo ||
-                          detalle.impresora?.nombre ||
+                          detalle.impresoras?.nombre ||
                           detalle.perifericos?.nombre ||
                           "—";
 
                         const serial =
                           detalle.equipos?.nro_serie ||
-                          detalle.impresora?.serial ||
+                          detalle.impresoras?.serial ||
                           detalle.perifericos?.serial ||
                           "—";
 
                         const sede =
                           detalle.equipos?.estado_ubicacion?.[0]?.sucursales
                             ?.sedes?.nombre ||
-                          detalle.impresora?.sucursales?.sedes?.nombre ||
+                          detalle.impresoras?.sucursales?.sedes?.nombre ||
                           detalle.perifericos?.sucursales?.sedes?.nombre ||
                           "—";
 
                         const sucursal =
                           detalle.equipos?.estado_ubicacion?.[0]?.sucursales
                             ?.nombre ||
-                          detalle.impresora?.sucursales?.nombre ||
+                          detalle.impresoras?.sucursales?.nombre ||
                           detalle.perifericos?.sucursales?.nombre ||
                           "—";
 
@@ -534,16 +534,24 @@ const MantenimientoDetalle = () => {
                     e.preventDefault();
                     const files = Array.from(e.dataTransfer.files || []);
 
-                    const archivosConvertidos = await Promise.all(
+                    const archivosFormateados = await Promise.all(
                       files.map(
                         (file) =>
                           new Promise((resolve, reject) => {
                             const reader = new FileReader();
                             reader.onload = () => {
                               resolve({
+                                id_archivo: 0,
+                                mantenimiento_id: 0,
                                 nombre_archivo: file.name,
                                 tipo_archivo: file.type,
-                                contenido: reader.result as string,
+                                archivos: [file],
+                                archivo: {
+                                  content: reader.result as string, 
+                                  nombre: file.name,
+                                  tipo: file.type,
+                                },
+                                fecha_subida: new Date(),
                               });
                             };
                             reader.onerror = reject;
@@ -552,17 +560,11 @@ const MantenimientoDetalle = () => {
                       )
                     );
 
-                    const nuevosArchivos = archivosConvertidos as {
-                      nombre_archivo: string;
-                      tipo_archivo: string;
-                      contenido: string;
-                    }[];
-
                     setNewMante((prev) => ({
                       ...prev,
                       archivosmantenimiento: [
                         ...(prev.archivosmantenimiento || []),
-                        ...nuevosArchivos,
+                        ...(archivosFormateados as any[]),
                       ],
                     }));
                   }}
@@ -585,17 +587,31 @@ const MantenimientoDetalle = () => {
                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
                       className="hidden"
                       onChange={(e) => {
-                        const files = Array.from(e.target.files || []).map(
-                          (file) => ({
-                            ...file,
-                            nombre_archivo: file.name,
-                            tipo_archivo: file.type,
-                          })
-                        );
-                        if (files.length > 0) {
+                        const selectedFiles = Array.from(e.target.files || []);
+
+                        if (selectedFiles.length > 0) {
+                          const archivosFormateados = selectedFiles.map(
+                            (file) => ({
+                              id_archivo: 0,
+                              mantenimiento_id: 0,
+                              nombre_archivo: file.name,
+                              tipo_archivo: file.type,
+                              archivos: [file],
+                              archivo: {
+                                content: "",
+                                nombre: file.name,
+                                tipo: file.type,
+                              },
+                              fecha_subida: new Date(),
+                            })
+                          );
+
                           setNewMante((prev) => ({
                             ...prev,
-                            archivosmantenimiento: files,
+                            archivosmantenimiento: [
+                              ...(prev.archivosmantenimiento || []),
+                              ...archivosFormateados,
+                            ],
                           }));
                         }
                       }}
@@ -611,12 +627,15 @@ const MantenimientoDetalle = () => {
                         key={index}
                         className="flex items-center justify-between border rounded-md p-3 bg-white"
                       >
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          <FileText className="h-4 w-4 text-blue-500" />
-                          <span className="text-sm truncate">
-                            {file.nombre_archivo}
-                          </span>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <FileText className="h-4 w-4 text-blue-500" />
+                            <span className="text-sm truncate">
+                              {file.archivos?.[0]?.name ?? file.nombre_archivo}
+                            </span>
+                          </div>
                         </div>
+
                         <Button
                           type="button"
                           variant="ghost"
@@ -639,12 +658,15 @@ const MantenimientoDetalle = () => {
                     ))}
                     <Button
                       type="button"
-                      onClick={() =>
-                        upload(
-                          newMante.id_mantenimiento,
-                          newMante.archivosmantenimiento
-                        )
-                      }
+                      onClick={() => {
+                        const filesToUpload = newMante.archivosmantenimiento
+                          ?.flatMap((item) => item.archivos)
+                          .filter((f) => f instanceof File);
+
+                        if (filesToUpload?.length) {
+                          upload(newMante.id_mantenimiento, filesToUpload);
+                        }
+                      }}
                       className="mt-10 w-full"
                     >
                       <Upload className="w-4 h-4" />
