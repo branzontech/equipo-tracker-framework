@@ -266,21 +266,21 @@ export const manteModel = {
             });
           }
 
-          if (detalle.impresora) {
+          if (detalle.impresoras) {
             await prisma.mantenimiento_detalle.create({
               data: {
                 mantenimientos: {
                   connect: { id_mantenimiento: mante.id_mantenimiento },
                 },
                 impresoras: {
-                  connect: { id_impresora: detalle.impresora.id_impresora },
+                  connect: { id_impresora: detalle.impresoras.id_impresora },
                 },
               },
             });
 
             await prisma.impresoras.update({
-              where: { id_impresora: detalle.impresora.id_impresora },
-              data: { estado_actual: "En mantenimiento" },
+              where: { id_impresora: detalle.impresoras.id_impresora },
+              data: { estado: "En mantenimiento" },
             });
           }
 
@@ -469,10 +469,10 @@ export const manteModel = {
           });
         }
 
-        if (detalle.impresora) {
+        if (detalle.impresoras) {
           await prisma.impresoras.update({
-            where: { id_impresora: detalle.impresora.id_impresora },
-            data: { estado_actual: nuevoEstado },
+            where: { id_impresora: detalle.impresoras.id_impresora },
+            data: { estado: nuevoEstado },
           });
         }
 
