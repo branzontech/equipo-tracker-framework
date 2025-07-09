@@ -958,6 +958,10 @@ const EditEquipo = () => {
                                 },
                               })
                             }
+                            disabled={
+                              newEquipo.estado_ubicacion?.estado_actual !==
+                              "Activo"
+                            }
                           >
                             <FormControl>
                               <SelectTrigger>
