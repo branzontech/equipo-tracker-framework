@@ -9,6 +9,7 @@ export interface Checklist {
     id_usuario: number;
     nombre: string;
   };
+  estado: "Habilitado" | "Deshabilitado";
 }
 
 export interface ChecklistRespuestaData {
