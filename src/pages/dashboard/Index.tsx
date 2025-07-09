@@ -24,9 +24,6 @@ import {
   Printer,
   GripVertical,
   Gauge,
-  ChartBar,
-  ChartLine,
-  ChartPie,
   ActivitySquare,
   TrendingUp,
   TrendingDown,
@@ -44,7 +41,6 @@ import {
 import {
   DashboardItem,
   incidentesData,
-  mantenimientosData,
   rendimientoEquiposData,
   rendimientoTonerData,
   serviciosActivosData,
@@ -56,7 +52,12 @@ import { useEquipos } from "../productos/hooks/use-equipos";
 import { useGlobal } from "@/hooks/use-global";
 
 export default function Dashboard() {
-  const { sedesConEquiposCount, equiposCount } = useGlobal();
+  const {
+    sedesConEquiposCount,
+    equiposCount,
+    mantenimientosData,
+    countAtrasados,
+  } = useGlobal();
   const { equiposData, sedesData } = useEquipos();
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("general");
@@ -88,16 +89,16 @@ export default function Dashboard() {
         {
           id: "mantenimientos",
           order: 1,
-          title: "Mantenimientos Vencidos",
+          title: "Mantenimientos Atrasados",
           size: "small",
           tab: "general",
           component: (
             <div className="w-full">
               <div className="flex items-center gap-2 text-sm">
                 <Wrench className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">Mantenimientos Vencidos</span>
+                <span className="truncate">Mantenimientos Atrasados</span>
               </div>
-              <div className="text-2xl font-bold mt-2 text-red-500">12</div>
+              <div className="text-2xl font-bold mt-2 text-red-500">{countAtrasados}</div>
               <p className="text-xs text-muted-foreground mt-1 truncate">
                 Requieren atención inmediata
               </p>
@@ -135,7 +136,9 @@ export default function Dashboard() {
                 <Building2 className="h-4 w-4 flex-shrink-0" />
                 <span className="truncate">Sedes Activas</span>
               </div>
-              <div className="text-2xl font-bold mt-2">{sedesConEquiposCount}</div>
+              <div className="text-2xl font-bold mt-2">
+                {sedesConEquiposCount}
+              </div>
               <p className="text-xs text-muted-foreground mt-1 truncate">
                 Con equipos asignados
               </p>
@@ -341,7 +344,13 @@ export default function Dashboard() {
         },
       ]);
     }
-  }, [sedesConEquiposCount, equiposCount, equiposData, sedesData]);
+  }, [
+    sedesConEquiposCount,
+    equiposCount,
+    equiposData,
+    sedesData,
+    mantenimientosData,
+  ]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     setDraggedItem(itemId);
@@ -446,8 +455,8 @@ export default function Dashboard() {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) =>
-              `${name} ${(percent * 100).toFixed(0)}%`
+            label={({ name, percent, value }) =>
+              value > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ""
             }
             outerRadius={window.innerWidth < 640 ? 80 : 100}
             fill="#8884d8"
