@@ -341,8 +341,8 @@ const ProgramacionMantenimiento = () => {
                                     ?.map((detalle) => {
                                       if (detalle.equipos)
                                         return detalle.equipos.nombre_equipo;
-                                      if (detalle.impresora)
-                                        return detalle.impresora.nombre;
+                                      if (detalle.impresoras)
+                                        return detalle.impresoras.nombre;
                                       if (detalle.perifericos)
                                         return detalle.perifericos.nombre;
                                       return null;
