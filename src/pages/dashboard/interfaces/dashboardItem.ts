@@ -1,9 +1,3 @@
-export const mantenimientosData = [
-  { name: 'Al día', value: 75, color: '#4ade80' },
-  { name: 'Próximos', value: 15, color: '#fbbf24' },
-  { name: 'Vencidos', value: 10, color: '#f87171' },
-];
-
 export const tonerData = [
   { name: 'Disponibles', value: 85, color: '#4ade80' },
   { name: 'Alerta', value: 15, color: '#f87171' },
