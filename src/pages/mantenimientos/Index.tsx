@@ -86,8 +86,10 @@ const MantenimientosIndex = () => {
     users,
   } = useUser();
   const { equipo, newEquipo, setNewEquipo, setEquipo } = useEquipos();
-  const { impresora } = useImpresora();
-  const { perifericos } = usePeriferico();
+  const { perifericos, newPeriferico, setNewPeriferico, setPerifericos } =
+    usePeriferico();
+  const { impresora, newImpresora, setNewImpresora, setImpresa } =
+    useImpresora();
   const { sedes } = useSedes();
   const { checklist } = useChecklist();
   const [plantillaSeleccionada, setPlantillaSeleccionada] =
@@ -139,18 +141,6 @@ const MantenimientosIndex = () => {
     setItemsChequeo([]);
   };
 
-  const selectEquipo = (equipo: Equipo) => {
-    setNewMante((prev) => ({
-      ...prev,
-      mantenimiento_detalle: [
-        ...prev.mantenimiento_detalle,
-        { equipos: equipo, impresora: null },
-      ],
-    }));
-
-    setNewEquipo((prev) => ({ ...prev, nro_serie: "" }));
-  };
-
   const handleUserSelect = (user) => {
     setNombreUser(user.nombre);
     setSelectedRecibeUser(user);
@@ -167,6 +157,42 @@ const MantenimientosIndex = () => {
     setSugerencias([]);
   };
 
+  const selectEquipo = (equipo: Equipo) => {
+    setNewMante((prev) => ({
+      ...prev,
+      mantenimiento_detalle: [
+        ...prev.mantenimiento_detalle,
+        { equipos: equipo, impresoras: null, perifericos: null },
+      ],
+    }));
+
+    setNewEquipo((prev) => ({ ...prev, nro_serie: "" }));
+  };
+
+  const selectPeriferico = (periferico: Perifericos) => {
+    setNewMante((prev) => ({
+      ...prev,
+      mantenimiento_detalle: [
+        ...prev.mantenimiento_detalle,
+        { equipos: null, perifericos: periferico, impresoras: null },
+      ],
+    }));
+
+    setNewPeriferico({ ...newPeriferico, serial: "" });
+  };
+
+  const selectImpresora = (impresora: Impresora) => {
+    setNewMante((prev) => ({
+      ...prev,
+      mantenimiento_detalle: [
+        ...prev.mantenimiento_detalle,
+        { equipos: null, perifericos: null, impresoras: impresora },
+      ],
+    }));
+
+    setNewImpresora({ ...newImpresora, serial: "" });
+  };
+
   const idsSeleccionadosEquipos = newMante.mantenimiento_detalle
     .map((d) => d.equipos?.id_equipo)
     .filter(Boolean);
@@ -177,6 +203,30 @@ const MantenimientosIndex = () => {
         .toLowerCase()
         .includes(newEquipo.nro_serie.toLowerCase()) &&
       !idsSeleccionadosEquipos.includes(eq.id_equipo)
+  );
+
+  const idsSeleccionadosPerifericos = newMante.mantenimiento_detalle
+    .map((d) => d.perifericos?.id_periferico)
+    .filter(Boolean);
+
+  const perifericosFiltrados = perifericos.filter(
+    (p) =>
+      `${p.nombre} ${p.serial}`
+        .toLowerCase()
+        .includes(newEquipo.nro_serie.toLowerCase()) &&
+      !idsSeleccionadosPerifericos.includes(p.id_periferico)
+  );
+
+  const idsSeleccionadosImpresoras = newMante.mantenimiento_detalle
+    .map((d) => d.impresoras?.id_impresora)
+    .filter(Boolean);
+
+  const impresorasFiltradas = impresora.filter(
+    (i) =>
+      `${i.nombre} ${i.serial}`
+        .toLowerCase()
+        .includes(newImpresora.serial.toLowerCase()) &&
+      !idsSeleccionadosImpresoras.includes(i.id_impresora)
   );
 
   const equiposFiltradosPorSede = equiposPorSede.filter(
@@ -201,7 +251,7 @@ const MantenimientosIndex = () => {
           if (item.tipo === "equipo")
             return detalle.equipos?.id_equipo !== item.id;
           if (item.tipo === "impresora")
-            return detalle.impresora?.id_impresora !== item.id;
+            return detalle.impresoras?.id_impresora !== item.id;
           if (item.tipo === "periferico")
             return detalle.perifericos?.id_periferico !== item.id;
           return true;
@@ -217,19 +267,13 @@ const MantenimientosIndex = () => {
             ...prev.mantenimiento_detalle,
             {
               equipos: item.tipo === "equipo" ? { id_equipo: item.id } : null,
-              impresora:
+              impresoras:
                 item.tipo === "impresora" ? { id_impresora: item.id } : null,
               perifericos:
                 item.tipo === "periferico" ? { id_periferico: item.id } : null,
             },
           ],
         };
-
-        console.log(
-          "Nuevo mantenimiento_detalle:",
-          updated.mantenimiento_detalle
-        );
-
         return updated;
       });
     }
@@ -307,6 +351,12 @@ const MantenimientosIndex = () => {
                           <SelectContent>
                             <SelectItem value="sedes">Por Sede</SelectItem>
                             <SelectItem value="equipos">Por Equipo</SelectItem>
+                            <SelectItem value="perifericos">
+                              Por Periférico
+                            </SelectItem>
+                            <SelectItem value="impresoras">
+                              Por Impresora
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -456,6 +506,146 @@ const MantenimientosIndex = () => {
                             )}
                         </>
                       )}
+
+                      {modoSeleccion === "perifericos" && (
+                        <>
+                          <div className="flex items-center mb-2">
+                            <UserRound className="h-4 w-4 mr-2 text-gray-500" />
+                            <Label className="text-sm sm:text-base font-medium">
+                              Buscar Periférico
+                            </Label>
+                          </div>
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              placeholder="Buscar por número de serie o nombre"
+                              value={newPeriferico.serial}
+                              onChange={(e) =>
+                                setNewPeriferico({
+                                  ...newPeriferico,
+                                  serial: e.target.value,
+                                })
+                              }
+                              className="w-full pl-10 mt-1"
+                            />
+                          </div>
+
+                          {newPeriferico.serial.trim() !== "" &&
+                            perifericosFiltrados.length > 0 && (
+                              <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                                {perifericosFiltrados.map((periferico) => (
+                                  <div
+                                    key={periferico.id_periferico}
+                                    className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                                    onClick={() => selectPeriferico(periferico)}
+                                  >
+                                    <div className="font-medium text-sm sm:text-base">
+                                      {periferico.nombre}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <span>
+                                          <span className="font-semibold">
+                                            Serial:
+                                          </span>{" "}
+                                          {periferico.serial}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Tipo de activo:
+                                          </span>{" "}
+                                          {periferico.tipo}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Marca:
+                                          </span>{" "}
+                                          {periferico.marcas?.nombre}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Sede:
+                                          </span>{" "}
+                                          {periferico.sucursales?.sedes?.nombre}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                        </>
+                      )}
+
+                      {modoSeleccion === "impresoras" && (
+                        <>
+                          <div className="flex items-center mb-2">
+                            <UserRound className="h-4 w-4 mr-2 text-gray-500" />
+                            <Label className="text-sm sm:text-base font-medium">
+                              Buscar Impresora
+                            </Label>
+                          </div>
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              placeholder="Buscar por número de serie o nombre"
+                              value={newImpresora.serial}
+                              onChange={(e) =>
+                                setNewImpresora({
+                                  ...newImpresora,
+                                  serial: e.target.value,
+                                })
+                              }
+                              className="w-full pl-10 mt-1"
+                            />
+                          </div>
+
+                          {newImpresora.serial.trim() !== "" &&
+                            impresorasFiltradas.length > 0 && (
+                              <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                                {impresorasFiltradas.map((impresora) => (
+                                  <div
+                                    key={impresora.id_impresora}
+                                    className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                                    onClick={() => selectImpresora(impresora)}
+                                  >
+                                    <div className="font-medium text-sm sm:text-base">
+                                      {impresora.nombre}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <span>
+                                          <span className="font-semibold">
+                                            Serial:
+                                          </span>{" "}
+                                          {impresora.serial}{" "}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Tipo de activo:
+                                          </span>{" "}
+                                          {impresora.tipo}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Marca:
+                                          </span>{" "}
+                                          {impresora.marcas?.nombre}
+                                        </span>
+                                        <span>
+                                          <span className="font-semibold">
+                                            Sede:
+                                          </span>{" "}
+                                          {impresora.sucursales?.sedes?.nombre}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                        </>
+                      )}
                     </div>
 
                     {modoSeleccion === "equipos" &&
@@ -521,6 +711,120 @@ const MantenimientosIndex = () => {
                               </div>
                             )
                           )}
+                        </div>
+                      )}
+
+                    {modoSeleccion === "perifericos" &&
+                      newMante.mantenimiento_detalle.length > 0 && (
+                        <div className="space-y-4">
+                          {newMante.mantenimiento_detalle
+                            .filter((d) => d.perifericos)
+                            .map((detalle, index) => (
+                              <div
+                                key={
+                                  detalle.perifericos?.id_periferico || index
+                                }
+                                className="bg-gray-50 rounded-lg p-4 border space-y-3"
+                              >
+                                <h4 className="font-semibold text-sm sm:text-base flex items-center">
+                                  <UserRound className="h-4 w-4 mr-2 text-gray-500" />
+                                  Periférico Seleccionado
+                                </h4>
+                                <div className="grid sm:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <p className="text-gray-500">Nombre</p>
+                                    <p className="font-medium">
+                                      {detalle.perifericos?.nombre}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Serial</p>
+                                    <p className="font-medium">
+                                      {detalle.perifericos?.serial}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">
+                                      Tipo de activo
+                                    </p>
+                                    <p className="font-medium">
+                                      {detalle.perifericos?.tipo}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Marca</p>
+                                    <p className="font-medium">
+                                      {detalle.perifericos?.marcas?.nombre}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Sede</p>
+                                    <p className="font-medium">
+                                      {
+                                        detalle.perifericos?.sucursales?.sedes
+                                          ?.nombre
+                                      }
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+
+                    {modoSeleccion === "impresoras" &&
+                      newMante.mantenimiento_detalle.length > 0 && (
+                        <div className="space-y-4">
+                          {newMante.mantenimiento_detalle
+                            .filter((d) => d.impresoras)
+                            .map((detalle, index) => (
+                              <div
+                                key={detalle.impresoras?.id_impresora || index}
+                                className="bg-gray-50 rounded-lg p-4 border space-y-3"
+                              >
+                                <h4 className="font-semibold text-sm sm:text-base flex items-center">
+                                  <UserRound className="h-4 w-4 mr-2 text-gray-500" />
+                                  Impresora Seleccionada
+                                </h4>
+                                <div className="grid sm:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <p className="text-gray-500">Nombre</p>
+                                    <p className="font-medium">
+                                      {detalle.impresoras?.nombre}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Serial</p>
+                                    <p className="font-medium">
+                                      {detalle.impresoras?.serial}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">
+                                      Tipo de activo
+                                    </p>
+                                    <p className="font-medium">
+                                      {detalle.impresoras?.tipo}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Marca</p>
+                                    <p className="font-medium">
+                                      {detalle.impresoras?.marcas?.nombre}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-500">Sede</p>
+                                    <p className="font-medium">
+                                      {
+                                        detalle.impresoras?.sucursales?.sedes
+                                          ?.nombre
+                                      }
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
                         </div>
                       )}
 
