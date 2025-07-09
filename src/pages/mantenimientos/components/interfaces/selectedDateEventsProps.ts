@@ -1,10 +1,10 @@
 import {
-  MantenimientoItem,
+  Mantenimiento,
   EstadoInfo,
 } from "@/pages/mantenimientos/interfaces/mantenimiento";
 
 export interface SelectedDateEventsProps {
   selectedDate: Date | undefined;
-  events: MantenimientoItem[];
+  events: Mantenimiento[];
   estados: EstadoInfo[];
 }
