@@ -3,6 +3,7 @@ import { Perifericos } from "@/pages/configuracion/maestros/interfaces/periferic
 import { Usuario } from "@/pages/configuracion/usuarios/interfaces/usuarios";
 import { Equipo } from "@/pages/productos/interfaces/equipo";
 import { Impresora } from "@/pages/toners/interfaces/impresora";
+import { LucideIcon } from "lucide-react";
 
 export interface Mantenimiento {
   id_mantenimiento: number;
@@ -51,4 +52,11 @@ export interface TableColumn {
   isVisible: boolean;
   order: number;
   className?: string;
+}
+
+export interface EstadoInfo {
+  value: string;        
+  label: string;        
+  icon: LucideIcon;     
+  color: string;      
 }
