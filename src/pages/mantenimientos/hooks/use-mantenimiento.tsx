@@ -150,7 +150,7 @@ export const useMantenimiento = () => {
         valor: newMante.mantenimiento_detalle.some(
           (detalle) =>
             detalle.equipos?.id_equipo ||
-            detalle.impresora?.id_impresora ||
+            detalle.impresoras?.id_impresora ||
             detalle.perifericos?.id_periferico
         ),
         mensaje: "Debe agregar al menos un equipo, impresora o periférico",
@@ -612,7 +612,7 @@ export const useMantenimiento = () => {
           icon: icons.success,
         });
         setTimeout(() => {
-          navigate("/mantenimientos/programacion");
+          navigate("/mantenimientos/documentacion");
         }, 4500);
       }
     } catch (error) {
