@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { Checklist, ChecklistRespuestaData } from "../interface/checklist";
-import { createChecklist, getChecklist } from "@/api/axios/checklist.api";
+import {
+  createChecklist,
+  disableChecklist,
+  enableChecklist,
+  getChecklist,
+  getChecklistById,
+  updateChecklist,
+} from "@/api/axios/checklist.api";
 import { toast } from "sonner";
 import { icons } from "@/components/interfaces/icons";
 import Cookies from "js-cookie";
@@ -19,6 +26,7 @@ export const useChecklist = () => {
       id_usuario: 0,
       nombre: "",
     },
+    estado: "Habilitado",
   });
   const [checklistData, setChecklistData] = useState<ChecklistRespuestaData>({
     mantenimientoId: 0,
@@ -30,6 +38,10 @@ export const useChecklist = () => {
     fechaRealizacion: undefined,
   });
   const [checklistCompleted, setChecklistCompleted] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedChecklistId, setSelectedChecklistId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchChecklist = async () => {
@@ -70,7 +82,7 @@ export const useChecklist = () => {
 
     try {
       const res = await createChecklist(dataSend);
-      if (res.success) {  
+      if (res.success) {
         toast.success("Plantilla creada correctamente", {
           icon: icons.success,
         });
@@ -118,6 +130,95 @@ export const useChecklist = () => {
     }
   };
 
+  const getByID = async (id: number) => {
+    const res = await getChecklistById(id);
+    setNewCheckList(res);
+  };
+
+  const update = async (id: number, data: Checklist) => {
+    const UserId = Cookies.get("userId");
+
+    if (!data.tipo_equipo) {
+      toast.error("Debe seleccionar un tipo de equipo", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.tipo_calificacion) {
+      toast.error("Debe seleccionar un tipo de calificación", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.nombre) {
+      toast.error("Debe ingresar un nombre para la plantilla", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    data.creado_por = UserId;
+
+    try {
+      const res = await updateChecklist(id, data);
+      if (res.success) {
+        toast.success("Plantilla actualizada correctamente", {
+          icon: icons.success,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 4500);
+      } else {
+        toast.error("Error al actualizar la plantilla", {
+          icon: icons.error,
+        });
+      }
+    } catch (error) {
+      toast.error("Error al actualizar la plantilla", {
+        icon: icons.error,
+      });
+    }
+  };
+
+  const handleOpenEditModal = (id: number) => {
+    setSelectedChecklistId(id);
+    setShowEditModal(true);
+  };
+
+  const disable = async (id: number) => {
+    const res = await disableChecklist(id);
+    if (res.success) {
+      toast.success("Checklist deshabilitada correctamente", {
+        icon: icons.success,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    } else {
+      toast.error("Error al deshabilitar la plantilla de chequeo", {
+        icon: icons.error,
+      });
+    }
+  };
+
+  const enable = async (id: number) => {
+    const res = await enableChecklist(id);
+    if (res.success) {
+      toast.success("Checklist habilitada correctamente", {
+        icon: icons.success,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 4500);
+    } else {
+      toast.error("Error al habilitar la plantilla de chequeo", {
+        icon: icons.error,
+      });
+    }
+  };
+
   return {
     checklist,
     newCheckList,
@@ -128,5 +229,14 @@ export const useChecklist = () => {
     finalizarChecklist,
     checklistCompleted,
     setChecklistCompleted,
+    getByID,
+    update,
+    showEditModal,
+    handleOpenEditModal,
+    selectedChecklistId,    
+    setShowEditModal, 
+    setSelectedChecklistId,
+    disable,
+    enable
   };
 };
