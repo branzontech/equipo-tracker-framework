@@ -17,4 +17,5 @@ export interface CalendarViewProps {
   onMonthChange: (date: Date) => void;
   onPeriodoChange: (value: string) => void;
   navigateMonth: (direction: "prev" | "next") => void;
+  showOutsideDays?: boolean;
 }
