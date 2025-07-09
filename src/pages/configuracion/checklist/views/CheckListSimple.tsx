@@ -25,6 +25,8 @@ export const ListaChequeoSimple = ({
   itemsSeleccionados,
   onToggleItem,
 }: ListaChequeoSimpleProps) => {
+  const checklisEnable = checklist.filter((c) => c.estado === "Habilitado");
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -42,8 +44,11 @@ export const ListaChequeoSimple = ({
             <SelectValue placeholder="Seleccione una plantilla" />
           </SelectTrigger>
           <SelectContent>
-            {checklist.map((p) => (
-              <SelectItem key={p.id_plantilla} value={p.id_plantilla.toString()}>
+            {checklisEnable.map((p) => (
+              <SelectItem
+                key={p.id_plantilla}
+                value={p.id_plantilla.toString()}
+              >
                 {p.nombre}
               </SelectItem>
             ))}
