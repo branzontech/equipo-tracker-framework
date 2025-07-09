@@ -22,6 +22,7 @@ import { parseISO } from "date-fns";
 import { getPerifericoBySerial } from "@/api/axios/periferico.api";
 import { Impresora } from "@/pages/toners/interfaces/impresora";
 import { getImpresoraBySerial } from "@/api/axios/impresora.api";
+import { useMantenimiento } from "@/pages/mantenimientos/hooks/use-mantenimiento";
 
 export const useGlobal = () => {
   const { count: sedesCount } = useSedes();
@@ -31,6 +32,7 @@ export const useGlobal = () => {
     sedesConEquiposCount,
     getInfoEquipo,
   } = useEquipos();
+  const { mantenimientosData, countAtrasados } = useMantenimiento();
   const {
     findEquipoByNroSerie,
     findPerifericoBySerial,
@@ -55,6 +57,7 @@ export const useGlobal = () => {
       motivo: "",
       tags: [],
       imagen: "",
+      usuario_id: "",
     },
   ]);
   const [perifericos, setPerifericos] = useState<Perifericos[]>([
@@ -66,13 +69,13 @@ export const useGlobal = () => {
       tipo: "",
       equipo_asociado_id: 0,
       equipos: null,
-      id_sede: 0,
-      sedes: null,
       marca_id: 0,
       marcas: null,
       prestamos: null,
       traslados: null,
       motivo: "",
+      id_sucursal: 0,
+      sucursales: null,
     },
   ]);
   const [impresoras, setImpresoras] = useState<Impresora[]>([
@@ -433,6 +436,8 @@ export const useGlobal = () => {
     buscarImpresora,
     openFileInNewTab,
     downloadFile,
+    mantenimientosData,
+    countAtrasados
   };
 };
 
