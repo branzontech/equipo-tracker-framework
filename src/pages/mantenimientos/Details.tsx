@@ -108,7 +108,8 @@ const MantenimientoDetalle = () => {
         : [...prev, campo];
 
       // Calcular el progreso
-      const totalCampos = newMante?.checklist_campos?.length || 0;
+      const totalCampos =
+        newMante?.mantenimiento_detalle?.[0]?.checklist_campos?.length || 0;
       const progreso =
         totalCampos === 0
           ? 0
@@ -120,14 +121,18 @@ const MantenimientoDetalle = () => {
       // Guardar el response
       // Construir el JSON de respuestas
       const respuestas: Record<string, boolean> = {};
-      newMante?.checklist_campos?.forEach((campo) => {
-        respuestas[campo] = nuevosSeleccionados.includes(campo);
-      });
+      newMante?.mantenimiento_detalle?.[0]?.checklist_campos?.forEach(
+        (campo) => {
+          respuestas[campo] = nuevosSeleccionados.includes(campo);
+        }
+      );
 
       // Guardar las respuestas completas
       saveResponse({
         mantenimientoId: newMante.id_mantenimiento,
-        plantillaId: newMante.checklist_plantillas?.id_plantilla,
+        plantillaId:
+          newMante.mantenimiento_detalle?.[0]?.checklist_plantillas
+            ?.id_plantilla,
         tecnicoId: newMante.tecnico_id,
         respuestas,
       });
@@ -153,8 +158,10 @@ const MantenimientoDetalle = () => {
   };
 
   const isChecklistCompleto =
-    (newMante?.checklist_campos?.length ?? 0) > 0 &&
-    newMante.checklist_campos.some((campo) => checkedItems.includes(campo));
+    (newMante?.mantenimiento_detalle?.[0]?.checklist_campos?.length ?? 0) > 0 &&
+    newMante.mantenimiento_detalle?.[0]?.checklist_campos.some((campo) =>
+      checkedItems.includes(campo)
+    );
 
   return (
     <>
@@ -321,203 +328,54 @@ const MantenimientoDetalle = () => {
 
           <Separator />
 
-          <section className="space-y-4 rounded-lg border bg-gray-50 p-6">
-            <Labels
-              icon={ClipboardList}
-              text={`Checklist de la plantilla - ${newMante.checklist_plantillas?.nombre}`}
-            />
+          <section className="space-y-6">
+            {newMante.mantenimiento_detalle.map((detalle, i) => (
+              <div
+                key={i}
+                className="space-y-4 rounded-lg border bg-gray-50 p-6"
+              >
+                <Labels
+                  icon={ClipboardList}
+                  text={`Checklist de la plantilla - ${
+                    detalle.checklist_plantillas?.nombre || "Sin plantilla"
+                  }`}
+                />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {newMante?.checklist_campos?.map((campo, index) => (
-                <div
-                  key={index}
-                  className="rounded-md border bg-white p-4 space-y-2 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{campo}</span>
-                    <span className="text-xs text-gray-400">Checkbox</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={checkedItems.includes(campo)}
-                      onChange={() => {
-                        if (checklistCompleted) return;
-                        toggleChecklistItem(campo);
-                      }}
-                      disabled={checklistCompleted}
-                    />
-                    <span
-                      className={`text-sm ${
-                        checkedItems.includes(campo)
-                          ? "line-through text-gray-500"
-                          : ""
-                      }`}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {detalle.checklist_campos?.map((campo, index) => (
+                    <div
+                      key={index}
+                      className="rounded-md border bg-white p-4 space-y-2 shadow-sm"
                     >
-                      Completado
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {isChecklistCompleto && (
-              <div className="mt-6 space-y-6">
-                <div className="space-y-2">
-                  <Label>Observaciones</Label>
-                  <Textarea
-                    placeholder="Ingrese observaciones adicionales..."
-                    value={checklistData.observaciones}
-                    onChange={(e) =>
-                      setChecklistData((prev) => ({
-                        ...prev,
-                        observaciones: e.target.value,
-                      }))
-                    }
-                    className="min-h-[80px]"
-                    readOnly={checklistCompleted}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <Label>Calificación del Estado del Equipo</Label>
-                  {newMante.checklist_plantillas?.tipo_calificacion ===
-                    "ESTRELLAS" && (
-                    <div className="flex items-center space-x-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`h-6 w-6 cursor-pointer transition-colors ${
-                            star <= (checklistData.calificacion ?? 0)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300 hover:text-yellow-200"
-                          }${
-                            !checklistCompleted
-                              ? "cursor-pointer hover:text-yellow-200"
-                              : "cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (checklistCompleted) return;
-                            setChecklistData((prev) => ({
-                              ...prev,
-                              calificacion: star,
-                            }));
-                          }}
-                        />
-                      ))}
-                      <span className="ml-2 text-sm text-gray-600">
-                        ({checklistData.calificacion ?? 0} de 5 estrellas)
-                      </span>
-                    </div>
-                  )}
-                  {/* Calificación por Escala 1-10 */}
-                  {newMante.checklist_plantillas?.tipo_calificacion ===
-                    "ESCALA" && (
-                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{campo}</span>
+                        <span className="text-xs text-gray-400">Checkbox</span>
+                      </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-red-500 font-medium">
-                          1 (Malo)
-                        </span>
-                        <div className="flex-1">
-                          <input
-                            type="range"
-                            min="1"
-                            max="10"
-                            value={checklistData.calificacion ?? 1}
-                            onChange={(e) =>
-                              setChecklistData((prev) => ({
-                                ...prev,
-                                calificacion: Number(e.target.value),
-                              }))
-                            }
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                            disabled={checklistCompleted}
-                          />
-                        </div>
-                        <span className="text-sm text-green-500 font-medium">
-                          10 (Excelente)
-                        </span>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-lg font-bold text-gray-700">
-                          Calificación: {checklistData.calificacion ?? 1}/10
-                        </span>
-                        <span className="block text-sm text-gray-500">
-                          {(checklistData.calificacion ?? 1) <= 3
-                            ? "Malo"
-                            : (checklistData.calificacion ?? 1) <= 7
-                            ? "Regular"
-                            : "Excelente"}
+                        <input
+                          type="checkbox"
+                          checked={checkedItems.includes(`${i}-${campo}`)}
+                          onChange={() => {
+                            if (checklistCompleted) return;
+                            toggleChecklistItem(`${i}-${campo}`);
+                          }}
+                          disabled={checklistCompleted}
+                        />
+                        <span
+                          className={`text-sm ${
+                            checkedItems.includes(`${i}-${campo}`)
+                              ? "line-through text-gray-500"
+                              : ""
+                          }`}
+                        >
+                          Completado
                         </span>
                       </div>
                     </div>
-                  )}
-                  {newMante.checklist_plantillas?.tipo_calificacion ===
-                    "CATEGORIA" && (
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-3 gap-2">
-                        {(["malo", "bueno", "excelente"] as const).map(
-                          (categoria, index) => (
-                            <Button
-                              key={categoria}
-                              type="button"
-                              variant={
-                                calificacionCategorica === categoria
-                                  ? "default"
-                                  : "outline"
-                              }
-                              onClick={() => {
-                                if (checklistCompleted) return;
-                                setCalificacionCategorica(categoria);
-                                setChecklistData((prev) => ({
-                                  ...prev,
-                                  calificacion: index + 1,
-                                }));
-                              }}
-                              disabled={checklistCompleted}
-                              className={`capitalize ${
-                                calificacionCategorica === categoria
-                                  ? categoria === "malo"
-                                    ? "bg-red-500 hover:bg-red-600"
-                                    : categoria === "bueno"
-                                    ? "bg-yellow-500 hover:bg-yellow-600"
-                                    : "bg-green-500 hover:bg-green-600"
-                                  : ""
-                              }`}
-                            >
-                              {categoria === "malo"
-                                ? "😞 Malo"
-                                : categoria === "bueno"
-                                ? "😐 Bueno"
-                                : "😄 Excelente"}
-                            </Button>
-                          )
-                        )}
-                      </div>
-                      <div className="text-center text-sm text-gray-600">
-                        Estado seleccionado:{" "}
-                        <span className="font-semibold capitalize">
-                          {calificacionCategorica}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="text-right">
-                  <Button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      completeChecklist();
-                    }}
-                    disabled={checklistCompleted || !isChecklistCompleto}
-                  >
-                    Guardar checklist
-                  </Button>
+                  ))}
                 </div>
               </div>
-            )}
+            ))}
           </section>
 
           {!checklistCompleted && (
@@ -547,7 +405,7 @@ const MantenimientoDetalle = () => {
                                 tipo_archivo: file.type,
                                 archivos: [file],
                                 archivo: {
-                                  content: reader.result as string, 
+                                  content: reader.result as string,
                                   nombre: file.name,
                                   tipo: file.type,
                                 },
