@@ -37,6 +37,100 @@ export const manteModel = {
                     select: {
                       sucursales: {
                         include: {
+                          sedes: { select: { nombre: true } },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              impresoras: {
+                include: {
+                  sucursales: {
+                    include: { sedes: { select: { nombre: true } } },
+                  },
+                },
+              },
+              perifericos: {
+                include: {
+                  sucursales: {
+                    include: { sedes: { select: { nombre: true } } },
+                  },
+                },
+              },
+              checklist_respuestas: {
+                orderBy: { fecha_realizacion: "desc" },
+                take: 1,
+                select: { calificacion: true, fecha_realizacion: true },
+              },
+            },
+          },
+        },
+      });
+
+      return mante.map((m) => ({
+        ...m,
+        archivosmantenimiento: m.archivosmantenimiento.map((a) => ({
+          ...a,
+          archivo: a.archivo
+            ? {
+                content: Buffer.from(a.archivo).toString("base64"),
+                nombre: a.nombre_archivo,
+                tipo: a.tipo_archivo,
+              }
+            : null,
+        })),
+      }));
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener mantenimientos");
+    }
+  },
+  async getById(id) {
+    const id_mantenimiento = Number(id);
+    try {
+      const mante = await prisma.mantenimientos.findUnique({
+        select: {
+          id_mantenimiento: true,
+          tecnico_id: true,
+          usuarios: { select: { nombre: true, rol: true, email: true } },
+          fecha_programada: true,
+          tipo: true,
+          prioridad: true,
+          descripcion: true,
+          tiempo_estimado: true,
+          recomendaciones: true,
+          observaciones_adi: true,
+          estado: true,
+          progreso: true,
+          checklist_campos: true,
+          checklist_plantillas: {
+            select: {
+              id_plantilla: true,
+              nombre: true,
+              tipo_equipo: true,
+              tipo_calificacion: true,
+              campos: true,
+              creado_por: true,
+              fecha_creacion: true,
+              usuarios: {
+                select: {
+                  id_usuario: true,
+                  nombre: true,
+                  email: true,
+                  rol: true,
+                },
+              },
+            },
+          },
+          mantenimiento_detalle: {
+            include: {
+              equipos: {
+                include: {
+                  estado_ubicacion: {
+                    include: {
+                      sucursales: {
+                        include: {
                           sedes: {
                             include: {
                               usuario_sede: {
@@ -54,6 +148,9 @@ export const manteModel = {
                           },
                         },
                       },
+                      usuarios: {
+                        select: { nombre: true, rol: true, id_usuario: true },
+                      },
                     },
                   },
                 },
@@ -61,164 +158,32 @@ export const manteModel = {
               impresoras: {
                 include: {
                   sucursales: {
-                    include: {
-                      sedes: {
-                        select: {
-                          nombre: true,
-                        },
-                      },
-                    },
+                    include: { sedes: { select: { nombre: true } } },
                   },
                 },
               },
               perifericos: {
                 include: {
                   sucursales: {
-                    include: {
-                      sedes: {
-                        select: {
-                          nombre: true,
-                        },
-                      },
-                    },
+                    include: { sedes: { select: { nombre: true } } },
                   },
                 },
+              },
+              checklist_respuestas: {
+                orderBy: { fecha_realizacion: "desc" },
+                take: 1,
               },
             },
           },
         },
+        where: { id_mantenimiento },
       });
 
-      const result = mante.map((m) => ({
-        ...m,
-        archivosmantenimiento: m.archivosmantenimiento.map((a) => ({
-          ...a,
-          archivo: a.archivo
-            ? {
-                content: Buffer.from(a.archivo).toString("base64"),
-                nombre: a.nombre_archivo,
-                tipo: a.tipo_archivo,
-              }
-            : null,
-        })),
-      }));
-
-      return result;
+      return mante;
     } catch (error) {
       console.log(error);
-      throw new Error("Error al obtener mantenimientos");
+      throw new Error("Error al obtener el mantenimiento");
     }
-  },
-  async getById(id) {
-    const id_mantenimiento = Number(id);
-    const mante = await prisma.mantenimientos.findUnique({
-      select: {
-        id_mantenimiento: true,
-        tecnico_id: true,
-        usuarios: {
-          select: {
-            nombre: true,
-            rol: true,
-            email: true,
-          },
-        },
-        fecha_programada: true,
-        tipo: true,
-        prioridad: true,
-        descripcion: true,
-        tiempo_estimado: true,
-        recomendaciones: true,
-        observaciones_adi: true,
-        estado: true,
-        progreso: true,
-        checklist_campos: true,
-        checklist_plantillas: {
-          select: {
-            id_plantilla: true,
-            nombre: true,
-            tipo_equipo: true,
-            tipo_calificacion: true,
-            campos: true,
-            creado_por: true,
-            fecha_creacion: true,
-            usuarios: {
-              select: {
-                id_usuario: true,
-                nombre: true,
-                email: true,
-                rol: true,
-              },
-            },
-          },
-        },
-        mantenimiento_detalle: {
-          include: {
-            equipos: {
-              include: {
-                estado_ubicacion: {
-                  include: {
-                    sucursales: {
-                      include: {
-                        sedes: {
-                          include: {
-                            usuario_sede: {
-                              include: {
-                                usuarios: {
-                                  select: {
-                                    nombre: true,
-                                    email: true,
-                                    rol: true,
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                    usuarios: {
-                      select: {
-                        nombre: true,
-                        rol: true,
-                        id_usuario: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            impresoras: {
-              include: {
-                sucursales: {
-                  include: {
-                    sedes: {
-                      select: {
-                        nombre: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            perifericos: {
-              include: {
-                sucursales: {
-                  include: {
-                    sedes: {
-                      select: {
-                        nombre: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      where: { id_mantenimiento },
-    });
-    return mante;
   },
   async create(data) {
     try {
@@ -246,7 +211,7 @@ export const manteModel = {
       if (data.mantenimiento_detalle && data.mantenimiento_detalle.length > 0) {
         for (const detalle of data.mantenimiento_detalle) {
           if (detalle.equipos) {
-            await prisma.mantenimiento_detalle.create({
+            const detalleCreado = await prisma.mantenimiento_detalle.create({
               data: {
                 mantenimientos: {
                   connect: { id_mantenimiento: mante.id_mantenimiento },
@@ -264,10 +229,24 @@ export const manteModel = {
               where: { equipo_asociado_id: detalle.equipos.id_equipo },
               data: { estado: "En mantenimiento" },
             });
+
+            if (detalle.plantilla_id) {
+              await prisma.checklist_respuestas.create({
+                data: {
+                  mantenimiento_id: mante.id_mantenimiento,
+                  plantilla_id: detalle.plantilla_id,
+                  tecnico_id: data.tecnico_id,
+                  respuestas: {},
+                  calificacion: 0,
+                  observaciones: "",
+                  detalle_id: detalleCreado.id_detalle,
+                },
+              });
+            }
           }
 
           if (detalle.impresoras) {
-            await prisma.mantenimiento_detalle.create({
+            const detalleCreado = await prisma.mantenimiento_detalle.create({
               data: {
                 mantenimientos: {
                   connect: { id_mantenimiento: mante.id_mantenimiento },
@@ -282,10 +261,24 @@ export const manteModel = {
               where: { id_impresora: detalle.impresoras.id_impresora },
               data: { estado: "En mantenimiento" },
             });
+
+            if (detalle.plantilla_id) {
+              await prisma.checklist_respuestas.create({
+                data: {
+                  mantenimiento_id: mante.id_mantenimiento,
+                  plantilla_id: detalle.plantilla_id,
+                  tecnico_id: data.tecnico_id,
+                  respuestas: {},
+                  calificacion: 0,
+                  observaciones: "",
+                  detalle_id: detalleCreado.id_detalle,
+                },
+              });
+            }
           }
 
           if (detalle.perifericos) {
-            await prisma.mantenimiento_detalle.create({
+            const detalleCreado = await prisma.mantenimiento_detalle.create({
               data: {
                 mantenimientos: {
                   connect: { id_mantenimiento: mante.id_mantenimiento },
@@ -300,6 +293,20 @@ export const manteModel = {
               where: { id_periferico: detalle.perifericos.id_periferico },
               data: { estado: "En mantenimiento" },
             });
+
+            if (detalle.plantilla_id) {
+              await prisma.checklist_respuestas.create({
+                data: {
+                  mantenimiento_id: mante.id_mantenimiento,
+                  plantilla_id: detalle.plantilla_id,
+                  tecnico_id: data.tecnico_id,
+                  respuestas: {},
+                  calificacion: 0,
+                  observaciones: "",
+                  detalle_id: detalleCreado.id_detalle,
+                },
+              });
+            }
           }
         }
       }
