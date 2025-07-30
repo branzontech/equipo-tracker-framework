@@ -248,36 +248,74 @@ const MantenimientosIndex = () => {
       setNewMante((prev) => ({
         ...prev,
         mantenimiento_detalle: prev.mantenimiento_detalle.filter((detalle) => {
-          if (item.tipo === "equipo")
-            return detalle.equipos?.id_equipo !== item.id;
-          if (item.tipo === "impresora")
-            return detalle.impresoras?.id_impresora !== item.id;
-          if (item.tipo === "periferico")
-            return detalle.perifericos?.id_periferico !== item.id;
-          return true;
+          switch (item.tipo) {
+            case "equipo":
+              return detalle.equipos?.id_equipo !== item.id;
+            case "impresora":
+              return detalle.impresoras?.id_impresora !== item.id;
+            case "periferico":
+              return detalle.perifericos?.id_periferico !== item.id;
+            default:
+              return true;
+          }
         }),
       }));
     } else {
       setEquiposSeleccionados((prev) => [...prev, item]);
 
       setNewMante((prev) => {
-        const updated = {
+        const equiposFull = equipo.find((eq) => eq.id_equipo === item.id);
+        const impresorasFull = impresora.find(
+          (im) => im.id_impresora === item.id
+        );
+        const perifericosFull = perifericos.find(
+          (pe) => pe.id_periferico === item.id
+        );
+
+        return {
           ...prev,
           mantenimiento_detalle: [
             ...prev.mantenimiento_detalle,
             {
-              equipos: item.tipo === "equipo" ? { id_equipo: item.id } : null,
+              equipos: item.tipo === "equipo" ? equiposFull || null : null,
               impresoras:
-                item.tipo === "impresora" ? { id_impresora: item.id } : null,
+                item.tipo === "impresora" ? impresorasFull || null : null,
               perifericos:
-                item.tipo === "periferico" ? { id_periferico: item.id } : null,
+                item.tipo === "periferico" ? perifericosFull || null : null,
             },
           ],
         };
-        return updated;
       });
     }
   };
+
+  // NEW LOGICA
+  function updateDetalle(index, key, value) {
+    const detalles = [...newMante.mantenimiento_detalle];
+    detalles[index][key] = value;
+    setNewMante({ ...newMante, mantenimiento_detalle: detalles });
+  }
+
+  const toggleCampo = (index: number, campo: string, checked: boolean) => {
+    const detalles = [...newMante.mantenimiento_detalle];
+    const camposActuales = detalles[index].checklist_campos || [];
+
+    detalles[index].checklist_campos = checked
+      ? [...camposActuales, campo] // agrega
+      : camposActuales.filter((c) => c !== campo); // quita
+
+    setNewMante({
+      ...newMante,
+      mantenimiento_detalle: detalles,
+    });
+  };
+
+  function tipoDelActivo(detalle) {
+    if (detalle.equipos) return "EQUIPO";
+    if (detalle.perifericos) return "PERIFERICO";
+    if (detalle.impresoras) return "IMPRESORA";
+    return "";
+  }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -292,12 +330,12 @@ const MantenimientosIndex = () => {
               <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-[#01242c]">
                   <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-[#01242c]" />
-                  <span>Nuevo Mantenimiento</span>
+                  <span>Programación</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 sm:p-6 pt-0">
                 <p className="text-xs sm:text-sm text-[#01242c] opacity-90">
-                  Crear un nuevo registro de mantenimiento para un equipo.
+                  Programa mantenimientos para muchos equipos.
                 </p>
               </CardContent>
             </Card>
@@ -1012,13 +1050,47 @@ const MantenimientosIndex = () => {
                     />
                   </div>
 
-                  <ListaChequeoSimple
-                    checklist={checklist}
-                    plantillaSeleccionada={plantillaSeleccionada}
-                    onChangePlantilla={handleChangePlantilla}
-                    itemsSeleccionados={itemsChequeo}
-                    onToggleItem={toggleItem}
-                  />
+                  {newMante.mantenimiento_detalle.map((detalle, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="space-y-2 border p-4 rounded-md"
+                      >
+                        <div className="font-medium text-sm mb-2 space-y-1">
+                          {detalle.equipos?.nombre_equipo && (
+                            <div>Equipo: {detalle.equipos.nombre_equipo}</div>
+                          )}
+                          {detalle.perifericos?.nombre && (
+                            <div>Periférico: {detalle.perifericos.nombre}</div>
+                          )}
+                          {detalle.impresoras?.nombre && (
+                            <div>Impresora: {detalle.impresoras.nombre}</div>
+                          )}
+                        </div>
+
+                        <ListaChequeoSimple
+                          checklist={checklist}
+                          tipoEquipo={tipoDelActivo(detalle)}
+                          plantillaSeleccionada={
+                            checklist.find(
+                              (p) => p.id_plantilla === detalle.plantilla_id
+                            ) || null
+                          }
+                          itemsSeleccionados={detalle.checklist_campos || []}
+                          onToggleItem={(campo, checked) =>
+                            toggleCampo(index, campo, checked)
+                          }
+                          onChangePlantilla={(plantilla) =>
+                            updateDetalle(
+                              index,
+                              "plantilla_id",
+                              plantilla?.id_plantilla
+                            )
+                          }
+                        />
+                      </div>
+                    );
+                  })}
 
                   <Separator />
 
@@ -1063,7 +1135,7 @@ const MantenimientosIndex = () => {
 
         <ListaChequeo />
 
-        <Card
+        {/* <Card
           className="hover:shadow-lg transition-shadow cursor-pointer bg-[#bff036]"
           onClick={() => navigate("/mantenimientos/programacion")}
         >
@@ -1078,7 +1150,7 @@ const MantenimientosIndex = () => {
               Programa y gestiona los mantenimientos preventivos y correctivos.
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card
           className="hover:shadow-lg transition-shadow cursor-pointer bg-[#bff036]"
