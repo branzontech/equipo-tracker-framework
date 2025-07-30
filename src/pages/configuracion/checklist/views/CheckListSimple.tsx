@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 type ListaChequeoSimpleProps = {
   checklist: Checklist[];
+  tipoEquipo: string;
   plantillaSeleccionada: Checklist | null;
   onChangePlantilla: (plantilla: Checklist | null) => void;
   itemsSeleccionados: string[];
@@ -20,12 +21,15 @@ type ListaChequeoSimpleProps = {
 
 export const ListaChequeoSimple = ({
   checklist,
+  tipoEquipo,
   plantillaSeleccionada,
   onChangePlantilla,
   itemsSeleccionados,
   onToggleItem,
 }: ListaChequeoSimpleProps) => {
-  const checklisEnable = checklist.filter((c) => c.estado === "Habilitado");
+  const checklisEnable = checklist.filter(
+    (c) => c.estado === "Habilitado" && c.tipo_equipo === tipoEquipo
+  );
 
   return (
     <div className="space-y-4">
