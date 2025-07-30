@@ -14,6 +14,7 @@ export interface Checklist {
 
 export interface ChecklistRespuestaData {
   mantenimientoId: number;
+  detalleId: number;
   plantillaId?: number;
   tecnicoId?: number;
   respuestas?: Record<string, boolean>;
