@@ -437,7 +437,7 @@ export const useGlobal = () => {
     openFileInNewTab,
     downloadFile,
     mantenimientosData,
-    countAtrasados
+    countAtrasados,
   };
 };
 
@@ -459,7 +459,7 @@ export const formatFecha = (fechaIso?: string | Date) => {
       fecha.getUTCSeconds() === 0;
 
     if (isMedianocheUTC) {
-      fecha.setUTCHours(12, 0, 0, 0); // 👈 evita que se reste un día al convertir a Bogotá
+      fecha.setUTCHours(12, 0, 0, 0); 
     }
   } else {
     fecha = fechaIso;
@@ -471,4 +471,28 @@ export const formatFecha = (fechaIso?: string | Date) => {
     timeZone: zona,
     locale: es,
   });
+};
+
+export const getFechaZonificada = (fechaIso?: string | Date) => {
+  if (!fechaIso) return null;
+
+  const zona = "America/Bogota";
+  let fecha: Date;
+
+  if (typeof fechaIso === "string") {
+    fecha = parseISO(fechaIso);
+
+    const isMedianocheUTC =
+      fecha.getUTCHours() === 0 &&
+      fecha.getUTCMinutes() === 0 &&
+      fecha.getUTCSeconds() === 0;
+
+    if (isMedianocheUTC) {
+      fecha.setUTCHours(12, 0, 0, 0);
+    }
+  } else {
+    fecha = fechaIso;
+  }
+
+  return toZonedTime(fecha, zona);
 };
