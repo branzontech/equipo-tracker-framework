@@ -12,6 +12,9 @@ export interface Mantenimiento {
     equipos: Equipo | null;
     impresoras: Impresora | null;
     perifericos: Perifericos | null;
+    plantilla_id?: number;
+    checklist_campos?: string[];
+    checklist_plantillas?: Checklist;
   }[];
 
   tecnico_id: number;
@@ -26,9 +29,6 @@ export interface Mantenimiento {
   observaciones_adi: string;
   estado: string;
   progreso: number;
-  plantilla_id: number;
-  checklist_plantillas: Checklist;
-  checklist_campos: string[];
 
   archivosmantenimiento: {
     id_archivo: number;
@@ -55,8 +55,8 @@ export interface TableColumn {
 }
 
 export interface EstadoInfo {
-  value: string;        
-  label: string;        
-  icon: LucideIcon;     
-  color: string;      
+  value: string;
+  label: string;
+  icon: LucideIcon;
+  color: string;
 }
