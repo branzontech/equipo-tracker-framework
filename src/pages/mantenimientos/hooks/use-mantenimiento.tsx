@@ -21,6 +21,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useEquipos } from "@/pages/productos/hooks/use-equipos";
+import { getFechaZonificada } from "@/hooks/use-global";
 
 export const useMantenimiento = () => {
   const [mantenimientos, setMantenimientos] = useState<Mantenimiento[]>([]);
@@ -39,9 +40,6 @@ export const useMantenimiento = () => {
     estado: "Pendiente",
     progreso: 0,
     archivosmantenimiento: [],
-    checklist_campos: [],
-    plantilla_id: null,
-    checklist_plantillas: null,
     mantenimiento_detalle: [],
   });
   const [currentTab, setCurrentTab] = useState("equipo");
@@ -120,15 +118,15 @@ export const useMantenimiento = () => {
     const fetchMantenimientos = async () => {
       const mantenimientos = await getAll();
 
-      // verificar que la fecha del mantenimeinto sea igual a la de hoy
-      // y actulizar el estado
-      const hoy = new Date();
+      const hoy = getFechaZonificada(new Date());
       let alDia = 0;
       let próximos = 0;
       let vencidos = 0;
 
       mantenimientos.forEach((mantenimiento) => {
-        const fechaProgramada = new Date(mantenimiento.fecha_programada);
+        const fechaProgramada = getFechaZonificada(
+          mantenimiento.fecha_programada
+        );
 
         const esHoy =
           fechaProgramada.getUTCDate() === hoy.getUTCDate() &&
@@ -177,14 +175,13 @@ export const useMantenimiento = () => {
       {
         valor: newMante.mantenimiento_detalle.some(
           (detalle) =>
-            detalle.equipos?.id_equipo ||
-            detalle.impresoras?.id_impresora ||
-            detalle.perifericos?.id_periferico
+            detalle.equipos != null ||
+            detalle.impresoras != null ||
+            detalle.perifericos != null
         ),
         mensaje: "Debe agregar al menos un equipo, impresora o periférico",
       },
     ],
-
     detalles: [
       {
         valor: newMante.tipo,
@@ -257,6 +254,49 @@ export const useMantenimiento = () => {
   };
 
   const onSubmit = async (data: Mantenimiento) => {
+    console.log("DATA:", data);
+    if (!data.fecha_programada) {
+      toast.error("Debe ingresar una fecha de programación", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.tiempo_estimado) {
+      toast.error("Debe ingresar un tiempo estimado", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.recomendaciones) {
+      toast.error("Debe ingresar las recomendaciones", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.mantenimiento_detalle?.[0]?.plantilla_id) {
+      toast.error("Debe seleccionar una plantilla", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.mantenimiento_detalle?.[0]?.checklist_campos) {
+      toast.error("Debe seleccionar por lo menos un campo de la plantilla", {
+        icon: icons.error,
+      });
+      return;
+    }
+
+    if (!data.observaciones_adi) {
+      toast.error("Debe ingresar las observaciones adicionales", {
+        icon: icons.error,
+      });
+      return;
+    }
+
     try {
       const response = await create(data);
       if (response.success) {
@@ -976,6 +1016,6 @@ export const useMantenimiento = () => {
     setNombrePlantilla,
     toggleItem,
     mantenimientosData,
-    countAtrasados
+    countAtrasados,
   };
 };
