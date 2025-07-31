@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 prisma
 .env
+.env.qa
 dist
 dist-ssr
 *.local
