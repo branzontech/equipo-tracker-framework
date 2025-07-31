@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
-dotenv.config({ path: './.env' });
+const envFile = process.env.NODE_ENV === 'qa' ? './.env.qa' : './.env';
+dotenv.config({ path: envFile });
 
 // Define the environment variables
 const { 
