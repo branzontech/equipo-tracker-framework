@@ -33,7 +33,7 @@ export const getPerifericoBySerial = async (serial: string) => {
 
 export const updatePeriferico = async (id: number, periferico: Perifericos) => {
   try {
-    const response = await api.put(`/perifericos/${id}`, periferico);
+    const response = await api.put(`/perifericos/update/${id}`, periferico);
     return response.data;
   } catch (error) {
     console.error("Error updating periferico:", error);
@@ -53,7 +53,7 @@ export const createPeriferico = async (periferico: Perifericos) => {
 
 export const deletePeriferico = async (id: number) => {
   try {
-    const response = await api.delete(`/perifericos/${id}`);
+    const response = await api.delete(`/perifericos/delete${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting periferico:", error);

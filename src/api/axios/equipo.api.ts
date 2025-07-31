@@ -39,7 +39,7 @@ export const getEquiposByNroSerie = async (nroSerie: string) => {
 
 export const deleteEquipo = async (id: number) => {
   try {
-    const response = await api.delete(`/equipos/${id}`);
+    const response = await api.delete(`/equipos/delete/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message);

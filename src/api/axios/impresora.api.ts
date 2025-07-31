@@ -7,7 +7,7 @@ export const getImpresora = async () => {
 };
 
 export const getImpresoraById = async (id: number) => {
-  const response = await api.get(`/impresoras/${id}`);
+  const response = await api.get(`/impresoras/getId/${id}`);
   return response.data;
 };
 

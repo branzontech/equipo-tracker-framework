@@ -12,7 +12,7 @@ const router = express.Router();
 
 router
   .get("/get", getAll)
-  .get("/:id", getById)
+  .get("/getId/:id", getById)
   .get("/get/:serial", getBySerial)
   .post("/create", createImpresora)
   .put("/update/:id", update)

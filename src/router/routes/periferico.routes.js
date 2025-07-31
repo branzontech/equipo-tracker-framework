@@ -15,7 +15,7 @@ router
     .get("/get", findAll)
     .get("/get/:id", findById)
     .get("/getPeriferico/:serial", findBySerial)
-    .put("/:id", update)
-    .delete("/:id", delete_)
+    .put("/update/:id", update)
+    .delete("/delete/:id", delete_)
 
 export default router;

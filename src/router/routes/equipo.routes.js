@@ -7,8 +7,8 @@ router
     .post("/create", create)
     .post("/update", update)
     .get("/get", findAll)
+    .get("/trazabilidad/:id_equipo", getTrazabilidadByEquipoId)
     .get("/:nro_serie", findAllById)
-    .delete("/:id", delete_)
-    .get("/trazabilidad/:id_equipo", getTrazabilidadByEquipoId);
+    .delete("/delete/:id", delete_);
 
 export default router;
