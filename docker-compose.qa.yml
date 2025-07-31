@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    environment:
+      - NODE_ENV=qa
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env.qa
+    depends_on:
+      - db
+    command: sh -c "npm run build && npx prisma generate && npx prisma migrate deploy && npm run seed && npm start"
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 11122005M
+      POSTGRES_DB: smart_ti_qa
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
