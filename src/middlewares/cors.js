@@ -4,15 +4,21 @@ const { allowedOrigins } = config();
 
 export const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      return callback(null, true);
+    }
 
-    const isAllowed = allowedOrigins.some((allowed) =>
-      origin.startsWith(allowed)
-    );
+    const cleanOrigin = origin.trim();
+    const cleanAllowed = allowedOrigins.map((o) => o.trim());
+    const isAllowed = cleanAllowed.includes(cleanOrigin);
 
     if (isAllowed) {
       return callback(null, true);
     } else {
+      if (cleanOrigin.match(/^http:\/\/localhost:\d+$/)) {
+        return callback(null, true);
+      }
+
       const error = new Error(
         "CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
       );
